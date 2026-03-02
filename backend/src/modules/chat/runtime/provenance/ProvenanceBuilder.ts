@@ -38,13 +38,17 @@ function anchoredSnippetCoverage(
   if (!normalizedAnswer || !normalizedSnippet) return 0;
   const anchors: string[] = [];
   if (normalizedSnippet.length >= 20) {
-    anchors.push(normalizedSnippet.slice(0, Math.min(90, normalizedSnippet.length)));
+    anchors.push(
+      normalizedSnippet.slice(0, Math.min(90, normalizedSnippet.length)),
+    );
   }
   if (normalizedSnippet.length >= 140) {
     anchors.push(normalizedSnippet.slice(-90));
   }
   if (anchors.length === 0) return 0;
-  const matched = anchors.filter((anchor) => normalizedAnswer.includes(anchor)).length;
+  const matched = anchors.filter((anchor) =>
+    normalizedAnswer.includes(anchor),
+  ).length;
   return matched / anchors.length;
 }
 
@@ -82,7 +86,9 @@ function resolveMinSnippetCoverage(answerMode?: AnswerMode): number {
 }
 
 function isStrictProvenanceV2Enabled(): boolean {
-  const raw = String(process.env.STRICT_PROVENANCE_V2 || "").trim().toLowerCase();
+  const raw = String(process.env.STRICT_PROVENANCE_V2 || "")
+    .trim()
+    .toLowerCase();
   if (!raw) return true;
   return !["0", "false", "off", "no"].includes(raw);
 }
@@ -166,7 +172,9 @@ export function buildChatProvenance(params: {
       }
     }
 
-    const evidenceIdsUsed = Array.from(new Set(legacyRefs.map((ref) => ref.evidenceId)));
+    const evidenceIdsUsed = Array.from(
+      new Set(legacyRefs.map((ref) => ref.evidenceId)),
+    );
     const sourceDocumentIds = Array.from(
       new Set(legacyRefs.map((ref) => ref.documentId)),
     );

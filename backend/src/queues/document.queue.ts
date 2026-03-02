@@ -535,9 +535,9 @@ const processDocumentAsync = async (
   const wasSkipped = (extraction as any).skipped === true;
   const extractedOcrUsed = Boolean(
     mimeType.startsWith("image/") ||
-      (extraction as any).ocrApplied ||
-      (extraction as any).ocrUsed ||
-      ((extraction as any).ocrPageCount ?? 0) > 0,
+    (extraction as any).ocrApplied ||
+    (extraction as any).ocrUsed ||
+    ((extraction as any).ocrPageCount ?? 0) > 0,
   );
   const ocrConfidence = extractedOcrUsed
     ? clamp01(

@@ -16,9 +16,8 @@ describe("Certification: evidence fidelity", () => {
   });
 
   test("doc-grounded output enforces structured provenance map integrity", async () => {
-    const { ResponseContractEnforcerService } = await import(
-      "../../services/core/enforcement/responseContractEnforcer.service"
-    );
+    const { ResponseContractEnforcerService } =
+      await import("../../services/core/enforcement/responseContractEnforcer.service");
 
     const enforcer = new ResponseContractEnforcerService();
 

@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "id": "dedupe_and_repetition",
+    "version": "1.0.0",
+    "description": "Dedupe and repetition controls for quality gates.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "maxDuplicateSentences": 0
+  },
+  "bannedPhrases": [
+    "no relevant information found",
+    "nothing found",
+    "as an ai language model"
+  ],
+  "bannedPatterns": [
+    "\\bno relevant info found\\b",
+    "\\bI could not find relevant content\\b"
+  ],
+  "rules": [
+    {
+      "id": "DR_001_no_exact_sentence_repetition",
+      "severity": "warning",
+      "description": "Detect exact sentence repetition within a response.",
+      "failureAction": "REPHRASE"
+    },
+    {
+      "id": "DR_002_near_duplicate_paraphrase",
+      "severity": "warning",
+      "description": "Detect paraphrased repetition in same answer.",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "DR_003_cross_turn_repetition",
+      "severity": "warning",
+      "description": "Detect repeating same answer across turns.",
+      "failureAction": "WARN"
+    }
+  ]
+}

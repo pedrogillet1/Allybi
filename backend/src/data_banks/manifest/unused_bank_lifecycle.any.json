@@ -6,6 +6,9 @@
     "languages": ["any"],
     "lastUpdated": "2026-02-28"
   },
+  "config": {
+    "enabled": true
+  },
   "defaultStatus": "deprecated_keep",
   "allowCandidateInStrict": false,
   "allowedStatuses": [

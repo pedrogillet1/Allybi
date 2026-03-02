@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "legal_risk_heuristics",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Legal risk heuristics with severity baselines, trigger patterns, and deterministic escalation/disambiguation actions.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "legal"
+    "domain": "legal",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "legal",
   "definitions": [
@@ -2806,6 +2821,21 @@
           "en": "This wording is ambiguous. Which interpretation should I apply for risk scoring?",
           "pt": "Esta redação é ambígua. Qual interpretação devo aplicar para pontuação de risco?"
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:ambiguous_clause_text_requires_disambiguation_before_final_severity",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2846,6 +2876,21 @@
           "en": "Termination rights are asymmetric with no exit compensation. Should I flag this imbalance?",
           "pt": "Os direitos de rescisão são assimétricos sem compensação de saída. Devo sinalizar este desequilíbrio?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:flag_asymmetric_termination_rights_without_exit_compensation",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2886,6 +2931,21 @@
           "en": "Auto-renewal cancellation window is not clearly identified. Should I flag the notice requirements?",
           "pt": "A janela de cancelamento da renovação automática não está claramente identificada. Devo sinalizar os requisitos de aviso?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:auto_renewal_terms_need_cancellation_window_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2926,6 +2986,21 @@
           "en": "Blanket consent lacks scope limitations. Should I flag for restriction?",
           "pt": "O consentimento genérico não possui limitações de escopo. Devo sinalizar para restrição?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:blanket_consent_provisions_need_scope_limitation_check",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2966,6 +3041,21 @@
           "en": "Multiple carve-outs may erode the liability cap. Should I calculate aggregate exposure?",
           "pt": "Múltiplos carve-outs podem erodir o teto de responsabilidade. Devo calcular a exposição agregada?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:cap_erosion_through_multiple_carve_outs_needs_aggregate_tracking",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3004,6 +3094,21 @@
           "en": "Should I flag uncapped indemnity plus capped liability as severe imbalance?",
           "pt": "Devo sinalizar indenização sem limite com responsabilidade limitada como desequilíbrio severo?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:indemnity_uncapped_while_liability_capped_indicates_structural_imbalance",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3044,6 +3149,21 @@
           "en": "Change of control trigger definition may be too broad or narrow. Should I assess the scope?",
           "pt": "A definição do gatilho de mudança de controle pode ser muito ampla ou estreita. Devo avaliar o escopo?"
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:change_of_control_triggers_need_definition_breadth_assessment",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3080,6 +3200,21 @@
           "en": "Multiple high-risk signals were found. Should I escalate as critical composite risk?",
           "pt": "Foram encontrados múltiplos sinais de alto risco. Devo escalar como risco crítico composto?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:combine_signals_to_escalate_when_2+_high_risks_coexist",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3120,6 +3255,21 @@
           "en": "Consent threshold does not distinguish supermajority from simple majority. Should I flag this?",
           "pt": "O limiar de consentimento não distingue supermaioria de maioria simples. Devo sinalizar?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:consent_thresholds_need_supermajority_vs_majority_distinction",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3160,6 +3310,21 @@
           "en": "Counterparty credit assessment does not consider currency exposure. Should I flag for analysis?",
           "pt": "A avaliação de crédito da contraparte não considera exposição cambial. Devo sinalizar para análise?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:counterparty_credit_assessment_needs_currency_exposure_analysis",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3200,6 +3365,21 @@
           "en": "Cure period appears shorter than industry standard. Should I flag for extension?",
           "pt": "O prazo de cura parece mais curto que o padrão do setor. Devo sinalizar para extensão?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:cure_periods_shorter_than_industry_standard_need_flagging",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3238,6 +3418,21 @@
           "en": "Should I escalate this to critical because breach notice obligations are missing?",
           "pt": "Devo escalar para crítico porque faltam obrigações de notificação de incidente?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:missing_breach_notice_with_personal_data_processing_is_critical",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3278,6 +3473,21 @@
           "en": "Data localization requirements lack jurisdictional mapping. Should I identify the affected jurisdictions?",
           "pt": "Os requisitos de localização de dados não possuem mapeamento jurisdicional. Devo identificar as jurisdições afetadas?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:data_localization_requirements_need_jurisdictional_mapping",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3318,6 +3528,21 @@
           "en": "De minimis threshold lacks inflation indexing or currency specification. Should I flag for adjustment?",
           "pt": "O limiar de minimis não possui indexação inflacionária ou especificação de moeda. Devo sinalizar para ajuste?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:de_minimis_thresholds_need_currency_and_inflation_indexing",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3358,6 +3583,21 @@
           "en": "I detected a potential Ambiguity Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Ambiguity Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3399,6 +3639,21 @@
           "en": "I detected Costly Arbitration Seat. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Costly Arbitration Seat. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3442,6 +3697,21 @@
           "en": "I detected As-Is Warranty Disclaimer. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei As-Is Warranty Disclaimer. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3483,6 +3753,21 @@
           "en": "I detected Assignment Without Consent. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Assignment Without Consent. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3523,6 +3808,21 @@
           "en": "I detected a potential Asymmetric Obligation Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Asymmetric Obligation Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3564,6 +3864,21 @@
           "en": "I detected Unilateral Audit Right. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Unilateral Audit Right. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3605,6 +3920,21 @@
           "en": "I detected Open-Ended Audit Scope. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Open-Ended Audit Scope. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3646,6 +3976,21 @@
           "en": "I detected Silent Auto-Renewal. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Silent Auto-Renewal. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3686,6 +4031,21 @@
           "en": "I detected a potential Auto-Renewal Trap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Auto-Renewal Trap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3726,6 +4086,21 @@
           "en": "I detected a potential Benchmarking Absence Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Benchmarking Absence Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3767,6 +4142,21 @@
           "en": "I detected Benchmarking Without Limits. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Benchmarking Without Limits. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3807,6 +4197,21 @@
           "en": "I detected a potential Blanket Consent Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Blanket Consent Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3847,6 +4252,21 @@
           "en": "I detected a potential Boilerplate Override Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Boilerplate Override Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3890,6 +4310,21 @@
           "en": "I detected Broad Indemnity Trigger. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Broad Indemnity Trigger. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3931,6 +4366,21 @@
           "en": "I detected Broad Liability Exclusion. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Broad Liability Exclusion. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3972,6 +4422,21 @@
           "en": "I detected Cap Below Contract Value. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Cap Below Contract Value. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4012,6 +4477,21 @@
           "en": "I detected a potential Cap Erosion Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Cap Erosion Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4053,6 +4533,21 @@
           "en": "I detected Non-Mutual Cap. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Non-Mutual Cap. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4093,6 +4588,21 @@
           "en": "I detected a potential Carve-Out Scope Creep risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Carve-Out Scope Creep. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4134,6 +4644,21 @@
           "en": "I detected Unilateral Pricing Change. Should I mark this as a CRITICAL legal risk?",
           "pt": "Detectei Unilateral Pricing Change. Devo marcar isto como risco jurídico CRITICAL?"
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4174,6 +4699,21 @@
           "en": "I detected a potential Change of Control Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Change of Control Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4214,6 +4754,21 @@
           "en": "I detected a potential Compliance Drift Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Compliance Drift Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4255,6 +4810,21 @@
           "en": "I detected Overbroad Confidentiality Exceptions. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Overbroad Confidentiality Exceptions. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4296,6 +4866,21 @@
           "en": "I detected Short Confidentiality Survival. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Short Confidentiality Survival. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4336,6 +4921,21 @@
           "en": "I detected a potential Consent Threshold Manipulation risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Consent Threshold Manipulation. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4376,6 +4976,21 @@
           "en": "I detected a potential Counter-Party Credit Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Counter-Party Credit Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4416,6 +5031,21 @@
           "en": "I detected a potential Coverage Gap Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Coverage Gap Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4457,6 +5087,21 @@
           "en": "I detected Cross-Border Transfer Unbounded. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Cross-Border Transfer Unbounded. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4497,6 +5142,21 @@
           "en": "I detected a potential Cure Period Inadequacy risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Cure Period Inadequacy. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4538,6 +5198,21 @@
           "en": "I detected Data Breach Notice Absent. Should I mark this as a CRITICAL legal risk?",
           "pt": "Detectei Data Breach Notice Absent. Devo marcar isto como risco jurídico CRITICAL?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4578,6 +5253,21 @@
           "en": "I detected a potential Data Localization Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Data Localization Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4618,6 +5308,21 @@
           "en": "I detected a potential De Minimis Threshold Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de De Minimis Threshold Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4658,6 +5363,21 @@
           "en": "I detected a potential Deductible Stacking Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Deductible Stacking Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4698,6 +5418,21 @@
           "en": "I detected a potential Delegation of Authority Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Delegation of Authority Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4738,6 +5473,21 @@
           "en": "I detected a potential Discovery Limitation Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Discovery Limitation Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4778,6 +5528,21 @@
           "en": "I detected a potential Dispute Resolution Deadlock risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Dispute Resolution Deadlock. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4818,6 +5583,21 @@
           "en": "I detected a potential Document Version Conflict risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Document Version Conflict. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4858,6 +5638,21 @@
           "en": "I detected a potential Duty to Mitigate Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Duty to Mitigate Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4898,6 +5693,21 @@
           "en": "I detected a potential Effective Date Ambiguity risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Effective Date Ambiguity. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4938,6 +5748,21 @@
           "en": "I detected a potential Encumbrance Priority Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Encumbrance Priority Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4978,6 +5803,21 @@
           "en": "I detected a potential Escalation Path Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Escalation Path Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5018,6 +5858,21 @@
           "en": "I detected a potential Evergreen Clause Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Evergreen Clause Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5058,6 +5913,21 @@
           "en": "I detected a potential Evidence Preservation Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Evidence Preservation Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5098,6 +5968,21 @@
           "en": "I detected a potential Exclusive Remedy Trap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Exclusive Remedy Trap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5138,6 +6023,21 @@
           "en": "I detected a potential Exhaustion of Remedies Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Exhaustion of Remedies Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5178,6 +6078,21 @@
           "en": "I detected a potential Export Control Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Export Control Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5218,6 +6133,21 @@
           "en": "I detected a potential Fair Dealing Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Fair Dealing Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5259,6 +6189,21 @@
           "en": "I detected Overbroad Force Majeure. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Overbroad Force Majeure. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5299,6 +6244,21 @@
           "en": "I detected a potential Force Majeure Scope Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Force Majeure Scope Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 84,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5339,6 +6299,21 @@
           "en": "I detected a potential Governing Law Conflict risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Governing Law Conflict. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 85,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5380,6 +6355,21 @@
           "en": "I detected Unfavorable Governing Law. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Unfavorable Governing Law. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 86,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5420,6 +6410,21 @@
           "en": "I detected a potential Guarantee Scope Creep risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Guarantee Scope Creep. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 87,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5460,6 +6465,21 @@
           "en": "I detected a potential Hidden Assignment Consent risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Hidden Assignment Consent. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 88,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5501,6 +6521,21 @@
           "en": "I detected High Late Interest. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei High Late Interest. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 89,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5541,6 +6576,21 @@
           "en": "I detected a potential Holdover Period Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Holdover Period Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 90,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5581,6 +6631,21 @@
           "en": "I detected a potential Inconsistent Definitions risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Inconsistent Definitions. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 91,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5621,6 +6686,21 @@
           "en": "I detected a potential Indemnity Timing Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Indemnity Timing Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 92,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5662,6 +6742,21 @@
           "en": "I detected Indemnity Without Procedure. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Indemnity Without Procedure. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 93,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5703,6 +6798,21 @@
           "en": "I detected One-Sided Injunctive Relief. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei One-Sided Injunctive Relief. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 94,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5743,6 +6853,21 @@
           "en": "I detected a potential Insurance Coverage Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Insurance Coverage Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 95,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5784,6 +6909,21 @@
           "en": "I detected Insurance Requirements Missing. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Insurance Requirements Missing. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 96,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5824,6 +6964,21 @@
           "en": "I detected a potential Integration Clause Loophole risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Integration Clause Loophole. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 97,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5864,6 +7019,21 @@
           "en": "I detected a potential IP Contamination Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de IP Contamination Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 98,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5905,6 +7075,21 @@
           "en": "I detected IP Ownership Shift. Should I mark this as a CRITICAL legal risk?",
           "pt": "Detectei IP Ownership Shift. Devo marcar isto como risco jurídico CRITICAL?"
         }
+      },
+      "precedence": 99,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5946,6 +7131,21 @@
           "en": "I detected One-Sided Jurisdiction. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei One-Sided Jurisdiction. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 100,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5986,6 +7186,21 @@
           "en": "I detected a potential Jurisdiction Shopping Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Jurisdiction Shopping Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 101,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6026,6 +7241,21 @@
           "en": "I detected a potential Knowledge Qualifier Abuse risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Knowledge Qualifier Abuse. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 102,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6066,6 +7296,21 @@
           "en": "I detected a potential Late Notice Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Late Notice Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 103,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6107,6 +7352,21 @@
           "en": "I detected Revocable Discretionary License. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Revocable Discretionary License. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 104,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6147,6 +7407,21 @@
           "en": "I detected a potential Limitation Period Trap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Limitation Period Trap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 105,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6187,6 +7462,21 @@
           "en": "I detected a potential Liquidated Damages Adequacy risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Liquidated Damages Adequacy. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 106,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6228,6 +7518,21 @@
           "en": "I detected Penalty-Like Liquidated Damages. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Penalty-Like Liquidated Damages. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 107,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6268,6 +7573,21 @@
           "en": "I detected a potential Material Change Trigger Gap risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Material Change Trigger Gap. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 108,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6308,6 +7628,21 @@
           "en": "I detected a potential Merger Clause Scope risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Merger Clause Scope. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 109,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6349,6 +7684,21 @@
           "en": "I detected Hard Minimum Commitment. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Hard Minimum Commitment. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 110,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6389,6 +7739,21 @@
           "en": "I detected a potential Missing Escalation Clause risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Missing Escalation Clause. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 111,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6430,6 +7795,21 @@
           "en": "I detected Most Favored Customer Exposure. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Most Favored Customer Exposure. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 112,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6471,6 +7851,21 @@
           "en": "I detected Overbroad Non-Compete. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Overbroad Non-Compete. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 113,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6512,6 +7907,21 @@
           "en": "I detected Unbounded Non-Solicit. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Unbounded Non-Solicit. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 114,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6552,6 +7962,21 @@
           "en": "I detected a potential Notice Delivery Failure Risk risk. Should I flag this for detailed review?",
           "pt": "Detectei um potencial risco de Notice Delivery Failure Risk. Devo sinalizar para revisão detalhada?"
         }
+      },
+      "precedence": 115,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_presence_and_severity",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6593,6 +8018,21 @@
           "en": "I detected Unreliable Notice Method. Should I mark this as a LOW legal risk?",
           "pt": "Detectei Unreliable Notice Method. Devo marcar isto como risco jurídico LOW?"
         }
+      },
+      "precedence": 116,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6634,6 +8074,21 @@
           "en": "I detected One-Way Indemnity. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei One-Way Indemnity. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 117,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6675,6 +8130,21 @@
           "en": "I detected Payment Acceleration. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Payment Acceleration. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 118,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6716,6 +8186,21 @@
           "en": "I detected Publicity Without Approval. Should I mark this as a LOW legal risk?",
           "pt": "Detectei Publicity Without Approval. Devo marcar isto como risco jurídico LOW?"
         }
+      },
+      "precedence": 119,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6757,6 +8242,21 @@
           "en": "I detected Reseller Channel Conflict. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Reseller Channel Conflict. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 120,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6798,6 +8298,21 @@
           "en": "I detected Security Standard Absent. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Security Standard Absent. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 121,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6839,6 +8354,21 @@
           "en": "I detected Service Credit Cap Too Low. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Service Credit Cap Too Low. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 122,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6880,6 +8410,21 @@
           "en": "I detected SLA Missing Remedy. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei SLA Missing Remedy. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 123,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6921,6 +8466,21 @@
           "en": "I detected Severability Rewrite Power. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Severability Rewrite Power. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 124,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6962,6 +8522,21 @@
           "en": "I detected Short Cure Period. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Short Cure Period. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 125,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7003,6 +8578,21 @@
           "en": "I detected Source Code Escrow Absent. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Source Code Escrow Absent. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 126,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7044,6 +8634,21 @@
           "en": "I detected Unrestricted Subprocessor Use. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Unrestricted Subprocessor Use. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 127,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7085,6 +8690,21 @@
           "en": "I detected Survival Omits Key Rights. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Survival Omits Key Rights. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 128,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7126,6 +8746,21 @@
           "en": "I detected Tax Gross-Up Absent. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Tax Gross-Up Absent. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 129,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7167,6 +8802,21 @@
           "en": "I detected Termination Only for Cause. Should I mark this as a HIGH legal risk?",
           "pt": "Detectei Termination Only for Cause. Devo marcar isto como risco jurídico HIGH?"
         }
+      },
+      "precedence": 130,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7210,6 +8860,21 @@
           "en": "I detected Unlimited Liability. Should I mark this as a CRITICAL legal risk?",
           "pt": "Detectei Unlimited Liability. Devo marcar isto como risco jurídico CRITICAL?"
         }
+      },
+      "precedence": 131,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7250,6 +8915,21 @@
           "en": "I detected Waiver by Conduct Risk. Should I mark this as a MEDIUM legal risk?",
           "pt": "Detectei Waiver by Conduct Risk. Devo marcar isto como risco jurídico MEDIUM?"
         }
+      },
+      "precedence": 132,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:risk_pattern_detection",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7290,6 +8970,21 @@
           "en": "Dispute resolution lacks deadlock-breaking escalation. Should I flag for additional mechanism?",
           "pt": "A resolução de disputas não possui escalonamento para desbloqueio. Devo sinalizar para mecanismo adicional?"
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:dispute_resolution_deadlock_needs_escalation_path_verification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7330,6 +9025,21 @@
           "en": "Multiple document versions lack a precedence rule. Should I flag for hierarchy specification?",
           "pt": "Múltiplas versões de documentos não possuem regra de precedência. Devo sinalizar para especificação de hierarquia?"
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:document_version_conflicts_need_precedence_rule_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7370,6 +9080,21 @@
           "en": "Evidence preservation lacks retention period specification. Should I flag for duration?",
           "pt": "A preservação de evidências não especifica o período de retenção. Devo sinalizar para definição de prazo?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:evidence_preservation_obligations_need_retention_period_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7410,6 +9135,21 @@
           "en": "Exclusive remedy may inadvertently bar consequential damages claims. Should I assess the interaction?",
           "pt": "O remédio exclusivo pode inadvertidamente bloquear reclamações de danos consequenciais. Devo avaliar a interação?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:exclusive_remedy_provisions_need_consequential_damages_check",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7452,6 +9192,21 @@
           "en": "Force majeure may not cover pandemic, cyber events, or sanctions. Should I flag the gaps?",
           "pt": "A força maior pode não cobrir pandemia, eventos cibernéticos ou sanções. Devo sinalizar as lacunas?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:force_majeure_scope_must_cover_pandemic_cyber_sanctions",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7490,6 +9245,21 @@
           "en": "Should I highlight governing-law/forum mismatch as dispute-cost risk?",
           "pt": "Devo destacar incompatibilidade entre lei aplicável e foro como risco de custo de litígio?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:governing_law_and_forum_mismatch_may_increase_litigation_complexity",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7530,6 +9300,21 @@
           "en": "Multi-jurisdiction deal has conflicting governing law provisions. Should I flag for resolution hierarchy?",
           "pt": "Operação multijurisdicional possui disposições de lei aplicável conflitantes. Devo sinalizar para hierarquia de resolução?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:governing_law_conflict_in_multi_jurisdiction_deals_needs_resolution_hierarchy",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7570,6 +9355,21 @@
           "en": "Assignment consent may be hidden in sub-clauses. Should I flag for visibility?",
           "pt": "O consentimento de cessão pode estar oculto em subcláusulas. Devo sinalizar para visibilidade?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:hidden_assignment_consent_in_sub_clauses_needs_flagging",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7610,6 +9410,21 @@
           "en": "Definitions may be inconsistent across the document suite. Should I run a cross-reference audit?",
           "pt": "As definições podem ser inconsistentes no conjunto de documentos. Devo executar uma auditoria de referência cruzada?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:inconsistent_definitions_across_document_suite_need_cross_reference_audit",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7650,6 +9465,21 @@
           "en": "Insurance coverage may be below minimum thresholds. Should I flag for adequacy review?",
           "pt": "A cobertura de seguro pode estar abaixo dos limiares mínimos. Devo sinalizar para revisão de adequação?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:insurance_coverage_gaps_need_minimum_coverage_threshold_check",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7690,6 +9520,21 @@
           "en": "Open source components may create IP contamination risk. Should I check license compatibility?",
           "pt": "Componentes de código aberto podem criar risco de contaminação de PI. Devo verificar compatibilidade de licença?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:ip_contamination_from_open_source_needs_license_compatibility_check",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7730,6 +9575,21 @@
           "en": "Limitation period may be shorter than typical claims lifecycle. Should I flag for review?",
           "pt": "O prazo prescricional pode ser mais curto que o ciclo de vida típico de reclamações. Devo sinalizar para revisão?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:limitation_periods_shorter_than_typical_claims_lifecycle_need_warning",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7770,6 +9630,21 @@
           "en": "Liquidated damages may not bear reasonable relationship to anticipated loss. Should I assess proportionality?",
           "pt": "Os danos liquidados podem não guardar relação razoável com a perda antecipada. Devo avaliar a proporcionalidade?"
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:liquidated_damages_must_bear_reasonable_relationship_to_anticipated_loss",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7810,6 +9685,21 @@
           "en": "Material change triggers lack exhaustive definition. Should I flag for specification?",
           "pt": "Os gatilhos de mudança material não possuem definição exaustiva. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:material_change_triggers_need_exhaustive_definition_or_examples",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7850,6 +9740,21 @@
           "en": "SLA lacks an escalation clause for unresolved service issues. Should I flag for addition?",
           "pt": "O SLA não possui cláusula de escalonamento para problemas de serviço não resolvidos. Devo sinalizar para adição?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:missing_escalation_clauses_in_slas_need_flagging",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7890,6 +9795,21 @@
           "en": "Notice provisions may not address electronic delivery validity. Should I flag for modernization?",
           "pt": "As disposições de notificação podem não abordar a validade da entrega eletrônica. Devo sinalizar para atualização?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:notice_provisions_need_electronic_delivery_validity_check",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7928,6 +9848,21 @@
           "en": "I could not locate the clause text. Which section should I scan next?",
           "pt": "Não consegui localizar o texto da cláusula. Qual seção devo escanear em seguida?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:if_clause_evidence_missing,_ask_one_question_and_stop_risk_scoring",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7966,6 +9901,21 @@
           "en": "Should I include direct quote and clause location for each risk flag?",
           "pt": "Devo incluir citação direta e localização da cláusula para cada risco?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:every_risk_flag_must_include_quote_and_location",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8004,6 +9954,21 @@
           "en": "Should I classify SLA without remedy as high operational risk?",
           "pt": "Devo classificar SLA sem remédio como alto risco operacional?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:sla_commitments_without_remedies_are_high_delivery_risk",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8042,6 +10007,21 @@
           "en": "Should I classify this as lock-in risk due to limited termination flexibility?",
           "pt": "Devo classificar isto como risco de lock-in por baixa flexibilidade de rescisão?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:long_lock-in_+_no_convenience_termination_raises_commercial_lock-in_risk",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8080,6 +10060,21 @@
           "en": "Should unilateral pricing change rights be marked critical automatically?",
           "pt": "Direitos unilaterais de alteração de preço devem ser marcados automaticamente como críticos?"
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:unilateral_change_rights_on_price/scope_should_be_critical",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     }
   ]

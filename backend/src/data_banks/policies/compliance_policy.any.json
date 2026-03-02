@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "id": "compliance_policy",
+    "version": "1.0.0",
+    "description": "Compliance governance policy for consent gating, restricted export, and legal-hold safeguards.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": true
+  },
+  "rules": [
+    {
+      "id": "COMP_900_missing_consent",
+      "priority": 900,
+      "when": {
+        "all": [
+          { "path": "signals.complianceRequired", "op": "eq", "value": true },
+          { "path": "signals.userConsent", "op": "neq", "value": true }
+        ]
+      },
+      "then": {
+        "action": "block",
+        "userMessage": "I need explicit consent before continuing with this request."
+      },
+      "reasonCode": "compliance_missing_consent",
+      "terminal": true
+    },
+    {
+      "id": "COMP_850_export_restricted",
+      "priority": 850,
+      "when": {
+        "path": "signals.exportRestricted",
+        "op": "eq",
+        "value": true
+      },
+      "then": {
+        "action": "block",
+        "userMessage": "This action is restricted by compliance policy for your workspace."
+      },
+      "reasonCode": "compliance_export_restricted",
+      "terminal": true
+    },
+    {
+      "id": "COMP_820_legal_hold",
+      "priority": 820,
+      "when": {
+        "path": "signals.legalHoldActive",
+        "op": "eq",
+        "value": true
+      },
+      "then": {
+        "action": "block",
+        "userMessage": "This conversation is under legal hold; sensitive actions are disabled."
+      },
+      "reasonCode": "compliance_legal_hold_active",
+      "terminal": true
+    }
+  ]
+}

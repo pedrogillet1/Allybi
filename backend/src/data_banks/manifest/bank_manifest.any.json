@@ -3,18 +3,16 @@
     "id": "bank_manifest",
     "version": "1.1.0",
     "description": "Top-level manifest describing Koda data bank categories, their purpose, strictness, environment behavior, and dependency/load guarantees. This file defines what categories exist and how they must behave across environments.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-25"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
-
   "config": {
     "enabled": true,
-
     "strictCategories": true,
     "failOnUnknownCategory": true,
-
     "envOverridesEnabled": true,
-
     "defaults": {
       "defaultSchemaId": "bank_schema",
       "defaultCategoryPolicy": {
@@ -24,232 +22,646 @@
       }
     }
   },
-
   "allowedCategoryIds": [
     "manifest",
     "schemas",
     "normalizers",
-    "negatives",
     "routing",
     "operators",
     "semantics",
     "scope",
     "retrieval",
     "formatting",
+    "dictionaries",
+    "lexicons",
+    "parsers",
+    "intent_patterns",
     "microcopy",
     "overlays",
     "prompts",
+    "policies",
+    "fallbacks",
     "quality",
     "triggers",
     "ambiguity",
-    "state",
-    "probes"
+    "probes",
+    "templates",
+    "tests"
   ],
-
   "loadOrder": [
     "manifest",
     "schemas",
     "normalizers",
-    "negatives",
     "routing",
     "operators",
     "semantics",
     "scope",
     "retrieval",
     "formatting",
+    "dictionaries",
+    "lexicons",
+    "parsers",
+    "intent_patterns",
     "microcopy",
     "overlays",
     "prompts",
+    "policies",
+    "fallbacks",
     "quality",
     "triggers",
     "ambiguity",
-    "state",
-    "probes"
+    "probes",
+    "templates",
+    "tests"
   ],
-
   "categories": [
     {
       "id": "manifest",
       "folder": "manifest",
       "description": "Bootstrapping control plane: registry, load order, dependency resolution, schema mapping, checksums, versions, and environment flags.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": false },
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
       "dependsOnCategories": [],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "schemas",
       "folder": "schemas",
-      "description": "JSON schema contracts for bank validation and for router/scope/retrieval/evidence/attachments outputs.",
+      "description": "JSON schema contracts for bank validation and router/scope/retrieval/evidence outputs.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "normalizers",
       "folder": "normalizers",
-      "description": "Normalization for user queries and doc names: language indicators, month/number/unit normalization, filename normalization, aliases.",
+      "description": "Normalization for user queries and document names (language/month/number/unit/synonym normalization).",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
-    },
-    {
-      "id": "negatives",
-      "folder": "negatives",
-      "description": "Negation/exclusion rules and denylist terms to prevent wrong scope, unsafe matches, and routing hijacks.",
-      "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "normalizers"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "routing",
       "folder": "routing",
-      "description": "Intent/operator routing and tie-breakers. Determines WHAT the user is trying to do and sets routing signals.",
+      "description": "Intent/operator routing and tie-breakers that decide action and answer mode.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "normalizers", "negatives"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "normalizers"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "operators",
       "folder": "operators",
-      "description": "Operator contracts: allowed outputs, constraints, signals, discovery rules, and nav_pills operator list.",
+      "description": "Operator contracts, output shapes, constraints, and operator-family wiring.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "semantics",
       "folder": "semantics",
-      "description": "Semantic signals: domain, time, numeric intent, synonyms, tokenization, layout, chunking, table extraction, section headings.",
+      "description": "Domain and retrieval semantics including ontology/taxonomy and grounding hints.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "normalizers", "negatives", "routing", "operators"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "normalizers",
+        "routing",
+        "operators"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "scope",
       "folder": "scope",
-      "description": "Hard/soft scope resolution and candidate filtering to prevent wrong-doc drift and enforce locks.",
+      "description": "Scope resolution and document lock policies to prevent wrong-document drift.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators", "semantics", "negatives"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "semantics"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
     },
     {
       "id": "retrieval",
       "folder": "retrieval",
-      "description": "Retrieval config + ranking boosts (keyword/title/type/recency/diversification) + evidence packaging contracts.",
+      "description": "Retrieval ranking/search behavior and evidence packaging policies.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "scope", "semantics"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "normalizers",
+        "semantics",
+        "scope"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "formatting",
       "folder": "formatting",
-      "description": "Answer structure + render policy + paragraph/bullet/table rules + bolding + banned phrases + followup templates.",
+      "description": "Answer formatting/render contracts and style constraints.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "semantics"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "dictionaries",
+      "folder": "dictionaries",
+      "description": "Language or domain dictionaries used by runtime parsers and normalizers.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "semantics"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "lexicons",
+      "folder": "lexicons",
+      "description": "Lexicon banks for domain/language vocabulary and controlled term sets.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "semantics",
+        "dictionaries"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "parsers",
+      "folder": "parsers",
+      "description": "Parsing banks for units/colors/functions/formats and extraction-oriented parsing rules.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "semantics",
+        "dictionaries"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "intent_patterns",
+      "folder": "intent_patterns",
+      "description": "Intent pattern banks mapped to runtime intent/operator classification.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "semantics"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
     },
     {
       "id": "microcopy",
       "folder": "microcopy",
-      "description": "User-facing messages (conversation, nav, no-docs, scoped-not-found, adaptive fallbacks). Must support anti-repetition/variety.",
+      "description": "User-facing microcopy for fallbacks, navigation, and guidance.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators", "formatting"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "formatting",
+        "semantics"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "overlays",
       "folder": "overlays",
-      "description": "Soft hints + UI contracts that modify behavior without changing core logic (optional runtime layer).",
+      "description": "Optional overlays that softly influence behavior without replacing core contracts.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": false, "failOnMissingRequired": false, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas"],
-      "requiredInEnv": { "production": false, "staging": false, "dev": false, "local": false }
+      "policy": {
+        "strictLoad": false,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "retrieval",
+        "formatting",
+        "microcopy"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
     },
     {
       "id": "prompts",
       "folder": "prompts",
-      "description": "Prompt registry + templates for system/compose/retrieval/disambiguation/fallback/tool prompts.",
+      "description": "Prompt registry and prompt banks for system/retrieval/compose/fallback flows.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators", "retrieval", "formatting"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "retrieval",
+        "formatting",
+        "microcopy"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "policies",
+      "folder": "policies",
+      "description": "Governance and behavioral policies consumed by routing/retrieval/composition.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "formatting",
+        "prompts",
+        "semantics"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
+    },
+    {
+      "id": "fallbacks",
+      "folder": "fallbacks",
+      "description": "Fallback routing/recovery banks for error/no-evidence/no-doc scenarios.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "policies",
+        "microcopy",
+        "prompts"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
     },
     {
       "id": "quality",
       "folder": "quality",
-      "description": "Quality gates and guards (grounding, hallucination, dedupe, numeric integrity, privacy). Blocks bad fallbacks and wrong-doc output.",
+      "description": "Quality gates and enforcement rules for safe, grounded output.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators", "retrieval", "formatting", "microcopy"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "retrieval",
+        "formatting",
+        "microcopy",
+        "prompts",
+        "policies",
+        "fallbacks"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "triggers",
       "folder": "triggers",
-      "description": "Trigger banks for intent/operator/format/nav/domain/language signals (optional, but recommended for parity).",
+      "description": "Optional trigger banks for routing/operator/language signals.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": false, "failOnMissingRequired": false, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators", "normalizers"],
-      "requiredInEnv": { "production": false, "staging": false, "dev": false, "local": false }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": true,
+        "allowOptionalSkip": false
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "normalizers"
+      ],
+      "requiredInEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      }
     },
     {
       "id": "ambiguity",
       "folder": "ambiguity",
-      "description": "Disambiguation policies + ranking features + clarification routing for blocking ambiguity cases.",
+      "description": "Disambiguation policy and ranking features for ambiguous queries.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators", "retrieval", "microcopy"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
-    },
-    {
-      "id": "state",
-      "folder": "state",
-      "description": "Conversation state schema, update rules, decay rules, and debug policy (keeps doc locks stable across turns).",
-      "schemaId": "bank_schema",
-      "policy": { "strictLoad": true, "failOnMissingRequired": true, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas", "routing", "operators"],
-      "requiredInEnv": { "production": true, "staging": true, "dev": true, "local": true }
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "retrieval",
+        "operators",
+        "microcopy",
+        "quality"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
     },
     {
       "id": "probes",
       "folder": "probes",
-      "description": "Regression/parity probes for CI/dev to prevent regressions (optional in prod runtime).",
+      "description": "Optional regression/parity probe banks for CI/runtime validation.",
       "schemaId": "bank_schema",
-      "policy": { "strictLoad": false, "failOnMissingRequired": false, "allowOptionalSkip": true },
-      "dependsOnCategories": ["manifest", "schemas"],
-      "requiredInEnv": { "production": false, "staging": false, "dev": false, "local": false }
+      "policy": {
+        "strictLoad": false,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "retrieval",
+        "formatting",
+        "quality"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "templates",
+      "folder": "templates",
+      "description": "Template banks used by rendering/composition helpers.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": true,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "operators",
+        "semantics",
+        "formatting"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
+    },
+    {
+      "id": "tests",
+      "folder": "tests",
+      "description": "Test fixture banks used for validation and certification scenarios.",
+      "schemaId": "bank_schema",
+      "policy": {
+        "strictLoad": false,
+        "failOnMissingRequired": false,
+        "allowOptionalSkip": true
+      },
+      "dependsOnCategories": [
+        "manifest",
+        "schemas",
+        "routing",
+        "operators",
+        "retrieval",
+        "formatting",
+        "quality",
+        "prompts"
+      ],
+      "requiredInEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      }
     }
   ],
-
   "requiredCategorySet": [
     "manifest",
     "schemas",
     "normalizers",
-    "negatives",
     "routing",
     "operators",
     "semantics",
-    "scope",
     "retrieval",
-    "formatting",
     "microcopy",
-    "prompts",
+    "policies",
     "quality",
-    "ambiguity",
-    "state"
+    "triggers"
   ],
-
   "tests": {
     "cases": [
       {

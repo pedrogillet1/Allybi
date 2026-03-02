@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "id": "di_ops_entities_ops_incident_report",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for incident report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_incident_report"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "incidentNumber",
+      "type": "string",
+      "required": true,
+      "description": "Incident or occurrence report number"
+    },
+    {
+      "id": "incidentDate",
+      "type": "date",
+      "required": true,
+      "description": "Date and time the incident occurred"
+    },
+    {
+      "id": "reportDate",
+      "type": "date",
+      "required": true,
+      "description": "Date the report was filed"
+    },
+    {
+      "id": "severity",
+      "type": "enum",
+      "required": true,
+      "description": "Incident severity classification",
+      "values": [
+        "critical",
+        "major",
+        "minor",
+        "near_miss",
+        "unknown"
+      ]
+    },
+    {
+      "id": "incidentType",
+      "type": "enum",
+      "required": false,
+      "description": "Category of incident",
+      "values": [
+        "equipment_failure",
+        "safety",
+        "environmental",
+        "quality",
+        "process",
+        "other",
+        "unknown"
+      ]
+    },
+    {
+      "id": "locationName",
+      "type": "string",
+      "required": true,
+      "description": "Location where the incident occurred"
+    },
+    {
+      "id": "equipmentId",
+      "type": "string",
+      "required": false,
+      "description": "Affected equipment asset ID"
+    },
+    {
+      "id": "equipmentName",
+      "type": "string",
+      "required": false,
+      "description": "Affected equipment description"
+    },
+    {
+      "id": "reportedBy",
+      "type": "string",
+      "required": false,
+      "description": "Person who reported the incident"
+    },
+    {
+      "id": "investigator",
+      "type": "string",
+      "required": false,
+      "description": "Person or team conducting investigation"
+    },
+    {
+      "id": "incidentDescription",
+      "type": "string",
+      "required": true,
+      "description": "Narrative description of what happened"
+    },
+    {
+      "id": "rootCause",
+      "type": "string",
+      "required": false,
+      "description": "Identified root cause"
+    },
+    {
+      "id": "immediateActions",
+      "type": "array_string",
+      "required": false,
+      "description": "Immediate containment actions taken"
+    },
+    {
+      "id": "correctiveActions",
+      "type": "array_string",
+      "required": false,
+      "description": "Long-term corrective actions assigned"
+    },
+    {
+      "id": "downtimeHours",
+      "type": "number",
+      "required": false,
+      "description": "Total downtime resulting from the incident"
+    },
+    {
+      "id": "estimatedCost",
+      "type": "currency",
+      "required": false,
+      "description": "Estimated financial impact"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code"
+    },
+    {
+      "id": "status",
+      "type": "enum",
+      "required": true,
+      "description": "Investigation status",
+      "values": [
+        "open",
+        "under_investigation",
+        "resolved",
+        "closed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

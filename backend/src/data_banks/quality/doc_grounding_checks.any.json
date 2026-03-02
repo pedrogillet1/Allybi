@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "id": "doc_grounding_checks",
+    "version": "1.0.0",
+    "description": "Doc-grounding minimum checks used by quality gates to block ungrounded document answers.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "minimumEvidenceItems": 1,
+    "requireDocGroundedModes": [
+      "doc_grounded_single",
+      "doc_grounded_multi",
+      "doc_grounded_table",
+      "doc_grounded_quote",
+      "help_steps"
+    ],
+    "failClosedInStrictEnv": true
+  },
+  "checks": [
+    {
+      "id": "DGC_001_evidence_items_required",
+      "severity": "error",
+      "description": "Document-grounded answer modes require at least one evidence item.",
+      "failureAction": "BLOCK_AND_FALLBACK"
+    },
+    {
+      "id": "DGC_002_provenance_required",
+      "severity": "error",
+      "description": "Document-grounded answer modes require valid provenance.",
+      "failureAction": "BLOCK_AND_FALLBACK"
+    },
+    {
+      "id": "DGC_003_evidence_relevance_threshold",
+      "severity": "error",
+      "description": "Evidence must exceed minimum relevance score.",
+      "failureAction": "BLOCK_AND_FALLBACK"
+    },
+    {
+      "id": "DGC_004_evidence_recency",
+      "severity": "warning",
+      "description": "Flag stale evidence from superseded versions.",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "DGC_005_evidence_coverage_vs_claim_count",
+      "severity": "warning",
+      "description": "Require ceil(N/3) evidence items for N claims.",
+      "failureAction": "WARN"
+    }
+  ]
+}

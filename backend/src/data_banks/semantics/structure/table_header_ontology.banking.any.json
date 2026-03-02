@@ -1,16 +1,29 @@
 {
   "_meta": {
     "id": "table_header_ontology_banking",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for banking documents with multilingual synonym coverage.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "banking"
+    "domain": "banking",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "banking",
   "headers": [
@@ -33,7 +46,11 @@
         "account_code",
         "account_number",
         "account_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_amount",
+      "curationReason": "weighted:account_amount:domain_general"
     },
     {
       "canonical": "account_code",
@@ -52,7 +69,11 @@
         "account_count",
         "account_quantity",
         "account_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_code",
+      "curationReason": "weighted:account_code:domain_general"
     },
     {
       "canonical": "account_count",
@@ -71,7 +92,11 @@
         "account_date",
         "account_rate",
         "account_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_count",
+      "curationReason": "weighted:account_count:domain_general"
     },
     {
       "canonical": "account_date",
@@ -90,7 +115,11 @@
         "account_end_date",
         "account_start_date",
         "ach_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_date",
+      "curationReason": "weighted:account_date:domain_general"
     },
     {
       "canonical": "account_end_date",
@@ -109,7 +138,11 @@
         "account_id",
         "account_status",
         "ach_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_end_date",
+      "curationReason": "weighted:account_end_date:domain_general"
     },
     {
       "canonical": "account_id",
@@ -128,7 +161,11 @@
         "account_name",
         "account_subtotal",
         "ach_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_id",
+      "curationReason": "weighted:account_id:domain_general"
     },
     {
       "canonical": "account_name",
@@ -147,7 +184,11 @@
         "account_number",
         "account_total",
         "ach_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_name",
+      "curationReason": "weighted:account_name:domain_general"
     },
     {
       "canonical": "account_number",
@@ -167,7 +208,11 @@
         "account_quantity",
         "account_type",
         "ach_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_number",
+      "curationReason": "weighted:account_number:domain_general"
     },
     {
       "canonical": "account_quantity",
@@ -187,7 +232,11 @@
         "account_rate",
         "account_unit",
         "ach_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_quantity",
+      "curationReason": "weighted:account_quantity:domain_general"
     },
     {
       "canonical": "account_rate",
@@ -206,7 +255,11 @@
         "account_start_date",
         "ach_amount",
         "ach_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_rate",
+      "curationReason": "weighted:account_rate:domain_general"
     },
     {
       "canonical": "account_start_date",
@@ -225,7 +278,11 @@
         "account_status",
         "ach_code",
         "ach_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_start_date",
+      "curationReason": "weighted:account_start_date:domain_general"
     },
     {
       "canonical": "account_status",
@@ -244,7 +301,11 @@
         "account_subtotal",
         "ach_count",
         "ach_quantity"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_status",
+      "curationReason": "weighted:account_status:domain_general"
     },
     {
       "canonical": "account_subtotal",
@@ -263,7 +324,11 @@
         "account_total",
         "ach_date",
         "ach_rate"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_subtotal",
+      "curationReason": "weighted:account_subtotal:domain_general"
     },
     {
       "canonical": "account_total",
@@ -282,7 +347,11 @@
         "account_type",
         "ach_end_date",
         "ach_start_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_total",
+      "curationReason": "weighted:account_total:domain_general"
     },
     {
       "canonical": "account_type",
@@ -301,7 +370,11 @@
         "account_unit",
         "ach_id",
         "ach_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_type",
+      "curationReason": "weighted:account_type:domain_general"
     },
     {
       "canonical": "account_unit",
@@ -320,7 +393,11 @@
         "ach_amount",
         "ach_name",
         "ach_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_account_unit",
+      "curationReason": "weighted:account_unit:domain_general"
     },
     {
       "canonical": "ach_amount",
@@ -341,7 +418,11 @@
         "ach_code",
         "ach_number",
         "ach_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_amount",
+      "curationReason": "weighted:ach_amount:domain_general"
     },
     {
       "canonical": "ach_code",
@@ -360,7 +441,11 @@
         "ach_count",
         "ach_quantity",
         "ach_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_code",
+      "curationReason": "weighted:ach_code:domain_general"
     },
     {
       "canonical": "ach_count",
@@ -377,7 +462,11 @@
         "ach_date",
         "ach_rate",
         "ach_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_count",
+      "curationReason": "weighted:ach_count:domain_general"
     },
     {
       "canonical": "ach_date",
@@ -396,7 +485,11 @@
         "ach_end_date",
         "ach_start_date",
         "amount_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_date",
+      "curationReason": "weighted:ach_date:domain_general"
     },
     {
       "canonical": "ach_end_date",
@@ -415,7 +508,11 @@
         "ach_id",
         "ach_status",
         "amount_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_end_date",
+      "curationReason": "weighted:ach_end_date:domain_general"
     },
     {
       "canonical": "ach_id",
@@ -432,7 +529,11 @@
         "ach_name",
         "ach_subtotal",
         "amount_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_id",
+      "curationReason": "weighted:ach_id:domain_general"
     },
     {
       "canonical": "ach_name",
@@ -451,7 +552,11 @@
         "ach_number",
         "ach_total",
         "amount_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_name",
+      "curationReason": "weighted:ach_name:domain_general"
     },
     {
       "canonical": "ach_number",
@@ -471,7 +576,11 @@
         "ach_quantity",
         "ach_type",
         "amount_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_number",
+      "curationReason": "weighted:ach_number:domain_general"
     },
     {
       "canonical": "ach_quantity",
@@ -491,7 +600,11 @@
         "ach_rate",
         "ach_unit",
         "amount_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_quantity",
+      "curationReason": "weighted:ach_quantity:domain_general"
     },
     {
       "canonical": "ach_rate",
@@ -510,7 +623,11 @@
         "ach_start_date",
         "amount_amount",
         "amount_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_rate",
+      "curationReason": "weighted:ach_rate:domain_general"
     },
     {
       "canonical": "ach_start_date",
@@ -529,7 +646,11 @@
         "ach_status",
         "amount_code",
         "amount_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_start_date",
+      "curationReason": "weighted:ach_start_date:domain_general"
     },
     {
       "canonical": "ach_status",
@@ -546,7 +667,11 @@
         "ach_subtotal",
         "amount_count",
         "amount_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_status",
+      "curationReason": "weighted:ach_status:domain_general"
     },
     {
       "canonical": "ach_subtotal",
@@ -563,7 +688,11 @@
         "ach_total",
         "amount_date",
         "amount_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_subtotal",
+      "curationReason": "weighted:ach_subtotal:domain_general"
     },
     {
       "canonical": "ach_total",
@@ -580,7 +709,11 @@
         "ach_type",
         "amount_end_date",
         "amount_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_total",
+      "curationReason": "weighted:ach_total:domain_general"
     },
     {
       "canonical": "ach_type",
@@ -599,7 +732,11 @@
         "ach_unit",
         "amount_id",
         "amount_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_type",
+      "curationReason": "weighted:ach_type:domain_general"
     },
     {
       "canonical": "ach_unit",
@@ -618,7 +755,11 @@
         "amount_amount",
         "amount_name",
         "amount_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_ach_unit",
+      "curationReason": "weighted:ach_unit:domain_general"
     },
     {
       "canonical": "amount_amount",
@@ -639,7 +780,11 @@
         "amount_code",
         "amount_number",
         "amount_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_amount",
+      "curationReason": "weighted:amount_amount:domain_general"
     },
     {
       "canonical": "amount_code",
@@ -660,7 +805,11 @@
         "amount_count",
         "amount_quantity",
         "amount_type"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_code",
+      "curationReason": "weighted:amount_code:domain_general"
     },
     {
       "canonical": "amount_count",
@@ -681,7 +830,11 @@
         "amount_date",
         "amount_rate",
         "amount_unit"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_count",
+      "curationReason": "weighted:amount_count:domain_general"
     },
     {
       "canonical": "amount_date",
@@ -702,7 +855,11 @@
         "amount_end_date",
         "amount_start_date",
         "authorization_amount"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_date",
+      "curationReason": "weighted:amount_date:domain_general"
     },
     {
       "canonical": "amount_end_date",
@@ -723,7 +880,11 @@
         "amount_id",
         "amount_status",
         "authorization_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_end_date",
+      "curationReason": "weighted:amount_end_date:domain_general"
     },
     {
       "canonical": "amount_id",
@@ -744,7 +905,11 @@
         "amount_name",
         "amount_subtotal",
         "authorization_count"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_id",
+      "curationReason": "weighted:amount_id:domain_general"
     },
     {
       "canonical": "amount_name",
@@ -765,7 +930,11 @@
         "amount_number",
         "amount_total",
         "authorization_date"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_name",
+      "curationReason": "weighted:amount_name:domain_general"
     },
     {
       "canonical": "amount_number",
@@ -787,7 +956,11 @@
         "amount_quantity",
         "amount_type",
         "authorization_end_date"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_number",
+      "curationReason": "weighted:amount_number:domain_general"
     },
     {
       "canonical": "amount_quantity",
@@ -809,7 +982,11 @@
         "amount_rate",
         "amount_unit",
         "authorization_id"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_quantity",
+      "curationReason": "weighted:amount_quantity:domain_general"
     },
     {
       "canonical": "amount_rate",
@@ -830,7 +1007,11 @@
         "amount_start_date",
         "authorization_amount",
         "authorization_name"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_rate",
+      "curationReason": "weighted:amount_rate:domain_general"
     },
     {
       "canonical": "amount_start_date",
@@ -851,7 +1032,11 @@
         "amount_status",
         "authorization_code",
         "authorization_number"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_start_date",
+      "curationReason": "weighted:amount_start_date:domain_general"
     },
     {
       "canonical": "amount_status",
@@ -872,7 +1057,11 @@
         "amount_subtotal",
         "authorization_count",
         "authorization_quantity"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_status",
+      "curationReason": "weighted:amount_status:domain_general"
     },
     {
       "canonical": "amount_subtotal",
@@ -893,7 +1082,11 @@
         "amount_total",
         "authorization_date",
         "authorization_rate"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_subtotal",
+      "curationReason": "weighted:amount_subtotal:domain_general"
     },
     {
       "canonical": "amount_total",
@@ -914,7 +1107,11 @@
         "amount_type",
         "authorization_end_date",
         "authorization_start_date"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_total",
+      "curationReason": "weighted:amount_total:domain_general"
     },
     {
       "canonical": "amount_type",
@@ -935,7 +1132,11 @@
         "amount_unit",
         "authorization_id",
         "authorization_status"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_type",
+      "curationReason": "weighted:amount_type:domain_general"
     },
     {
       "canonical": "amount_unit",
@@ -956,7 +1157,11 @@
         "authorization_amount",
         "authorization_name",
         "authorization_subtotal"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_unit",
+      "curationReason": "weighted:amount_unit:domain_general"
     },
     {
       "canonical": "authorization_amount",
@@ -977,7 +1182,11 @@
         "authorization_code",
         "authorization_number",
         "authorization_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_amount",
+      "curationReason": "weighted:authorization_amount:domain_general"
     },
     {
       "canonical": "authorization_code",
@@ -996,7 +1205,11 @@
         "authorization_count",
         "authorization_quantity",
         "authorization_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_code",
+      "curationReason": "weighted:authorization_code:domain_general"
     },
     {
       "canonical": "authorization_count",
@@ -1013,7 +1226,11 @@
         "authorization_date",
         "authorization_rate",
         "authorization_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_count",
+      "curationReason": "weighted:authorization_count:domain_general"
     },
     {
       "canonical": "authorization_date",
@@ -1032,7 +1249,11 @@
         "authorization_end_date",
         "authorization_start_date",
         "available_balance_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_date",
+      "curationReason": "weighted:authorization_date:domain_general"
     },
     {
       "canonical": "authorization_end_date",
@@ -1051,7 +1272,11 @@
         "authorization_id",
         "authorization_status",
         "available_balance_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_end_date",
+      "curationReason": "weighted:authorization_end_date:domain_general"
     },
     {
       "canonical": "authorization_id",
@@ -1068,7 +1293,11 @@
         "authorization_name",
         "authorization_subtotal",
         "available_balance_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_id",
+      "curationReason": "weighted:authorization_id:domain_general"
     },
     {
       "canonical": "authorization_name",
@@ -1087,7 +1316,11 @@
         "authorization_number",
         "authorization_total",
         "available_balance_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_name",
+      "curationReason": "weighted:authorization_name:domain_general"
     },
     {
       "canonical": "authorization_number",
@@ -1107,7 +1340,11 @@
         "authorization_quantity",
         "authorization_type",
         "available_balance_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_number",
+      "curationReason": "weighted:authorization_number:domain_general"
     },
     {
       "canonical": "authorization_quantity",
@@ -1127,7 +1364,11 @@
         "authorization_rate",
         "authorization_unit",
         "available_balance_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_quantity",
+      "curationReason": "weighted:authorization_quantity:domain_general"
     },
     {
       "canonical": "authorization_rate",
@@ -1146,7 +1387,11 @@
         "authorization_start_date",
         "available_balance_amount",
         "available_balance_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_rate",
+      "curationReason": "weighted:authorization_rate:domain_general"
     },
     {
       "canonical": "authorization_start_date",
@@ -1165,7 +1410,11 @@
         "authorization_status",
         "available_balance_code",
         "available_balance_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_start_date",
+      "curationReason": "weighted:authorization_start_date:domain_general"
     },
     {
       "canonical": "authorization_status",
@@ -1182,7 +1431,11 @@
         "authorization_subtotal",
         "available_balance_count",
         "available_balance_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_status",
+      "curationReason": "weighted:authorization_status:domain_general"
     },
     {
       "canonical": "authorization_subtotal",
@@ -1199,7 +1452,11 @@
         "authorization_total",
         "available_balance_date",
         "available_balance_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_subtotal",
+      "curationReason": "weighted:authorization_subtotal:domain_general"
     },
     {
       "canonical": "authorization_total",
@@ -1216,7 +1473,11 @@
         "authorization_type",
         "available_balance_end_date",
         "available_balance_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_total",
+      "curationReason": "weighted:authorization_total:domain_general"
     },
     {
       "canonical": "authorization_type",
@@ -1235,7 +1496,11 @@
         "authorization_unit",
         "available_balance_id",
         "available_balance_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_type",
+      "curationReason": "weighted:authorization_type:domain_general"
     },
     {
       "canonical": "authorization_unit",
@@ -1254,7 +1519,11 @@
         "available_balance_amount",
         "available_balance_name",
         "available_balance_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_authorization_unit",
+      "curationReason": "weighted:authorization_unit:domain_general"
     },
     {
       "canonical": "available_balance_amount",
@@ -1275,7 +1544,11 @@
         "available_balance_code",
         "available_balance_number",
         "available_balance_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_amount",
+      "curationReason": "weighted:available_balance_amount:domain_general"
     },
     {
       "canonical": "available_balance_code",
@@ -1294,7 +1567,11 @@
         "available_balance_count",
         "available_balance_quantity",
         "available_balance_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_code",
+      "curationReason": "weighted:available_balance_code:domain_general"
     },
     {
       "canonical": "available_balance_count",
@@ -1313,7 +1590,11 @@
         "available_balance_date",
         "available_balance_rate",
         "available_balance_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_count",
+      "curationReason": "weighted:available_balance_count:domain_general"
     },
     {
       "canonical": "available_balance_date",
@@ -1332,7 +1613,11 @@
         "available_balance_end_date",
         "available_balance_start_date",
         "bank_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_date",
+      "curationReason": "weighted:available_balance_date:domain_general"
     },
     {
       "canonical": "available_balance_end_date",
@@ -1351,7 +1636,11 @@
         "available_balance_id",
         "available_balance_status",
         "bank_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_end_date",
+      "curationReason": "weighted:available_balance_end_date:domain_general"
     },
     {
       "canonical": "available_balance_id",
@@ -1370,7 +1659,11 @@
         "available_balance_name",
         "available_balance_subtotal",
         "bank_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_id",
+      "curationReason": "weighted:available_balance_id:domain_general"
     },
     {
       "canonical": "available_balance_name",
@@ -1389,7 +1682,11 @@
         "available_balance_number",
         "available_balance_total",
         "bank_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_name",
+      "curationReason": "weighted:available_balance_name:domain_general"
     },
     {
       "canonical": "available_balance_number",
@@ -1409,7 +1706,11 @@
         "available_balance_quantity",
         "available_balance_type",
         "bank_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_number",
+      "curationReason": "weighted:available_balance_number:domain_general"
     },
     {
       "canonical": "available_balance_quantity",
@@ -1429,7 +1730,11 @@
         "available_balance_rate",
         "available_balance_unit",
         "bank_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_quantity",
+      "curationReason": "weighted:available_balance_quantity:domain_general"
     },
     {
       "canonical": "available_balance_rate",
@@ -1448,7 +1753,11 @@
         "available_balance_start_date",
         "bank_amount",
         "bank_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_rate",
+      "curationReason": "weighted:available_balance_rate:domain_general"
     },
     {
       "canonical": "available_balance_start_date",
@@ -1467,7 +1776,11 @@
         "available_balance_status",
         "bank_code",
         "bank_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_start_date",
+      "curationReason": "weighted:available_balance_start_date:domain_general"
     },
     {
       "canonical": "available_balance_status",
@@ -1486,7 +1799,11 @@
         "available_balance_subtotal",
         "bank_count",
         "bank_quantity"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_status",
+      "curationReason": "weighted:available_balance_status:domain_general"
     },
     {
       "canonical": "available_balance_subtotal",
@@ -1505,7 +1822,11 @@
         "available_balance_total",
         "bank_date",
         "bank_rate"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_subtotal",
+      "curationReason": "weighted:available_balance_subtotal:domain_general"
     },
     {
       "canonical": "available_balance_total",
@@ -1524,7 +1845,11 @@
         "available_balance_type",
         "bank_end_date",
         "bank_start_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_total",
+      "curationReason": "weighted:available_balance_total:domain_general"
     },
     {
       "canonical": "available_balance_type",
@@ -1543,7 +1868,11 @@
         "available_balance_unit",
         "bank_id",
         "bank_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_type",
+      "curationReason": "weighted:available_balance_type:domain_general"
     },
     {
       "canonical": "available_balance_unit",
@@ -1562,7 +1891,11 @@
         "bank_amount",
         "bank_name",
         "bank_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_available_balance_unit",
+      "curationReason": "weighted:available_balance_unit:domain_general"
     },
     {
       "canonical": "bank_amount",
@@ -1583,7 +1916,11 @@
         "bank_code",
         "bank_number",
         "bank_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_amount",
+      "curationReason": "weighted:bank_amount:domain_general"
     },
     {
       "canonical": "bank_code",
@@ -1602,7 +1939,11 @@
         "bank_count",
         "bank_quantity",
         "bank_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_code",
+      "curationReason": "weighted:bank_code:domain_general"
     },
     {
       "canonical": "bank_count",
@@ -1619,7 +1960,11 @@
         "bank_date",
         "bank_rate",
         "bank_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_count",
+      "curationReason": "weighted:bank_count:domain_general"
     },
     {
       "canonical": "bank_date",
@@ -1638,7 +1983,11 @@
         "bank_end_date",
         "bank_start_date",
         "beneficiary_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_date",
+      "curationReason": "weighted:bank_date:domain_general"
     },
     {
       "canonical": "bank_end_date",
@@ -1657,7 +2006,11 @@
         "bank_id",
         "bank_status",
         "beneficiary_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_end_date",
+      "curationReason": "weighted:bank_end_date:domain_general"
     },
     {
       "canonical": "bank_id",
@@ -1674,7 +2027,11 @@
         "bank_name",
         "bank_subtotal",
         "beneficiary_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_id",
+      "curationReason": "weighted:bank_id:domain_general"
     },
     {
       "canonical": "bank_name",
@@ -1693,7 +2050,11 @@
         "bank_number",
         "bank_total",
         "beneficiary_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_name",
+      "curationReason": "weighted:bank_name:domain_general"
     },
     {
       "canonical": "bank_number",
@@ -1713,7 +2074,11 @@
         "bank_quantity",
         "bank_type",
         "beneficiary_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_number",
+      "curationReason": "weighted:bank_number:domain_general"
     },
     {
       "canonical": "bank_quantity",
@@ -1733,7 +2098,11 @@
         "bank_rate",
         "bank_unit",
         "beneficiary_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_quantity",
+      "curationReason": "weighted:bank_quantity:domain_general"
     },
     {
       "canonical": "bank_rate",
@@ -1752,7 +2121,11 @@
         "bank_start_date",
         "beneficiary_amount",
         "beneficiary_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_rate",
+      "curationReason": "weighted:bank_rate:domain_general"
     },
     {
       "canonical": "bank_start_date",
@@ -1771,7 +2144,11 @@
         "bank_status",
         "beneficiary_code",
         "beneficiary_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_start_date",
+      "curationReason": "weighted:bank_start_date:domain_general"
     },
     {
       "canonical": "bank_status",
@@ -1788,7 +2165,11 @@
         "bank_subtotal",
         "beneficiary_count",
         "beneficiary_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_status",
+      "curationReason": "weighted:bank_status:domain_general"
     },
     {
       "canonical": "bank_subtotal",
@@ -1805,7 +2186,11 @@
         "bank_total",
         "beneficiary_date",
         "beneficiary_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_subtotal",
+      "curationReason": "weighted:bank_subtotal:domain_general"
     },
     {
       "canonical": "bank_total",
@@ -1822,7 +2207,11 @@
         "bank_type",
         "beneficiary_end_date",
         "beneficiary_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_total",
+      "curationReason": "weighted:bank_total:domain_general"
     },
     {
       "canonical": "bank_type",
@@ -1841,7 +2230,11 @@
         "bank_unit",
         "beneficiary_id",
         "beneficiary_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_type",
+      "curationReason": "weighted:bank_type:domain_general"
     },
     {
       "canonical": "bank_unit",
@@ -1860,7 +2253,11 @@
         "beneficiary_amount",
         "beneficiary_name",
         "beneficiary_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_bank_unit",
+      "curationReason": "weighted:bank_unit:domain_general"
     },
     {
       "canonical": "beneficiary_amount",
@@ -1881,7 +2278,11 @@
         "beneficiary_code",
         "beneficiary_number",
         "beneficiary_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_amount",
+      "curationReason": "weighted:beneficiary_amount:domain_general"
     },
     {
       "canonical": "beneficiary_code",
@@ -1900,7 +2301,11 @@
         "beneficiary_count",
         "beneficiary_quantity",
         "beneficiary_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_code",
+      "curationReason": "weighted:beneficiary_code:domain_general"
     },
     {
       "canonical": "beneficiary_count",
@@ -1917,7 +2322,11 @@
         "beneficiary_date",
         "beneficiary_rate",
         "beneficiary_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_count",
+      "curationReason": "weighted:beneficiary_count:domain_general"
     },
     {
       "canonical": "beneficiary_date",
@@ -1936,7 +2345,11 @@
         "beneficiary_end_date",
         "beneficiary_start_date",
         "branch_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_date",
+      "curationReason": "weighted:beneficiary_date:domain_general"
     },
     {
       "canonical": "beneficiary_end_date",
@@ -1955,7 +2368,11 @@
         "beneficiary_id",
         "beneficiary_status",
         "branch_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_end_date",
+      "curationReason": "weighted:beneficiary_end_date:domain_general"
     },
     {
       "canonical": "beneficiary_id",
@@ -1972,7 +2389,11 @@
         "beneficiary_name",
         "beneficiary_subtotal",
         "branch_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_id",
+      "curationReason": "weighted:beneficiary_id:domain_general"
     },
     {
       "canonical": "beneficiary_name",
@@ -1991,7 +2412,11 @@
         "beneficiary_number",
         "beneficiary_total",
         "branch_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_name",
+      "curationReason": "weighted:beneficiary_name:domain_general"
     },
     {
       "canonical": "beneficiary_number",
@@ -2011,7 +2436,11 @@
         "beneficiary_quantity",
         "beneficiary_type",
         "branch_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_number",
+      "curationReason": "weighted:beneficiary_number:domain_general"
     },
     {
       "canonical": "beneficiary_quantity",
@@ -2031,7 +2460,11 @@
         "beneficiary_rate",
         "beneficiary_unit",
         "branch_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_quantity",
+      "curationReason": "weighted:beneficiary_quantity:domain_general"
     },
     {
       "canonical": "beneficiary_rate",
@@ -2050,7 +2483,11 @@
         "beneficiary_start_date",
         "branch_amount",
         "branch_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_rate",
+      "curationReason": "weighted:beneficiary_rate:domain_general"
     },
     {
       "canonical": "beneficiary_start_date",
@@ -2069,7 +2506,11 @@
         "beneficiary_status",
         "branch_code",
         "branch_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_start_date",
+      "curationReason": "weighted:beneficiary_start_date:domain_general"
     },
     {
       "canonical": "beneficiary_status",
@@ -2086,7 +2527,11 @@
         "beneficiary_subtotal",
         "branch_count",
         "branch_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_status",
+      "curationReason": "weighted:beneficiary_status:domain_general"
     },
     {
       "canonical": "beneficiary_subtotal",
@@ -2103,7 +2548,11 @@
         "beneficiary_total",
         "branch_date",
         "branch_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_subtotal",
+      "curationReason": "weighted:beneficiary_subtotal:domain_general"
     },
     {
       "canonical": "beneficiary_total",
@@ -2120,7 +2569,11 @@
         "beneficiary_type",
         "branch_end_date",
         "branch_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_total",
+      "curationReason": "weighted:beneficiary_total:domain_general"
     },
     {
       "canonical": "beneficiary_type",
@@ -2139,7 +2592,11 @@
         "beneficiary_unit",
         "branch_id",
         "branch_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_type",
+      "curationReason": "weighted:beneficiary_type:domain_general"
     },
     {
       "canonical": "beneficiary_unit",
@@ -2158,7 +2615,11 @@
         "branch_amount",
         "branch_name",
         "branch_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_beneficiary_unit",
+      "curationReason": "weighted:beneficiary_unit:domain_general"
     },
     {
       "canonical": "branch_amount",
@@ -2179,7 +2640,11 @@
         "branch_code",
         "branch_number",
         "branch_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_amount",
+      "curationReason": "weighted:branch_amount:domain_general"
     },
     {
       "canonical": "branch_code",
@@ -2198,7 +2663,11 @@
         "branch_count",
         "branch_quantity",
         "branch_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_code",
+      "curationReason": "weighted:branch_code:domain_general"
     },
     {
       "canonical": "branch_count",
@@ -2215,7 +2684,11 @@
         "branch_date",
         "branch_rate",
         "branch_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_count",
+      "curationReason": "weighted:branch_count:domain_general"
     },
     {
       "canonical": "branch_date",
@@ -2234,7 +2707,11 @@
         "branch_end_date",
         "branch_start_date",
         "card_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_date",
+      "curationReason": "weighted:branch_date:domain_general"
     },
     {
       "canonical": "branch_end_date",
@@ -2253,7 +2730,11 @@
         "branch_id",
         "branch_status",
         "card_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_end_date",
+      "curationReason": "weighted:branch_end_date:domain_general"
     },
     {
       "canonical": "branch_id",
@@ -2270,7 +2751,11 @@
         "branch_name",
         "branch_subtotal",
         "card_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_id",
+      "curationReason": "weighted:branch_id:domain_general"
     },
     {
       "canonical": "branch_name",
@@ -2289,7 +2774,11 @@
         "branch_number",
         "branch_total",
         "card_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_name",
+      "curationReason": "weighted:branch_name:domain_general"
     },
     {
       "canonical": "branch_number",
@@ -2309,7 +2798,11 @@
         "account_amount",
         "branch_quantity",
         "branch_type"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_number",
+      "curationReason": "weighted:branch_number:domain_general"
     },
     {
       "canonical": "branch_quantity",
@@ -2329,7 +2822,11 @@
         "account_code",
         "branch_rate",
         "branch_unit"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_quantity",
+      "curationReason": "weighted:branch_quantity:domain_general"
     },
     {
       "canonical": "branch_rate",
@@ -2348,7 +2845,11 @@
         "account_count",
         "branch_start_date",
         "card_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_rate",
+      "curationReason": "weighted:branch_rate:domain_general"
     },
     {
       "canonical": "branch_start_date",
@@ -2367,7 +2868,11 @@
         "account_date",
         "branch_status",
         "card_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_start_date",
+      "curationReason": "weighted:branch_start_date:domain_general"
     },
     {
       "canonical": "branch_status",
@@ -2384,7 +2889,11 @@
         "account_end_date",
         "branch_subtotal",
         "card_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_status",
+      "curationReason": "weighted:branch_status:domain_general"
     },
     {
       "canonical": "branch_subtotal",
@@ -2401,7 +2910,11 @@
         "account_id",
         "branch_total",
         "card_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_subtotal",
+      "curationReason": "weighted:branch_subtotal:domain_general"
     },
     {
       "canonical": "branch_total",
@@ -2418,7 +2931,11 @@
         "account_amount",
         "account_name",
         "branch_type"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_total",
+      "curationReason": "weighted:branch_total:domain_general"
     },
     {
       "canonical": "branch_type",
@@ -2437,7 +2954,11 @@
         "account_code",
         "account_number",
         "branch_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_type",
+      "curationReason": "weighted:branch_type:domain_general"
     },
     {
       "canonical": "branch_unit",
@@ -2456,7 +2977,11 @@
         "account_count",
         "account_quantity",
         "card_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_branch_unit",
+      "curationReason": "weighted:branch_unit:domain_general"
     },
     {
       "canonical": "card_amount",
@@ -2477,7 +3002,11 @@
         "account_date",
         "account_rate",
         "card_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_card_amount",
+      "curationReason": "weighted:card_amount:domain_general"
     },
     {
       "canonical": "card_code",
@@ -2496,7 +3025,11 @@
         "account_end_date",
         "account_start_date",
         "card_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_card_code",
+      "curationReason": "weighted:card_code:domain_general"
     },
     {
       "canonical": "card_count",
@@ -2515,7 +3048,11 @@
         "account_id",
         "account_status",
         "card_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_card_count",
+      "curationReason": "weighted:card_count:domain_general"
     },
     {
       "canonical": "card_date",
@@ -2534,7 +3071,11 @@
         "account_amount",
         "account_name",
         "account_subtotal"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:banking",
+      "disambiguationRuleId": "headers_disambiguation_general_card_date",
+      "curationReason": "weighted:card_date:domain_general"
     }
   ]
 }

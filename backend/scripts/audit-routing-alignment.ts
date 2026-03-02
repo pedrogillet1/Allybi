@@ -59,22 +59,39 @@ function main() {
 
   const problems: string[] = [];
 
-  // --- Editing: banks vs backend ---
-  const canonical = new Set<string>((editingRouting?.operators?.canonical || []).filter((s: any) => typeof s === "string"));
-  for (const op of editOps) if (!canonical.has(op)) problems.push(`[editing_routing] missing canonical op ${op}`);
-  for (const op of canonical) if (!editOps.has(op)) problems.push(`[editing_routing] canonical op not implemented in EditOperator: ${op}`);
+  // --- Editing routing bank shape ---
+  if (editingRouting?.config?.enabled !== true) {
+    problems.push(`[editing_routing] expected config.enabled=true`);
+  }
+  const guardrails = Array.isArray(editingRouting?.guardrails) ? editingRouting.guardrails : [];
+  if (guardrails.length === 0) problems.push(`[editing_routing] guardrails must be a non-empty array`);
+  const guardrailIds = new Set<string>();
+  for (const rule of guardrails) {
+    const id = typeof rule?.id === "string" ? rule.id.trim() : "";
+    if (!id) {
+      problems.push(`[editing_routing] guardrail missing id`);
+      continue;
+    }
+    if (guardrailIds.has(id)) problems.push(`[editing_routing] duplicate guardrail id ${id}`);
+    guardrailIds.add(id);
+  }
 
-  const alwaysConfirm = new Set<string>((editingRouting?.operators?.alwaysConfirm || []).filter((s: any) => typeof s === "string"));
-  for (const op of alwaysConfirm) if (!editOps.has(op)) problems.push(`[editing_routing] alwaysConfirm op not in EditOperator: ${op}`);
-
-  // rules
-  for (const r of (editingRouting?.rules || [])) {
-    const op = r?.then?.operator;
-    if (typeof op === "string" && !editOps.has(op)) problems.push(`[editing_routing] rule ${r?.ruleId || "(no id)"} uses unsupported operator ${op}`);
+  const tiebreakers = Array.isArray(editingRouting?.tiebreakers) ? editingRouting.tiebreakers : [];
+  if (tiebreakers.length === 0) problems.push(`[editing_routing] tiebreakers must be a non-empty array`);
+  for (const t of tiebreakers) {
+    const id = typeof t?.id === "string" ? t.id.trim() : "";
+    if (!id) problems.push(`[editing_routing] tiebreaker missing id`);
+    if (typeof t?.weight !== "number" || !Number.isFinite(t.weight)) {
+      problems.push(`[editing_routing] tiebreaker ${id || "(no id)"} missing numeric weight`);
+    }
   }
 
   // intent_config editing family
-  const families = Array.isArray(intentConfig?.intentFamilies) ? intentConfig.intentFamilies : [];
+  const families = Array.isArray(intentConfig?.intentFamilies)
+    ? intentConfig.intentFamilies
+    : Array.isArray(intentConfig?.config?.intentFamilies)
+      ? intentConfig.config.intentFamilies
+      : [];
   const editingFam = families.find((f: any) => f?.id === "editing") || null;
   if (!editingFam) problems.push(`[intent_config] missing intentFamily=editing`);
   if (editingFam) {
@@ -127,9 +144,15 @@ function main() {
     }
   }
 
-  // viewer safe auto apply must not include alwaysConfirm operators
+  const confirmationModeOps = new Set<string>(
+    (operatorContracts?.operators || [])
+      .filter((o: any) => o?.preferredAnswerMode === "action_confirmation" && typeof o?.id === "string")
+      .map((o: any) => o.id),
+  );
+
+  // viewer safe auto apply must not include explicit confirmation operators
   for (const op of viewerSafeOps) {
-    if (alwaysConfirm.has(op)) problems.push(`[viewer] safeAutoApplyOperators includes alwaysConfirm op ${op}`);
+    if (confirmationModeOps.has(op)) problems.push(`[viewer] safeAutoApplyOperators includes action_confirmation op ${op}`);
   }
 
   // --- Connectors: banks should be consistent across routing + intent_config + operator_families + contracts + shapes ---

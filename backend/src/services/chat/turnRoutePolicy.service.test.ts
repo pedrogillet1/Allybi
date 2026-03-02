@@ -257,7 +257,7 @@ describe("TurnRoutePolicyService", () => {
       expect(svc.isConnectorTurn("send an email to alice", "en")).toBe(true);
     });
 
-    test("email patterns with locale 'en' do NOT match when locale argument is 'pt'", () => {
+    test("falls back to english email patterns when locale argument is 'pt'", () => {
       const disabledConnectors = {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
@@ -269,11 +269,10 @@ describe("TurnRoutePolicyService", () => {
       });
 
       const svc = new TurnRoutePolicyService();
-      // mockEmailBank rules have locale: "en", so 'pt' should not match
-      expect(svc.isConnectorTurn("send an email to alice", "pt")).toBe(false);
+      expect(svc.isConnectorTurn("send an email to alice", "pt")).toBe(true);
     });
 
-    test("email patterns with locale 'en' do NOT match when locale argument is 'es'", () => {
+    test("falls back to english email patterns when locale argument is 'es'", () => {
       const disabledConnectors = {
         ...mockConnectorsBank,
         config: { ...mockConnectorsBank.config, enabled: false },
@@ -285,7 +284,7 @@ describe("TurnRoutePolicyService", () => {
       });
 
       const svc = new TurnRoutePolicyService();
-      expect(svc.isConnectorTurn("send an email to carlos", "es")).toBe(false);
+      expect(svc.isConnectorTurn("send an email to carlos", "es")).toBe(true);
     });
 
     test("connector patterns with locale 'any' match regardless of locale", () => {
@@ -670,6 +669,363 @@ describe("TurnRoutePolicyService", () => {
       );
       expect(calledIds).toContain("connectors_routing");
       expect(calledIds).toContain("email_routing");
+    });
+  });
+
+  describe("guardrails and provider routing", () => {
+    test("reroutes sync to CONNECT_START when provider is not connected", () => {
+      const connectorsBank = {
+        config: {
+          enabled: true,
+          guardrails: { requireConnectBeforeSyncOrSearch: true },
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: {
+            intent: "CONNECTORS",
+            domain: "connectors",
+            scope: "connectors",
+          },
+          thresholds: { minConfidence: 0.57 },
+        },
+        providers: { allowed: ["gmail", "outlook", "slack"] },
+        rules: [
+          {
+            ruleId: "CR_SYNC",
+            priority: 90,
+            reasonCode: "connector_sync_requested",
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["\\bsync\\b.{0,20}\\bgmail\\b"],
+                },
+              ],
+            },
+            then: {
+              intent: "CONNECTORS",
+              operator: "CONNECTOR_SYNC",
+              domain: "connectors",
+              scope: "connectors",
+            },
+            confidenceBoost: 0.15,
+          },
+        ],
+      };
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return connectorsBank as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("sync gmail now", "en", {
+        connectedProviders: { gmail: false },
+      });
+
+      expect(decision).not.toBeNull();
+      expect(decision?.operatorId).toBe("CONNECT_START");
+      expect(decision?.providerId).toBe("gmail");
+      expect(decision?.decisionNotes).toContain(
+        "guardrail:require_connect_before_sync_or_search",
+      );
+    });
+
+    test("keeps sync operator when provider is connected", () => {
+      const connectorsBank = {
+        config: {
+          enabled: true,
+          guardrails: { requireConnectBeforeSyncOrSearch: true },
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: {
+            intent: "CONNECTORS",
+            domain: "connectors",
+            scope: "connectors",
+          },
+          thresholds: { minConfidence: 0.57 },
+        },
+        providers: { allowed: ["gmail", "outlook", "slack"] },
+        rules: [
+          {
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["\\bsync\\b.{0,20}\\bgmail\\b"],
+                },
+              ],
+            },
+            then: {
+              intent: "CONNECTORS",
+              operator: "CONNECTOR_SYNC",
+              domain: "connectors",
+              scope: "connectors",
+            },
+          },
+        ],
+      };
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return connectorsBank as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("sync gmail now", "en", {
+        connectedProviders: { gmail: true },
+      });
+
+      expect(decision?.operatorId).toBe("CONNECTOR_SYNC");
+      expect(decision?.providerId).toBe("gmail");
+    });
+
+    test("enforces permission guardrail for connector search", () => {
+      const connectorsBank = {
+        config: {
+          enabled: true,
+          guardrails: { neverReadConnectorContentWithoutUserPermission: true },
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: {
+            intent: "CONNECTORS",
+            domain: "connectors",
+            scope: "connectors",
+          },
+          thresholds: { minConfidence: 0.57 },
+        },
+        providers: { allowed: ["gmail", "outlook", "slack"] },
+        rules: [
+          {
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["\\bsearch\\b.{0,20}\\bgmail\\b"],
+                },
+              ],
+            },
+            then: {
+              intent: "CONNECTORS",
+              operator: "CONNECTOR_SEARCH",
+              domain: "connectors",
+              scope: "connectors",
+            },
+          },
+        ],
+      };
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return connectorsBank as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision("search gmail", "en", {
+        connectedProviders: { gmail: true },
+        hasConnectorReadPermission: false,
+      });
+
+      expect(decision?.operatorId).toBe("CONNECTOR_STATUS");
+      expect(decision?.decisionNotes).toContain(
+        "guardrail:permission_required_for_connector_content",
+      );
+    });
+
+    test("marks disconnect routes as requires confirmation", () => {
+      const connectorsBank = {
+        config: {
+          enabled: true,
+          guardrails: { disconnectAlwaysConfirm: true },
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: {
+            intent: "CONNECTORS",
+            domain: "connectors",
+            scope: "connectors",
+          },
+          thresholds: { minConfidence: 0.57 },
+        },
+        providers: {
+          allowed: ["gmail", "outlook", "slack"],
+          aliases: { "office 365": "outlook" },
+        },
+        operators: { alwaysConfirm: [] },
+        rules: [
+          {
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["disconnect.*office 365"],
+                },
+              ],
+            },
+            then: {
+              intent: "CONNECTORS",
+              operator: "CONNECTOR_DISCONNECT",
+              domain: "connectors",
+              scope: "connectors",
+            },
+          },
+        ],
+      };
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return connectorsBank as any;
+        if (bankId === "email_routing") return null;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision(
+        "disconnect office 365",
+        "en",
+      );
+
+      expect(decision?.providerId).toBe("outlook");
+      expect(decision?.requiresConfirmation).toBe(true);
+      expect(decision?.decisionNotes).toContain("requires_confirmation");
+    });
+
+    test("marks EMAIL_SEND as requires confirmation from email bank", () => {
+      const emailBank = {
+        config: {
+          enabled: true,
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: { intent: "EMAIL", domain: "email", scope: "email" },
+          thresholds: { minConfidence: 0.58 },
+        },
+        providers: { allowed: ["gmail", "outlook", "email"] },
+        operators: { alwaysConfirm: ["EMAIL_SEND"] },
+        rules: [
+          {
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["\\bsend\\b.{0,20}\\bemail\\b"],
+                },
+              ],
+            },
+            then: {
+              intent: "EMAIL",
+              operator: "EMAIL_SEND",
+              domain: "email",
+              scope: "email",
+            },
+          },
+        ],
+      };
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return null;
+        if (bankId === "email_routing") return emailBank as any;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision(
+        "send email to finance",
+        "en",
+      );
+
+      expect(decision?.intentFamily).toBe("email");
+      expect(decision?.operatorId).toBe("EMAIL_SEND");
+      expect(decision?.requiresConfirmation).toBe(true);
+      expect(decision?.decisionNotes).toContain("requires_confirmation");
+    });
+
+    test("reroutes email_latest to slack connector search when query clearly targets slack", () => {
+      const emailBank = {
+        config: {
+          enabled: true,
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: { intent: "EMAIL", domain: "email", scope: "email" },
+          thresholds: { minConfidence: 0.58 },
+        },
+        providers: { allowed: ["gmail", "outlook", "email"] },
+        rules: [
+          {
+            when: {
+              any: [
+                {
+                  type: "regex",
+                  locale: "en",
+                  patterns: ["\\b(latest|last)\\b.{0,10}\\b(message|email)\\b"],
+                },
+              ],
+            },
+            then: {
+              intent: "EMAIL",
+              operator: "EMAIL_LATEST",
+              domain: "email",
+              scope: "email",
+            },
+          },
+        ],
+      };
+      const connectorsBank = {
+        config: {
+          enabled: true,
+          guardrails: {
+            requireConnectBeforeSyncOrSearch: false,
+          },
+          matching: {
+            caseSensitive: false,
+            stripDiacriticsForMatching: true,
+            collapseWhitespace: true,
+          },
+          defaults: { intent: "CONNECTORS", domain: "connectors", scope: "connectors" },
+          thresholds: { minConfidence: 0.57 },
+        },
+        providers: { allowed: ["gmail", "outlook", "slack"] },
+        rules: [],
+      };
+
+      mockGetRoutingBank.mockImplementation((bankId: string) => {
+        if (bankId === "connectors_routing") return connectorsBank as any;
+        if (bankId === "email_routing") return emailBank as any;
+        return null;
+      });
+
+      const svc = new TurnRoutePolicyService({ strict: false });
+      const decision = svc.resolveConnectorDecision(
+        "show my latest slack message",
+        "en",
+        {
+          connectedProviders: { slack: true },
+        },
+      );
+
+      expect(decision?.intentFamily).toBe("connectors");
+      expect(decision?.operatorId).toBe("CONNECTOR_SEARCH");
+      expect(decision?.providerId).toBe("slack");
+      expect(decision?.decisionNotes).toContain(
+        "guardrail:slack_terms_prefer_connector_search",
+      );
     });
   });
 });

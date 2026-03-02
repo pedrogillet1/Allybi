@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_ops_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for operations domain.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "redactionRules": [
+    {
+      "id": "ops_redact_001_equipment_serial",
+      "dataType": "equipment_serial_number",
+      "pattern": "\\b(?:serial\\s*(?:number|no\\.?|#)?\\s*:?\\s*)[A-Z0-9\\-]{6,30}\\b",
+      "action": "REDACT",
+      "replacement": "[EQUIPMENT SERIAL REDACTED]"
+    },
+    {
+      "id": "ops_redact_002_employee_badge",
+      "dataType": "employee_badge_id",
+      "pattern": "\\b(?:badge\\s*(?:id|no\\.?|#)?\\s*:?\\s*|employee\\s*(?:id|no\\.?|#)?\\s*:?\\s*)\\w{4,15}\\b",
+      "action": "REDACT",
+      "replacement": "[EMPLOYEE ID REDACTED]"
+    },
+    {
+      "id": "ops_redact_003_gps_coordinates",
+      "dataType": "gps_coordinates",
+      "pattern": "[-+]?\\d{1,3}\\.\\d{4,8}\\s*,\\s*[-+]?\\d{1,3}\\.\\d{4,8}",
+      "action": "REDACT",
+      "replacement": "[GPS COORDINATES REDACTED]"
+    },
+    {
+      "id": "ops_redact_004_internal_system_id",
+      "dataType": "internal_system_id",
+      "pattern": "\\b(?:system\\s*id|asset\\s*(?:tag|id)|ERP\\s*(?:id|ref))\\s*:?\\s*[A-Z0-9\\-]{5,20}\\b",
+      "action": "REDACT",
+      "replacement": "[INTERNAL ID REDACTED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "ops_safety_001_no_operational_directive",
+      "severity": "warning",
+      "description": "Do not issue operational directives or authorize maintenance actions from document data alone.",
+      "trigger": "user asks for go/no-go decision",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "ops_safety_002_no_blame_attribution",
+      "severity": "error",
+      "description": "Do not attribute fault or blame to specific individuals; flag findings neutrally.",
+      "trigger": "incident analysis with personnel references",
+      "action": "NEUTRAL_FLAG"
+    },
+    {
+      "id": "ops_safety_003_no_safety_certification",
+      "severity": "error",
+      "description": "Never certify equipment as safe or compliant; only report documented inspection results.",
+      "trigger": "safety compliance question",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "ops_safety_004_data_staleness",
+      "severity": "warning",
+      "description": "Treat uploaded reports as historical snapshots; cannot guarantee current operational state.",
+      "trigger": "real-time status question",
+      "action": "STATE_UNCERTAINTY"
+    }
+  ]
+}

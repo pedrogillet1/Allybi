@@ -72,7 +72,10 @@ function buildEmbeddingOperationId(documentId: string): string {
   return `op_${Date.now().toString(36)}_${compactDocId.slice(0, 12)}_${suffix}`;
 }
 
-let chunkEncryptionServicesSingleton: ChunkEncryptionServices | null | undefined;
+let chunkEncryptionServicesSingleton:
+  | ChunkEncryptionServices
+  | null
+  | undefined;
 
 function getChunkEncryptionServicesSafe(): ChunkEncryptionServices | null {
   if (chunkEncryptionServicesSingleton !== undefined)
@@ -519,7 +522,9 @@ export async function storeDocumentEmbeddings(
     }
   }
 
-  const terminalMessage = String(lastErr?.message || lastErr || "Indexing failed");
+  const terminalMessage = String(
+    lastErr?.message || lastErr || "Indexing failed",
+  );
   const failureData: Record<string, unknown> = {
     indexingState: "failed",
     indexingOperationId: operationId,

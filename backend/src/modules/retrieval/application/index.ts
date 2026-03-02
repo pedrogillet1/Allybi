@@ -40,13 +40,11 @@ export type {
   FileListAttachment,
   MessageAttachment,
   RawSource,
-  EvidenceChunkForFiltering,
   StandardResponse,
 } from "../../../services/core/retrieval/sourceButtons.service";
 export {
   SourceButtonsService,
   getSourceButtonsService,
-  extractUsedDocuments,
   filterSourceButtonsByUsage,
   buildDocGroundedResponse,
   buildFileActionResponse,

@@ -230,6 +230,48 @@ export interface ChatEngine {
     telemetry?: Record<string, unknown>;
   }>;
 
+  generateRetrievalPlan?(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    messages: Array<{
+      role: ChatRole;
+      content: string;
+      attachments?: unknown | null;
+    }>;
+    evidencePack?: {
+      query?: { original?: string; normalized?: string };
+      scope?: { activeDocId?: string | null; explicitDocLock?: boolean };
+      stats?: {
+        evidenceItems?: number;
+        uniqueDocsInEvidence?: number;
+        topScore?: number | null;
+        scoreGap?: number | null;
+      };
+      evidence: Array<{
+        docId: string;
+        title?: string | null;
+        filename?: string | null;
+        location?: {
+          page?: number | null;
+          sheet?: string | null;
+          slide?: number | null;
+          sectionKey?: string | null;
+        };
+        locationKey?: string;
+        snippet?: string;
+        score?: { finalScore?: number };
+        evidenceType?: "text" | "table" | "image";
+      }>;
+    } | null;
+    context?: Record<string, unknown>;
+    meta?: Record<string, unknown>;
+  }): Promise<{
+    text: string;
+    attachmentsPayload?: unknown;
+    telemetry?: Record<string, unknown>;
+  }>;
+
   stream(params: {
     traceId: string;
     userId: string;

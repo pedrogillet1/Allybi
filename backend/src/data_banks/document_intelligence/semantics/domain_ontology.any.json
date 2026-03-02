@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "di_domain_ontology",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "owner": "document_intelligence",
     "languages": [
       "en",
@@ -16,13 +16,82 @@
     "tests": [
       "SSOT_DOMAIN_001"
     ],
-    "lastUpdated": "2026-02-27",
+    "lastUpdated": "2026-03-01",
     "description": "di_domain_ontology (document_intelligence) configuration bank."
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "canonicalDomainIds": [
+      "accounting",
+      "banking",
+      "billing",
+      "education",
+      "finance",
+      "housing",
+      "hr_payroll",
+      "identity",
+      "insurance",
+      "legal",
+      "medical",
+      "ops",
+      "tax",
+      "travel"
+    ],
+    "domainAliases": {
+      "operations": "ops"
+    }
   },
   "domains": [
+    {
+      "id": "accounting",
+      "label": "Accounting",
+      "labelPt": "Contabilidade",
+      "description": "General ledger, trial balance, journal entries, reconciliation, accounts receivable/payable aging, audit workpapers, internal controls, and compliance documentation.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de contabilidade.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance"
+      ]
+    },
+    {
+      "id": "banking",
+      "label": "Banking",
+      "labelPt": "Bancario",
+      "description": "Retail and commercial banking records including account statements, card statements, loan statements, and payment receipts.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de bancario.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "billing",
+        "finance",
+        "accounting"
+      ]
+    },
+    {
+      "id": "billing",
+      "label": "Billing",
+      "labelPt": "Cobranca",
+      "description": "Consumer and business billing documents including telecom, utilities, receipts, and invoices with due dates, balances, and charge components.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de cobranca.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "banking",
+        "accounting",
+        "finance"
+      ]
+    },
+    {
+      "id": "education",
+      "label": "Education",
+      "labelPt": "Educacao",
+      "description": "Academic records and school administration documents used to verify enrollment, performance, schedules, and aid awards.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de educacao.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "hr_payroll",
+        "identity"
+      ]
+    },
     {
       "id": "finance",
       "label": "Finance",
@@ -78,8 +147,52 @@
       ],
       "crossDomainLinks": [
         "legal",
-        "operations"
+        "ops"
       ]
+    },
+    {
+      "id": "housing",
+      "label": "Housing",
+      "labelPt": "Moradia",
+      "description": "Housing and property documents including lease summaries, rent receipts, mortgage statements, property tax bills, HOA statements, and inspection reports.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de moradia.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "banking",
+        "billing",
+        "insurance"
+      ]
+    },
+    {
+      "id": "hr_payroll",
+      "label": "HR and Payroll",
+      "labelPt": "RH e Folha",
+      "description": "Employment and payroll documents including pay stubs, timesheets, benefits enrollment, expense reports, and verification letters.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de rh e folha.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "accounting",
+        "finance",
+        "identity"
+      ]
+    },
+    {
+      "id": "identity",
+      "label": "Identity",
+      "labelPt": "Identidade",
+      "description": "Identity verification documents including personal IDs, passports, proof-of-address, and business registration certificates.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de identidade.",
+      "subdomains": [],
+      "crossDomainLinks": []
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "labelPt": "Seguros",
+      "description": "Insurance policy interpretation, claims processing, benefits explanations, and premium billing extraction.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de seguros.",
+      "subdomains": [],
+      "crossDomainLinks": []
     },
     {
       "id": "legal",
@@ -142,7 +255,7 @@
       "crossDomainLinks": [
         "finance",
         "medical",
-        "operations"
+        "ops"
       ]
     },
     {
@@ -200,11 +313,11 @@
       ],
       "crossDomainLinks": [
         "legal",
-        "operations"
+        "ops"
       ]
     },
     {
-      "id": "operations",
+      "id": "ops",
       "label": "Operations",
       "labelPt": "Operações",
       "description": "Business processes, IT infrastructure, project management, quality assurance, and operational governance.",
@@ -259,6 +372,28 @@
       "crossDomainLinks": [
         "finance",
         "legal"
+      ]
+    },
+    {
+      "id": "tax",
+      "label": "Tax",
+      "labelPt": "Tributario",
+      "description": "Tax compliance, return filing, tax notices, payment slips, and property tax billing interpretation.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de tributario.",
+      "subdomains": [],
+      "crossDomainLinks": []
+    },
+    {
+      "id": "travel",
+      "label": "Travel",
+      "labelPt": "Viagem",
+      "description": "Travel booking and transport documents including itinerary, boarding pass, reservations, insurance, rentals, and visa receipts.",
+      "descriptionPt": "Perfil de dominio para interpretacao de documentos de viagem.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "billing",
+        "identity",
+        "insurance"
       ]
     }
   ]

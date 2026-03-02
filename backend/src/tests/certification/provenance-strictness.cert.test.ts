@@ -10,7 +10,8 @@ describe("Certification: provenance strictness", () => {
         {
           docId: "doc-1",
           locationKey: "loc-1",
-          snippet: "The quarterly margin increased due to controlled operating expenses.",
+          snippet:
+            "The quarterly margin increased due to controlled operating expenses.",
         },
       ],
     } as any;

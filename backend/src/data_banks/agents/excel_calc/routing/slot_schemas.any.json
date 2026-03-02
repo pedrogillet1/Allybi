@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "id": "slot_schemas_excel_calc",
     "bankId": "slot_schemas_excel_calc",
     "version": "1.0.0",
     "description": "Canonical slot definitions for the Excel Calculation Agent with validation rules, coercion logic, and default values for 68 slot types.",

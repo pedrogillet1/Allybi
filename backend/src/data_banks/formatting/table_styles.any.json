@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "id": "table_styles",
+    "version": "1.0.0",
+    "description": "Table style primitives consumed by render policy and response contract enforcement.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "strictGfm": true,
+    "separatorCell": "---",
+    "ensureHeaderSeparator": true,
+    "normalizeUnevenRows": true
+  },
+  "rules": [
+    {
+      "id": "TS_001_alignment_by_content_type",
+      "description": "Right-align numeric, left-align text",
+      "action": "ENFORCE"
+    },
+    {
+      "id": "TS_002_cell_content_limits",
+      "description": "Max 80 chars per cell",
+      "action": "TRUNCATE",
+      "maxCharsPerCell": 80
+    },
+    {
+      "id": "TS_003_header_case_normalization",
+      "description": "Title case headers",
+      "action": "ENFORCE"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "TS_T01",
+        "input": "revenue",
+        "expect": "Revenue"
+      }
+    ]
+  }
+}

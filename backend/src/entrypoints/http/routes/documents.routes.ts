@@ -2178,9 +2178,8 @@ router.get(
 
       // If no preview PDF, try generating on-demand
       if (!pdfKey) {
-        const previewGen = await import(
-          "../../../services/preview/previewPdfGenerator.service"
-        );
+        const previewGen =
+          await import("../../../services/preview/previewPdfGenerator.service");
         const result = await previewGen.generatePreviewPdf(doc.id, userId);
         if (result.success && result.pdfKey) {
           pdfKey = result.pdfKey;
@@ -2678,9 +2677,8 @@ router.post(
         // For PDFs, Excel, and PowerPoint - convert to DOCX via CloudConvert
         const convertibleToDocx = ["application/pdf", ...officeTypes];
         if (convertibleToDocx.includes(mime)) {
-          const cloudConvert = await import(
-            "../../../services/conversion/cloudConvertPptx.service"
-          );
+          const cloudConvert =
+            await import("../../../services/conversion/cloudConvertPptx.service");
           if (!cloudConvert.isCloudConvertAvailable()) {
             res
               .status(400)
@@ -2773,9 +2771,8 @@ router.post(
         });
 
         if (!metadata?.previewPdfKey) {
-          const previewGen = await import(
-            "../../../services/preview/previewPdfGenerator.service"
-          );
+          const previewGen =
+            await import("../../../services/preview/previewPdfGenerator.service");
           const result = await previewGen.generatePreviewPdf(doc.id, userId);
           if (!result.success) {
             res

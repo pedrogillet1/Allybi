@@ -1,83 +1,1436 @@
 {
   "_meta": {
     "id": "party_patterns",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Entity-role extraction patterns for counterparties, signatories, providers, and vendors.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
-    "enabled": true
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "medium",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
   },
   "rules": [
-    { "id": "party_001", "name": "corp_suffix_inc", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Inc|INC)\\.?\\b", "examples": ["Acme Inc.", "Global Solutions INC"], "entityType": "organization", "role": "corporation", "notes": "US corporation with Inc suffix" },
-    { "id": "party_002", "name": "corp_suffix_corp", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Corp|CORP)\\.?\\b", "examples": ["Tech Corp.", "National CORP"], "entityType": "organization", "role": "corporation", "notes": "US corporation with Corp suffix" },
-    { "id": "party_003", "name": "corp_suffix_llc", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LLC|L\\.L\\.C\\.?)\\b", "examples": ["Smith & Associates LLC", "Ventures L.L.C."], "entityType": "organization", "role": "limited_liability_company", "notes": "US limited liability company" },
-    { "id": "party_004", "name": "corp_suffix_ltd", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Ltd|LTD)\\.?\\b", "examples": ["Global Solutions Ltd.", "Trading LTD"], "entityType": "organization", "role": "limited_company", "notes": "UK/international limited company" },
-    { "id": "party_005", "name": "corp_suffix_co", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Co|CO)\\.\\b", "examples": ["Smith & Co.", "Manufacturing CO."], "entityType": "organization", "role": "company", "notes": "Company with Co. suffix" },
-    { "id": "party_006", "name": "corp_suffix_lp", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LP|L\\.P\\.?)\\b", "examples": ["Capital Partners LP", "Investments L.P."], "entityType": "organization", "role": "limited_partnership", "notes": "Limited partnership" },
-    { "id": "party_007", "name": "corp_suffix_llp", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LLP|L\\.L\\.P\\.?)\\b", "examples": ["Baker McKenzie LLP", "Attorneys L.L.P."], "entityType": "organization", "role": "limited_liability_partnership", "notes": "Limited liability partnership" },
-    { "id": "party_008", "name": "corp_suffix_plc", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:PLC|plc|Plc)\\b", "examples": ["British Petroleum PLC", "Barclays plc"], "entityType": "organization", "role": "public_limited_company", "notes": "UK public limited company" },
-    { "id": "party_009", "name": "corp_suffix_na", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:N\\.?A\\.?)\\b", "examples": ["JPMorgan Chase N.A.", "Bank of America NA"], "entityType": "organization", "role": "national_association", "notes": "National association (banking)" },
-    { "id": "party_010", "name": "corp_suffix_gmbh", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:GmbH|GMBH)\\b", "examples": ["Siemens GmbH", "Deutsche Tech GMBH"], "entityType": "organization", "role": "limited_company_de", "notes": "German limited liability company" },
-    { "id": "party_011", "name": "corp_suffix_ag", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:AG|A\\.G\\.)\\b", "examples": ["Deutsche Bank AG", "Novartis A.G."], "entityType": "organization", "role": "stock_corporation_de", "notes": "German/Swiss stock corporation" },
-    { "id": "party_012", "name": "corp_suffix_se", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\sSE\\b", "examples": ["SAP SE", "Airbus SE"], "entityType": "organization", "role": "european_company", "notes": "European company (Societas Europaea)" },
-    { "id": "party_013", "name": "corp_suffix_bv", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:B\\.?V\\.?)\\b", "examples": ["Shell B.V.", "Philips BV"], "entityType": "organization", "role": "limited_company_nl", "notes": "Dutch private limited company" },
-    { "id": "party_014", "name": "corp_suffix_nv", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:N\\.?V\\.?)\\b", "examples": ["ING N.V.", "Heineken NV"], "entityType": "organization", "role": "public_company_nl", "notes": "Dutch public company" },
-    { "id": "party_015", "name": "corp_suffix_srl", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:S\\.?R\\.?L\\.?)\\b", "examples": ["Fiat S.R.L.", "Tech Solutions SRL"], "entityType": "organization", "role": "limited_company_it", "notes": "Italian/Romanian limited company" },
-    { "id": "party_016", "name": "corp_br_sa", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:S\\.?A\\.?|S/A)\\b", "examples": ["Petrobras S.A.", "Vale S/A", "Itau Unibanco SA"], "entityType": "organization", "role": "corporation_br", "notes": "Brazilian/Portuguese corporation (Sociedade Anonima)" },
-    { "id": "party_017", "name": "corp_br_ltda", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Ltda|LTDA)\\.?\\b", "examples": ["Comercio Silva Ltda.", "Servicos ABC LTDA"], "entityType": "organization", "role": "limited_company_br", "notes": "Brazilian limited company" },
-    { "id": "party_018", "name": "corp_br_eireli", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:EIRELI|Eireli)\\b", "examples": ["Consultoria XYZ EIRELI", "Tech Eireli"], "entityType": "organization", "role": "sole_proprietor_br", "notes": "Brazilian individual limited liability entity" },
-    { "id": "party_019", "name": "corp_br_me", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:ME|M\\.E\\.)\\b", "examples": ["Joao Silva ME", "Comercio ABC M.E."], "entityType": "organization", "role": "micro_enterprise_br", "notes": "Brazilian micro enterprise" },
-    { "id": "party_020", "name": "corp_br_mei", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:MEI)\\b", "examples": ["Maria Santos MEI"], "entityType": "organization", "role": "individual_entrepreneur_br", "notes": "Brazilian individual micro entrepreneur" },
-    { "id": "party_021", "name": "corp_mx_sa_cv", "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\sS\\.?A\\.?\\sde\\sC\\.?V\\.?\\b", "examples": ["Cemex S.A. de C.V.", "Grupo Bimbo SA de CV"], "entityType": "organization", "role": "corporation_mx", "notes": "Mexican variable capital corporation" },
-    { "id": "party_022", "name": "role_buyer_en", "pattern": "(?:the\\s)?(?:Buyer|BUYER|buyer)", "examples": ["the Buyer", "Buyer", "BUYER"], "entityType": "role", "role": "buyer", "notes": "English buyer role label" },
-    { "id": "party_023", "name": "role_seller_en", "pattern": "(?:the\\s)?(?:Seller|SELLER|seller)", "examples": ["the Seller", "Seller", "SELLER"], "entityType": "role", "role": "seller", "notes": "English seller role label" },
-    { "id": "party_024", "name": "role_landlord_en", "pattern": "(?:the\\s)?(?:Landlord|LANDLORD|Lessor|LESSOR)", "examples": ["the Landlord", "Lessor", "LANDLORD"], "entityType": "role", "role": "landlord", "notes": "English landlord/lessor role" },
-    { "id": "party_025", "name": "role_tenant_en", "pattern": "(?:the\\s)?(?:Tenant|TENANT|Lessee|LESSEE)", "examples": ["the Tenant", "Lessee", "TENANT"], "entityType": "role", "role": "tenant", "notes": "English tenant/lessee role" },
-    { "id": "party_026", "name": "role_licensor_en", "pattern": "(?:the\\s)?(?:Licensor|LICENSOR)", "examples": ["the Licensor", "LICENSOR"], "entityType": "role", "role": "licensor", "notes": "English licensor role" },
-    { "id": "party_027", "name": "role_licensee_en", "pattern": "(?:the\\s)?(?:Licensee|LICENSEE)", "examples": ["the Licensee", "LICENSEE"], "entityType": "role", "role": "licensee", "notes": "English licensee role" },
-    { "id": "party_028", "name": "role_employer_en", "pattern": "(?:the\\s)?(?:Employer|EMPLOYER|Company)", "examples": ["the Employer", "EMPLOYER", "the Company"], "entityType": "role", "role": "employer", "notes": "English employer role" },
-    { "id": "party_029", "name": "role_employee_en", "pattern": "(?:the\\s)?(?:Employee|EMPLOYEE|Worker)", "examples": ["the Employee", "EMPLOYEE", "the Worker"], "entityType": "role", "role": "employee", "notes": "English employee role" },
-    { "id": "party_030", "name": "role_lender_en", "pattern": "(?:the\\s)?(?:Lender|LENDER|Creditor)", "examples": ["the Lender", "LENDER", "the Creditor"], "entityType": "role", "role": "lender", "notes": "English lender/creditor role" },
-    { "id": "party_031", "name": "role_borrower_en", "pattern": "(?:the\\s)?(?:Borrower|BORROWER|Debtor)", "examples": ["the Borrower", "BORROWER", "the Debtor"], "entityType": "role", "role": "borrower", "notes": "English borrower/debtor role" },
-    { "id": "party_032", "name": "role_guarantor_en", "pattern": "(?:the\\s)?(?:Guarantor|GUARANTOR|Surety)", "examples": ["the Guarantor", "GUARANTOR", "the Surety"], "entityType": "role", "role": "guarantor", "notes": "English guarantor role" },
-    { "id": "party_033", "name": "role_contractor_en", "pattern": "(?:the\\s)?(?:Contractor|CONTRACTOR|Service Provider)", "examples": ["the Contractor", "CONTRACTOR", "the Service Provider"], "entityType": "role", "role": "contractor", "notes": "English contractor role" },
-    { "id": "party_034", "name": "role_client_en", "pattern": "(?:the\\s)?(?:Client|CLIENT|Customer)", "examples": ["the Client", "CLIENT", "the Customer"], "entityType": "role", "role": "client", "notes": "English client/customer role" },
-    { "id": "party_035", "name": "role_vendor_en", "pattern": "(?:the\\s)?(?:Vendor|VENDOR|Supplier)", "examples": ["the Vendor", "VENDOR", "the Supplier"], "entityType": "role", "role": "vendor", "notes": "English vendor/supplier role" },
-    { "id": "party_036", "name": "role_insurer_en", "pattern": "(?:the\\s)?(?:Insurer|INSURER|Underwriter)", "examples": ["the Insurer", "INSURER", "the Underwriter"], "entityType": "role", "role": "insurer", "notes": "English insurer role" },
-    { "id": "party_037", "name": "role_insured_en", "pattern": "(?:the\\s)?(?:Insured|INSURED|Policyholder)", "examples": ["the Insured", "INSURED", "the Policyholder"], "entityType": "role", "role": "insured", "notes": "English insured role" },
-    { "id": "party_038", "name": "role_beneficiary_en", "pattern": "(?:the\\s)?(?:Beneficiary|BENEFICIARY)", "examples": ["the Beneficiary", "BENEFICIARY"], "entityType": "role", "role": "beneficiary", "notes": "English beneficiary role" },
-    { "id": "party_039", "name": "role_trustee_en", "pattern": "(?:the\\s)?(?:Trustee|TRUSTEE)", "examples": ["the Trustee", "TRUSTEE"], "entityType": "role", "role": "trustee", "notes": "English trustee role" },
-    { "id": "party_040", "name": "role_agent_en", "pattern": "(?:the\\s)?(?:Agent|AGENT|Representative)", "examples": ["the Agent", "AGENT", "the Representative"], "entityType": "role", "role": "agent", "notes": "English agent/representative role" },
-    { "id": "party_041", "name": "role_comprador_pt", "pattern": "(?:o\\s)?(?:Comprador|COMPRADOR|Adquirente)", "examples": ["o Comprador", "COMPRADOR", "o Adquirente"], "entityType": "role", "role": "buyer", "notes": "Portuguese buyer role" },
-    { "id": "party_042", "name": "role_vendedor_pt", "pattern": "(?:o\\s)?(?:Vendedor|VENDEDOR|Alienante)", "examples": ["o Vendedor", "VENDEDOR", "o Alienante"], "entityType": "role", "role": "seller", "notes": "Portuguese seller role" },
-    { "id": "party_043", "name": "role_locador_pt", "pattern": "(?:o\\s)?(?:Locador|LOCADOR)", "examples": ["o Locador", "LOCADOR"], "entityType": "role", "role": "landlord", "notes": "Portuguese landlord role" },
-    { "id": "party_044", "name": "role_locatario_pt", "pattern": "(?:o\\s)?(?:Locatario|LOCATARIO)", "examples": ["o Locatario", "LOCATARIO"], "entityType": "role", "role": "tenant", "notes": "Portuguese tenant role" },
-    { "id": "party_045", "name": "role_contratante_pt", "pattern": "(?:o\\s|a\\s)?(?:Contratante|CONTRATANTE)", "examples": ["o Contratante", "a Contratante", "CONTRATANTE"], "entityType": "role", "role": "contracting_party", "notes": "Portuguese contracting party" },
-    { "id": "party_046", "name": "role_contratado_pt", "pattern": "(?:o\\s|a\\s)?(?:Contratado|CONTRATADO|Contratada|CONTRATADA)", "examples": ["o Contratado", "a Contratada", "CONTRATADO"], "entityType": "role", "role": "contracted_party", "notes": "Portuguese contracted party" },
-    { "id": "party_047", "name": "role_empregador_pt", "pattern": "(?:o\\s)?(?:Empregador|EMPREGADOR|Empresa)", "examples": ["o Empregador", "EMPREGADOR", "a Empresa"], "entityType": "role", "role": "employer", "notes": "Portuguese employer role" },
-    { "id": "party_048", "name": "role_empregado_pt", "pattern": "(?:o\\s|a\\s)?(?:Empregado|EMPREGADO|Empregada|EMPREGADA)", "examples": ["o Empregado", "a Empregada", "EMPREGADO"], "entityType": "role", "role": "employee", "notes": "Portuguese employee role" },
-    { "id": "party_049", "name": "role_fiador_pt", "pattern": "(?:o\\s)?(?:Fiador|FIADOR|Avalista)", "examples": ["o Fiador", "FIADOR", "o Avalista"], "entityType": "role", "role": "guarantor", "notes": "Portuguese guarantor role" },
-    { "id": "party_050", "name": "role_fornecedor_pt", "pattern": "(?:o\\s)?(?:Fornecedor|FORNECEDOR|Prestador)", "examples": ["o Fornecedor", "FORNECEDOR", "o Prestador"], "entityType": "role", "role": "supplier", "notes": "Portuguese supplier/provider role" },
-    { "id": "party_051", "name": "person_title_en_mr", "pattern": "(?:Mr|Mrs|Ms|Miss|Dr|Prof)\\.?\\s[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*", "examples": ["Mr. John Smith", "Dr. Jane Doe", "Prof. Brown"], "entityType": "person", "role": "named_individual", "notes": "English person with title prefix" },
-    { "id": "party_052", "name": "person_title_pt_sr", "pattern": "(?:Sr|Sra|Dra?)\\.?\\s[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*", "examples": ["Sr. Joao Silva", "Sra. Maria Santos", "Dr. Carlos Lima"], "entityType": "person", "role": "named_individual", "notes": "Portuguese person with title prefix" },
-    { "id": "party_053", "name": "govt_department_en", "pattern": "(?:Department|Ministry|Bureau|Office|Agency|Commission|Authority)\\sof\\s[A-Z][\\w\\s]+", "examples": ["Department of Justice", "Agency of Health", "Commission of Securities"], "entityType": "organization", "role": "government_body", "notes": "English government department/agency" },
-    { "id": "party_054", "name": "govt_entity_pt", "pattern": "(?:Ministerio|Secretaria|Agencia|Comissao|Autoridade|Tribunal|Procuradoria)\\s(?:de|do|da|dos|das)\\s[A-Z][\\w\\s]+", "examples": ["Ministerio da Fazenda", "Secretaria de Saude", "Tribunal de Justica"], "entityType": "organization", "role": "government_body", "notes": "Portuguese government entity" },
-    { "id": "party_055", "name": "medical_entity_hospital", "pattern": "(?:Hospital|Clinic|Medical Center|Laboratory|Pharmacy|Centro Medico|Laboratorio|Farmacia|Clinica)\\s[A-Z][\\w\\s]*", "examples": ["Hospital Sao Paulo", "Medical Center East", "Laboratorio ABC"], "entityType": "organization", "role": "healthcare_provider", "notes": "Healthcare facility" },
-    { "id": "party_056", "name": "financial_entity_bank", "pattern": "(?:Bank|Banco|Credit Union|Savings|Insurance|Seguradora|Fund|Fundo|Exchange|Bolsa)\\s(?:of\\s|do\\s|da\\s|de\\s)?[A-Z][\\w\\s]*", "examples": ["Bank of America", "Banco do Brasil", "Seguradora Allianz"], "entityType": "organization", "role": "financial_institution", "notes": "Financial institution" },
-    { "id": "party_057", "name": "signatory_signed_by_en", "pattern": "(?:signed by|executed by|on behalf of)\\s[A-Z][\\w\\s.,'-]+", "examples": ["signed by John Smith", "executed by Acme Corp.", "on behalf of Global LLC"], "entityType": "signatory_action", "role": "signatory", "notes": "English signatory identification" },
-    { "id": "party_058", "name": "signatory_assinado_pt", "pattern": "(?:assinado por|firmado por|representado por|em nome de)\\s[A-Z][\\w\\s.,'-]+", "examples": ["assinado por Joao Silva", "firmado por Empresa ABC Ltda.", "representado por Maria Santos"], "entityType": "signatory_action", "role": "signatory", "notes": "Portuguese signatory identification" },
-    { "id": "party_059", "name": "witness_en", "pattern": "(?:witnessed by|in the presence of|witness:)\\s?[A-Z][\\w\\s.,'-]+", "examples": ["witnessed by Jane Doe", "in the presence of John Brown", "Witness: Alice Smith"], "entityType": "signatory_action", "role": "witness", "notes": "English witness identification" },
-    { "id": "party_060", "name": "witness_pt", "pattern": "(?:testemunha|testemunhas|na presenca de):?\\s?[A-Z][\\w\\s.,'-]+", "examples": ["Testemunha: Carlos Lima", "testemunhas: Ana e Pedro"], "entityType": "signatory_action", "role": "witness", "notes": "Portuguese witness identification" },
-    { "id": "party_061", "name": "registered_office_en", "pattern": "(?:registered office|principal place of business|headquarters)\\s(?:at|in|located at)\\s[A-Z][\\w\\s.,'-]+", "examples": ["registered office at 123 Main St", "principal place of business in New York"], "entityType": "address", "role": "registered_address", "notes": "English registered office" },
-    { "id": "party_062", "name": "registered_office_pt", "pattern": "(?:sede social|sede|endereco|domicilio)\\s(?:em|na|no|sito em)\\s[A-Z][\\w\\s.,'-]+", "examples": ["sede social em Sao Paulo", "sede na Rua Augusta, 100"], "entityType": "address", "role": "registered_address", "notes": "Portuguese registered office" },
-    { "id": "party_063", "name": "tax_id_cnpj", "pattern": "CNPJ\\s?(?:n[o.]?\\s?)?\\d{2}\\.?\\d{3}\\.?\\d{3}/?\\d{4}-?\\d{2}", "examples": ["CNPJ 12.345.678/0001-90", "CNPJ no. 12345678000190"], "entityType": "tax_identifier", "role": "company_tax_id_br", "notes": "Brazilian company tax ID" },
-    { "id": "party_064", "name": "tax_id_cpf", "pattern": "CPF\\s?(?:n[o.]?\\s?)?\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}", "examples": ["CPF 123.456.789-00", "CPF no. 12345678900"], "entityType": "tax_identifier", "role": "individual_tax_id_br", "notes": "Brazilian individual tax ID" },
-    { "id": "party_065", "name": "tax_id_ein", "pattern": "EIN\\s?(?:No\\.?\\s?)?\\d{2}-?\\d{7}", "examples": ["EIN 12-3456789", "EIN No. 123456789"], "entityType": "tax_identifier", "role": "employer_id_us", "notes": "US employer identification number" },
-    { "id": "party_066", "name": "tax_id_vat", "pattern": "VAT\\s?(?:No\\.?\\s?)?[A-Z]{2}\\d{8,12}", "examples": ["VAT No. GB123456789", "VAT DE123456789"], "entityType": "tax_identifier", "role": "vat_number", "notes": "European VAT number" },
-    { "id": "party_067", "name": "tax_id_nif", "pattern": "NIF\\s?(?:n[o.]?\\s?)?\\d{9}", "examples": ["NIF 123456789", "NIF no. 987654321"], "entityType": "tax_identifier", "role": "tax_id_pt", "notes": "Portuguese/Spanish tax number" },
-    { "id": "party_068", "name": "registration_en", "pattern": "(?:registered under|company number|registration no\\.?)\\s?:?\\s?[A-Z0-9-]+", "examples": ["registered under 12345678", "company number SC123456", "Registration No. HRB 12345"], "entityType": "registration", "role": "company_registration", "notes": "English company registration" },
-    { "id": "party_069", "name": "registration_pt", "pattern": "(?:inscrita no|registrada sob|NIRE|Junta Comercial)\\s?:?\\s?[A-Z0-9.-]+", "examples": ["inscrita no CNPJ 12.345.678/0001-90", "NIRE 35300123456"], "entityType": "registration", "role": "company_registration_br", "notes": "Brazilian company registration" }
+    {
+      "id": "party_001",
+      "name": "corp_suffix_inc",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Inc|INC)\\.?\\b",
+      "examples": [
+        "Acme Inc.",
+        "Global Solutions INC"
+      ],
+      "entityType": "organization",
+      "role": "corporation",
+      "notes": "US corporation with Inc suffix",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_002",
+      "name": "corp_suffix_corp",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Corp|CORP)\\.?\\b",
+      "examples": [
+        "Tech Corp.",
+        "National CORP"
+      ],
+      "entityType": "organization",
+      "role": "corporation",
+      "notes": "US corporation with Corp suffix",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_003",
+      "name": "corp_suffix_llc",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LLC|L\\.L\\.C\\.?)\\b",
+      "examples": [
+        "Smith & Associates LLC",
+        "Ventures L.L.C."
+      ],
+      "entityType": "organization",
+      "role": "limited_liability_company",
+      "notes": "US limited liability company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_004",
+      "name": "corp_suffix_ltd",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Ltd|LTD)\\.?\\b",
+      "examples": [
+        "Global Solutions Ltd.",
+        "Trading LTD"
+      ],
+      "entityType": "organization",
+      "role": "limited_company",
+      "notes": "UK/international limited company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_005",
+      "name": "corp_suffix_co",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Co|CO)\\.\\b",
+      "examples": [
+        "Smith & Co.",
+        "Manufacturing CO."
+      ],
+      "entityType": "organization",
+      "role": "company",
+      "notes": "Company with Co. suffix",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_006",
+      "name": "corp_suffix_lp",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LP|L\\.P\\.?)\\b",
+      "examples": [
+        "Capital Partners LP",
+        "Investments L.P."
+      ],
+      "entityType": "organization",
+      "role": "limited_partnership",
+      "notes": "Limited partnership",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_007",
+      "name": "corp_suffix_llp",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LLP|L\\.L\\.P\\.?)\\b",
+      "examples": [
+        "Baker McKenzie LLP",
+        "Attorneys L.L.P."
+      ],
+      "entityType": "organization",
+      "role": "limited_liability_partnership",
+      "notes": "Limited liability partnership",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_008",
+      "name": "corp_suffix_plc",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:PLC|plc|Plc)\\b",
+      "examples": [
+        "British Petroleum PLC",
+        "Barclays plc"
+      ],
+      "entityType": "organization",
+      "role": "public_limited_company",
+      "notes": "UK public limited company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_009",
+      "name": "corp_suffix_na",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:N\\.?A\\.?)\\b",
+      "examples": [
+        "JPMorgan Chase N.A.",
+        "Bank of America NA"
+      ],
+      "entityType": "organization",
+      "role": "national_association",
+      "notes": "National association (banking)",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_010",
+      "name": "corp_suffix_gmbh",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:GmbH|GMBH)\\b",
+      "examples": [
+        "Siemens GmbH",
+        "Deutsche Tech GMBH"
+      ],
+      "entityType": "organization",
+      "role": "limited_company_de",
+      "notes": "German limited liability company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_011",
+      "name": "corp_suffix_ag",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:AG|A\\.G\\.)\\b",
+      "examples": [
+        "Deutsche Bank AG",
+        "Novartis A.G."
+      ],
+      "entityType": "organization",
+      "role": "stock_corporation_de",
+      "notes": "German/Swiss stock corporation",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_012",
+      "name": "corp_suffix_se",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\sSE\\b",
+      "examples": [
+        "SAP SE",
+        "Airbus SE"
+      ],
+      "entityType": "organization",
+      "role": "european_company",
+      "notes": "European company (Societas Europaea)",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_013",
+      "name": "corp_suffix_bv",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:B\\.?V\\.?)\\b",
+      "examples": [
+        "Shell B.V.",
+        "Philips BV"
+      ],
+      "entityType": "organization",
+      "role": "limited_company_nl",
+      "notes": "Dutch private limited company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_014",
+      "name": "corp_suffix_nv",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:N\\.?V\\.?)\\b",
+      "examples": [
+        "ING N.V.",
+        "Heineken NV"
+      ],
+      "entityType": "organization",
+      "role": "public_company_nl",
+      "notes": "Dutch public company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_015",
+      "name": "corp_suffix_srl",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:S\\.?R\\.?L\\.?)\\b",
+      "examples": [
+        "Fiat S.R.L.",
+        "Tech Solutions SRL"
+      ],
+      "entityType": "organization",
+      "role": "limited_company_it",
+      "notes": "Italian/Romanian limited company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_016",
+      "name": "corp_br_sa",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:S\\.?A\\.?|S/A)\\b",
+      "examples": [
+        "Petrobras S.A.",
+        "Vale S/A",
+        "Itau Unibanco SA"
+      ],
+      "entityType": "organization",
+      "role": "corporation_br",
+      "notes": "Brazilian/Portuguese corporation (Sociedade Anonima)",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_017",
+      "name": "corp_br_ltda",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Ltda|LTDA)\\.?\\b",
+      "examples": [
+        "Comercio Silva Ltda.",
+        "Servicos ABC LTDA"
+      ],
+      "entityType": "organization",
+      "role": "limited_company_br",
+      "notes": "Brazilian limited company",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_018",
+      "name": "corp_br_eireli",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:EIRELI|Eireli)\\b",
+      "examples": [
+        "Consultoria XYZ EIRELI",
+        "Tech Eireli"
+      ],
+      "entityType": "organization",
+      "role": "sole_proprietor_br",
+      "notes": "Brazilian individual limited liability entity",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_019",
+      "name": "corp_br_me",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:ME|M\\.E\\.)\\b",
+      "examples": [
+        "Joao Silva ME",
+        "Comercio ABC M.E."
+      ],
+      "entityType": "organization",
+      "role": "micro_enterprise_br",
+      "notes": "Brazilian micro enterprise",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_020",
+      "name": "corp_br_mei",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:MEI)\\b",
+      "examples": [
+        "Maria Santos MEI"
+      ],
+      "entityType": "organization",
+      "role": "individual_entrepreneur_br",
+      "notes": "Brazilian individual micro entrepreneur",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_021",
+      "name": "corp_mx_sa_cv",
+      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\sS\\.?A\\.?\\sde\\sC\\.?V\\.?\\b",
+      "examples": [
+        "Cemex S.A. de C.V.",
+        "Grupo Bimbo SA de CV"
+      ],
+      "entityType": "organization",
+      "role": "corporation_mx",
+      "notes": "Mexican variable capital corporation",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_022",
+      "name": "role_buyer_en",
+      "pattern": "(?:the\\s)?(?:Buyer|BUYER|buyer)",
+      "examples": [
+        "the Buyer",
+        "Buyer",
+        "BUYER"
+      ],
+      "entityType": "role",
+      "role": "buyer",
+      "notes": "English buyer role label",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_023",
+      "name": "role_seller_en",
+      "pattern": "(?:the\\s)?(?:Seller|SELLER|seller)",
+      "examples": [
+        "the Seller",
+        "Seller",
+        "SELLER"
+      ],
+      "entityType": "role",
+      "role": "seller",
+      "notes": "English seller role label",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_024",
+      "name": "role_landlord_en",
+      "pattern": "(?:the\\s)?(?:Landlord|LANDLORD|Lessor|LESSOR)",
+      "examples": [
+        "the Landlord",
+        "Lessor",
+        "LANDLORD"
+      ],
+      "entityType": "role",
+      "role": "landlord",
+      "notes": "English landlord/lessor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_025",
+      "name": "role_tenant_en",
+      "pattern": "(?:the\\s)?(?:Tenant|TENANT|Lessee|LESSEE)",
+      "examples": [
+        "the Tenant",
+        "Lessee",
+        "TENANT"
+      ],
+      "entityType": "role",
+      "role": "tenant",
+      "notes": "English tenant/lessee role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_026",
+      "name": "role_licensor_en",
+      "pattern": "(?:the\\s)?(?:Licensor|LICENSOR)",
+      "examples": [
+        "the Licensor",
+        "LICENSOR"
+      ],
+      "entityType": "role",
+      "role": "licensor",
+      "notes": "English licensor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_027",
+      "name": "role_licensee_en",
+      "pattern": "(?:the\\s)?(?:Licensee|LICENSEE)",
+      "examples": [
+        "the Licensee",
+        "LICENSEE"
+      ],
+      "entityType": "role",
+      "role": "licensee",
+      "notes": "English licensee role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_028",
+      "name": "role_employer_en",
+      "pattern": "(?:the\\s)?(?:Employer|EMPLOYER|Company)",
+      "examples": [
+        "the Employer",
+        "EMPLOYER",
+        "the Company"
+      ],
+      "entityType": "role",
+      "role": "employer",
+      "notes": "English employer role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_029",
+      "name": "role_employee_en",
+      "pattern": "(?:the\\s)?(?:Employee|EMPLOYEE|Worker)",
+      "examples": [
+        "the Employee",
+        "EMPLOYEE",
+        "the Worker"
+      ],
+      "entityType": "role",
+      "role": "employee",
+      "notes": "English employee role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_030",
+      "name": "role_lender_en",
+      "pattern": "(?:the\\s)?(?:Lender|LENDER|Creditor)",
+      "examples": [
+        "the Lender",
+        "LENDER",
+        "the Creditor"
+      ],
+      "entityType": "role",
+      "role": "lender",
+      "notes": "English lender/creditor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_031",
+      "name": "role_borrower_en",
+      "pattern": "(?:the\\s)?(?:Borrower|BORROWER|Debtor)",
+      "examples": [
+        "the Borrower",
+        "BORROWER",
+        "the Debtor"
+      ],
+      "entityType": "role",
+      "role": "borrower",
+      "notes": "English borrower/debtor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_032",
+      "name": "role_guarantor_en",
+      "pattern": "(?:the\\s)?(?:Guarantor|GUARANTOR|Surety)",
+      "examples": [
+        "the Guarantor",
+        "GUARANTOR",
+        "the Surety"
+      ],
+      "entityType": "role",
+      "role": "guarantor",
+      "notes": "English guarantor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_033",
+      "name": "role_contractor_en",
+      "pattern": "(?:the\\s)?(?:Contractor|CONTRACTOR|Service Provider)",
+      "examples": [
+        "the Contractor",
+        "CONTRACTOR",
+        "the Service Provider"
+      ],
+      "entityType": "role",
+      "role": "contractor",
+      "notes": "English contractor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_034",
+      "name": "role_client_en",
+      "pattern": "(?:the\\s)?(?:Client|CLIENT|Customer)",
+      "examples": [
+        "the Client",
+        "CLIENT",
+        "the Customer"
+      ],
+      "entityType": "role",
+      "role": "client",
+      "notes": "English client/customer role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_035",
+      "name": "role_vendor_en",
+      "pattern": "(?:the\\s)?(?:Vendor|VENDOR|Supplier)",
+      "examples": [
+        "the Vendor",
+        "VENDOR",
+        "the Supplier"
+      ],
+      "entityType": "role",
+      "role": "vendor",
+      "notes": "English vendor/supplier role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_036",
+      "name": "role_insurer_en",
+      "pattern": "(?:the\\s)?(?:Insurer|INSURER|Underwriter)",
+      "examples": [
+        "the Insurer",
+        "INSURER",
+        "the Underwriter"
+      ],
+      "entityType": "role",
+      "role": "insurer",
+      "notes": "English insurer role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_037",
+      "name": "role_insured_en",
+      "pattern": "(?:the\\s)?(?:Insured|INSURED|Policyholder)",
+      "examples": [
+        "the Insured",
+        "INSURED",
+        "the Policyholder"
+      ],
+      "entityType": "role",
+      "role": "insured",
+      "notes": "English insured role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_038",
+      "name": "role_beneficiary_en",
+      "pattern": "(?:the\\s)?(?:Beneficiary|BENEFICIARY)",
+      "examples": [
+        "the Beneficiary",
+        "BENEFICIARY"
+      ],
+      "entityType": "role",
+      "role": "beneficiary",
+      "notes": "English beneficiary role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_039",
+      "name": "role_trustee_en",
+      "pattern": "(?:the\\s)?(?:Trustee|TRUSTEE)",
+      "examples": [
+        "the Trustee",
+        "TRUSTEE"
+      ],
+      "entityType": "role",
+      "role": "trustee",
+      "notes": "English trustee role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_040",
+      "name": "role_agent_en",
+      "pattern": "(?:the\\s)?(?:Agent|AGENT|Representative)",
+      "examples": [
+        "the Agent",
+        "AGENT",
+        "the Representative"
+      ],
+      "entityType": "role",
+      "role": "agent",
+      "notes": "English agent/representative role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_041",
+      "name": "role_comprador_pt",
+      "pattern": "(?:o\\s)?(?:Comprador|COMPRADOR|Adquirente)",
+      "examples": [
+        "o Comprador",
+        "COMPRADOR",
+        "o Adquirente"
+      ],
+      "entityType": "role",
+      "role": "buyer",
+      "notes": "Portuguese buyer role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_042",
+      "name": "role_vendedor_pt",
+      "pattern": "(?:o\\s)?(?:Vendedor|VENDEDOR|Alienante)",
+      "examples": [
+        "o Vendedor",
+        "VENDEDOR",
+        "o Alienante"
+      ],
+      "entityType": "role",
+      "role": "seller",
+      "notes": "Portuguese seller role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_043",
+      "name": "role_locador_pt",
+      "pattern": "(?:o\\s)?(?:Locador|LOCADOR)",
+      "examples": [
+        "o Locador",
+        "LOCADOR"
+      ],
+      "entityType": "role",
+      "role": "landlord",
+      "notes": "Portuguese landlord role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_044",
+      "name": "role_locatario_pt",
+      "pattern": "(?:o\\s)?(?:Locatario|LOCATARIO)",
+      "examples": [
+        "o Locatario",
+        "LOCATARIO"
+      ],
+      "entityType": "role",
+      "role": "tenant",
+      "notes": "Portuguese tenant role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_045",
+      "name": "role_contratante_pt",
+      "pattern": "(?:o\\s|a\\s)?(?:Contratante|CONTRATANTE)",
+      "examples": [
+        "o Contratante",
+        "a Contratante",
+        "CONTRATANTE"
+      ],
+      "entityType": "role",
+      "role": "contracting_party",
+      "notes": "Portuguese contracting party",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_046",
+      "name": "role_contratado_pt",
+      "pattern": "(?:o\\s|a\\s)?(?:Contratado|CONTRATADO|Contratada|CONTRATADA)",
+      "examples": [
+        "o Contratado",
+        "a Contratada",
+        "CONTRATADO"
+      ],
+      "entityType": "role",
+      "role": "contracted_party",
+      "notes": "Portuguese contracted party",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_047",
+      "name": "role_empregador_pt",
+      "pattern": "(?:o\\s)?(?:Empregador|EMPREGADOR|Empresa)",
+      "examples": [
+        "o Empregador",
+        "EMPREGADOR",
+        "a Empresa"
+      ],
+      "entityType": "role",
+      "role": "employer",
+      "notes": "Portuguese employer role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_048",
+      "name": "role_empregado_pt",
+      "pattern": "(?:o\\s|a\\s)?(?:Empregado|EMPREGADO|Empregada|EMPREGADA)",
+      "examples": [
+        "o Empregado",
+        "a Empregada",
+        "EMPREGADO"
+      ],
+      "entityType": "role",
+      "role": "employee",
+      "notes": "Portuguese employee role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_049",
+      "name": "role_fiador_pt",
+      "pattern": "(?:o\\s)?(?:Fiador|FIADOR|Avalista)",
+      "examples": [
+        "o Fiador",
+        "FIADOR",
+        "o Avalista"
+      ],
+      "entityType": "role",
+      "role": "guarantor",
+      "notes": "Portuguese guarantor role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_050",
+      "name": "role_fornecedor_pt",
+      "pattern": "(?:o\\s)?(?:Fornecedor|FORNECEDOR|Prestador)",
+      "examples": [
+        "o Fornecedor",
+        "FORNECEDOR",
+        "o Prestador"
+      ],
+      "entityType": "role",
+      "role": "supplier",
+      "notes": "Portuguese supplier/provider role",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_051",
+      "name": "person_title_en_mr",
+      "pattern": "(?:Mr|Mrs|Ms|Miss|Dr|Prof)\\.?\\s[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*",
+      "examples": [
+        "Mr. John Smith",
+        "Dr. Jane Doe",
+        "Prof. Brown"
+      ],
+      "entityType": "person",
+      "role": "named_individual",
+      "notes": "English person with title prefix",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_052",
+      "name": "person_title_pt_sr",
+      "pattern": "(?:Sr|Sra|Dra?)\\.?\\s[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*",
+      "examples": [
+        "Sr. Joao Silva",
+        "Sra. Maria Santos",
+        "Dr. Carlos Lima"
+      ],
+      "entityType": "person",
+      "role": "named_individual",
+      "notes": "Portuguese person with title prefix",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_053",
+      "name": "govt_department_en",
+      "pattern": "(?:Department|Ministry|Bureau|Office|Agency|Commission|Authority)\\sof\\s[A-Z][\\w\\s]+",
+      "examples": [
+        "Department of Justice",
+        "Agency of Health",
+        "Commission of Securities"
+      ],
+      "entityType": "organization",
+      "role": "government_body",
+      "notes": "English government department/agency",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_054",
+      "name": "govt_entity_pt",
+      "pattern": "(?:Ministerio|Secretaria|Agencia|Comissao|Autoridade|Tribunal|Procuradoria)\\s(?:de|do|da|dos|das)\\s[A-Z][\\w\\s]+",
+      "examples": [
+        "Ministerio da Fazenda",
+        "Secretaria de Saude",
+        "Tribunal de Justica"
+      ],
+      "entityType": "organization",
+      "role": "government_body",
+      "notes": "Portuguese government entity",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_055",
+      "name": "medical_entity_hospital",
+      "pattern": "(?:Hospital|Clinic|Medical Center|Laboratory|Pharmacy|Centro Medico|Laboratorio|Farmacia|Clinica)\\s[A-Z][\\w\\s]*",
+      "examples": [
+        "Hospital Sao Paulo",
+        "Medical Center East",
+        "Laboratorio ABC"
+      ],
+      "entityType": "organization",
+      "role": "healthcare_provider",
+      "notes": "Healthcare facility",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_056",
+      "name": "financial_entity_bank",
+      "pattern": "(?:Bank|Banco|Credit Union|Savings|Insurance|Seguradora|Fund|Fundo|Exchange|Bolsa)\\s(?:of\\s|do\\s|da\\s|de\\s)?[A-Z][\\w\\s]*",
+      "examples": [
+        "Bank of America",
+        "Banco do Brasil",
+        "Seguradora Allianz"
+      ],
+      "entityType": "organization",
+      "role": "financial_institution",
+      "notes": "Financial institution",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_057",
+      "name": "signatory_signed_by_en",
+      "pattern": "(?:signed by|executed by|on behalf of)\\s[A-Z][\\w\\s.,'-]+",
+      "examples": [
+        "signed by John Smith",
+        "executed by Acme Corp.",
+        "on behalf of Global LLC"
+      ],
+      "entityType": "signatory_action",
+      "role": "signatory",
+      "notes": "English signatory identification",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_058",
+      "name": "signatory_assinado_pt",
+      "pattern": "(?:assinado por|firmado por|representado por|em nome de)\\s[A-Z][\\w\\s.,'-]+",
+      "examples": [
+        "assinado por Joao Silva",
+        "firmado por Empresa ABC Ltda.",
+        "representado por Maria Santos"
+      ],
+      "entityType": "signatory_action",
+      "role": "signatory",
+      "notes": "Portuguese signatory identification",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_059",
+      "name": "witness_en",
+      "pattern": "(?:witnessed by|in the presence of|witness:)\\s?[A-Z][\\w\\s.,'-]+",
+      "examples": [
+        "witnessed by Jane Doe",
+        "in the presence of John Brown",
+        "Witness: Alice Smith"
+      ],
+      "entityType": "signatory_action",
+      "role": "witness",
+      "notes": "English witness identification",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_060",
+      "name": "witness_pt",
+      "pattern": "(?:testemunha|testemunhas|na presenca de):?\\s?[A-Z][\\w\\s.,'-]+",
+      "examples": [
+        "Testemunha: Carlos Lima",
+        "testemunhas: Ana e Pedro"
+      ],
+      "entityType": "signatory_action",
+      "role": "witness",
+      "notes": "Portuguese witness identification",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_061",
+      "name": "registered_office_en",
+      "pattern": "(?:registered office|principal place of business|headquarters)\\s(?:at|in|located at)\\s[A-Z][\\w\\s.,'-]+",
+      "examples": [
+        "registered office at 123 Main St",
+        "principal place of business in New York"
+      ],
+      "entityType": "address",
+      "role": "registered_address",
+      "notes": "English registered office",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_062",
+      "name": "registered_office_pt",
+      "pattern": "(?:sede social|sede|endereco|domicilio)\\s(?:em|na|no|sito em)\\s[A-Z][\\w\\s.,'-]+",
+      "examples": [
+        "sede social em Sao Paulo",
+        "sede na Rua Augusta, 100"
+      ],
+      "entityType": "address",
+      "role": "registered_address",
+      "notes": "Portuguese registered office",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_063",
+      "name": "tax_id_cnpj",
+      "pattern": "CNPJ\\s?(?:n[o.]?\\s?)?\\d{2}\\.?\\d{3}\\.?\\d{3}/?\\d{4}-?\\d{2}",
+      "examples": [
+        "CNPJ 12.345.678/0001-90",
+        "CNPJ no. 12345678000190"
+      ],
+      "entityType": "tax_identifier",
+      "role": "company_tax_id_br",
+      "notes": "Brazilian company tax ID",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
+    },
+    {
+      "id": "party_064",
+      "name": "tax_id_cpf",
+      "pattern": "CPF\\s?(?:n[o.]?\\s?)?\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}",
+      "examples": [
+        "CPF 123.456.789-00",
+        "CPF no. 12345678900"
+      ],
+      "entityType": "tax_identifier",
+      "role": "individual_tax_id_br",
+      "notes": "Brazilian individual tax ID",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
+    },
+    {
+      "id": "party_065",
+      "name": "tax_id_ein",
+      "pattern": "EIN\\s?(?:No\\.?\\s?)?\\d{2}-?\\d{7}",
+      "examples": [
+        "EIN 12-3456789",
+        "EIN No. 123456789"
+      ],
+      "entityType": "tax_identifier",
+      "role": "employer_id_us",
+      "notes": "US employer identification number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
+    },
+    {
+      "id": "party_066",
+      "name": "tax_id_vat",
+      "pattern": "VAT\\s?(?:No\\.?\\s?)?[A-Z]{2}\\d{8,12}",
+      "examples": [
+        "VAT No. GB123456789",
+        "VAT DE123456789"
+      ],
+      "entityType": "tax_identifier",
+      "role": "vat_number",
+      "notes": "European VAT number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
+    },
+    {
+      "id": "party_067",
+      "name": "tax_id_nif",
+      "pattern": "NIF\\s?(?:n[o.]?\\s?)?\\d{9}",
+      "examples": [
+        "NIF 123456789",
+        "NIF no. 987654321"
+      ],
+      "entityType": "tax_identifier",
+      "role": "tax_id_pt",
+      "notes": "Portuguese/Spanish tax number",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_identifier"
+      }
+    },
+    {
+      "id": "party_068",
+      "name": "registration_en",
+      "pattern": "(?:registered under|company number|registration no\\.?)\\s?:?\\s?[A-Z0-9-]+",
+      "examples": [
+        "registered under 12345678",
+        "company number SC123456",
+        "Registration No. HRB 12345"
+      ],
+      "entityType": "registration",
+      "role": "company_registration",
+      "notes": "English company registration",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    },
+    {
+      "id": "party_069",
+      "name": "registration_pt",
+      "pattern": "(?:inscrita no|registrada sob|NIRE|Junta Comercial)\\s?:?\\s?[A-Z0-9.-]+",
+      "examples": [
+        "inscrita no CNPJ 12.345.678/0001-90",
+        "NIRE 35300123456"
+      ],
+      "entityType": "registration",
+      "role": "company_registration_br",
+      "notes": "Brazilian company registration",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [],
+        "curationReason": "signals:stable_pattern+typed_party"
+      }
+    }
   ]
 }

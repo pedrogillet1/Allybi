@@ -1,0 +1,29 @@
+{
+  "_meta": {
+    "id": "pii_field_labels",
+    "version": "1.0.0",
+    "description": "PII labels and patterns used by quality gates for minimal privacy protection.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true
+  },
+  "labels": [
+    "ssn",
+    "cpf",
+    "cnpj",
+    "tax_id",
+    "tin",
+    "passport",
+    "driver_license",
+    "dob",
+    "email",
+    "phone"
+  ],
+  "piiPatterns": [
+    "\\b\\d{3}-\\d{2}-\\d{4}\\b",
+    "\\b(?:cpf|cnpj|tax\\s*id|tin)\\b",
+    "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b"
+  ]
+}

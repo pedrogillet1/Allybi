@@ -28,6 +28,12 @@
     { "abbr": "PEPS", "expansion": "Primeiro que Entra, Primeiro que Sai (FIFO)" },
     { "abbr": "PL", "expansion": "Patrimônio Líquido" },
     { "abbr": "SPED", "expansion": "Sistema Público de Escrituração Digital" },
-    { "abbr": "UEPS", "expansion": "Último que Entra, Primeiro que Sai (LIFO)" }
+    { "abbr": "UEPS", "expansion": "Último que Entra, Primeiro que Sai (LIFO)" },
+    { "abbr": "LE", "expansion": "Lançamento de Estorno" },
+    { "abbr": "LA", "expansion": "Lançamento de Ajuste" },
+    { "abbr": "LC", "expansion": "Lançamento Contábil" },
+    { "abbr": "PC", "expansion": "Plano de Contas" },
+    { "abbr": "AI", "expansion": "Ativo Imobilizado" },
+    { "abbr": "SCI", "expansion": "Segregação de Funções" }
   ]
 }

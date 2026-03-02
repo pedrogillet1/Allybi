@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "di_ops_tables_ops_quality_report",
+    "version": "1.0.0",
+    "description": "Expected table patterns for quality report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_quality_report"
+  },
+  "tableHeaderSynonyms": {
+    "parameter": [
+      "parameter",
+      "characteristic",
+      "test",
+      "parametro"
+    ],
+    "specification": [
+      "specification",
+      "target",
+      "tolerance",
+      "especificacao"
+    ],
+    "actual": [
+      "actual",
+      "measured",
+      "result",
+      "valor medido"
+    ],
+    "pass_fail": [
+      "pass/fail",
+      "result",
+      "verdict",
+      "aprovado"
+    ],
+    "defect_type": [
+      "defect type",
+      "non-conformance",
+      "tipo defeito"
+    ],
+    "quantity": [
+      "qty",
+      "count",
+      "quantidade"
+    ]
+  },
+  "tables": [
+    {
+      "id": "ops_quality_report_test_results_table",
+      "name": {
+        "en": "Test Results",
+        "pt": "Resultados dos Testes"
+      },
+      "section": "test_results",
+      "expectedColumns": [
+        "parameter",
+        "specification",
+        "actual",
+        "pass_fail"
+      ],
+      "keyRows": [
+        "overall_result"
+      ]
+    },
+    {
+      "id": "ops_quality_report_defects_table",
+      "name": {
+        "en": "Defect Summary",
+        "pt": "Resumo de Defeitos"
+      },
+      "section": "non_conformances",
+      "expectedColumns": [
+        "defect_type",
+        "description",
+        "quantity",
+        "severity"
+      ],
+      "keyRows": [
+        "total_defects"
+      ]
+    },
+    {
+      "id": "ops_quality_report_sampling_table",
+      "name": {
+        "en": "Sampling Data",
+        "pt": "Dados de Amostragem"
+      },
+      "section": "test_results",
+      "expectedColumns": [
+        "sample_id",
+        "measurement",
+        "unit",
+        "pass_fail"
+      ],
+      "keyRows": [
+        "average",
+        "std_deviation"
+      ]
+    }
+  ]
+}

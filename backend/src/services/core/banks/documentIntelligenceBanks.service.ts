@@ -308,14 +308,14 @@ export class DocumentIntelligenceBanksService {
     const configuredCore = Array.isArray(fromMap?.domains)
       ? fromMap.domains
           .map((value: unknown) => normalizeDocumentIntelligenceDomain(value))
-          .filter((value): value is DocumentIntelligenceDomain =>
+          .filter((value: unknown): value is DocumentIntelligenceDomain =>
             Boolean(value),
           )
       : [];
     const configuredExtended = Array.isArray(fromMap?.extendedDomains)
       ? fromMap.extendedDomains
           .map((value: unknown) => normalizeDocumentIntelligenceDomain(value))
-          .filter((value): value is DocumentIntelligenceDomain =>
+          .filter((value: unknown): value is DocumentIntelligenceDomain =>
             Boolean(value),
           )
       : [];
@@ -332,7 +332,9 @@ export class DocumentIntelligenceBanksService {
   ): DocumentIntelligenceDomain {
     const normalized = normalizeDocumentIntelligenceDomain(domain);
     if (!normalized) {
-      throw new Error(`Unsupported document intelligence domain for ${context}`);
+      throw new Error(
+        `Unsupported document intelligence domain for ${context}`,
+      );
     }
     return normalized;
   }
@@ -655,7 +657,10 @@ export class DocumentIntelligenceBanksService {
     domain: DocumentIntelligenceDomain,
     docType: string,
   ): any | null {
-    const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeSections");
+    const normalized = this.normalizeDomainOrThrow(
+      domain,
+      "getDocTypeSections",
+    );
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
     return this.getCachedOptional<any>(

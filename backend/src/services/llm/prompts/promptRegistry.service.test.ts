@@ -10,9 +10,14 @@ function loadPromptBanks() {
     "prompt_registry",
     "system_base",
     "mode_chat",
+    "mode_editing",
     "rag_policy",
     "task_answer_with_sources",
     "policy_citations",
+    "retrieval_prompt",
+    "disambiguation_prompt",
+    "fallback_prompt",
+    "tool_prompts",
   ];
   const banks = Object.fromEntries(
     bankIds.map((bankId) => [
@@ -63,7 +68,9 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
         operator: "extract",
         operatorFamily: "qa",
       });
-      expect(bundle.debug?.selectedTemplateIds || []).toContain(expectedTemplate);
+      expect(bundle.debug?.selectedTemplateIds || []).toContain(
+        expectedTemplate,
+      );
     }
   });
 
@@ -148,5 +155,308 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
       if (prev === undefined) delete process.env.PROMPT_MODE_COVERAGE_STRICT;
       else process.env.PROMPT_MODE_COVERAGE_STRICT = prev;
     }
+  });
+
+  test("uses concrete template for retrieval kind", () => {
+    const service = new PromptRegistryService(loadPromptBanks());
+    const bundle = service.buildPrompt("retrieval", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "doc_grounded_single",
+      operator: "locate_docs",
+      intentFamily: "retrieval",
+      slots: {
+        userQuery: "find total revenue",
+        scope: "{lock:soft}",
+        docContext: "{docs:2}",
+      },
+    });
+    const selected = bundle.debug?.selectedTemplateIds ?? [];
+    expect(
+      selected.some((templateId) => templateId.endsWith(":meta.description")),
+    ).toBe(false);
+  });
+
+  test("uses concrete template for disambiguation kind", () => {
+    const service = new PromptRegistryService(loadPromptBanks());
+    const bundle = service.buildPrompt("disambiguation", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "rank_disambiguate",
+      operator: "locate_docs",
+      intentFamily: "retrieval",
+      slots: {
+        userQuery: "open budget file",
+        candidateCount: 2,
+        candidates: "- 1) Budget 2025\n- 2) Budget 2024",
+      },
+      disambiguation: {
+        active: true,
+        candidateType: "document",
+        options: [
+          { id: "d1", label: "Budget 2025" },
+          { id: "d2", label: "Budget 2024" },
+        ],
+      },
+    });
+    const selected = bundle.debug?.selectedTemplateIds ?? [];
+    expect(
+      selected.some((templateId) => templateId.endsWith(":meta.description")),
+    ).toBe(false);
+  });
+
+  test("uses concrete template for fallback kind reason codes", () => {
+    const service = new PromptRegistryService(loadPromptBanks());
+    const expectations: Record<string, string> = {
+      no_docs_indexed: "fallback_no_docs_indexed",
+      scope_hard_constraints_empty: "fallback_scope_hard_constraints_empty",
+      no_relevant_chunks_in_scoped_docs:
+        "fallback_no_relevant_chunks_in_scoped_docs",
+      indexing_in_progress: "fallback_indexing_in_progress",
+      extraction_failed: "fallback_extraction_failed",
+      low_confidence: "fallback_low_confidence",
+    };
+
+    for (const [reasonCode, expectedTemplate] of Object.entries(expectations)) {
+      const bundle = service.buildPrompt("fallback", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "general_answer",
+        intentFamily: "documents",
+        fallback: {
+          triggered: true,
+          reasonCode,
+        },
+      });
+      const selected = bundle.debug?.selectedTemplateIds ?? [];
+      expect(selected).toContain(expectedTemplate);
+      expect(
+        selected.some((templateId) => templateId === "fallback_prompt:meta.description"),
+      ).toBe(false);
+    }
+  });
+
+  test("resolves tool_prompts entries from tools[] shape", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            layersByKind: { tool: ["tool_prompts"] },
+          } as T;
+        }
+        if (bankId === "tool_prompts") {
+          return JSON.parse(
+            fs.readFileSync(
+              path.resolve(
+                process.cwd(),
+                "src/data_banks/prompts/tool_prompts.any.json",
+              ),
+              "utf8",
+            ),
+          ) as T;
+        }
+        throw new Error(`missing bank: ${bankId}`);
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    const bundle = service.buildPrompt("tool", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "nav_pills",
+      operator: "open",
+      operatorFamily: "file_actions",
+      intentFamily: "file_actions",
+      slots: { userQuery: "open budget" },
+    });
+    const selected = bundle.debug?.selectedTemplateIds ?? [];
+    expect(selected).toContain("nav_pills_open");
+  });
+
+  test("covers every tool_prompts tool id with deterministic selection", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            layersByKind: { tool: ["tool_prompts"] },
+          } as T;
+        }
+        if (bankId === "tool_prompts") {
+          return JSON.parse(
+            fs.readFileSync(
+              path.resolve(
+                process.cwd(),
+                "src/data_banks/prompts/tool_prompts.any.json",
+              ),
+              "utf8",
+            ),
+          ) as T;
+        }
+        throw new Error(`missing bank: ${bankId}`);
+      },
+    };
+    const service = new PromptRegistryService(loader);
+
+    const checks: Array<{
+      expected: string;
+      ctx: Record<string, any>;
+    }> = [
+      {
+        expected: "nav_pills_open",
+        ctx: {
+          answerMode: "nav_pills",
+          operator: "open",
+          intentFamily: "file_actions",
+        },
+      },
+      {
+        expected: "nav_pills_where",
+        ctx: {
+          answerMode: "nav_pills",
+          operator: "locate_file",
+          intentFamily: "file_actions",
+        },
+      },
+      {
+        expected: "nav_pills_discover",
+        ctx: {
+          answerMode: "nav_pills",
+          operator: "locate_docs",
+          intentFamily: "retrieval",
+        },
+      },
+      {
+        expected: "file_list_show_more_entrypoint",
+        ctx: {
+          answerMode: "general_answer",
+          operator: "list",
+          intentFamily: "file_actions",
+        },
+      },
+      {
+        expected: "file_list_screen_title_generator",
+        ctx: {
+          answerMode: "general_answer",
+          operator: "noop",
+          intentFamily: "file_actions",
+          uiSurface: "files_screen",
+          usedBy: ["show_more_button"],
+        },
+      },
+      {
+        expected: "locate_content_breadcrumbs",
+        ctx: {
+          answerMode: "doc_grounded_multi",
+          operator: "locate_content",
+          intentFamily: "documents",
+        },
+      },
+      {
+        expected: "extract_micro_value_helper",
+        ctx: {
+          answerMode: "doc_grounded_single",
+          operator: "extract",
+          intentFamily: "documents",
+          semanticFlags: ["microValue"],
+        },
+      },
+    ];
+
+    for (const check of checks) {
+      const bundle = service.buildPrompt("tool", {
+        env: "local",
+        outputLanguage: "en",
+        ...check.ctx,
+        slots: {
+          userQuery: "find requested value",
+          runtimeSignals: {
+            microValue: check.expected === "extract_micro_value_helper",
+          },
+        },
+      } as any);
+      expect(bundle.debug?.selectedTemplateIds || []).toContain(check.expected);
+    }
+  });
+
+  test("fails closed for unsupported tool appliesTo keys", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            layersByKind: { tool: ["tool_prompts"] },
+          } as T;
+        }
+        if (bankId === "tool_prompts") {
+          return {
+            _meta: { id: "tool_prompts", version: "test" },
+            config: { enabled: true },
+            tools: [
+              {
+                id: "bad_tool",
+                appliesTo: {
+                  operators: ["open"],
+                  unsupportedKey: "x",
+                },
+                system: { en: ["bad"] },
+              },
+            ],
+          } as T;
+        }
+        throw new Error(`missing bank: ${bankId}`);
+      },
+    };
+    const service = new PromptRegistryService(loader);
+
+    expect(() =>
+      service.buildPrompt("tool", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "nav_pills",
+        operator: "open",
+      }),
+    ).toThrow(/prompt_tool_applies_to_unsupported_keys/);
+  });
+
+  test("throws when unresolved placeholders remain after interpolation", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            config: { enabled: true },
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: [
+              {
+                id: "bad_placeholder",
+                priority: 100,
+                when: { answerModes: ["doc_grounded_single"] },
+                messages: [
+                  {
+                    role: "system",
+                    content: { any: "Use {{missing-slot}} and answer." },
+                  },
+                ],
+              },
+            ],
+          } as T;
+        }
+        return { config: { enabled: true, messages: [] } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(/prompt_unresolved_placeholders/);
   });
 });

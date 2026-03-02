@@ -75,6 +75,30 @@ export function analyzeMessageToPlan(
     language,
   );
 
+  const firstAmbiguous = matchResults.find(
+    (result) =>
+      result.ambiguity &&
+      result.ambiguity.candidateIds.length > 1 &&
+      result.candidates.length > 1,
+  );
+  if (firstAmbiguous?.ambiguity) {
+    const message =
+      language === "pt"
+        ? "Sua solicitação está ambígua. Você quer dizer uma destas opções?"
+        : "Your request is ambiguous. Which of these options did you mean?";
+    return {
+      kind: "clarification",
+      missingSlots: [
+        {
+          slot: `intent_disambiguation:${firstAmbiguous.ambiguity.group}`,
+          message,
+        },
+      ],
+      partialOps: [],
+      sourcePatternIds: firstAmbiguous.ambiguity.candidateIds,
+    };
+  }
+
   // If no segments matched, return null (fall through to existing pipeline)
   const hasAnyMatch = matchResults.some((r) => r.bestMatch !== null);
   if (!hasAnyMatch) return null;

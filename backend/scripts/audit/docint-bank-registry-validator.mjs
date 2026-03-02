@@ -237,6 +237,10 @@ for (const entry of registryBanks) {
     // Self-referential checksum entry; validated via banks:checksum flow.
     continue;
   }
+  if (id === "bank_checksums" && relPath === "manifest/bank_checksums.any.json") {
+    // Self-referential checksum entry; checksum content changes as checksums are regenerated.
+    continue;
+  }
 
   const fullPath = path.join(dataBanksRoot, relPath);
   if (!fs.existsSync(fullPath)) {

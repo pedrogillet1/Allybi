@@ -1,157 +1,2657 @@
 {
   "_meta": {
     "id": "table_header_ontology_ops",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for ops.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "ops"
+    "domain": "ops",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "ops",
   "headers": [
-    { "canonical": "acceptance_criteria", "synonyms": ["acceptance criteria", "done criteria", "exit criteria", "criterios de aceitacao", "criterios de conclusao"], "related": ["task_status", "completion_percentage"] },
-    { "canonical": "action_item", "synonyms": ["action item", "action", "task", "item de acao", "tarefa", "acao"], "related": ["action_owner", "due_date"] },
-    { "canonical": "action_owner", "synonyms": ["owner", "responsible", "assigned to", "responsavel", "dono da acao", "atribuido a"], "related": ["action_item", "assigned_to"] },
-    { "canonical": "actual_completion_date", "synonyms": ["actual completion", "completed on", "finished date", "data real de conclusao", "concluido em"], "related": ["planned_completion_date", "completion_percentage"] },
-    { "canonical": "actual_cost", "synonyms": ["actual cost", "real cost", "incurred cost", "custo real", "custo incorrido", "custo efetivo"], "related": ["planned_cost", "cost_variance"] },
-    { "canonical": "actual_hours", "synonyms": ["actual hours", "hours worked", "real hours", "horas reais", "horas trabalhadas"], "related": ["planned_hours", "estimated_hours"] },
-    { "canonical": "alert_level", "synonyms": ["alert level", "alarm", "notification level", "nivel de alerta", "alarme"], "related": ["incident_severity", "escalation_level"] },
-    { "canonical": "approval_status", "synonyms": ["approval status", "approved", "pending approval", "status de aprovacao", "aprovado", "pendente de aprovacao"], "related": ["approver", "approval_date"] },
-    { "canonical": "approver", "synonyms": ["approver", "approved by", "authorizer", "aprovador", "aprovado por", "autorizador"], "related": ["approval_status", "approval_date"] },
-    { "canonical": "asset_condition", "synonyms": ["asset condition", "condition", "state", "condicao do ativo", "estado", "condicao"], "related": ["asset_status", "last_maintenance"] },
-    { "canonical": "asset_id", "synonyms": ["asset id", "asset number", "asset code", "id do ativo", "numero do ativo", "codigo do ativo"], "related": ["asset_name", "asset_tag"] },
-    { "canonical": "asset_location", "synonyms": ["asset location", "location", "site", "localizacao do ativo", "local", "site"], "related": ["asset_id", "warehouse"] },
-    { "canonical": "asset_name", "synonyms": ["asset name", "asset", "equipment name", "nome do ativo", "ativo", "nome do equipamento"], "related": ["asset_id", "asset_type"] },
-    { "canonical": "asset_status", "synonyms": ["asset status", "status", "operational status", "status do ativo", "situacao do ativo"], "related": ["asset_condition", "asset_id"] },
-    { "canonical": "asset_tag", "synonyms": ["asset tag", "tag", "label", "etiqueta do ativo", "tag", "plaqueta"], "related": ["asset_id", "serial_number"] },
-    { "canonical": "asset_type", "synonyms": ["asset type", "type", "category", "tipo de ativo", "tipo", "categoria do ativo"], "related": ["asset_name", "asset_id"] },
-    { "canonical": "assigned_to", "synonyms": ["assigned to", "assignee", "responsible", "atribuido a", "responsavel", "designado para"], "related": ["action_owner", "team"] },
-    { "canonical": "batch_number", "synonyms": ["batch number", "batch", "batch id", "numero do lote", "lote", "id do lote"], "related": ["lot_number", "production_date"] },
-    { "canonical": "budget_allocated", "synonyms": ["budget allocated", "allocated budget", "approved budget", "orcamento alocado", "budget aprovado"], "related": ["budget_spent", "budget_remaining"] },
-    { "canonical": "budget_remaining", "synonyms": ["budget remaining", "remaining budget", "available budget", "orcamento restante", "saldo do orcamento"], "related": ["budget_allocated", "budget_spent"] },
-    { "canonical": "budget_spent", "synonyms": ["budget spent", "spent", "consumed budget", "orcamento gasto", "gasto", "consumido"], "related": ["budget_allocated", "budget_remaining"] },
-    { "canonical": "capacity", "synonyms": ["capacity", "max capacity", "total capacity", "capacidade", "capacidade maxima", "capacidade total"], "related": ["capacity_utilization", "throughput"] },
-    { "canonical": "capacity_utilization", "synonyms": ["utilization", "capacity utilization", "usage rate", "utilizacao", "taxa de uso", "utilizacao da capacidade"], "related": ["capacity", "throughput"] },
-    { "canonical": "category", "synonyms": ["category", "type", "classification", "categoria", "tipo", "classificacao"], "related": ["issue_type", "task_type"] },
-    { "canonical": "change_description", "synonyms": ["change description", "change details", "description", "descricao da mudanca", "detalhes da alteracao"], "related": ["change_id", "change_type"] },
-    { "canonical": "change_id", "synonyms": ["change id", "change number", "cr number", "id da mudanca", "numero da mudanca"], "related": ["change_description", "change_status"] },
-    { "canonical": "change_status", "synonyms": ["change status", "status", "cr status", "status da mudanca", "situacao da alteracao"], "related": ["change_id", "change_priority"] },
-    { "canonical": "completion_date", "synonyms": ["completion date", "completed on", "finish date", "data de conclusao", "concluido em", "data de termino"], "related": ["start_date", "completion_percentage"] },
-    { "canonical": "completion_percentage", "synonyms": ["completion", "% complete", "progress", "percentual de conclusao", "progresso", "% concluido"], "related": ["completion_date", "task_status"] },
-    { "canonical": "corrective_action", "synonyms": ["corrective action", "remedy", "fix", "acao corretiva", "remedio", "correcao"], "related": ["root_cause", "incident_id"] },
-    { "canonical": "cost_estimate", "synonyms": ["cost estimate", "estimated cost", "quote", "estimativa de custo", "orcamento estimado", "cotacao"], "related": ["actual_cost", "planned_cost"] },
-    { "canonical": "cost_variance", "synonyms": ["cost variance", "cv", "budget variance", "variacao de custo", "desvio de custo"], "related": ["actual_cost", "planned_cost"] },
-    { "canonical": "created_by", "synonyms": ["created by", "author", "requester", "criado por", "autor", "solicitante"], "related": ["created_date", "requested_by"] },
-    { "canonical": "created_date", "synonyms": ["created date", "creation date", "opened on", "data de criacao", "criado em", "aberto em"], "related": ["created_by", "due_date"] },
-    { "canonical": "criticality", "synonyms": ["criticality", "critical level", "importance", "criticidade", "nivel critico", "importancia"], "related": ["priority", "severity"] },
-    { "canonical": "current_stock", "synonyms": ["current stock", "on hand", "available stock", "estoque atual", "em maos", "estoque disponivel"], "related": ["min_stock_level", "reorder_point"] },
-    { "canonical": "cycle_time", "synonyms": ["cycle time", "processing time", "lead time", "tempo de ciclo", "tempo de processamento"], "related": ["lead_time", "throughput"] },
-    { "canonical": "defect_count", "synonyms": ["defect count", "defects", "bug count", "quantidade de defeitos", "defeitos", "numero de bugs"], "related": ["defect_rate", "defect_type"] },
-    { "canonical": "defect_rate", "synonyms": ["defect rate", "failure rate", "error rate", "taxa de defeito", "taxa de falha", "taxa de erro"], "related": ["defect_count", "quality_score"] },
-    { "canonical": "defect_type", "synonyms": ["defect type", "type of defect", "failure mode", "tipo de defeito", "tipo de falha", "modo de falha"], "related": ["defect_count", "root_cause"] },
-    { "canonical": "delivery_date", "synonyms": ["delivery date", "delivered on", "ship date", "data de entrega", "entregue em", "data de envio"], "related": ["delivery_status", "eta"] },
-    { "canonical": "delivery_status", "synonyms": ["delivery status", "shipment status", "status", "status da entrega", "status do envio"], "related": ["delivery_date", "tracking_number"] },
-    { "canonical": "department", "synonyms": ["department", "dept", "division", "departamento", "setor", "divisao"], "related": ["team", "location"] },
-    { "canonical": "description", "synonyms": ["description", "details", "summary", "descricao", "detalhes", "resumo"], "related": ["issue_description", "task_name"] },
-    { "canonical": "downtime_hours", "synonyms": ["downtime", "downtime hours", "outage time", "tempo de inatividade", "horas paradas", "tempo de parada"], "related": ["uptime_percentage", "mttr"] },
-    { "canonical": "due_date", "synonyms": ["due date", "deadline", "target date", "data de vencimento", "prazo", "data limite"], "related": ["start_date", "completion_date"] },
-    { "canonical": "duration", "synonyms": ["duration", "elapsed time", "time span", "duracao", "tempo decorrido", "intervalo"], "related": ["start_date", "completion_date"] },
-    { "canonical": "effort_estimate", "synonyms": ["effort estimate", "estimated effort", "hours estimate", "estimativa de esforco", "horas estimadas"], "related": ["estimated_hours", "actual_hours"] },
-    { "canonical": "end_date", "synonyms": ["end date", "finish date", "completion date", "data de termino", "data final", "data de conclusao"], "related": ["start_date", "duration"] },
-    { "canonical": "equipment_id", "synonyms": ["equipment id", "machine id", "equip no", "id do equipamento", "numero da maquina"], "related": ["equipment_name", "equipment_status"] },
-    { "canonical": "equipment_name", "synonyms": ["equipment", "machine", "equipment name", "equipamento", "maquina", "nome do equipamento"], "related": ["equipment_id", "equipment_status"] },
-    { "canonical": "equipment_status", "synonyms": ["equipment status", "machine status", "operational status", "status do equipamento", "status da maquina"], "related": ["equipment_id", "downtime_hours"] },
-    { "canonical": "escalation_level", "synonyms": ["escalation level", "escalation", "tier", "nivel de escalacao", "tier", "nivel"], "related": ["severity", "priority"] },
-    { "canonical": "estimated_completion", "synonyms": ["estimated completion", "ecd", "target completion", "conclusao estimada", "previsao de conclusao"], "related": ["due_date", "completion_percentage"] },
-    { "canonical": "estimated_cost", "synonyms": ["estimated cost", "projected cost", "forecast cost", "custo estimado", "custo projetado"], "related": ["actual_cost", "cost_estimate"] },
-    { "canonical": "eta", "synonyms": ["eta", "estimated arrival", "expected delivery", "eta", "previsao de chegada", "previsao de entrega"], "related": ["delivery_date", "lead_time"] },
-    { "canonical": "failure_mode", "synonyms": ["failure mode", "failure type", "fault", "modo de falha", "tipo de falha", "defeito"], "related": ["defect_type", "root_cause"] },
-    { "canonical": "fulfillment_rate", "synonyms": ["fulfillment rate", "fill rate", "completion rate", "taxa de atendimento", "taxa de preenchimento"], "related": ["order_quantity", "quantity_delivered"] },
-    { "canonical": "impact", "synonyms": ["impact", "business impact", "effect", "impacto", "impacto no negocio", "efeito"], "related": ["severity", "priority"] },
-    { "canonical": "incident_category", "synonyms": ["incident category", "category", "incident type", "categoria do incidente", "tipo de incidente"], "related": ["incident_id", "incident_severity"] },
-    { "canonical": "incident_date", "synonyms": ["incident date", "event date", "occurred on", "data do incidente", "data do evento", "ocorrido em"], "related": ["incident_id", "incident_status"] },
-    { "canonical": "incident_id", "synonyms": ["incident id", "incident number", "ticket", "id do incidente", "numero do incidente", "chamado"], "related": ["incident_date", "incident_status"] },
-    { "canonical": "incident_severity", "synonyms": ["severity", "incident severity", "sev", "severidade", "gravidade do incidente"], "related": ["incident_id", "priority"] },
-    { "canonical": "incident_status", "synonyms": ["incident status", "status", "state", "status do incidente", "situacao do incidente"], "related": ["incident_id", "resolution_date"] },
-    { "canonical": "inspection_date", "synonyms": ["inspection date", "inspected on", "check date", "data da inspecao", "inspecionado em"], "related": ["inspection_result", "inspection_type"] },
-    { "canonical": "inspection_result", "synonyms": ["inspection result", "finding", "outcome", "resultado da inspecao", "achado", "parecer"], "related": ["inspection_date", "inspection_type"] },
-    { "canonical": "issue_description", "synonyms": ["issue description", "problem description", "details", "descricao do problema", "detalhes da questao"], "related": ["issue_id", "issue_type"] },
-    { "canonical": "issue_id", "synonyms": ["issue id", "issue number", "issue no", "id do problema", "numero da questao"], "related": ["issue_description", "issue_status"] },
-    { "canonical": "issue_priority", "synonyms": ["issue priority", "priority", "urgency", "prioridade do problema", "prioridade", "urgencia"], "related": ["issue_id", "severity"] },
-    { "canonical": "issue_status", "synonyms": ["issue status", "status", "state", "status do problema", "situacao da questao"], "related": ["issue_id", "resolution_date"] },
-    { "canonical": "issue_type", "synonyms": ["issue type", "type", "problem type", "tipo de problema", "tipo da questao"], "related": ["issue_id", "category"] },
-    { "canonical": "item_name", "synonyms": ["item name", "item", "product name", "nome do item", "item", "nome do produto"], "related": ["item_number", "sku"] },
-    { "canonical": "item_number", "synonyms": ["item number", "item no", "part no", "numero do item", "codigo do item"], "related": ["item_name", "sku"] },
-    { "canonical": "kpi_name", "synonyms": ["kpi", "kpi name", "metric name", "nome do kpi", "indicador", "nome da metrica"], "related": ["kpi_target", "kpi_value"] },
-    { "canonical": "kpi_target", "synonyms": ["target", "kpi target", "goal", "meta", "meta do kpi", "objetivo"], "related": ["kpi_name", "kpi_value"] },
-    { "canonical": "kpi_value", "synonyms": ["kpi value", "actual value", "measured value", "valor do kpi", "valor realizado", "valor medido"], "related": ["kpi_name", "kpi_target"] },
-    { "canonical": "last_maintenance", "synonyms": ["last maintenance", "last service", "last repair", "ultima manutencao", "ultimo servico"], "related": ["next_maintenance", "maintenance_date"] },
-    { "canonical": "lead_time", "synonyms": ["lead time", "delivery lead time", "turnaround", "prazo de entrega", "lead time", "tempo de atendimento"], "related": ["cycle_time", "eta"] },
-    { "canonical": "location", "synonyms": ["location", "site", "place", "local", "localizacao", "site"], "related": ["warehouse", "department"] },
-    { "canonical": "maintenance_cost", "synonyms": ["maintenance cost", "repair cost", "service cost", "custo de manutencao", "custo de reparo"], "related": ["maintenance_date", "actual_cost"] },
-    { "canonical": "maintenance_date", "synonyms": ["maintenance date", "service date", "repair date", "data da manutencao", "data do servico"], "related": ["maintenance_type", "last_maintenance"] },
-    { "canonical": "maintenance_type", "synonyms": ["maintenance type", "service type", "repair type", "tipo de manutencao", "tipo de servico"], "related": ["maintenance_date", "maintenance_cost"] },
-    { "canonical": "milestone_name", "synonyms": ["milestone", "milestone name", "checkpoint", "marco", "nome do marco", "etapa"], "related": ["milestone_date", "milestone_status"] },
-    { "canonical": "milestone_date", "synonyms": ["milestone date", "target date", "due date", "data do marco", "data da etapa"], "related": ["milestone_name", "milestone_status"] },
-    { "canonical": "milestone_status", "synonyms": ["milestone status", "status", "state", "status do marco", "situacao da etapa"], "related": ["milestone_name", "milestone_date"] },
-    { "canonical": "min_stock_level", "synonyms": ["min stock", "minimum stock", "safety stock", "estoque minimo", "estoque de seguranca"], "related": ["current_stock", "reorder_point"] },
-    { "canonical": "mtbf", "synonyms": ["mtbf", "mean time between failures", "reliability", "tempo medio entre falhas", "mtbf"], "related": ["mttr", "downtime_hours"] },
-    { "canonical": "mttr", "synonyms": ["mttr", "mean time to repair", "repair time", "tempo medio de reparo", "mttr"], "related": ["mtbf", "downtime_hours"] },
-    { "canonical": "next_maintenance", "synonyms": ["next maintenance", "next service", "scheduled maintenance", "proxima manutencao", "proximo servico"], "related": ["last_maintenance", "maintenance_date"] },
-    { "canonical": "on_hand_quantity", "synonyms": ["on hand", "in stock", "available qty", "em estoque", "quantidade disponivel", "em maos"], "related": ["current_stock", "on_order_quantity"] },
-    { "canonical": "on_order_quantity", "synonyms": ["on order", "ordered qty", "pending delivery", "em pedido", "quantidade pedida", "pendente de entrega"], "related": ["on_hand_quantity", "order_quantity"] },
-    { "canonical": "order_date", "synonyms": ["order date", "date ordered", "request date", "data do pedido", "data da solicitacao"], "related": ["order_id", "order_status"] },
-    { "canonical": "order_id", "synonyms": ["order id", "order number", "order no", "id do pedido", "numero do pedido"], "related": ["order_date", "order_status"] },
-    { "canonical": "order_quantity", "synonyms": ["order quantity", "qty ordered", "quantity", "quantidade pedida", "qtd pedida", "quantidade"], "related": ["quantity_delivered", "quantity_received"] },
-    { "canonical": "order_status", "synonyms": ["order status", "status", "state", "status do pedido", "situacao do pedido"], "related": ["order_id", "order_date"] },
-    { "canonical": "owner", "synonyms": ["owner", "responsible party", "lead", "proprietario", "responsavel", "lider"], "related": ["assigned_to", "action_owner"] },
-    { "canonical": "part_number", "synonyms": ["part number", "pn", "part no", "numero da peca", "codigo da peca"], "related": ["item_number", "serial_number"] },
-    { "canonical": "percent_complete", "synonyms": ["percent complete", "% done", "progress %", "percentual concluido", "% pronto", "progresso %"], "related": ["completion_percentage", "task_status"] },
-    { "canonical": "po_number", "synonyms": ["po number", "po", "purchase order no", "numero do po", "numero da oc", "pedido de compra"], "related": ["order_id", "supplier_name"] },
-    { "canonical": "priority", "synonyms": ["priority", "urgency", "importance", "prioridade", "urgencia", "importancia"], "related": ["severity", "escalation_level"] },
-    { "canonical": "production_date", "synonyms": ["production date", "manufactured on", "built date", "data de producao", "fabricado em"], "related": ["batch_number", "production_quantity"] },
-    { "canonical": "production_quantity", "synonyms": ["production qty", "output qty", "produced", "quantidade produzida", "producao", "saida"], "related": ["production_date", "yield_rate"] },
-    { "canonical": "project_id", "synonyms": ["project id", "project number", "project code", "id do projeto", "numero do projeto", "codigo do projeto"], "related": ["project_name", "project_status"] },
-    { "canonical": "project_name", "synonyms": ["project", "project name", "initiative", "projeto", "nome do projeto", "iniciativa"], "related": ["project_id", "project_status"] },
-    { "canonical": "project_status", "synonyms": ["project status", "status", "health", "status do projeto", "situacao do projeto", "saude do projeto"], "related": ["project_id", "completion_percentage"] },
-    { "canonical": "quality_score", "synonyms": ["quality score", "quality rating", "qa score", "pontuacao de qualidade", "nota de qualidade"], "related": ["defect_rate", "inspection_result"] },
-    { "canonical": "quantity", "synonyms": ["quantity", "qty", "count", "quantidade", "qtd", "contagem"], "related": ["order_quantity", "on_hand_quantity"] },
-    { "canonical": "quantity_delivered", "synonyms": ["qty delivered", "delivered", "shipped qty", "qtd entregue", "entregue", "qtd enviada"], "related": ["order_quantity", "quantity_received"] },
-    { "canonical": "quantity_received", "synonyms": ["qty received", "received", "accepted qty", "qtd recebida", "recebido", "qtd aceita"], "related": ["quantity_delivered", "quantity_rejected"] },
-    { "canonical": "quantity_rejected", "synonyms": ["qty rejected", "rejected", "defective qty", "qtd rejeitada", "rejeitado", "qtd com defeito"], "related": ["quantity_received", "defect_count"] },
-    { "canonical": "reorder_point", "synonyms": ["reorder point", "rop", "reorder level", "ponto de reposicao", "nivel de reposicao"], "related": ["min_stock_level", "current_stock"] },
-    { "canonical": "resolution_date", "synonyms": ["resolution date", "resolved on", "closed date", "data da resolucao", "resolvido em", "data de fechamento"], "related": ["incident_id", "resolution_time"] },
-    { "canonical": "resolution_time", "synonyms": ["resolution time", "time to resolve", "ttr", "tempo de resolucao", "tempo para resolver"], "related": ["resolution_date", "response_time"] },
-    { "canonical": "response_time", "synonyms": ["response time", "time to respond", "first response", "tempo de resposta", "primeira resposta"], "related": ["resolution_time", "sla_target"] },
-    { "canonical": "risk_category", "synonyms": ["risk category", "risk type", "risk area", "categoria de risco", "tipo de risco", "area de risco"], "related": ["risk_level", "risk_score"] },
-    { "canonical": "risk_level", "synonyms": ["risk level", "risk rating", "risk severity", "nivel de risco", "classificacao de risco"], "related": ["risk_category", "risk_score"] },
-    { "canonical": "risk_score", "synonyms": ["risk score", "risk index", "composite risk", "pontuacao de risco", "indice de risco"], "related": ["risk_level", "risk_probability"] },
-    { "canonical": "root_cause", "synonyms": ["root cause", "cause", "origin", "causa raiz", "causa", "origem"], "related": ["corrective_action", "failure_mode"] },
-    { "canonical": "schedule_variance", "synonyms": ["schedule variance", "sv", "timeline variance", "variacao de cronograma", "desvio de prazo"], "related": ["planned_completion_date", "actual_completion_date"] },
-    { "canonical": "serial_number", "synonyms": ["serial number", "sn", "serial", "numero de serie", "serial", "ns"], "related": ["asset_id", "part_number"] },
-    { "canonical": "severity", "synonyms": ["severity", "sev", "impact level", "severidade", "gravidade", "nivel de impacto"], "related": ["priority", "escalation_level"] },
-    { "canonical": "sku", "synonyms": ["sku", "stock keeping unit", "product code", "sku", "codigo do produto", "codigo de estoque"], "related": ["item_number", "item_name"] },
-    { "canonical": "sla_compliance", "synonyms": ["sla compliance", "sla met", "within sla", "conformidade com sla", "sla atendido", "dentro do sla"], "related": ["sla_target", "response_time"] },
-    { "canonical": "sla_target", "synonyms": ["sla target", "sla", "service level target", "meta de sla", "objetivo de sla", "nivel de servico"], "related": ["sla_compliance", "response_time"] },
-    { "canonical": "start_date", "synonyms": ["start date", "begin date", "commenced on", "data de inicio", "inicio", "comecou em"], "related": ["end_date", "duration"] },
-    { "canonical": "status", "synonyms": ["status", "state", "current status", "status", "situacao", "estado"], "related": ["task_status", "order_status"] },
-    { "canonical": "supplier_name", "synonyms": ["supplier", "vendor", "provider", "fornecedor", "prestador", "vendor"], "related": ["supplier_rating", "po_number"] },
-    { "canonical": "supplier_rating", "synonyms": ["supplier rating", "vendor rating", "score", "avaliacao do fornecedor", "nota do fornecedor"], "related": ["supplier_name", "quality_score"] },
-    { "canonical": "task_name", "synonyms": ["task", "task name", "activity", "tarefa", "nome da tarefa", "atividade"], "related": ["task_id", "task_status"] },
-    { "canonical": "task_status", "synonyms": ["task status", "status", "state", "status da tarefa", "situacao da tarefa"], "related": ["task_name", "completion_percentage"] },
-    { "canonical": "team", "synonyms": ["team", "group", "squad", "equipe", "time", "grupo"], "related": ["department", "assigned_to"] },
-    { "canonical": "throughput", "synonyms": ["throughput", "output rate", "production rate", "vazao", "taxa de producao", "capacidade de processamento"], "related": ["capacity", "cycle_time"] },
-    { "canonical": "total_cost", "synonyms": ["total cost", "total expense", "grand total", "custo total", "despesa total", "total geral"], "related": ["actual_cost", "estimated_cost"] },
-    { "canonical": "tracking_number", "synonyms": ["tracking number", "tracking", "awb", "numero de rastreio", "rastreamento", "codigo de rastreio"], "related": ["delivery_status", "shipment_id"] },
-    { "canonical": "unit_cost", "synonyms": ["unit cost", "cost per unit", "unit price", "custo unitario", "preco unitario", "custo por unidade"], "related": ["total_cost", "quantity"] },
-    { "canonical": "uptime_percentage", "synonyms": ["uptime", "availability", "uptime %", "disponibilidade", "tempo ativo", "% de uptime"], "related": ["downtime_hours", "mtbf"] },
-    { "canonical": "utilization_rate", "synonyms": ["utilization rate", "usage rate", "efficiency", "taxa de utilizacao", "taxa de uso", "eficiencia"], "related": ["capacity_utilization", "throughput"] },
-    { "canonical": "warehouse", "synonyms": ["warehouse", "storage", "depot", "armazem", "deposito", "almoxarifado"], "related": ["location", "on_hand_quantity"] },
-    { "canonical": "work_order_id", "synonyms": ["work order", "wo", "work order number", "ordem de servico", "os", "numero da os"], "related": ["work_order_status", "maintenance_date"] },
-    { "canonical": "work_order_status", "synonyms": ["wo status", "work order status", "status", "status da os", "situacao da ordem de servico"], "related": ["work_order_id", "completion_date"] },
-    { "canonical": "yield_rate", "synonyms": ["yield", "yield rate", "output yield", "rendimento", "taxa de rendimento", "yield"], "related": ["production_quantity", "defect_rate"] }
+    {
+      "canonical": "acceptance_criteria",
+      "synonyms": [
+        "acceptance criteria",
+        "done criteria",
+        "exit criteria",
+        "criterios de aceitacao",
+        "criterios de conclusao"
+      ],
+      "related": [
+        "task_status",
+        "completion_percentage"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_acceptance_criteria",
+      "curationReason": "weighted:acceptance_criteria:domain_general"
+    },
+    {
+      "canonical": "action_item",
+      "synonyms": [
+        "action item",
+        "action",
+        "task",
+        "item de acao",
+        "tarefa",
+        "acao"
+      ],
+      "related": [
+        "action_owner",
+        "due_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_action_item",
+      "curationReason": "weighted:action_item:domain_general"
+    },
+    {
+      "canonical": "action_owner",
+      "synonyms": [
+        "owner",
+        "responsible",
+        "assigned to",
+        "responsavel",
+        "dono da acao",
+        "atribuido a"
+      ],
+      "related": [
+        "action_item",
+        "assigned_to"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_action_owner",
+      "curationReason": "weighted:action_owner:domain_general"
+    },
+    {
+      "canonical": "actual_completion_date",
+      "synonyms": [
+        "actual completion",
+        "completed on",
+        "finished date",
+        "data real de conclusao",
+        "concluido em"
+      ],
+      "related": [
+        "planned_completion_date",
+        "completion_percentage"
+      ],
+      "priority": 720,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_actual_completion_date",
+      "curationReason": "weighted:actual_completion_date:domain_general"
+    },
+    {
+      "canonical": "actual_cost",
+      "synonyms": [
+        "actual cost",
+        "real cost",
+        "incurred cost",
+        "custo real",
+        "custo incorrido",
+        "custo efetivo"
+      ],
+      "related": [
+        "planned_cost",
+        "cost_variance"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_actual_cost",
+      "curationReason": "weighted:actual_cost:domain_general"
+    },
+    {
+      "canonical": "actual_hours",
+      "synonyms": [
+        "actual hours",
+        "hours worked",
+        "real hours",
+        "horas reais",
+        "horas trabalhadas"
+      ],
+      "related": [
+        "planned_hours",
+        "estimated_hours"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_actual_hours",
+      "curationReason": "weighted:actual_hours:domain_general"
+    },
+    {
+      "canonical": "alert_level",
+      "synonyms": [
+        "alert level",
+        "alarm",
+        "notification level",
+        "nivel de alerta",
+        "alarme"
+      ],
+      "related": [
+        "incident_severity",
+        "escalation_level"
+      ],
+      "priority": 820,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_alert_level",
+      "curationReason": "weighted:alert_level:domain_general"
+    },
+    {
+      "canonical": "approval_status",
+      "synonyms": [
+        "approval status",
+        "approved",
+        "pending approval",
+        "status de aprovacao",
+        "aprovado",
+        "pendente de aprovacao"
+      ],
+      "related": [
+        "approver",
+        "approval_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_approval_status",
+      "curationReason": "weighted:approval_status:domain_general"
+    },
+    {
+      "canonical": "approver",
+      "synonyms": [
+        "approver",
+        "approved by",
+        "authorizer",
+        "aprovador",
+        "aprovado por",
+        "autorizador"
+      ],
+      "related": [
+        "approval_status",
+        "approval_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_approver",
+      "curationReason": "weighted:approver:domain_general"
+    },
+    {
+      "canonical": "asset_condition",
+      "synonyms": [
+        "asset condition",
+        "condition",
+        "state",
+        "condicao do ativo",
+        "estado",
+        "condicao"
+      ],
+      "related": [
+        "asset_status",
+        "last_maintenance"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_condition",
+      "curationReason": "weighted:asset_condition:domain_general"
+    },
+    {
+      "canonical": "asset_id",
+      "synonyms": [
+        "asset id",
+        "asset number",
+        "asset code",
+        "id do ativo",
+        "numero do ativo",
+        "codigo do ativo"
+      ],
+      "related": [
+        "asset_name",
+        "asset_tag"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_id",
+      "curationReason": "weighted:asset_id:domain_general"
+    },
+    {
+      "canonical": "asset_location",
+      "synonyms": [
+        "asset location",
+        "location",
+        "site",
+        "localizacao do ativo",
+        "local",
+        "site"
+      ],
+      "related": [
+        "asset_id",
+        "warehouse"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_location",
+      "curationReason": "weighted:asset_location:domain_general"
+    },
+    {
+      "canonical": "asset_name",
+      "synonyms": [
+        "asset name",
+        "asset",
+        "equipment name",
+        "nome do ativo",
+        "ativo",
+        "nome do equipamento"
+      ],
+      "related": [
+        "asset_id",
+        "asset_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_name",
+      "curationReason": "weighted:asset_name:domain_general"
+    },
+    {
+      "canonical": "asset_status",
+      "synonyms": [
+        "asset status",
+        "status",
+        "operational status",
+        "status do ativo",
+        "situacao do ativo"
+      ],
+      "related": [
+        "asset_condition",
+        "asset_id"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_status",
+      "curationReason": "weighted:asset_status:domain_general"
+    },
+    {
+      "canonical": "asset_tag",
+      "synonyms": [
+        "asset tag",
+        "tag",
+        "label",
+        "etiqueta do ativo",
+        "tag",
+        "plaqueta"
+      ],
+      "related": [
+        "asset_id",
+        "serial_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_tag",
+      "curationReason": "weighted:asset_tag:domain_general"
+    },
+    {
+      "canonical": "asset_type",
+      "synonyms": [
+        "asset type",
+        "type",
+        "category",
+        "tipo de ativo",
+        "tipo",
+        "categoria do ativo"
+      ],
+      "related": [
+        "asset_name",
+        "asset_id"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_asset_type",
+      "curationReason": "weighted:asset_type:domain_general"
+    },
+    {
+      "canonical": "assigned_to",
+      "synonyms": [
+        "assigned to",
+        "assignee",
+        "responsible",
+        "atribuido a",
+        "responsavel",
+        "designado para"
+      ],
+      "related": [
+        "action_owner",
+        "team"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_assigned_to",
+      "curationReason": "weighted:assigned_to:domain_general"
+    },
+    {
+      "canonical": "batch_number",
+      "synonyms": [
+        "batch number",
+        "batch",
+        "batch id",
+        "numero do lote",
+        "lote",
+        "id do lote"
+      ],
+      "related": [
+        "lot_number",
+        "production_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_batch_number",
+      "curationReason": "weighted:batch_number:domain_general"
+    },
+    {
+      "canonical": "budget_allocated",
+      "synonyms": [
+        "budget allocated",
+        "allocated budget",
+        "approved budget",
+        "orcamento alocado",
+        "budget aprovado"
+      ],
+      "related": [
+        "budget_spent",
+        "budget_remaining"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_budget_allocated",
+      "curationReason": "weighted:budget_allocated:domain_general"
+    },
+    {
+      "canonical": "budget_remaining",
+      "synonyms": [
+        "budget remaining",
+        "remaining budget",
+        "available budget",
+        "orcamento restante",
+        "saldo do orcamento"
+      ],
+      "related": [
+        "budget_allocated",
+        "budget_spent"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_budget_remaining",
+      "curationReason": "weighted:budget_remaining:domain_general"
+    },
+    {
+      "canonical": "budget_spent",
+      "synonyms": [
+        "budget spent",
+        "spent",
+        "consumed budget",
+        "orcamento gasto",
+        "gasto",
+        "consumido"
+      ],
+      "related": [
+        "budget_allocated",
+        "budget_remaining"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_budget_spent",
+      "curationReason": "weighted:budget_spent:domain_general"
+    },
+    {
+      "canonical": "capacity",
+      "synonyms": [
+        "capacity",
+        "max capacity",
+        "total capacity",
+        "capacidade",
+        "capacidade maxima",
+        "capacidade total"
+      ],
+      "related": [
+        "capacity_utilization",
+        "throughput"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_capacity",
+      "curationReason": "weighted:capacity:domain_general"
+    },
+    {
+      "canonical": "capacity_utilization",
+      "synonyms": [
+        "utilization",
+        "capacity utilization",
+        "usage rate",
+        "utilizacao",
+        "taxa de uso",
+        "utilizacao da capacidade"
+      ],
+      "related": [
+        "capacity",
+        "throughput"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_capacity_utilization",
+      "curationReason": "weighted:capacity_utilization:domain_general"
+    },
+    {
+      "canonical": "category",
+      "synonyms": [
+        "category",
+        "type",
+        "classification",
+        "categoria",
+        "tipo",
+        "classificacao"
+      ],
+      "related": [
+        "issue_type",
+        "task_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_category",
+      "curationReason": "weighted:category:domain_general"
+    },
+    {
+      "canonical": "change_description",
+      "synonyms": [
+        "change description",
+        "change details",
+        "description",
+        "descricao da mudanca",
+        "detalhes da alteracao"
+      ],
+      "related": [
+        "change_id",
+        "change_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_change_description",
+      "curationReason": "weighted:change_description:domain_general"
+    },
+    {
+      "canonical": "change_id",
+      "synonyms": [
+        "change id",
+        "change number",
+        "cr number",
+        "id da mudanca",
+        "numero da mudanca"
+      ],
+      "related": [
+        "change_description",
+        "change_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_change_id",
+      "curationReason": "weighted:change_id:domain_general"
+    },
+    {
+      "canonical": "change_status",
+      "synonyms": [
+        "change status",
+        "status",
+        "cr status",
+        "status da mudanca",
+        "situacao da alteracao"
+      ],
+      "related": [
+        "change_id",
+        "change_priority"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_change_status",
+      "curationReason": "weighted:change_status:domain_general"
+    },
+    {
+      "canonical": "completion_date",
+      "synonyms": [
+        "completion date",
+        "completed on",
+        "finish date",
+        "data de conclusao",
+        "concluido em",
+        "data de termino"
+      ],
+      "related": [
+        "start_date",
+        "completion_percentage"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_completion_date",
+      "curationReason": "weighted:completion_date:domain_general"
+    },
+    {
+      "canonical": "completion_percentage",
+      "synonyms": [
+        "completion",
+        "% complete",
+        "progress",
+        "percentual de conclusao",
+        "progresso",
+        "% concluido"
+      ],
+      "related": [
+        "completion_date",
+        "task_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_completion_percentage",
+      "curationReason": "weighted:completion_percentage:domain_general"
+    },
+    {
+      "canonical": "corrective_action",
+      "synonyms": [
+        "corrective action",
+        "remedy",
+        "fix",
+        "acao corretiva",
+        "remedio",
+        "correcao"
+      ],
+      "related": [
+        "root_cause",
+        "incident_id"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_corrective_action",
+      "curationReason": "weighted:corrective_action:domain_general"
+    },
+    {
+      "canonical": "cost_estimate",
+      "synonyms": [
+        "cost estimate",
+        "estimated cost",
+        "quote",
+        "estimativa de custo",
+        "orcamento estimado",
+        "cotacao"
+      ],
+      "related": [
+        "actual_cost",
+        "planned_cost"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_estimate",
+      "curationReason": "weighted:cost_estimate:domain_general"
+    },
+    {
+      "canonical": "cost_variance",
+      "synonyms": [
+        "cost variance",
+        "cv",
+        "budget variance",
+        "variacao de custo",
+        "desvio de custo"
+      ],
+      "related": [
+        "actual_cost",
+        "planned_cost"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_cost_variance",
+      "curationReason": "weighted:cost_variance:domain_general"
+    },
+    {
+      "canonical": "created_by",
+      "synonyms": [
+        "created by",
+        "author",
+        "requester",
+        "criado por",
+        "autor",
+        "solicitante"
+      ],
+      "related": [
+        "created_date",
+        "requested_by"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_created_by",
+      "curationReason": "weighted:created_by:domain_general"
+    },
+    {
+      "canonical": "created_date",
+      "synonyms": [
+        "created date",
+        "creation date",
+        "opened on",
+        "data de criacao",
+        "criado em",
+        "aberto em"
+      ],
+      "related": [
+        "created_by",
+        "due_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_created_date",
+      "curationReason": "weighted:created_date:domain_general"
+    },
+    {
+      "canonical": "criticality",
+      "synonyms": [
+        "criticality",
+        "critical level",
+        "importance",
+        "criticidade",
+        "nivel critico",
+        "importancia"
+      ],
+      "related": [
+        "priority",
+        "severity"
+      ],
+      "priority": 826,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_criticality",
+      "curationReason": "weighted:criticality:domain_general"
+    },
+    {
+      "canonical": "current_stock",
+      "synonyms": [
+        "current stock",
+        "on hand",
+        "available stock",
+        "estoque atual",
+        "em maos",
+        "estoque disponivel"
+      ],
+      "related": [
+        "min_stock_level",
+        "reorder_point"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_current_stock",
+      "curationReason": "weighted:current_stock:domain_general"
+    },
+    {
+      "canonical": "cycle_time",
+      "synonyms": [
+        "cycle time",
+        "processing time",
+        "lead time",
+        "tempo de ciclo",
+        "tempo de processamento"
+      ],
+      "related": [
+        "lead_time",
+        "throughput"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_cycle_time",
+      "curationReason": "weighted:cycle_time:domain_general"
+    },
+    {
+      "canonical": "defect_count",
+      "synonyms": [
+        "defect count",
+        "defects",
+        "bug count",
+        "quantidade de defeitos",
+        "defeitos",
+        "numero de bugs"
+      ],
+      "related": [
+        "defect_rate",
+        "defect_type"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_defect_count",
+      "curationReason": "weighted:defect_count:domain_general"
+    },
+    {
+      "canonical": "defect_rate",
+      "synonyms": [
+        "defect rate",
+        "failure rate",
+        "error rate",
+        "taxa de defeito",
+        "taxa de falha",
+        "taxa de erro"
+      ],
+      "related": [
+        "defect_count",
+        "quality_score"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_defect_rate",
+      "curationReason": "weighted:defect_rate:domain_general"
+    },
+    {
+      "canonical": "defect_type",
+      "synonyms": [
+        "defect type",
+        "type of defect",
+        "failure mode",
+        "tipo de defeito",
+        "tipo de falha",
+        "modo de falha"
+      ],
+      "related": [
+        "defect_count",
+        "root_cause"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_defect_type",
+      "curationReason": "weighted:defect_type:domain_general"
+    },
+    {
+      "canonical": "delivery_date",
+      "synonyms": [
+        "delivery date",
+        "delivered on",
+        "ship date",
+        "data de entrega",
+        "entregue em",
+        "data de envio"
+      ],
+      "related": [
+        "delivery_status",
+        "eta"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_delivery_date",
+      "curationReason": "weighted:delivery_date:domain_general"
+    },
+    {
+      "canonical": "delivery_status",
+      "synonyms": [
+        "delivery status",
+        "shipment status",
+        "status",
+        "status da entrega",
+        "status do envio"
+      ],
+      "related": [
+        "delivery_date",
+        "tracking_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_delivery_status",
+      "curationReason": "weighted:delivery_status:domain_general"
+    },
+    {
+      "canonical": "department",
+      "synonyms": [
+        "department",
+        "dept",
+        "division",
+        "departamento",
+        "setor",
+        "divisao"
+      ],
+      "related": [
+        "team",
+        "location"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_department",
+      "curationReason": "weighted:department:domain_general"
+    },
+    {
+      "canonical": "description",
+      "synonyms": [
+        "description",
+        "details",
+        "summary",
+        "descricao",
+        "detalhes",
+        "resumo"
+      ],
+      "related": [
+        "issue_description",
+        "task_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_description",
+      "curationReason": "weighted:description:domain_general"
+    },
+    {
+      "canonical": "downtime_hours",
+      "synonyms": [
+        "downtime",
+        "downtime hours",
+        "outage time",
+        "tempo de inatividade",
+        "horas paradas",
+        "tempo de parada"
+      ],
+      "related": [
+        "uptime_percentage",
+        "mttr"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_downtime_hours",
+      "curationReason": "weighted:downtime_hours:domain_general"
+    },
+    {
+      "canonical": "due_date",
+      "synonyms": [
+        "due date",
+        "deadline",
+        "target date",
+        "data de vencimento",
+        "prazo",
+        "data limite"
+      ],
+      "related": [
+        "start_date",
+        "completion_date"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_due_date",
+      "curationReason": "weighted:due_date:domain_general"
+    },
+    {
+      "canonical": "duration",
+      "synonyms": [
+        "duration",
+        "elapsed time",
+        "time span",
+        "duracao",
+        "tempo decorrido",
+        "intervalo"
+      ],
+      "related": [
+        "start_date",
+        "completion_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_duration",
+      "curationReason": "weighted:duration:domain_general"
+    },
+    {
+      "canonical": "effort_estimate",
+      "synonyms": [
+        "effort estimate",
+        "estimated effort",
+        "hours estimate",
+        "estimativa de esforco",
+        "horas estimadas"
+      ],
+      "related": [
+        "estimated_hours",
+        "actual_hours"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_effort_estimate",
+      "curationReason": "weighted:effort_estimate:domain_general"
+    },
+    {
+      "canonical": "end_date",
+      "synonyms": [
+        "end date",
+        "finish date",
+        "completion date",
+        "data de termino",
+        "data final",
+        "data de conclusao"
+      ],
+      "related": [
+        "start_date",
+        "duration"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_end_date",
+      "curationReason": "weighted:end_date:domain_general"
+    },
+    {
+      "canonical": "equipment_id",
+      "synonyms": [
+        "equipment id",
+        "machine id",
+        "equip no",
+        "id do equipamento",
+        "numero da maquina"
+      ],
+      "related": [
+        "equipment_name",
+        "equipment_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_equipment_id",
+      "curationReason": "weighted:equipment_id:domain_general"
+    },
+    {
+      "canonical": "equipment_name",
+      "synonyms": [
+        "equipment",
+        "machine",
+        "equipment name",
+        "equipamento",
+        "maquina",
+        "nome do equipamento"
+      ],
+      "related": [
+        "equipment_id",
+        "equipment_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_equipment_name",
+      "curationReason": "weighted:equipment_name:domain_general"
+    },
+    {
+      "canonical": "equipment_status",
+      "synonyms": [
+        "equipment status",
+        "machine status",
+        "operational status",
+        "status do equipamento",
+        "status da maquina"
+      ],
+      "related": [
+        "equipment_id",
+        "downtime_hours"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_equipment_status",
+      "curationReason": "weighted:equipment_status:domain_general"
+    },
+    {
+      "canonical": "escalation_level",
+      "synonyms": [
+        "escalation level",
+        "escalation",
+        "tier",
+        "nivel de escalacao",
+        "tier",
+        "nivel"
+      ],
+      "related": [
+        "severity",
+        "priority"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_escalation_level",
+      "curationReason": "weighted:escalation_level:domain_general"
+    },
+    {
+      "canonical": "estimated_completion",
+      "synonyms": [
+        "estimated completion",
+        "ecd",
+        "target completion",
+        "conclusao estimada",
+        "previsao de conclusao"
+      ],
+      "related": [
+        "due_date",
+        "completion_percentage"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_estimated_completion",
+      "curationReason": "weighted:estimated_completion:domain_general"
+    },
+    {
+      "canonical": "estimated_cost",
+      "synonyms": [
+        "estimated cost",
+        "projected cost",
+        "forecast cost",
+        "custo estimado",
+        "custo projetado"
+      ],
+      "related": [
+        "actual_cost",
+        "cost_estimate"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_estimated_cost",
+      "curationReason": "weighted:estimated_cost:domain_general"
+    },
+    {
+      "canonical": "eta",
+      "synonyms": [
+        "eta",
+        "estimated arrival",
+        "expected delivery",
+        "eta",
+        "previsao de chegada",
+        "previsao de entrega"
+      ],
+      "related": [
+        "delivery_date",
+        "lead_time"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_eta",
+      "curationReason": "weighted:eta:domain_general"
+    },
+    {
+      "canonical": "failure_mode",
+      "synonyms": [
+        "failure mode",
+        "failure type",
+        "fault",
+        "modo de falha",
+        "tipo de falha",
+        "defeito"
+      ],
+      "related": [
+        "defect_type",
+        "root_cause"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_failure_mode",
+      "curationReason": "weighted:failure_mode:domain_general"
+    },
+    {
+      "canonical": "fulfillment_rate",
+      "synonyms": [
+        "fulfillment rate",
+        "fill rate",
+        "completion rate",
+        "taxa de atendimento",
+        "taxa de preenchimento"
+      ],
+      "related": [
+        "order_quantity",
+        "quantity_delivered"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_fulfillment_rate",
+      "curationReason": "weighted:fulfillment_rate:domain_general"
+    },
+    {
+      "canonical": "impact",
+      "synonyms": [
+        "impact",
+        "business impact",
+        "effect",
+        "impacto",
+        "impacto no negocio",
+        "efeito"
+      ],
+      "related": [
+        "severity",
+        "priority"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_impact",
+      "curationReason": "weighted:impact:domain_general"
+    },
+    {
+      "canonical": "incident_category",
+      "synonyms": [
+        "incident category",
+        "category",
+        "incident type",
+        "categoria do incidente",
+        "tipo de incidente"
+      ],
+      "related": [
+        "incident_id",
+        "incident_severity"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_incident_category",
+      "curationReason": "weighted:incident_category:domain_general"
+    },
+    {
+      "canonical": "incident_date",
+      "synonyms": [
+        "incident date",
+        "event date",
+        "occurred on",
+        "data do incidente",
+        "data do evento",
+        "ocorrido em"
+      ],
+      "related": [
+        "incident_id",
+        "incident_status"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_incident_date",
+      "curationReason": "weighted:incident_date:domain_general"
+    },
+    {
+      "canonical": "incident_id",
+      "synonyms": [
+        "incident id",
+        "incident number",
+        "ticket",
+        "id do incidente",
+        "numero do incidente",
+        "chamado"
+      ],
+      "related": [
+        "incident_date",
+        "incident_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_incident_id",
+      "curationReason": "weighted:incident_id:domain_general"
+    },
+    {
+      "canonical": "incident_severity",
+      "synonyms": [
+        "severity",
+        "incident severity",
+        "sev",
+        "severidade",
+        "gravidade do incidente"
+      ],
+      "related": [
+        "incident_id",
+        "priority"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_incident_severity",
+      "curationReason": "weighted:incident_severity:domain_general"
+    },
+    {
+      "canonical": "incident_status",
+      "synonyms": [
+        "incident status",
+        "status",
+        "state",
+        "status do incidente",
+        "situacao do incidente"
+      ],
+      "related": [
+        "incident_id",
+        "resolution_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_incident_status",
+      "curationReason": "weighted:incident_status:domain_general"
+    },
+    {
+      "canonical": "inspection_date",
+      "synonyms": [
+        "inspection date",
+        "inspected on",
+        "check date",
+        "data da inspecao",
+        "inspecionado em"
+      ],
+      "related": [
+        "inspection_result",
+        "inspection_type"
+      ],
+      "priority": 720,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_inspection_date",
+      "curationReason": "weighted:inspection_date:domain_general"
+    },
+    {
+      "canonical": "inspection_result",
+      "synonyms": [
+        "inspection result",
+        "finding",
+        "outcome",
+        "resultado da inspecao",
+        "achado",
+        "parecer"
+      ],
+      "related": [
+        "inspection_date",
+        "inspection_type"
+      ],
+      "priority": 896,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_inspection_result",
+      "curationReason": "weighted:inspection_result:domain_general"
+    },
+    {
+      "canonical": "issue_description",
+      "synonyms": [
+        "issue description",
+        "problem description",
+        "details",
+        "descricao do problema",
+        "detalhes da questao"
+      ],
+      "related": [
+        "issue_id",
+        "issue_type"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_issue_description",
+      "curationReason": "weighted:issue_description:domain_general"
+    },
+    {
+      "canonical": "issue_id",
+      "synonyms": [
+        "issue id",
+        "issue number",
+        "issue no",
+        "id do problema",
+        "numero da questao"
+      ],
+      "related": [
+        "issue_description",
+        "issue_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_issue_id",
+      "curationReason": "weighted:issue_id:domain_general"
+    },
+    {
+      "canonical": "issue_priority",
+      "synonyms": [
+        "issue priority",
+        "priority",
+        "urgency",
+        "prioridade do problema",
+        "prioridade",
+        "urgencia"
+      ],
+      "related": [
+        "issue_id",
+        "severity"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_issue_priority",
+      "curationReason": "weighted:issue_priority:domain_general"
+    },
+    {
+      "canonical": "issue_status",
+      "synonyms": [
+        "issue status",
+        "status",
+        "state",
+        "status do problema",
+        "situacao da questao"
+      ],
+      "related": [
+        "issue_id",
+        "resolution_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_issue_status",
+      "curationReason": "weighted:issue_status:domain_general"
+    },
+    {
+      "canonical": "issue_type",
+      "synonyms": [
+        "issue type",
+        "type",
+        "problem type",
+        "tipo de problema",
+        "tipo da questao"
+      ],
+      "related": [
+        "issue_id",
+        "category"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_issue_type",
+      "curationReason": "weighted:issue_type:domain_general"
+    },
+    {
+      "canonical": "item_name",
+      "synonyms": [
+        "item name",
+        "item",
+        "product name",
+        "nome do item",
+        "item",
+        "nome do produto"
+      ],
+      "related": [
+        "item_number",
+        "sku"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_item_name",
+      "curationReason": "weighted:item_name:domain_general"
+    },
+    {
+      "canonical": "item_number",
+      "synonyms": [
+        "item number",
+        "item no",
+        "part no",
+        "numero do item",
+        "codigo do item"
+      ],
+      "related": [
+        "item_name",
+        "sku"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_item_number",
+      "curationReason": "weighted:item_number:domain_general"
+    },
+    {
+      "canonical": "kpi_name",
+      "synonyms": [
+        "kpi",
+        "kpi name",
+        "metric name",
+        "nome do kpi",
+        "indicador",
+        "nome da metrica"
+      ],
+      "related": [
+        "kpi_target",
+        "kpi_value"
+      ],
+      "priority": 896,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_kpi_name",
+      "curationReason": "weighted:kpi_name:domain_general"
+    },
+    {
+      "canonical": "kpi_target",
+      "synonyms": [
+        "target",
+        "kpi target",
+        "goal",
+        "meta",
+        "meta do kpi",
+        "objetivo"
+      ],
+      "related": [
+        "kpi_name",
+        "kpi_value"
+      ],
+      "priority": 896,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_kpi_target",
+      "curationReason": "weighted:kpi_target:domain_general"
+    },
+    {
+      "canonical": "kpi_value",
+      "synonyms": [
+        "kpi value",
+        "actual value",
+        "measured value",
+        "valor do kpi",
+        "valor realizado",
+        "valor medido"
+      ],
+      "related": [
+        "kpi_name",
+        "kpi_target"
+      ],
+      "priority": 896,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_kpi_value",
+      "curationReason": "weighted:kpi_value:domain_general"
+    },
+    {
+      "canonical": "last_maintenance",
+      "synonyms": [
+        "last maintenance",
+        "last service",
+        "last repair",
+        "ultima manutencao",
+        "ultimo servico"
+      ],
+      "related": [
+        "next_maintenance",
+        "maintenance_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_last_maintenance",
+      "curationReason": "weighted:last_maintenance:domain_general"
+    },
+    {
+      "canonical": "lead_time",
+      "synonyms": [
+        "lead time",
+        "delivery lead time",
+        "turnaround",
+        "prazo de entrega",
+        "lead time",
+        "tempo de atendimento"
+      ],
+      "related": [
+        "cycle_time",
+        "eta"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_lead_time",
+      "curationReason": "weighted:lead_time:domain_general"
+    },
+    {
+      "canonical": "location",
+      "synonyms": [
+        "location",
+        "site",
+        "place",
+        "local",
+        "localizacao",
+        "site"
+      ],
+      "related": [
+        "warehouse",
+        "department"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_location",
+      "curationReason": "weighted:location:domain_general"
+    },
+    {
+      "canonical": "maintenance_cost",
+      "synonyms": [
+        "maintenance cost",
+        "repair cost",
+        "service cost",
+        "custo de manutencao",
+        "custo de reparo"
+      ],
+      "related": [
+        "maintenance_date",
+        "actual_cost"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_maintenance_cost",
+      "curationReason": "weighted:maintenance_cost:domain_general"
+    },
+    {
+      "canonical": "maintenance_date",
+      "synonyms": [
+        "maintenance date",
+        "service date",
+        "repair date",
+        "data da manutencao",
+        "data do servico"
+      ],
+      "related": [
+        "maintenance_type",
+        "last_maintenance"
+      ],
+      "priority": 720,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_maintenance_date",
+      "curationReason": "weighted:maintenance_date:domain_general"
+    },
+    {
+      "canonical": "maintenance_type",
+      "synonyms": [
+        "maintenance type",
+        "service type",
+        "repair type",
+        "tipo de manutencao",
+        "tipo de servico"
+      ],
+      "related": [
+        "maintenance_date",
+        "maintenance_cost"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_maintenance_type",
+      "curationReason": "weighted:maintenance_type:domain_general"
+    },
+    {
+      "canonical": "milestone_name",
+      "synonyms": [
+        "milestone",
+        "milestone name",
+        "checkpoint",
+        "marco",
+        "nome do marco",
+        "etapa"
+      ],
+      "related": [
+        "milestone_date",
+        "milestone_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_milestone_name",
+      "curationReason": "weighted:milestone_name:domain_general"
+    },
+    {
+      "canonical": "milestone_date",
+      "synonyms": [
+        "milestone date",
+        "target date",
+        "due date",
+        "data do marco",
+        "data da etapa"
+      ],
+      "related": [
+        "milestone_name",
+        "milestone_status"
+      ],
+      "priority": 720,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_milestone_date",
+      "curationReason": "weighted:milestone_date:domain_general"
+    },
+    {
+      "canonical": "milestone_status",
+      "synonyms": [
+        "milestone status",
+        "status",
+        "state",
+        "status do marco",
+        "situacao da etapa"
+      ],
+      "related": [
+        "milestone_name",
+        "milestone_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_milestone_status",
+      "curationReason": "weighted:milestone_status:domain_general"
+    },
+    {
+      "canonical": "min_stock_level",
+      "synonyms": [
+        "min stock",
+        "minimum stock",
+        "safety stock",
+        "estoque minimo",
+        "estoque de seguranca"
+      ],
+      "related": [
+        "current_stock",
+        "reorder_point"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_min_stock_level",
+      "curationReason": "weighted:min_stock_level:domain_general"
+    },
+    {
+      "canonical": "mtbf",
+      "synonyms": [
+        "mtbf",
+        "mean time between failures",
+        "reliability",
+        "tempo medio entre falhas",
+        "mtbf"
+      ],
+      "related": [
+        "mttr",
+        "downtime_hours"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_mtbf",
+      "curationReason": "weighted:mtbf:domain_general"
+    },
+    {
+      "canonical": "mttr",
+      "synonyms": [
+        "mttr",
+        "mean time to repair",
+        "repair time",
+        "tempo medio de reparo",
+        "mttr"
+      ],
+      "related": [
+        "mtbf",
+        "downtime_hours"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_mttr",
+      "curationReason": "weighted:mttr:domain_general"
+    },
+    {
+      "canonical": "next_maintenance",
+      "synonyms": [
+        "next maintenance",
+        "next service",
+        "scheduled maintenance",
+        "proxima manutencao",
+        "proximo servico"
+      ],
+      "related": [
+        "last_maintenance",
+        "maintenance_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_next_maintenance",
+      "curationReason": "weighted:next_maintenance:domain_general"
+    },
+    {
+      "canonical": "on_hand_quantity",
+      "synonyms": [
+        "on hand",
+        "in stock",
+        "available qty",
+        "em estoque",
+        "quantidade disponivel",
+        "em maos"
+      ],
+      "related": [
+        "current_stock",
+        "on_order_quantity"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_on_hand_quantity",
+      "curationReason": "weighted:on_hand_quantity:domain_general"
+    },
+    {
+      "canonical": "on_order_quantity",
+      "synonyms": [
+        "on order",
+        "ordered qty",
+        "pending delivery",
+        "em pedido",
+        "quantidade pedida",
+        "pendente de entrega"
+      ],
+      "related": [
+        "on_hand_quantity",
+        "order_quantity"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_on_order_quantity",
+      "curationReason": "weighted:on_order_quantity:domain_general"
+    },
+    {
+      "canonical": "order_date",
+      "synonyms": [
+        "order date",
+        "date ordered",
+        "request date",
+        "data do pedido",
+        "data da solicitacao"
+      ],
+      "related": [
+        "order_id",
+        "order_status"
+      ],
+      "priority": 720,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_order_date",
+      "curationReason": "weighted:order_date:domain_general"
+    },
+    {
+      "canonical": "order_id",
+      "synonyms": [
+        "order id",
+        "order number",
+        "order no",
+        "id do pedido",
+        "numero do pedido"
+      ],
+      "related": [
+        "order_date",
+        "order_status"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_order_id",
+      "curationReason": "weighted:order_id:domain_general"
+    },
+    {
+      "canonical": "order_quantity",
+      "synonyms": [
+        "order quantity",
+        "qty ordered",
+        "quantity",
+        "quantidade pedida",
+        "qtd pedida",
+        "quantidade"
+      ],
+      "related": [
+        "quantity_delivered",
+        "quantity_received"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_order_quantity",
+      "curationReason": "weighted:order_quantity:domain_general"
+    },
+    {
+      "canonical": "order_status",
+      "synonyms": [
+        "order status",
+        "status",
+        "state",
+        "status do pedido",
+        "situacao do pedido"
+      ],
+      "related": [
+        "order_id",
+        "order_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_order_status",
+      "curationReason": "weighted:order_status:domain_general"
+    },
+    {
+      "canonical": "owner",
+      "synonyms": [
+        "owner",
+        "responsible party",
+        "lead",
+        "proprietario",
+        "responsavel",
+        "lider"
+      ],
+      "related": [
+        "assigned_to",
+        "action_owner"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_owner",
+      "curationReason": "weighted:owner:domain_general"
+    },
+    {
+      "canonical": "part_number",
+      "synonyms": [
+        "part number",
+        "pn",
+        "part no",
+        "numero da peca",
+        "codigo da peca"
+      ],
+      "related": [
+        "item_number",
+        "serial_number"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_part_number",
+      "curationReason": "weighted:part_number:domain_general"
+    },
+    {
+      "canonical": "percent_complete",
+      "synonyms": [
+        "percent complete",
+        "% done",
+        "progress %",
+        "percentual concluido",
+        "% pronto",
+        "progresso %"
+      ],
+      "related": [
+        "completion_percentage",
+        "task_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_percent_complete",
+      "curationReason": "weighted:percent_complete:domain_general"
+    },
+    {
+      "canonical": "po_number",
+      "synonyms": [
+        "po number",
+        "po",
+        "purchase order no",
+        "numero do po",
+        "numero da oc",
+        "pedido de compra"
+      ],
+      "related": [
+        "order_id",
+        "supplier_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_po_number",
+      "curationReason": "weighted:po_number:domain_general"
+    },
+    {
+      "canonical": "priority",
+      "synonyms": [
+        "priority",
+        "urgency",
+        "importance",
+        "prioridade",
+        "urgencia",
+        "importancia"
+      ],
+      "related": [
+        "severity",
+        "escalation_level"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_priority",
+      "curationReason": "weighted:priority:domain_general"
+    },
+    {
+      "canonical": "production_date",
+      "synonyms": [
+        "production date",
+        "manufactured on",
+        "built date",
+        "data de producao",
+        "fabricado em"
+      ],
+      "related": [
+        "batch_number",
+        "production_quantity"
+      ],
+      "priority": 720,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_production_date",
+      "curationReason": "weighted:production_date:domain_general"
+    },
+    {
+      "canonical": "production_quantity",
+      "synonyms": [
+        "production qty",
+        "output qty",
+        "produced",
+        "quantidade produzida",
+        "producao",
+        "saida"
+      ],
+      "related": [
+        "production_date",
+        "yield_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_production_quantity",
+      "curationReason": "weighted:production_quantity:domain_general"
+    },
+    {
+      "canonical": "project_id",
+      "synonyms": [
+        "project id",
+        "project number",
+        "project code",
+        "id do projeto",
+        "numero do projeto",
+        "codigo do projeto"
+      ],
+      "related": [
+        "project_name",
+        "project_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_project_id",
+      "curationReason": "weighted:project_id:domain_general"
+    },
+    {
+      "canonical": "project_name",
+      "synonyms": [
+        "project",
+        "project name",
+        "initiative",
+        "projeto",
+        "nome do projeto",
+        "iniciativa"
+      ],
+      "related": [
+        "project_id",
+        "project_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_project_name",
+      "curationReason": "weighted:project_name:domain_general"
+    },
+    {
+      "canonical": "project_status",
+      "synonyms": [
+        "project status",
+        "status",
+        "health",
+        "status do projeto",
+        "situacao do projeto",
+        "saude do projeto"
+      ],
+      "related": [
+        "project_id",
+        "completion_percentage"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_project_status",
+      "curationReason": "weighted:project_status:domain_general"
+    },
+    {
+      "canonical": "quality_score",
+      "synonyms": [
+        "quality score",
+        "quality rating",
+        "qa score",
+        "pontuacao de qualidade",
+        "nota de qualidade"
+      ],
+      "related": [
+        "defect_rate",
+        "inspection_result"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_quality_score",
+      "curationReason": "weighted:quality_score:domain_general"
+    },
+    {
+      "canonical": "quantity",
+      "synonyms": [
+        "quantity",
+        "qty",
+        "count",
+        "quantidade",
+        "qtd",
+        "contagem"
+      ],
+      "related": [
+        "order_quantity",
+        "on_hand_quantity"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_quantity",
+      "curationReason": "weighted:quantity:domain_general"
+    },
+    {
+      "canonical": "quantity_delivered",
+      "synonyms": [
+        "qty delivered",
+        "delivered",
+        "shipped qty",
+        "qtd entregue",
+        "entregue",
+        "qtd enviada"
+      ],
+      "related": [
+        "order_quantity",
+        "quantity_received"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_quantity_delivered",
+      "curationReason": "weighted:quantity_delivered:domain_general"
+    },
+    {
+      "canonical": "quantity_received",
+      "synonyms": [
+        "qty received",
+        "received",
+        "accepted qty",
+        "qtd recebida",
+        "recebido",
+        "qtd aceita"
+      ],
+      "related": [
+        "quantity_delivered",
+        "quantity_rejected"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_quantity_received",
+      "curationReason": "weighted:quantity_received:domain_general"
+    },
+    {
+      "canonical": "quantity_rejected",
+      "synonyms": [
+        "qty rejected",
+        "rejected",
+        "defective qty",
+        "qtd rejeitada",
+        "rejeitado",
+        "qtd com defeito"
+      ],
+      "related": [
+        "quantity_received",
+        "defect_count"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_quantity_rejected",
+      "curationReason": "weighted:quantity_rejected:domain_general"
+    },
+    {
+      "canonical": "reorder_point",
+      "synonyms": [
+        "reorder point",
+        "rop",
+        "reorder level",
+        "ponto de reposicao",
+        "nivel de reposicao"
+      ],
+      "related": [
+        "min_stock_level",
+        "current_stock"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_reorder_point",
+      "curationReason": "weighted:reorder_point:domain_general"
+    },
+    {
+      "canonical": "resolution_date",
+      "synonyms": [
+        "resolution date",
+        "resolved on",
+        "closed date",
+        "data da resolucao",
+        "resolvido em",
+        "data de fechamento"
+      ],
+      "related": [
+        "incident_id",
+        "resolution_time"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_resolution_date",
+      "curationReason": "weighted:resolution_date:domain_general"
+    },
+    {
+      "canonical": "resolution_time",
+      "synonyms": [
+        "resolution time",
+        "time to resolve",
+        "ttr",
+        "tempo de resolucao",
+        "tempo para resolver"
+      ],
+      "related": [
+        "resolution_date",
+        "response_time"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_resolution_time",
+      "curationReason": "weighted:resolution_time:domain_general"
+    },
+    {
+      "canonical": "response_time",
+      "synonyms": [
+        "response time",
+        "time to respond",
+        "first response",
+        "tempo de resposta",
+        "primeira resposta"
+      ],
+      "related": [
+        "resolution_time",
+        "sla_target"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_response_time",
+      "curationReason": "weighted:response_time:domain_general"
+    },
+    {
+      "canonical": "risk_category",
+      "synonyms": [
+        "risk category",
+        "risk type",
+        "risk area",
+        "categoria de risco",
+        "tipo de risco",
+        "area de risco"
+      ],
+      "related": [
+        "risk_level",
+        "risk_score"
+      ],
+      "priority": 826,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_risk_category",
+      "curationReason": "weighted:risk_category:domain_general"
+    },
+    {
+      "canonical": "risk_level",
+      "synonyms": [
+        "risk level",
+        "risk rating",
+        "risk severity",
+        "nivel de risco",
+        "classificacao de risco"
+      ],
+      "related": [
+        "risk_category",
+        "risk_score"
+      ],
+      "priority": 820,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_risk_level",
+      "curationReason": "weighted:risk_level:domain_general"
+    },
+    {
+      "canonical": "risk_score",
+      "synonyms": [
+        "risk score",
+        "risk index",
+        "composite risk",
+        "pontuacao de risco",
+        "indice de risco"
+      ],
+      "related": [
+        "risk_level",
+        "risk_probability"
+      ],
+      "priority": 820,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_risk_score",
+      "curationReason": "weighted:risk_score:domain_general"
+    },
+    {
+      "canonical": "root_cause",
+      "synonyms": [
+        "root cause",
+        "cause",
+        "origin",
+        "causa raiz",
+        "causa",
+        "origem"
+      ],
+      "related": [
+        "corrective_action",
+        "failure_mode"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_root_cause",
+      "curationReason": "weighted:root_cause:domain_general"
+    },
+    {
+      "canonical": "schedule_variance",
+      "synonyms": [
+        "schedule variance",
+        "sv",
+        "timeline variance",
+        "variacao de cronograma",
+        "desvio de prazo"
+      ],
+      "related": [
+        "planned_completion_date",
+        "actual_completion_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_schedule_variance",
+      "curationReason": "weighted:schedule_variance:domain_general"
+    },
+    {
+      "canonical": "serial_number",
+      "synonyms": [
+        "serial number",
+        "sn",
+        "serial",
+        "numero de serie",
+        "serial",
+        "ns"
+      ],
+      "related": [
+        "asset_id",
+        "part_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_serial_number",
+      "curationReason": "weighted:serial_number:domain_general"
+    },
+    {
+      "canonical": "severity",
+      "synonyms": [
+        "severity",
+        "sev",
+        "impact level",
+        "severidade",
+        "gravidade",
+        "nivel de impacto"
+      ],
+      "related": [
+        "priority",
+        "escalation_level"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_severity",
+      "curationReason": "weighted:severity:domain_general"
+    },
+    {
+      "canonical": "sku",
+      "synonyms": [
+        "sku",
+        "stock keeping unit",
+        "product code",
+        "sku",
+        "codigo do produto",
+        "codigo de estoque"
+      ],
+      "related": [
+        "item_number",
+        "item_name"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_sku",
+      "curationReason": "weighted:sku:domain_general"
+    },
+    {
+      "canonical": "sla_compliance",
+      "synonyms": [
+        "sla compliance",
+        "sla met",
+        "within sla",
+        "conformidade com sla",
+        "sla atendido",
+        "dentro do sla"
+      ],
+      "related": [
+        "sla_target",
+        "response_time"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_sla_compliance",
+      "curationReason": "weighted:sla_compliance:domain_general"
+    },
+    {
+      "canonical": "sla_target",
+      "synonyms": [
+        "sla target",
+        "sla",
+        "service level target",
+        "meta de sla",
+        "objetivo de sla",
+        "nivel de servico"
+      ],
+      "related": [
+        "sla_compliance",
+        "response_time"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_sla_target",
+      "curationReason": "weighted:sla_target:domain_general"
+    },
+    {
+      "canonical": "start_date",
+      "synonyms": [
+        "start date",
+        "begin date",
+        "commenced on",
+        "data de inicio",
+        "inicio",
+        "comecou em"
+      ],
+      "related": [
+        "end_date",
+        "duration"
+      ],
+      "priority": 726,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_start_date",
+      "curationReason": "weighted:start_date:domain_general"
+    },
+    {
+      "canonical": "status",
+      "synonyms": [
+        "status",
+        "state",
+        "current status",
+        "status",
+        "situacao",
+        "estado"
+      ],
+      "related": [
+        "task_status",
+        "order_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_status",
+      "curationReason": "weighted:status:domain_general"
+    },
+    {
+      "canonical": "supplier_name",
+      "synonyms": [
+        "supplier",
+        "vendor",
+        "provider",
+        "fornecedor",
+        "prestador",
+        "vendor"
+      ],
+      "related": [
+        "supplier_rating",
+        "po_number"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_supplier_name",
+      "curationReason": "weighted:supplier_name:domain_general"
+    },
+    {
+      "canonical": "supplier_rating",
+      "synonyms": [
+        "supplier rating",
+        "vendor rating",
+        "score",
+        "avaliacao do fornecedor",
+        "nota do fornecedor"
+      ],
+      "related": [
+        "supplier_name",
+        "quality_score"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_supplier_rating",
+      "curationReason": "weighted:supplier_rating:domain_general"
+    },
+    {
+      "canonical": "task_name",
+      "synonyms": [
+        "task",
+        "task name",
+        "activity",
+        "tarefa",
+        "nome da tarefa",
+        "atividade"
+      ],
+      "related": [
+        "task_id",
+        "task_status"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_task_name",
+      "curationReason": "weighted:task_name:domain_general"
+    },
+    {
+      "canonical": "task_status",
+      "synonyms": [
+        "task status",
+        "status",
+        "state",
+        "status da tarefa",
+        "situacao da tarefa"
+      ],
+      "related": [
+        "task_name",
+        "completion_percentage"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_task_status",
+      "curationReason": "weighted:task_status:domain_general"
+    },
+    {
+      "canonical": "team",
+      "synonyms": [
+        "team",
+        "group",
+        "squad",
+        "equipe",
+        "time",
+        "grupo"
+      ],
+      "related": [
+        "department",
+        "assigned_to"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_team",
+      "curationReason": "weighted:team:domain_general"
+    },
+    {
+      "canonical": "throughput",
+      "synonyms": [
+        "throughput",
+        "output rate",
+        "production rate",
+        "vazao",
+        "taxa de producao",
+        "capacidade de processamento"
+      ],
+      "related": [
+        "capacity",
+        "cycle_time"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_throughput",
+      "curationReason": "weighted:throughput:domain_general"
+    },
+    {
+      "canonical": "total_cost",
+      "synonyms": [
+        "total cost",
+        "total expense",
+        "grand total",
+        "custo total",
+        "despesa total",
+        "total geral"
+      ],
+      "related": [
+        "actual_cost",
+        "estimated_cost"
+      ],
+      "priority": 896,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_total_cost",
+      "curationReason": "weighted:total_cost:domain_general"
+    },
+    {
+      "canonical": "tracking_number",
+      "synonyms": [
+        "tracking number",
+        "tracking",
+        "awb",
+        "numero de rastreio",
+        "rastreamento",
+        "codigo de rastreio"
+      ],
+      "related": [
+        "delivery_status",
+        "shipment_id"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_tracking_number",
+      "curationReason": "weighted:tracking_number:domain_general"
+    },
+    {
+      "canonical": "unit_cost",
+      "synonyms": [
+        "unit cost",
+        "cost per unit",
+        "unit price",
+        "custo unitario",
+        "preco unitario",
+        "custo por unidade"
+      ],
+      "related": [
+        "total_cost",
+        "quantity"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_unit_cost",
+      "curationReason": "weighted:unit_cost:domain_general"
+    },
+    {
+      "canonical": "uptime_percentage",
+      "synonyms": [
+        "uptime",
+        "availability",
+        "uptime %",
+        "disponibilidade",
+        "tempo ativo",
+        "% de uptime"
+      ],
+      "related": [
+        "downtime_hours",
+        "mtbf"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_uptime_percentage",
+      "curationReason": "weighted:uptime_percentage:domain_general"
+    },
+    {
+      "canonical": "utilization_rate",
+      "synonyms": [
+        "utilization rate",
+        "usage rate",
+        "efficiency",
+        "taxa de utilizacao",
+        "taxa de uso",
+        "eficiencia"
+      ],
+      "related": [
+        "capacity_utilization",
+        "throughput"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_utilization_rate",
+      "curationReason": "weighted:utilization_rate:domain_general"
+    },
+    {
+      "canonical": "warehouse",
+      "synonyms": [
+        "warehouse",
+        "storage",
+        "depot",
+        "armazem",
+        "deposito",
+        "almoxarifado"
+      ],
+      "related": [
+        "location",
+        "on_hand_quantity"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_warehouse",
+      "curationReason": "weighted:warehouse:domain_general"
+    },
+    {
+      "canonical": "work_order_id",
+      "synonyms": [
+        "work order",
+        "wo",
+        "work order number",
+        "ordem de servico",
+        "os",
+        "numero da os"
+      ],
+      "related": [
+        "work_order_status",
+        "maintenance_date"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_work_order_id",
+      "curationReason": "weighted:work_order_id:domain_general"
+    },
+    {
+      "canonical": "work_order_status",
+      "synonyms": [
+        "wo status",
+        "work order status",
+        "status",
+        "status da os",
+        "situacao da ordem de servico"
+      ],
+      "related": [
+        "work_order_id",
+        "completion_date"
+      ],
+      "priority": 540,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_work_order_status",
+      "curationReason": "weighted:work_order_status:domain_general"
+    },
+    {
+      "canonical": "yield_rate",
+      "synonyms": [
+        "yield",
+        "yield rate",
+        "output yield",
+        "rendimento",
+        "taxa de rendimento",
+        "yield"
+      ],
+      "related": [
+        "production_quantity",
+        "defect_rate"
+      ],
+      "priority": 546,
+      "scope": "table_header:ops",
+      "disambiguationRuleId": "headers_disambiguation_general_yield_rate",
+      "curationReason": "weighted:yield_rate:domain_general"
+    }
   ]
 }

@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "accounting_rules",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Accounting interpretation policy with accrual/cash handling, classification logic, and deterministic validation rules.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "finance"
+    "domain": "finance",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "finance",
   "definitions": [
@@ -2160,6 +2175,21 @@
           "en": "Should I convert this analysis to accrual basis or cash basis?",
           "pt": "Devo converter esta análise para regime de competência ou caixa?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:accrual_and_cash_basis_mixed_in_same_metric",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2197,6 +2227,21 @@
           "en": "Which FX translation policy should I use for this report?",
           "pt": "Qual política de conversão cambial devo usar neste relatório?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:functional_versus_presentation_currency_policy_required",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2234,6 +2279,21 @@
           "en": "Which note section should I use as evidence for this conclusion?",
           "pt": "Qual seção de notas devo usar como evidência para esta conclusão?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:material_conclusions_require_note_disclosure_evidence",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2271,6 +2331,21 @@
           "en": "Should this be treated as change in estimate or prior-period error?",
           "pt": "Isto deve ser tratado como mudança de estimativa ou erro de período anterior?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:changes_in_estimates_must_be_distinguished_from_errors",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2308,6 +2383,21 @@
           "en": "Should I eliminate intercompany balances before presenting consolidated figures?",
           "pt": "Devo eliminar saldos intercompany antes de apresentar números consolidados?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:intercompany_elimination_before_consolidation",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2345,6 +2435,21 @@
           "en": "What materiality threshold should I apply for this review?",
           "pt": "Qual limite de materialidade devo aplicar nesta revisão?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:materiality_threshold_must_be_explicit",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2382,6 +2487,21 @@
           "en": "Should I classify this item as recurring or non-recurring?",
           "pt": "Devo classificar este item como recorrente ou não recorrente?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:non-recurring_tags",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2421,6 +2541,21 @@
           "en": "Which posting date cutoff should I apply?",
           "pt": "Qual data de corte contábil devo aplicar?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:cutoff_integrity",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2461,6 +2596,21 @@
           "en": "Which accounting policy should I apply for Accrual Basis?",
           "pt": "Qual política contábil devo aplicar para Accrual Basis?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2501,6 +2651,21 @@
           "en": "Which accounting policy should I apply for Allowance for Doubtful Accounts?",
           "pt": "Qual política contábil devo aplicar para Allowance for Doubtful Accounts?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2541,6 +2706,21 @@
           "en": "Which accounting policy should I apply for Amortization?",
           "pt": "Qual política contábil devo aplicar para Amortization?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2581,6 +2761,21 @@
           "en": "Which accounting policy should I apply for Borrowing Costs?",
           "pt": "Qual política contábil devo aplicar para Borrowing Costs?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2621,6 +2816,21 @@
           "en": "Which accounting policy should I apply for Capitalization vs Expense?",
           "pt": "Qual política contábil devo aplicar para Capitalization vs Expense?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2661,6 +2871,21 @@
           "en": "Which accounting policy should I apply for Cash Basis?",
           "pt": "Qual política contábil devo aplicar para Cash Basis?"
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2701,6 +2926,21 @@
           "en": "Which accounting policy should I apply for Current vs Non-current Classification?",
           "pt": "Qual política contábil devo aplicar para Current vs Non-current Classification?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2741,6 +2981,21 @@
           "en": "Which accounting policy should I apply for Consistency?",
           "pt": "Qual política contábil devo aplicar para Consistency?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2781,6 +3036,21 @@
           "en": "Which accounting policy should I apply for Consolidation?",
           "pt": "Qual política contábil devo aplicar para Consolidation?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2821,6 +3091,21 @@
           "en": "Which accounting policy should I apply for Contingent Asset?",
           "pt": "Qual política contábil devo aplicar para Contingent Asset?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2861,6 +3146,21 @@
           "en": "Which accounting policy should I apply for Contingent Liability?",
           "pt": "Qual política contábil devo aplicar para Contingent Liability?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2901,6 +3201,21 @@
           "en": "Which accounting policy should I apply for Cost of Sales Definition?",
           "pt": "Qual política contábil devo aplicar para Cost of Sales Definition?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2941,6 +3256,21 @@
           "en": "Which accounting policy should I apply for Cutoff?",
           "pt": "Qual política contábil devo aplicar para Cutoff?"
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2981,6 +3311,21 @@
           "en": "Which accounting policy should I apply for Deferred Revenue?",
           "pt": "Qual política contábil devo aplicar para Deferred Revenue?"
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3021,6 +3366,21 @@
           "en": "Which accounting policy should I apply for Deferred Tax?",
           "pt": "Qual política contábil devo aplicar para Deferred Tax?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3061,6 +3421,21 @@
           "en": "Which accounting policy should I apply for Depreciation?",
           "pt": "Qual política contábil devo aplicar para Depreciation?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3101,6 +3476,21 @@
           "en": "Which accounting policy should I apply for Disclosure Completeness?",
           "pt": "Qual política contábil devo aplicar para Disclosure Completeness?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3141,6 +3531,21 @@
           "en": "Which accounting policy should I apply for Earnings Quality?",
           "pt": "Qual política contábil devo aplicar para Earnings Quality?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3181,6 +3586,21 @@
           "en": "Which accounting policy should I apply for Extraordinary Item Policy?",
           "pt": "Qual política contábil devo aplicar para Extraordinary Item Policy?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3221,6 +3641,21 @@
           "en": "Which accounting policy should I apply for Fair Value?",
           "pt": "Qual política contábil devo aplicar para Fair Value?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3261,6 +3696,21 @@
           "en": "Which accounting policy should I apply for Foreign Currency Translation?",
           "pt": "Qual política contábil devo aplicar para Foreign Currency Translation?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3301,6 +3751,21 @@
           "en": "Which accounting policy should I apply for Going Concern?",
           "pt": "Qual política contábil devo aplicar para Going Concern?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3341,6 +3806,21 @@
           "en": "Which accounting policy should I apply for Goodwill Testing?",
           "pt": "Qual política contábil devo aplicar para Goodwill Testing?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3381,6 +3861,21 @@
           "en": "Which accounting policy should I apply for Government Grants?",
           "pt": "Qual política contábil devo aplicar para Government Grants?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3421,6 +3916,21 @@
           "en": "Which accounting policy should I apply for Hedge Accounting?",
           "pt": "Qual política contábil devo aplicar para Hedge Accounting?"
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3461,6 +3971,21 @@
           "en": "Which accounting policy should I apply for Historical Cost?",
           "pt": "Qual política contábil devo aplicar para Historical Cost?"
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3500,6 +4025,21 @@
           "en": "Which accounting policy should I apply for Impairment?",
           "pt": "Qual política contábil devo aplicar para Impairment?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3540,6 +4080,21 @@
           "en": "Which accounting policy should I apply for Intangibles Recognition?",
           "pt": "Qual política contábil devo aplicar para Intangibles Recognition?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3580,6 +4135,21 @@
           "en": "Which accounting policy should I apply for Intercompany Elimination?",
           "pt": "Qual política contábil devo aplicar para Intercompany Elimination?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3620,6 +4190,21 @@
           "en": "Which accounting policy should I apply for Inventory Valuation?",
           "pt": "Qual política contábil devo aplicar para Inventory Valuation?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3660,6 +4245,21 @@
           "en": "Which accounting policy should I apply for Lease Capitalization?",
           "pt": "Qual política contábil devo aplicar para Lease Capitalization?"
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3700,6 +4300,21 @@
           "en": "Which accounting policy should I apply for Matching Principle?",
           "pt": "Qual política contábil devo aplicar para Matching Principle?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3740,6 +4355,21 @@
           "en": "Which accounting policy should I apply for Materiality?",
           "pt": "Qual política contábil devo aplicar para Materiality?"
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3780,6 +4410,21 @@
           "en": "Which accounting policy should I apply for Non-Recurring Item?",
           "pt": "Qual política contábil devo aplicar para Non-Recurring Item?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3820,6 +4465,21 @@
           "en": "Which accounting policy should I apply for Provision?",
           "pt": "Qual política contábil devo aplicar para Provision?"
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3860,6 +4520,21 @@
           "en": "Which accounting policy should I apply for Prudence?",
           "pt": "Qual política contábil devo aplicar para Prudence?"
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3900,6 +4575,21 @@
           "en": "Which accounting policy should I apply for Related Party?",
           "pt": "Qual política contábil devo aplicar para Related Party?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3940,6 +4630,21 @@
           "en": "Which accounting policy should I apply for Research and Development Treatment?",
           "pt": "Qual política contábil devo aplicar para Research and Development Treatment?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3980,6 +4685,21 @@
           "en": "Which accounting policy should I apply for Reserves and Equity Movements?",
           "pt": "Qual política contábil devo aplicar para Reserves and Equity Movements?"
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4020,6 +4740,21 @@
           "en": "Which accounting policy should I apply for Restatement Policy?",
           "pt": "Qual política contábil devo aplicar para Restatement Policy?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4060,6 +4795,21 @@
           "en": "Which accounting policy should I apply for Revenue Recognition?",
           "pt": "Qual política contábil devo aplicar para Revenue Recognition?"
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4100,6 +4850,21 @@
           "en": "Which accounting policy should I apply for Segment Reporting?",
           "pt": "Qual política contábil devo aplicar para Segment Reporting?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4140,6 +4905,21 @@
           "en": "Which accounting policy should I apply for Subsequent Events?",
           "pt": "Qual política contábil devo aplicar para Subsequent Events?"
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4180,6 +4960,21 @@
           "en": "Which accounting policy should I apply for Substance over Form?",
           "pt": "Qual política contábil devo aplicar para Substance over Form?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4220,6 +5015,21 @@
           "en": "Which accounting policy should I apply for Tax Rate Reconciliation?",
           "pt": "Qual política contábil devo aplicar para Tax Rate Reconciliation?"
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4260,6 +5070,21 @@
           "en": "Which accounting policy should I apply for Unearned Revenue?",
           "pt": "Qual política contábil devo aplicar para Unearned Revenue?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+compare",
+          "check:policy_alignment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4297,6 +5122,21 @@
           "en": "Which periods are affected by the restatement?",
           "pt": "Quais períodos são afetados pela reapresentação?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:restatement_requires_affected_periods_list",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4334,6 +5174,21 @@
           "en": "Should I build a statutory-to-effective tax bridge before concluding?",
           "pt": "Devo montar uma ponte da taxa nominal para efetiva antes de concluir?"
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:effective_tax_rate_needs_statutory_bridge",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4373,6 +5228,21 @@
           "en": "Should I classify this lease under IFRS 16 or US GAAP ASC 842?",
           "pt": "Devo classificar este arrendamento conforme IFRS 16 ou US GAAP ASC 842?"
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:lease_classification_ifrs16_vs_asc842_must_be_specified",
+          "scope:global",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "core",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4412,6 +5282,21 @@
           "en": "Should I use the incremental borrowing rate or the implicit rate in the lease for discounting?",
           "pt": "Devo usar a taxa incremental de empréstimo ou a taxa implícita no arrendamento para desconto?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+calculate",
+          "check:rou_discount_rate_incremental_borrowing_vs_implicit",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4451,6 +5336,21 @@
           "en": "Which option pricing model should I use: Black-Scholes or Monte Carlo simulation?",
           "pt": "Qual modelo de precificação de opções devo usar: Black-Scholes ou simulação de Monte Carlo?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+calculate",
+          "check:sbc_requires_option_pricing_model_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4490,6 +5390,21 @@
           "en": "Should I apply straight-line or graded vesting for the stock option expense recognition?",
           "pt": "Devo aplicar aquisição linear ou gradual para o reconhecimento da despesa de opções de ações?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+calculate",
+          "check:stock_option_expense_requires_vesting_schedule_alignment",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4529,6 +5444,21 @@
           "en": "Should this OCI item be classified as reclassifiable or non-reclassifiable to profit or loss?",
           "pt": "Este item de OCI deve ser classificado como reclassificável ou não reclassificável para o resultado?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:oci_items_must_classify_reclassifiable_vs_non_reclassifiable",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4568,6 +5498,21 @@
           "en": "What is the functional currency of this entity for translation purposes?",
           "pt": "Qual é a moeda funcional desta entidade para fins de conversão?"
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:foreign_currency_translation_needs_functional_currency_id",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4607,6 +5552,21 @@
           "en": "Which hedge effectiveness testing method was used (dollar-offset, regression, or critical terms match)?",
           "pt": "Qual método de teste de efetividade do hedge foi utilizado (dollar-offset, regressão ou correspondência de termos críticos)?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:hedge_effectiveness_testing_method_must_be_disclosed",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4650,6 +5610,21 @@
           "en": "At which fair value hierarchy level (1, 2, or 3) is this measurement classified?",
           "pt": "Em qual nível da hierarquia de valor justo (1, 2 ou 3) esta mensuração está classificada?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:fair_value_hierarchy_level_must_be_stated",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4689,6 +5664,21 @@
           "en": "What is the date of classification as discontinued operations?",
           "pt": "Qual é a data de classificação como operações descontinuadas?"
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:discontinued_operations_require_classification_date",
+          "scope:global",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "core",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4728,6 +5718,21 @@
           "en": "Have all intercompany balances been eliminated bidirectionally (both seller and buyer sides)?",
           "pt": "Todos os saldos intercompany foram eliminados bidirecionalmente (lado do vendedor e do comprador)?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:intercompany_elimination_must_be_complete_and_bidirectional",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4767,6 +5772,21 @@
           "en": "Should NCI be measured at acquisition-date fair value (full goodwill) or proportionate share of net assets?",
           "pt": "O NCI deve ser mensurado ao valor justo na data de aquisição (goodwill total) ou pela participação proporcional nos ativos líquidos?"
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:nci_must_use_acquisition_date_fair_value_or_proportionate_share",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4806,6 +5826,21 @@
           "en": "Which valuation methodology was used for each identified intangible (MEEM, relief-from-royalty, with/without)?",
           "pt": "Qual metodologia de avaliação foi usada para cada intangível identificado (MEEM, alívio de royalty, com/sem)?"
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:ppa_needs_valuation_methodology_for_each_intangible",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4845,6 +5880,21 @@
           "en": "Has the contingent consideration been remeasured at fair value as of this reporting date?",
           "pt": "A contraprestação contingente foi remensurada ao valor justo nesta data de reporte?"
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:contingent_consideration_must_be_remeasured_each_reporting_date",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4884,6 +5934,21 @@
           "en": "Is there a detailed restructuring plan with evidence of communication to affected parties?",
           "pt": "Existe um plano detalhado de reestruturação com evidência de comunicação às partes afetadas?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:restructuring_provisions_need_detailed_plan_and_communication",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4923,6 +5988,21 @@
           "en": "Are the expected credit losses measured on a 12-month or lifetime basis, and what stage applies?",
           "pt": "As perdas de crédito esperadas são mensuradas em base de 12 meses ou vitalícia, e qual estágio se aplica?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:ecl_needs_staging_12month_vs_lifetime_disclosure",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4962,6 +6042,21 @@
           "en": "Which specific ASC 842 criteria were applied to distinguish operating from finance lease?",
           "pt": "Quais critérios específicos do ASC 842 foram aplicados para distinguir arrendamento operacional de financeiro?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:operating_vs_finance_lease_asc842_needs_criteria_reference",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5001,6 +6096,21 @@
           "en": "What market data source was used for the biological asset fair value less costs to sell?",
           "pt": "Qual fonte de dados de mercado foi usada para o valor justo menos custos de venda do ativo biológico?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:biological_assets_fair_value_needs_market_data_source",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5040,6 +6150,21 @@
           "en": "Is the investment property measured using the cost model or the fair value model, and is it consistently applied?",
           "pt": "A propriedade para investimento é mensurada pelo modelo de custo ou de valor justo, e é aplicado de forma consistente?"
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:investment_property_model_must_be_consistently_applied",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5079,6 +6204,21 @@
           "en": "Is there evidence that the asset is available for immediate sale in its present condition?",
           "pt": "Há evidência de que o ativo está disponível para venda imediata em suas condições atuais?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:held_for_sale_needs_available_for_immediate_sale_evidence",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5118,6 +6258,21 @@
           "en": "Has the going concern assessment covered at least 12 months from the date of financial statement issuance?",
           "pt": "A avaliação de continuidade operacional cobriu pelo menos 12 meses a partir da data de emissão das demonstrações financeiras?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:going_concern_needs_specific_time_horizon_12months",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5157,6 +6312,21 @@
           "en": "Do the reported segments meet the quantitative thresholds (10% revenue, profit, or assets test)?",
           "pt": "Os segmentos reportados atendem aos limites quantitativos (teste de 10% de receita, resultado ou ativos)?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:segment_aggregation_needs_quantitative_threshold_disclosure",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5196,6 +6366,21 @@
           "en": "Is treasury stock accounted for using the cost method or the par value method?",
           "pt": "As ações em tesouraria são contabilizadas pelo método do custo ou pelo método do valor nominal?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:treasury_stock_requires_cost_vs_par_value_method",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5235,6 +6420,21 @@
           "en": "Is comprehensive income presented in a single continuous statement or in two separate statements?",
           "pt": "O resultado abrangente é apresentado em uma demonstração contínua única ou em duas demonstrações separadas?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:comprehensive_income_presentation_format_must_be_identified",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5274,6 +6474,21 @@
           "en": "Have the earn-out scenarios been probability-weighted with disclosed assumptions?",
           "pt": "Os cenários de earn-out foram ponderados por probabilidade com premissas divulgadas?"
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+calculate",
+          "check:earnout_liabilities_need_probability_weighted_scenario_disclosure",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5313,6 +6528,21 @@
           "en": "What discount rate and expected settlement timing were used for the environmental liability?",
           "pt": "Qual taxa de desconto e prazo esperado de liquidação foram usados para o passivo ambiental?"
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:evaluate+validate+summarize",
+          "check:environmental_liabilities_require_discount_rate_and_timing",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     }
   ]

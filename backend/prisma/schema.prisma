@@ -185,7 +185,7 @@ model Document {
   fileSize                   Int
   mimeType                   String
   fileHash                   String
-  status                     String                     @default("uploaded")
+  status                     DocumentStatus             @default(uploaded)
   parentVersionId            String?
   isEncrypted                Boolean                    @default(false)
   encryptionSalt             String?
@@ -204,7 +204,7 @@ model Document {
   language                   String                     @default("en")
   chunksCount                Int?                       @default(0)
   embeddingsGenerated        Boolean                    @default(false)
-  indexingState              String?                    @map("indexing_state")
+  indexingState              DocumentIndexingState      @default(pending) @map("indexing_state")
   indexingOperationId        String?                    @map("indexing_operation_id")
   indexingError              String?                    @map("indexing_error")
   indexingUpdatedAt          DateTime?                  @map("indexing_updated_at")
@@ -391,7 +391,7 @@ model Conversation {
 model Message {
   id                String                 @id @default(uuid())
   conversationId    String
-  role              String
+  role              MessageRole
   content           String?
   contentEncrypted  String?
   metadata          String?
@@ -1134,6 +1134,7 @@ model HourlyMetrics {
 }
 
 enum DocumentStatus {
+  uploading
   uploaded
   available
   enriching
@@ -1141,6 +1142,20 @@ enum DocumentStatus {
   ready
   failed
   skipped
+  completed
+}
+
+enum DocumentIndexingState {
+  pending
+  running
+  indexed
+  failed
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
 }
 
 // ============================================================================

@@ -1,0 +1,82 @@
+{
+  "_meta": {
+    "id": "di_ops_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for operations analysis tasks.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "scaffolds": [
+    {
+      "id": "ops_scaffold_001_sla_compliance_check",
+      "name": "SLA Compliance Check",
+      "operators": [
+        "validate",
+        "calculate",
+        "compare"
+      ],
+      "steps": [
+        "Extract SLA targets and their measurement criteria",
+        "Capture actual metric values for the reporting period",
+        "Compare actual vs target for each SLA line item",
+        "Identify breaches, near-misses, and compliant items",
+        "Return compliance summary with cited evidence and breach details"
+      ]
+    },
+    {
+      "id": "ops_scaffold_002_maintenance_schedule_analysis",
+      "name": "Maintenance Schedule Analysis",
+      "operators": [
+        "extract",
+        "evaluate",
+        "advise"
+      ],
+      "steps": [
+        "Extract scheduled maintenance activities with due dates and frequency",
+        "Cross-reference completed maintenance entries from the log",
+        "Identify overdue, upcoming, and completed tasks",
+        "Flag equipment with missed preventive maintenance windows",
+        "Provide neutral assessment of schedule adherence and risk areas"
+      ]
+    },
+    {
+      "id": "ops_scaffold_003_incident_root_cause",
+      "name": "Incident Root Cause Analysis",
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Extract incident details including timeline, location, and severity",
+        "Identify contributing factors and immediate causes cited in the report",
+        "Map causal chain from trigger event to observed impact",
+        "Check whether corrective actions are documented and assigned",
+        "Summarize root cause findings with confidence and evidence gaps"
+      ]
+    },
+    {
+      "id": "ops_scaffold_004_production_throughput_analysis",
+      "name": "Production Throughput Analysis",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ],
+      "steps": [
+        "Extract production output quantities and time periods",
+        "Calculate throughput rate and compare against capacity targets",
+        "Identify bottleneck indicators such as downtime events or low OEE",
+        "Check cycle time consistency across shifts or production lines",
+        "Return throughput summary with variance analysis and cited data"
+      ]
+    }
+  ]
+}

@@ -199,8 +199,5 @@ export function isSemanticTruncationV2Enabled(env = process.env): boolean {
   if (value === "0" || value === "false" || value === "no" || value === "off") {
     return false;
   }
-  const nodeEnv = String(env.NODE_ENV || "")
-    .trim()
-    .toLowerCase();
-  return nodeEnv === "production" || nodeEnv === "staging";
+  return true;
 }

@@ -9,7 +9,12 @@ import { PromptRegistryService } from "../../services/llm/prompts/promptRegistry
 
 function createPromptLoader() {
   const promptRoot = path.resolve(process.cwd(), "src/data_banks/prompts");
-  const bankIds = ["prompt_registry", "system_base", "mode_chat", "fallback_prompt"];
+  const bankIds = [
+    "prompt_registry",
+    "system_base",
+    "mode_chat",
+    "fallback_prompt",
+  ];
   const banks = Object.fromEntries(
     bankIds.map((bankId) => [
       bankId,
@@ -25,7 +30,9 @@ function createPromptLoader() {
   };
 }
 
-function createInput(overrides?: Partial<BuildRequestInput>): BuildRequestInput {
+function createInput(
+  overrides?: Partial<BuildRequestInput>,
+): BuildRequestInput {
   return {
     env: "local" as any,
     route: {
@@ -76,11 +83,13 @@ describe("Integration: help/fallback prompt wiring", () => {
     expect(meta.promptType).toBe("fallback");
     expect(meta.reasonCodes).toContain("scope_hard_constraints_empty");
     expect(
-      (trace?.orderedPrompts || []).some((entry) => entry.bankId === "fallback_prompt"),
+      (trace?.orderedPrompts || []).some(
+        (entry) => entry.bankId === "fallback_prompt",
+      ),
     ).toBe(true);
-    expect((capturedPromptCtx?.slots as Record<string, string>)?.productHelpTopic).toBe(
-      "limitations_memory_scope",
-    );
+    expect(
+      (capturedPromptCtx?.slots as Record<string, string>)?.productHelpTopic,
+    ).toBe("limitations_memory_scope");
     expect(
       (capturedPromptCtx?.slots as Record<string, string>)?.productHelpSnippet,
     ).toContain("selection/range");

@@ -222,7 +222,7 @@
   border: 1px solid #e6e6ec;
   border-radius: 12px;
   overflow: hidden;
-  table-layout: auto;
+  table-layout: fixed;
 }
 
 .markdown-th,
@@ -234,8 +234,8 @@
   border-bottom: 2px solid #c0c0c5;
   border-right: 1px solid #e0e0e5;
   color: #111111;
-  white-space: nowrap;
-  min-width: 80px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .markdown-td,
@@ -245,8 +245,8 @@
   border-right: 1px solid #e0e0e5;
   color: #111111;
   vertical-align: top;
-  min-width: 80px;
-  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .koda-markdown td:last-child {

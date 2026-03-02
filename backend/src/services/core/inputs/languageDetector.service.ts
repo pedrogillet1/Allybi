@@ -242,6 +242,16 @@ export class LanguageDetectorService {
       debug,
     );
 
+    // Apply implicit language bias from language_triggers without marking
+    // the turn as an explicit language request.
+    for (const lang of ["en", "pt", "es"] as const) {
+      const bias = clamp01(Number(directive.biasScores?.[lang] ?? 0));
+      if (bias <= 0) continue;
+      scored.scores[lang] = clamp01(
+        Math.max(scored.scores[lang], bias, implicitCueConfidence * bias),
+      );
+    }
+
     // 4) Mixed-language detection heuristic:
     // If we detect strong evidence for 2+ languages, treat as mixed and return any unless directive forces a language.
     const detectedLangCount = (["en", "pt", "es"] as const).filter(
@@ -337,17 +347,26 @@ export class LanguageDetectorService {
     languageRequested: boolean;
     languageSelected: LangCode | null;
     mixedLanguageDetected: boolean;
+    biasScores: Record<"en" | "pt" | "es", number>;
   } {
+    const biasScores: Record<"en" | "pt" | "es", number> = {
+      en: 0,
+      pt: 0,
+      es: 0,
+    };
     if (!triggersBank?.config?.enabled) {
       return {
         languageRequested: false,
         languageSelected: null,
         mixedLanguageDetected: false,
+        biasScores,
       };
     }
 
     const rules = Array.isArray(triggersBank.rules) ? triggersBank.rules : [];
-    let best: { lang: LangCode; conf: number; ruleId: string } | null = null;
+    let bestExplicit: { lang: Exclude<LangCode, "any">; conf: number } | null =
+      null;
+    let mixedLanguageHint = false;
 
     // We treat these banks as "pattern + action"; we evaluate triggerPatterns across en/pt/es keys.
     for (const r of rules) {
@@ -371,17 +390,19 @@ export class LanguageDetectorService {
       const type = action.type ?? "";
       if (type === "set_language") {
         const lang = action.language as LangCode;
-        if (isLang(lang)) {
+        if (lang === "any") {
+          mixedLanguageHint = true;
+        } else if (lang === "en" || lang === "pt" || lang === "es") {
           const conf = clamp01(Number(action.confidence ?? 0.95));
-          if (!best || conf > best.conf)
-            best = { lang, conf, ruleId: String(rid) };
+          if (!bestExplicit || conf > bestExplicit.conf) {
+            bestExplicit = { lang, conf };
+          }
         }
       } else if (type === "bias_language") {
         const lang = action.language as LangCode;
-        if (isLang(lang)) {
+        if (lang === "en" || lang === "pt" || lang === "es") {
           const conf = clamp01(Number(action.confidence ?? 0.75));
-          if (!best || conf > best.conf)
-            best = { lang, conf, ruleId: String(rid) };
+          biasScores[lang] = Math.max(biasScores[lang], conf);
         }
       }
     }
@@ -391,17 +412,19 @@ export class LanguageDetectorService {
       debug.matchedDirectiveRuleIds.includes("mixed_language_detection") ||
       /mixed/i.test(debug.matchedDirectiveRuleIds.join("|"));
 
-    if (!best)
+    if (!bestExplicit)
       return {
         languageRequested: false,
         languageSelected: null,
-        mixedLanguageDetected: mixed,
+        mixedLanguageDetected: mixed || mixedLanguageHint,
+        biasScores,
       };
 
     return {
       languageRequested: true,
-      languageSelected: best.lang,
-      mixedLanguageDetected: mixed || best.lang === "any",
+      languageSelected: bestExplicit.lang,
+      mixedLanguageDetected: mixed || mixedLanguageHint,
+      biasScores,
     };
   }
 

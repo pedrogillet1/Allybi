@@ -68,6 +68,43 @@ export class LLMChatEngine implements ChatEngine {
     };
   }
 
+  async generateRetrievalPlan(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    messages: Array<{
+      role: ChatRole;
+      content: string;
+      attachments?: unknown | null;
+    }>;
+    evidencePack?: EvidencePackLike | null;
+    context?: Record<string, unknown>;
+    meta?: Record<string, unknown>;
+  }): Promise<{
+    text: string;
+    attachmentsPayload?: unknown;
+    telemetry?: Record<string, unknown>;
+  }> {
+    const out = await this.gateway.generateRetrievalPlan({
+      traceId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+      messages: params.messages,
+      evidencePack: params.evidencePack,
+      context: params.context,
+      meta: params.meta,
+    });
+
+    return {
+      text: out.text,
+      telemetry: {
+        provider: this.provider,
+        model: this.modelId,
+        ...out.telemetry,
+      },
+    };
+  }
+
   async stream(params: {
     traceId: string;
     userId: string;

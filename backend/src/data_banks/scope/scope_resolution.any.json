@@ -16,13 +16,13 @@
     },
 
     "integrationHooks": {
-      "queryRewriteBankId": "query_rewrite",
-      "conversationStateSchemaBankId": "conversation_state_schema",
-      "activeDocRulesBankId": "active_doc_rules",
-      "negativesBankId": "negation_and_exclusions",
-      "timeSemanticsBankId": "time_semantics",
-      "numericSemanticsBankId": "numeric_semantics",
-      "domainDetectionBankId": "domain_detection",
+      "queryRewriteBankId": "query_rewrites_schema",
+      "conversationStateSchemaBankId": "memory_policy",
+      "activeDocRulesBankId": "wrong_doc_lock",
+      "negativesBankId": "retrieval_negatives",
+      "timeSemanticsBankId": "date_patterns",
+      "numericSemanticsBankId": "money_patterns",
+      "domainDetectionBankId": "domain_ontology",
       "domainOntologyBankId": "domain_ontology",
       "docAliasesBankId": "doc_aliases",
       "stopwordsDocnamesBankId": "stopwords_docnames"

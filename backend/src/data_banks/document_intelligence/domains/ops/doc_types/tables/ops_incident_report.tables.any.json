@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "id": "di_ops_tables_ops_incident_report",
+    "version": "1.0.0",
+    "description": "Expected table patterns for incident report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_incident_report"
+  },
+  "tableHeaderSynonyms": {
+    "date_time": [
+      "date",
+      "time",
+      "timestamp",
+      "data",
+      "hora"
+    ],
+    "event": [
+      "event",
+      "action",
+      "observation",
+      "evento"
+    ],
+    "responsible": [
+      "responsible",
+      "assigned to",
+      "owner",
+      "responsavel"
+    ],
+    "status": [
+      "status",
+      "state",
+      "situacao"
+    ],
+    "impact": [
+      "impact",
+      "cost",
+      "downtime",
+      "impacto"
+    ]
+  },
+  "tables": [
+    {
+      "id": "ops_incident_report_timeline_table",
+      "name": {
+        "en": "Event Timeline",
+        "pt": "Cronologia do Evento"
+      },
+      "section": "timeline",
+      "expectedColumns": [
+        "date_time",
+        "event",
+        "responsible"
+      ],
+      "keyRows": [
+        "resolution_time"
+      ]
+    },
+    {
+      "id": "ops_incident_report_corrective_actions_table",
+      "name": {
+        "en": "Corrective Actions",
+        "pt": "Acoes Corretivas"
+      },
+      "section": "corrective_actions",
+      "expectedColumns": [
+        "action",
+        "responsible",
+        "due_date",
+        "status"
+      ],
+      "keyRows": [
+        "total_actions"
+      ]
+    },
+    {
+      "id": "ops_incident_report_impact_table",
+      "name": {
+        "en": "Impact Summary",
+        "pt": "Resumo de Impacto"
+      },
+      "section": "impact_assessment",
+      "expectedColumns": [
+        "impact_type",
+        "description",
+        "value"
+      ],
+      "keyRows": [
+        "total_impact"
+      ]
+    }
+  ]
+}

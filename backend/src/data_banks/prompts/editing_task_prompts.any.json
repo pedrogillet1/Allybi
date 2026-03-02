@@ -4,7 +4,7 @@
     "version": "1.1.0",
     "description": "Task-specific prompts for editing, helper generation, and utility model calls.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true
@@ -186,5 +186,122 @@
         }
       ]
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ETP_1001_conversation_title_constraints",
+        "input": {
+          "templateId": "conversation_title",
+          "firstMessage": "summarize quarterly budget review and action items"
+        },
+        "expect": {
+          "outputShape": "plain_text",
+          "minWords": 3,
+          "maxWords": 7,
+          "titleCase": true,
+          "forbidTokens": ["\"", "`", ".pdf", ".docx"]
+        }
+      },
+      {
+        "id": "ETP_1002_rewrite_span_no_instruction_echo",
+        "input": {
+          "templateId": "rewrite_span",
+          "instruction": "make this more formal",
+          "selectedText": "send me the file asap"
+        },
+        "expect": {
+          "outputShape": "plain_text",
+          "mustNotContain": ["make this more formal"]
+        }
+      },
+      {
+        "id": "ETP_1003_translate_batch_preserves_ids",
+        "input": {
+          "templateId": "docx_translate_batch",
+          "targetLanguage": "pt",
+          "paragraphs": [
+            { "paragraphId": "p1", "text": "Hello team." },
+            { "paragraphId": "p2", "text": "Meeting is tomorrow." }
+          ]
+        },
+        "expect": {
+          "outputShape": "json_array",
+          "preserveParagraphIds": ["p1", "p2"],
+          "sameItemCountAsInput": true
+        }
+      },
+      {
+        "id": "ETP_1004_list_to_paragraph_json_contract",
+        "input": {
+          "templateId": "docx_list_to_paragraph",
+          "bullets": ["Point A", "Point B"]
+        },
+        "expect": {
+          "outputShape": "json_object",
+          "requiredKeys": ["paragraph"],
+          "forbidAdditionalWrapperText": true
+        }
+      },
+      {
+        "id": "ETP_1005_email_explain_structure",
+        "input": {
+          "templateId": "email_explain",
+          "emailContext": "Need approval by Friday. Owner: Ana."
+        },
+        "expect": {
+          "summarySentenceCount": { "min": 1, "max": 2 },
+          "requiresKeyPointsSection": true,
+          "allowsSuggestedReply": true
+        }
+      },
+      {
+        "id": "ETP_TEST_001_conversation_title_constraints",
+        "input": "Generate a conversation title for: user asked to bold the first paragraph",
+        "expect": {
+          "promptApplied": true,
+          "maxLength": 60,
+          "noSpecialChars": true,
+          "formatIsPlainString": true
+        }
+      },
+      {
+        "id": "ETP_TEST_002_rewrite_span_no_instruction_echo",
+        "input": "Rewrite this sentence to be more formal: 'Hey, check this out'",
+        "expect": {
+          "promptApplied": true,
+          "noInstructionEcho": true,
+          "outputIsRewrittenTextOnly": true
+        }
+      },
+      {
+        "id": "ETP_TEST_003_docx_translate_batch_preserves_ids",
+        "input": "Translate paragraphs [{\"paragraphId\":\"p1\",\"text\":\"Hello\"},{\"paragraphId\":\"p2\",\"text\":\"World\"}] to Portuguese",
+        "expect": {
+          "promptApplied": true,
+          "preservesParagraphIdMapping": true,
+          "outputArrayLengthMatchesInput": true
+        }
+      },
+      {
+        "id": "ETP_TEST_004_docx_list_to_paragraph_json_only",
+        "input": "Convert bullet list to paragraph",
+        "expect": {
+          "promptApplied": true,
+          "outputIsJsonParagraphObject": true,
+          "noMarkdownWrapper": true
+        }
+      },
+      {
+        "id": "ETP_TEST_005_email_explain_structure",
+        "input": "Explain this email thread",
+        "expect": {
+          "promptApplied": true,
+          "hasShortSummary": true,
+          "hasKeyPoints": true,
+          "hasOptionalReply": true
+        }
+      }
+    ]
+  }
 }

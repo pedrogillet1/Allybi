@@ -68,6 +68,9 @@ const TARGET_OPTIONAL_RUNTIME_OPS = new Set<EditOperator>([
   "COMPUTE",
   "COMPUTE_BUNDLE",
   "ADD_SLIDE",
+  "PY_COMPUTE",
+  "PY_CHART",
+  "PY_WRITEBACK",
 ]);
 
 function runtimeDomain(domain: EditDomain): "docx" | "excel" | null {

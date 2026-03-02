@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "id": "di_ops_domain_profile",
+    "version": "1.0.0",
+    "description": "Operations domain profile with scope, detection signals, and supported operators.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "displayName": {
+    "en": "Operations",
+    "pt": "Operacoes"
+  },
+  "scope": "Supply chain, logistics, warehouse, fleet management, maintenance, quality control, procurement, capacity planning, production, and SLA/KPI reporting.",
+  "coreConcepts": [
+    "supply_chain",
+    "logistics",
+    "warehouse_management",
+    "fleet_management",
+    "maintenance_schedule",
+    "quality_inspection",
+    "procurement",
+    "capacity_planning",
+    "production_line",
+    "SLA",
+    "KPI",
+    "incident_report",
+    "work_order",
+    "inventory",
+    "shipping_manifest",
+    "cycle_time",
+    "throughput",
+    "uptime",
+    "MTBF",
+    "MTTR"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "work order",
+      "maintenance log",
+      "shipping manifest",
+      "incident report",
+      "SLA report",
+      "quality inspection",
+      "production schedule",
+      "bill of lading",
+      "packing list",
+      "purchase order"
+    ],
+    "mediumConfidence": [
+      "throughput",
+      "uptime",
+      "downtime",
+      "cycle time",
+      "lead time",
+      "backlog",
+      "safety stock",
+      "reorder point"
+    ]
+  },
+  "relatedDomains": [
+    "finance"
+  ],
+  "ontologyPrefix": "ops"
+}

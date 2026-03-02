@@ -40,6 +40,26 @@ export interface AllybiBanks {
   excelFunctionsPtToEn: any;
   docxHeadingLevelsEn: any;
   docxHeadingLevelsPt: any;
+  // Excel Calc agent banks
+  calcIntentPatternsEn?: any;
+  calcIntentPatternsPt?: any;
+  calcTaskTaxonomy?: any;
+  slotSchemasCalc?: any;
+  excelFunctionCatalog?: any;
+  pythonRecipeCatalog?: any;
+  clarificationPolicyCalc?: any;
+  chartIntentTaxonomy?: any;
+  chartRecipeCatalog?: any;
+  chartTemplates?: any;
+  // Top-level banks needed by calc
+  statsMethodOntology?: any;
+  distributionOntology?: any;
+  columnSemanticsOntology?: any;
+  localeNumericDateRules?: any;
+  rangeResolutionRules?: any;
+  resultVerificationPolicy?: any;
+  spreadsheetSemantics?: any;
+  excelNumberFormatsStructure?: any;
 }
 
 function safeBank<T = any>(id: string): T | null {
@@ -87,5 +107,25 @@ export function loadAllybiBanks(): AllybiBanks {
     excelFunctionsPtToEn: safeBank("excel_functions_pt_to_en"),
     docxHeadingLevelsEn: safeBank("docx_heading_levels_en"),
     docxHeadingLevelsPt: safeBank("docx_heading_levels_pt"),
+    // Excel Calc agent banks
+    calcIntentPatternsEn: safeBank("calc_intent_patterns_en"),
+    calcIntentPatternsPt: safeBank("calc_intent_patterns_pt"),
+    calcTaskTaxonomy: safeBank("calc_task_taxonomy"),
+    slotSchemasCalc: safeBank("slot_schemas_excel_calc"),
+    excelFunctionCatalog: safeBank("excel_function_catalog"),
+    pythonRecipeCatalog: safeBank("python_recipe_catalog"),
+    clarificationPolicyCalc: safeBank("clarification_policy_excel_calc"),
+    chartIntentTaxonomy: safeBank("chart_intent_taxonomy"),
+    chartRecipeCatalog: safeBank("chart_recipe_catalog"),
+    chartTemplates: safeBank("chart_templates"),
+    // Top-level banks needed by calc
+    statsMethodOntology: safeBank("stats_method_ontology"),
+    distributionOntology: safeBank("distribution_ontology"),
+    columnSemanticsOntology: safeBank("column_semantics_ontology"),
+    localeNumericDateRules: safeBank("locale_numeric_date_rules"),
+    rangeResolutionRules: safeBank("range_resolution_rules"),
+    resultVerificationPolicy: safeBank("result_verification_policy"),
+    spreadsheetSemantics: safeBank("spreadsheet_semantics"),
+    excelNumberFormatsStructure: safeBank("excel_number_formats_structure"),
   };
 }

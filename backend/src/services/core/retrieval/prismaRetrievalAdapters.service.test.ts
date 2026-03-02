@@ -32,7 +32,8 @@ jest.mock("../../retrieval/chunkCrypto.service", () => ({
 
 jest.mock("../../retrieval/embedding.service", () => ({
   EmbeddingsService: jest.fn().mockImplementation(() => ({
-    generateQueryEmbedding: (...args: any[]) => mockGenerateQueryEmbedding(...args),
+    generateQueryEmbedding: (...args: any[]) =>
+      mockGenerateQueryEmbedding(...args),
   })),
 }));
 
@@ -62,7 +63,7 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
         documentId: "doc-1",
         chunkIndex: 0,
         text: null,
-        textEncrypted: "{\"v\":1}",
+        textEncrypted: '{"v":1}',
         page: 2,
         document: {
           id: "doc-1",
@@ -123,7 +124,7 @@ describe("PrismaRetrievalAdapterFactory encrypted chunk hydration", () => {
         documentId: "doc-2",
         chunkIndex: 7,
         text: null,
-        textEncrypted: "{\"v\":1}",
+        textEncrypted: '{"v":1}',
         page: 8,
       },
     ]);

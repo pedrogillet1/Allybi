@@ -271,6 +271,22 @@
     }
   ],
 
+  "disambiguation": {
+    "requiredWhen": {
+      "missingProviderForOperators": [
+        "EMAIL_LATEST",
+        "EMAIL_EXPLAIN_LATEST",
+        "EMAIL_DRAFT",
+        "EMAIL_SEND",
+        "EMAIL_DOC_FUSION"
+      ],
+      "confidenceBelow": 0.64,
+      "decisionMarginBelow": 0.06
+    },
+    "actions": ["pick_provider", "cancel"],
+    "uiBlock": "choices"
+  },
+
   "outputContract": {
     "shape": {
       "intent": "EMAIL",
@@ -282,5 +298,35 @@
       "reasonCodes": "string[]",
       "databanksUsed": "string[]"
     }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "ER_T_0001_latest_email_en",
+        "input": { "text": "show my latest email", "language": "en" },
+        "expect": { "operator": "EMAIL_LATEST" }
+      },
+      {
+        "id": "ER_T_0002_explain_latest_email_pt",
+        "input": { "text": "explique meu ultimo email", "language": "pt" },
+        "expect": { "operator": "EMAIL_EXPLAIN_LATEST" }
+      },
+      {
+        "id": "ER_T_0003_summarize_previous_en",
+        "input": { "text": "summarize this email", "language": "en" },
+        "expect": { "operator": "EMAIL_SUMMARIZE_PREVIOUS" }
+      },
+      {
+        "id": "ER_T_0004_send_email_en",
+        "input": { "text": "send an email to alice@example.com", "language": "en" },
+        "expect": { "operator": "EMAIL_SEND" }
+      },
+      {
+        "id": "ER_T_0005_doc_fusion_en",
+        "input": { "text": "use this email and the contract.pdf to draft a response", "language": "en" },
+        "expect": { "operator": "EMAIL_DOC_FUSION" }
+      }
+    ]
   }
 }

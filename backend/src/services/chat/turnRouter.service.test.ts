@@ -327,20 +327,19 @@ describe("TurnRouterService.decide()", () => {
     const routePolicy = {
       isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
     };
+    let capturedCandidates: Array<{
+      operatorId?: string;
+      intentFamily?: string;
+    }> = [];
     const intentConfig = {
-      decide: jest
-        .fn()
-        .mockImplementation(
-          (input: {
-            candidates: Array<{ operatorId?: string; intentFamily?: string }>;
-          }) => {
-            const fileCandidate = input.candidates.find(
-              (c) => c.intentFamily === "file_actions",
-            );
-            expect(fileCandidate?.operatorId).toBe("file_move");
-            return makeDecisionOutput("file_actions");
-          },
-        ),
+      decide: jest.fn(
+        (input: {
+          candidates: Array<{ operatorId?: string; intentFamily?: string }>;
+        }) => {
+          capturedCandidates = input.candidates;
+          return makeDecisionOutput("file_actions");
+        },
+      ),
     };
     const bank = makeFileActionBank();
     const router = new TurnRouterService(
@@ -353,22 +352,22 @@ describe("TurnRouterService.decide()", () => {
 
     expect(router.decide(ctx)).toBe("KNOWLEDGE");
     expect(intentConfig.decide).toHaveBeenCalled();
+    const fileCandidate = capturedCandidates.find(
+      (c) => c.intentFamily === "file_actions",
+    );
+    expect(fileCandidate?.operatorId).toBe("file_move");
   });
 
   test("suppresses file_action detection when global mustNotContain guard matches", () => {
     const routePolicy = {
       isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
     };
+    let capturedCandidates: Array<{ intentFamily?: string }> = [];
     const intentConfig = {
-      decide: jest.fn(
-        (input: { candidates: Array<{ intentFamily?: string }> }) => {
-          const hasFileActions = input.candidates.some(
-            (c) => c.intentFamily === "file_actions",
-          );
-          expect(hasFileActions).toBe(false);
-          return makeDecisionOutput("help");
-        },
-      ),
+      decide: jest.fn((input: { candidates: Array<{ intentFamily?: string }> }) => {
+        capturedCandidates = input.candidates;
+        return makeDecisionOutput("help");
+      }),
     };
     const bank = makeFileActionBank();
     const router = new TurnRouterService(
@@ -381,5 +380,223 @@ describe("TurnRouterService.decide()", () => {
 
     expect(router.decide(ctx)).toBe("GENERAL");
     expect(intentConfig.decide).toHaveBeenCalled();
+    const hasFileActions = capturedCandidates.some(
+      (c) => c.intentFamily === "file_actions",
+    );
+    expect(hasFileActions).toBe(false);
+  });
+
+  test("suppresses file_action candidate using operator collision matrix", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    let capturedCandidates: Array<{ intentFamily?: string }> = [];
+    const intentConfig = {
+      decide: jest.fn((input: { candidates: Array<{ intentFamily?: string }> }) => {
+        capturedCandidates = input.candidates;
+        return makeDecisionOutput("help");
+      }),
+    };
+    const bank = makeFileActionBank();
+    const collisionMatrixBank = {
+      config: { enabled: true },
+      rules: [
+        {
+          id: "CM_1",
+          when: {
+            operators: ["open"],
+            queryRegexAny: {
+              en: ["\\bwhere\\s+in\\s+the\\s+document\\b"],
+            },
+          },
+        },
+      ],
+    };
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      ((bankId: string) =>
+        bankId === "file_action_operators" ? bank : null) as any,
+      ((bankId: string) =>
+        bankId === "operator_collision_matrix"
+          ? collisionMatrixBank
+          : null) as any,
+    );
+    const ctx = makeCtx({
+      messageText: "open report.pdf where in the document is the clause",
+    });
+
+    expect(router.decide(ctx)).toBe("GENERAL");
+    expect(intentConfig.decide).toHaveBeenCalled();
+    const hasFileActions = capturedCandidates.some(
+      (c) => c.intentFamily === "file_actions",
+    );
+    expect(hasFileActions).toBe(false);
+  });
+
+  test("respects caseSensitive file action detection when caseInsensitive=false", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const bank = makeFileActionBank();
+    bank.config.operatorDetection.caseInsensitive = false;
+    let capturedCandidates: Array<{
+      operatorId?: string;
+      intentFamily?: string;
+    }> = [];
+    const intentConfig = {
+      decide: jest.fn(
+        (input: {
+          candidates: Array<{ operatorId?: string; intentFamily?: string }>;
+        }) => {
+          capturedCandidates = input.candidates;
+          return makeDecisionOutput("help");
+        },
+      ),
+    };
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      ((bankId: string) =>
+        bankId === "file_action_operators" ? bank : null) as any,
+    );
+    const ctx = makeCtx({ messageText: "MOVE report.pdf TO archive" });
+
+    expect(router.decide(ctx)).toBe("GENERAL");
+    const fileCandidate = capturedCandidates.find(
+      (c) => c.intentFamily === "file_actions",
+    );
+    expect(fileCandidate).toBeUndefined();
+  });
+
+  test("matches uppercase file action message when caseInsensitive=true", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const bank = makeFileActionBank();
+    bank.config.operatorDetection.caseInsensitive = true;
+    let capturedCandidates: Array<{
+      operatorId?: string;
+      intentFamily?: string;
+    }> = [];
+    const intentConfig = {
+      decide: jest.fn(
+        (input: {
+          candidates: Array<{ operatorId?: string; intentFamily?: string }>;
+        }) => {
+          capturedCandidates = input.candidates;
+          return makeDecisionOutput("file_actions");
+        },
+      ),
+    };
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      ((bankId: string) =>
+        bankId === "file_action_operators" ? bank : null) as any,
+    );
+    const ctx = makeCtx({ messageText: "MOVE report.pdf TO archive" });
+
+    expect(router.decide(ctx)).toBe("KNOWLEDGE");
+    const fileCandidate = capturedCandidates.find(
+      (c) => c.intentFamily === "file_actions",
+    );
+    expect(fileCandidate?.operatorId).toBe("file_move");
+  });
+
+  test("uses followup_indicators bank when explicit context followup signal is absent", () => {
+    const routePolicy = {
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest.fn(
+        (input: {
+          signals?: { isFollowup?: boolean; followupConfidence?: number };
+        }) => {
+          expect(input.signals?.isFollowup).toBe(true);
+          expect((input.signals?.followupConfidence || 0) >= 0.65).toBe(true);
+          return makeDecisionOutput("documents");
+        },
+      ),
+    };
+    const followupIndicatorsBank = {
+      config: {
+        enabled: true,
+        actionsContract: { thresholds: { followupScoreMin: 0.65 } },
+      },
+      rules: [
+        {
+          id: "continuation_markers",
+          triggerPatterns: {
+            en: ["\\b(and also|also|now|continue|next|then)\\b"],
+          },
+          action: { type: "add_followup_score", score: 0.7 },
+          reasonCode: "followup_continuation_marker",
+        },
+      ],
+    };
+    const router = new TurnRouterService(
+      routePolicy,
+      intentConfig as any,
+      (() => null) as any,
+      ((bankId: string) =>
+        bankId === "followup_indicators"
+          ? followupIndicatorsBank
+          : null) as any,
+    );
+    const ctx = makeCtx({
+      messageText: "and also the margin",
+      request: {
+        userId: "user-1",
+        message: "and also the margin",
+        context: {
+          intentState: {
+            lastRoutingDecision: { intentFamily: "documents" },
+          },
+        },
+      },
+      attachedDocuments: [{ id: "doc-1", mime: "application/pdf" }],
+    });
+
+    expect(router.decide(ctx)).toBe("KNOWLEDGE");
+    expect(intentConfig.decide).toHaveBeenCalled();
+  });
+
+  test("passes connector context into route policy decision call", () => {
+    const routePolicy = {
+      resolveConnectorDecision: jest.fn(() => null),
+      isConnectorTurn: jest.fn<() => boolean>().mockReturnValue(false),
+    };
+    const intentConfig = {
+      decide: jest
+        .fn<() => IntentDecisionOutput>()
+        .mockReturnValue(makeDecisionOutput("help")),
+    };
+
+    const router = new TurnRouterService(routePolicy as any, intentConfig);
+    const ctx = makeCtx({
+      messageText: "sync gmail",
+      connectors: {
+        activeConnector: "gmail",
+        connected: { gmail: true, outlook: false },
+      },
+      request: {
+        userId: "user-1",
+        message: "sync gmail",
+        context: { signals: { hasConnectorReadPermission: true } },
+      },
+    });
+
+    router.decide(ctx);
+
+    expect(routePolicy.resolveConnectorDecision).toHaveBeenCalledWith(
+      "sync gmail",
+      "en",
+      expect.objectContaining({
+        activeProvider: "gmail",
+        connectedProviders: expect.objectContaining({ gmail: true }),
+        hasConnectorReadPermission: true,
+      }),
+    );
   });
 });

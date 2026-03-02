@@ -16,5 +16,18 @@
         }
       }
     ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "PROMPT_TEST_001_mode_editing",
+        "input": "Change the date to January 15",
+        "expect": {
+          "promptApplied": true,
+          "preservesUntouchedContent": true,
+          "numbersSafe": true
+        }
+      }
+    ]
   }
 }

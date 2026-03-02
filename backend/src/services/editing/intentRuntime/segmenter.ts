@@ -177,7 +177,7 @@ export function segmentMessage(
   const weakConnector = WEAK_CONNECTOR_BY_LANG[language];
   const normalizedConnectors = Array.from(
     new Set(connectors.map((c) => normalizeConnector(c)).filter(Boolean)),
-  );
+  ).filter((connector) => !(language === "en" && connector === "next"));
   const strongConnectors = normalizedConnectors.filter(
     (connector) => connector !== weakConnector,
   );

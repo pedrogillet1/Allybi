@@ -1,732 +1,1946 @@
 {
   "_meta": {
     "id": "spreadsheet_semantics",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Spreadsheet semantics ontology: KPI definitions, units, currency rules, time periods, reconciliation hints, and column-role inference heuristics.",
-    "lastUpdated": "2026-02-27",
-    "languages": ["any"]
+    "lastUpdated": "2026-03-01",
+    "languages": [
+      "any"
+    ]
   },
-  "config": { "enabled": true },
+  "config": {
+    "enabled": true,
+    "domainAliases": {
+      "operations": "ops"
+    },
+    "canonicalDomainCategories": [
+      "finance",
+      "legal",
+      "medical",
+      "ops",
+      "accounting"
+    ]
+  },
   "kpiDefinitions": [
     {
       "id": "arr",
-      "name": { "en": "Annual Recurring Revenue", "pt": "Receita Recorrente Anual" },
-      "aliases": { "en": ["ARR", "annual recurring"], "pt": ["RRA", "receita recorrente anual"] },
+      "name": {
+        "en": "Annual Recurring Revenue",
+        "pt": "Receita Recorrente Anual"
+      },
+      "aliases": {
+        "en": [
+          "ARR",
+          "annual recurring"
+        ],
+        "pt": [
+          "RRA",
+          "receita recorrente anual"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "MRR * 12",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["mrr", "nrr"]
+      "relatedKPIs": [
+        "mrr",
+        "nrr"
+      ]
     },
     {
       "id": "mrr",
-      "name": { "en": "Monthly Recurring Revenue", "pt": "Receita Recorrente Mensal" },
-      "aliases": { "en": ["MRR", "monthly recurring"], "pt": ["RRM", "receita recorrente mensal"] },
+      "name": {
+        "en": "Monthly Recurring Revenue",
+        "pt": "Receita Recorrente Mensal"
+      },
+      "aliases": {
+        "en": [
+          "MRR",
+          "monthly recurring"
+        ],
+        "pt": [
+          "RRM",
+          "receita recorrente mensal"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(active_subscriptions * subscription_price)",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["arr", "net_mrr", "churn_mrr"]
+      "relatedKPIs": [
+        "arr",
+        "net_mrr",
+        "churn_mrr"
+      ]
     },
     {
       "id": "net_mrr",
-      "name": { "en": "Net New MRR", "pt": "MRR Novo Liquido" },
-      "aliases": { "en": ["net new MRR", "net MRR change"], "pt": ["MRR novo liquido", "variacao liquida MRR"] },
+      "name": {
+        "en": "Net New MRR",
+        "pt": "MRR Novo Liquido"
+      },
+      "aliases": {
+        "en": [
+          "net new MRR",
+          "net MRR change"
+        ],
+        "pt": [
+          "MRR novo liquido",
+          "variacao liquida MRR"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "new_mrr + expansion_mrr - contraction_mrr - churn_mrr",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["new_mrr", "expansion_mrr", "contraction_mrr", "churn_mrr"]
+      "relatedKPIs": [
+        "new_mrr",
+        "expansion_mrr",
+        "contraction_mrr",
+        "churn_mrr"
+      ]
     },
     {
       "id": "expansion_mrr",
-      "name": { "en": "Expansion MRR", "pt": "MRR de Expansao" },
-      "aliases": { "en": ["expansion revenue", "upsell MRR"], "pt": ["MRR de expansao", "receita de upsell"] },
+      "name": {
+        "en": "Expansion MRR",
+        "pt": "MRR de Expansao"
+      },
+      "aliases": {
+        "en": [
+          "expansion revenue",
+          "upsell MRR"
+        ],
+        "pt": [
+          "MRR de expansao",
+          "receita de upsell"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(upgrade_amount) for existing customers",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["net_mrr", "nrr"]
+      "relatedKPIs": [
+        "net_mrr",
+        "nrr"
+      ]
     },
     {
       "id": "contraction_mrr",
-      "name": { "en": "Contraction MRR", "pt": "MRR de Contracao" },
-      "aliases": { "en": ["contraction revenue", "downgrade MRR"], "pt": ["MRR de contracao", "receita de downgrade"] },
+      "name": {
+        "en": "Contraction MRR",
+        "pt": "MRR de Contracao"
+      },
+      "aliases": {
+        "en": [
+          "contraction revenue",
+          "downgrade MRR"
+        ],
+        "pt": [
+          "MRR de contracao",
+          "receita de downgrade"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(downgrade_amount) for existing customers",
       "unit": "currency",
       "direction": "lower_is_better",
-      "relatedKPIs": ["net_mrr", "churn_mrr"]
+      "relatedKPIs": [
+        "net_mrr",
+        "churn_mrr"
+      ]
     },
     {
       "id": "churn_mrr",
-      "name": { "en": "Churned MRR", "pt": "MRR Cancelado" },
-      "aliases": { "en": ["churned revenue", "lost MRR"], "pt": ["MRR cancelado", "receita perdida"] },
+      "name": {
+        "en": "Churned MRR",
+        "pt": "MRR Cancelado"
+      },
+      "aliases": {
+        "en": [
+          "churned revenue",
+          "lost MRR"
+        ],
+        "pt": [
+          "MRR cancelado",
+          "receita perdida"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(cancelled_subscription_value)",
       "unit": "currency",
       "direction": "lower_is_better",
-      "relatedKPIs": ["churn_rate", "net_mrr"]
+      "relatedKPIs": [
+        "churn_rate",
+        "net_mrr"
+      ]
     },
     {
       "id": "new_mrr",
-      "name": { "en": "New MRR", "pt": "MRR Novo" },
-      "aliases": { "en": ["new business MRR", "new customer MRR"], "pt": ["MRR novo", "MRR de novos clientes"] },
+      "name": {
+        "en": "New MRR",
+        "pt": "MRR Novo"
+      },
+      "aliases": {
+        "en": [
+          "new business MRR",
+          "new customer MRR"
+        ],
+        "pt": [
+          "MRR novo",
+          "MRR de novos clientes"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(first_subscription_value) for new customers",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["net_mrr", "cac"]
+      "relatedKPIs": [
+        "net_mrr",
+        "cac"
+      ]
     },
     {
       "id": "arpu",
-      "name": { "en": "Average Revenue Per User", "pt": "Receita Media por Usuario" },
-      "aliases": { "en": ["ARPU", "revenue per user"], "pt": ["ARPU", "receita media por usuario"] },
+      "name": {
+        "en": "Average Revenue Per User",
+        "pt": "Receita Media por Usuario"
+      },
+      "aliases": {
+        "en": [
+          "ARPU",
+          "revenue per user"
+        ],
+        "pt": [
+          "ARPU",
+          "receita media por usuario"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "total_revenue / total_users",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["arpa", "mrr"]
+      "relatedKPIs": [
+        "arpa",
+        "mrr"
+      ]
     },
     {
       "id": "arpa",
-      "name": { "en": "Average Revenue Per Account", "pt": "Receita Media por Conta" },
-      "aliases": { "en": ["ARPA", "revenue per account"], "pt": ["ARPA", "receita media por conta"] },
+      "name": {
+        "en": "Average Revenue Per Account",
+        "pt": "Receita Media por Conta"
+      },
+      "aliases": {
+        "en": [
+          "ARPA",
+          "revenue per account"
+        ],
+        "pt": [
+          "ARPA",
+          "receita media por conta"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "total_revenue / total_accounts",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["arpu", "mrr"]
+      "relatedKPIs": [
+        "arpu",
+        "mrr"
+      ]
     },
     {
       "id": "rpu",
-      "name": { "en": "Revenue Per Unit", "pt": "Receita por Unidade" },
-      "aliases": { "en": ["RPU", "unit revenue"], "pt": ["RPU", "receita unitaria"] },
+      "name": {
+        "en": "Revenue Per Unit",
+        "pt": "Receita por Unidade"
+      },
+      "aliases": {
+        "en": [
+          "RPU",
+          "unit revenue"
+        ],
+        "pt": [
+          "RPU",
+          "receita unitaria"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "total_revenue / total_units_sold",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["arpu", "arpa"]
+      "relatedKPIs": [
+        "arpu",
+        "arpa"
+      ]
     },
     {
       "id": "revenue_per_employee",
-      "name": { "en": "Revenue Per Employee", "pt": "Receita por Funcionario" },
-      "aliases": { "en": ["rev per employee", "revenue efficiency"], "pt": ["receita por funcionario", "eficiencia de receita"] },
+      "name": {
+        "en": "Revenue Per Employee",
+        "pt": "Receita por Funcionario"
+      },
+      "aliases": {
+        "en": [
+          "rev per employee",
+          "revenue efficiency"
+        ],
+        "pt": [
+          "receita por funcionario",
+          "eficiencia de receita"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "total_revenue / headcount",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["arpu", "operating_margin"]
+      "relatedKPIs": [
+        "arpu",
+        "operating_margin"
+      ]
     },
     {
       "id": "bookings",
-      "name": { "en": "Bookings", "pt": "Contratos Fechados" },
-      "aliases": { "en": ["bookings", "total bookings", "TCV"], "pt": ["contratos fechados", "total contratado"] },
+      "name": {
+        "en": "Bookings",
+        "pt": "Contratos Fechados"
+      },
+      "aliases": {
+        "en": [
+          "bookings",
+          "total bookings",
+          "TCV"
+        ],
+        "pt": [
+          "contratos fechados",
+          "total contratado"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(contract_value) for new and renewal deals",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["billings", "arr"]
+      "relatedKPIs": [
+        "billings",
+        "arr"
+      ]
     },
     {
       "id": "billings",
-      "name": { "en": "Billings", "pt": "Faturamento" },
-      "aliases": { "en": ["billings", "invoiced amount"], "pt": ["faturamento", "valor faturado"] },
+      "name": {
+        "en": "Billings",
+        "pt": "Faturamento"
+      },
+      "aliases": {
+        "en": [
+          "billings",
+          "invoiced amount"
+        ],
+        "pt": [
+          "faturamento",
+          "valor faturado"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "SUM(invoiced_amount) in period",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["bookings", "deferred_revenue"]
+      "relatedKPIs": [
+        "bookings",
+        "deferred_revenue"
+      ]
     },
     {
       "id": "deferred_revenue",
-      "name": { "en": "Deferred Revenue", "pt": "Receita Diferida" },
-      "aliases": { "en": ["deferred revenue", "unearned revenue"], "pt": ["receita diferida", "receita antecipada"] },
+      "name": {
+        "en": "Deferred Revenue",
+        "pt": "Receita Diferida"
+      },
+      "aliases": {
+        "en": [
+          "deferred revenue",
+          "unearned revenue"
+        ],
+        "pt": [
+          "receita diferida",
+          "receita antecipada"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "billings - recognized_revenue",
       "unit": "currency",
       "direction": "neutral",
-      "relatedKPIs": ["billings", "arr"]
+      "relatedKPIs": [
+        "billings",
+        "arr"
+      ]
     },
     {
       "id": "nrr",
-      "name": { "en": "Net Revenue Retention", "pt": "Retencao Liquida de Receita" },
-      "aliases": { "en": ["NRR", "net dollar retention", "NDR"], "pt": ["NRR", "retencao liquida", "NDR"] },
+      "name": {
+        "en": "Net Revenue Retention",
+        "pt": "Retencao Liquida de Receita"
+      },
+      "aliases": {
+        "en": [
+          "NRR",
+          "net dollar retention",
+          "NDR"
+        ],
+        "pt": [
+          "NRR",
+          "retencao liquida",
+          "NDR"
+        ]
+      },
       "category": "saas_revenue",
       "formula": "(beginning_mrr + expansion - contraction - churn) / beginning_mrr * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["expansion_mrr", "churn_rate"]
+      "relatedKPIs": [
+        "expansion_mrr",
+        "churn_rate"
+      ]
     },
     {
       "id": "revenue_growth_rate",
-      "name": { "en": "Revenue Growth Rate", "pt": "Taxa de Crescimento de Receita" },
-      "aliases": { "en": ["revenue growth", "top-line growth"], "pt": ["crescimento de receita", "crescimento top-line"] },
+      "name": {
+        "en": "Revenue Growth Rate",
+        "pt": "Taxa de Crescimento de Receita"
+      },
+      "aliases": {
+        "en": [
+          "revenue growth",
+          "top-line growth"
+        ],
+        "pt": [
+          "crescimento de receita",
+          "crescimento top-line"
+        ]
+      },
       "category": "growth",
       "formula": "(current_revenue - prior_revenue) / prior_revenue * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["yoy_growth", "cagr"]
+      "relatedKPIs": [
+        "yoy_growth",
+        "cagr"
+      ]
     },
     {
       "id": "yoy_growth",
-      "name": { "en": "Year-over-Year Growth", "pt": "Crescimento Ano a Ano" },
-      "aliases": { "en": ["YoY", "year-over-year", "annual growth"], "pt": ["YoY", "ano a ano", "crescimento anual"] },
+      "name": {
+        "en": "Year-over-Year Growth",
+        "pt": "Crescimento Ano a Ano"
+      },
+      "aliases": {
+        "en": [
+          "YoY",
+          "year-over-year",
+          "annual growth"
+        ],
+        "pt": [
+          "YoY",
+          "ano a ano",
+          "crescimento anual"
+        ]
+      },
       "category": "growth",
       "formula": "(current_year_value - prior_year_value) / prior_year_value * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["revenue_growth_rate", "cagr"]
+      "relatedKPIs": [
+        "revenue_growth_rate",
+        "cagr"
+      ]
     },
     {
       "id": "mom_growth",
-      "name": { "en": "Month-over-Month Growth", "pt": "Crescimento Mes a Mes" },
-      "aliases": { "en": ["MoM", "month-over-month", "monthly growth"], "pt": ["MoM", "mes a mes", "crescimento mensal"] },
+      "name": {
+        "en": "Month-over-Month Growth",
+        "pt": "Crescimento Mes a Mes"
+      },
+      "aliases": {
+        "en": [
+          "MoM",
+          "month-over-month",
+          "monthly growth"
+        ],
+        "pt": [
+          "MoM",
+          "mes a mes",
+          "crescimento mensal"
+        ]
+      },
       "category": "growth",
       "formula": "(current_month - prior_month) / prior_month * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["qoq_growth", "yoy_growth"]
+      "relatedKPIs": [
+        "qoq_growth",
+        "yoy_growth"
+      ]
     },
     {
       "id": "qoq_growth",
-      "name": { "en": "Quarter-over-Quarter Growth", "pt": "Crescimento Trimestre a Trimestre" },
-      "aliases": { "en": ["QoQ", "quarter-over-quarter", "quarterly growth"], "pt": ["QoQ", "trimestre a trimestre", "crescimento trimestral"] },
+      "name": {
+        "en": "Quarter-over-Quarter Growth",
+        "pt": "Crescimento Trimestre a Trimestre"
+      },
+      "aliases": {
+        "en": [
+          "QoQ",
+          "quarter-over-quarter",
+          "quarterly growth"
+        ],
+        "pt": [
+          "QoQ",
+          "trimestre a trimestre",
+          "crescimento trimestral"
+        ]
+      },
       "category": "growth",
       "formula": "(current_quarter - prior_quarter) / prior_quarter * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["mom_growth", "yoy_growth"]
+      "relatedKPIs": [
+        "mom_growth",
+        "yoy_growth"
+      ]
     },
     {
       "id": "cagr",
-      "name": { "en": "Compound Annual Growth Rate", "pt": "Taxa Composta de Crescimento Anual" },
-      "aliases": { "en": ["CAGR", "compound growth"], "pt": ["CAGR", "TCCA", "crescimento composto"] },
+      "name": {
+        "en": "Compound Annual Growth Rate",
+        "pt": "Taxa Composta de Crescimento Anual"
+      },
+      "aliases": {
+        "en": [
+          "CAGR",
+          "compound growth"
+        ],
+        "pt": [
+          "CAGR",
+          "TCCA",
+          "crescimento composto"
+        ]
+      },
       "category": "growth",
       "formula": "(ending_value / beginning_value)^(1/years) - 1",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["yoy_growth", "revenue_growth_rate"]
+      "relatedKPIs": [
+        "yoy_growth",
+        "revenue_growth_rate"
+      ]
     },
     {
       "id": "rule_of_40",
-      "name": { "en": "Rule of 40", "pt": "Regra dos 40" },
-      "aliases": { "en": ["rule of 40", "rule of forty"], "pt": ["regra dos 40", "regra dos quarenta"] },
+      "name": {
+        "en": "Rule of 40",
+        "pt": "Regra dos 40"
+      },
+      "aliases": {
+        "en": [
+          "rule of 40",
+          "rule of forty"
+        ],
+        "pt": [
+          "regra dos 40",
+          "regra dos quarenta"
+        ]
+      },
       "category": "growth",
       "formula": "revenue_growth_rate + profit_margin",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["revenue_growth_rate", "operating_margin"]
+      "relatedKPIs": [
+        "revenue_growth_rate",
+        "operating_margin"
+      ]
     },
     {
       "id": "growth_efficiency",
-      "name": { "en": "Growth Efficiency Index", "pt": "Indice de Eficiencia de Crescimento" },
-      "aliases": { "en": ["GEI", "growth efficiency"], "pt": ["GEI", "eficiencia de crescimento"] },
+      "name": {
+        "en": "Growth Efficiency Index",
+        "pt": "Indice de Eficiencia de Crescimento"
+      },
+      "aliases": {
+        "en": [
+          "GEI",
+          "growth efficiency"
+        ],
+        "pt": [
+          "GEI",
+          "eficiencia de crescimento"
+        ]
+      },
       "category": "growth",
       "formula": "net_new_arr / net_burn",
       "unit": "ratio",
       "direction": "higher_is_better",
-      "relatedKPIs": ["burn_rate", "arr"]
+      "relatedKPIs": [
+        "burn_rate",
+        "arr"
+      ]
     },
     {
       "id": "net_dollar_retention",
-      "name": { "en": "Net Dollar Retention", "pt": "Retencao Liquida em Dolar" },
-      "aliases": { "en": ["NDR", "net dollar retention rate"], "pt": ["NDR", "retencao liquida em dolar"] },
+      "name": {
+        "en": "Net Dollar Retention",
+        "pt": "Retencao Liquida em Dolar"
+      },
+      "aliases": {
+        "en": [
+          "NDR",
+          "net dollar retention rate"
+        ],
+        "pt": [
+          "NDR",
+          "retencao liquida em dolar"
+        ]
+      },
       "category": "growth",
       "formula": "(starting_mrr + expansion - contraction - churn) / starting_mrr * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["nrr", "churn_rate"]
+      "relatedKPIs": [
+        "nrr",
+        "churn_rate"
+      ]
     },
     {
       "id": "logo_retention",
-      "name": { "en": "Logo Retention Rate", "pt": "Taxa de Retencao de Clientes" },
-      "aliases": { "en": ["logo retention", "customer retention rate"], "pt": ["retencao de logos", "taxa de retencao de clientes"] },
+      "name": {
+        "en": "Logo Retention Rate",
+        "pt": "Taxa de Retencao de Clientes"
+      },
+      "aliases": {
+        "en": [
+          "logo retention",
+          "customer retention rate"
+        ],
+        "pt": [
+          "retencao de logos",
+          "taxa de retencao de clientes"
+        ]
+      },
       "category": "growth",
       "formula": "(customers_start - churned_customers) / customers_start * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["churn_rate", "retention_rate"]
+      "relatedKPIs": [
+        "churn_rate",
+        "retention_rate"
+      ]
     },
     {
       "id": "quick_ratio_saas",
-      "name": { "en": "SaaS Quick Ratio", "pt": "Quick Ratio SaaS" },
-      "aliases": { "en": ["SaaS quick ratio", "growth efficiency ratio"], "pt": ["quick ratio SaaS", "razao de eficiencia"] },
+      "name": {
+        "en": "SaaS Quick Ratio",
+        "pt": "Quick Ratio SaaS"
+      },
+      "aliases": {
+        "en": [
+          "SaaS quick ratio",
+          "growth efficiency ratio"
+        ],
+        "pt": [
+          "quick ratio SaaS",
+          "razao de eficiencia"
+        ]
+      },
       "category": "growth",
       "formula": "(new_mrr + expansion_mrr) / (contraction_mrr + churn_mrr)",
       "unit": "ratio",
       "direction": "higher_is_better",
-      "relatedKPIs": ["new_mrr", "churn_mrr"]
+      "relatedKPIs": [
+        "new_mrr",
+        "churn_mrr"
+      ]
     },
     {
       "id": "gross_margin",
-      "name": { "en": "Gross Margin", "pt": "Margem Bruta" },
-      "aliases": { "en": ["gross margin", "gross profit margin", "GM"], "pt": ["margem bruta", "MB"] },
+      "name": {
+        "en": "Gross Margin",
+        "pt": "Margem Bruta"
+      },
+      "aliases": {
+        "en": [
+          "gross margin",
+          "gross profit margin",
+          "GM"
+        ],
+        "pt": [
+          "margem bruta",
+          "MB"
+        ]
+      },
       "category": "profitability",
       "formula": "(revenue - cogs) / revenue * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["net_margin", "operating_margin"]
+      "relatedKPIs": [
+        "net_margin",
+        "operating_margin"
+      ]
     },
     {
       "id": "net_margin",
-      "name": { "en": "Net Profit Margin", "pt": "Margem Liquida" },
-      "aliases": { "en": ["net margin", "net profit margin", "bottom line margin"], "pt": ["margem liquida", "ML"] },
+      "name": {
+        "en": "Net Profit Margin",
+        "pt": "Margem Liquida"
+      },
+      "aliases": {
+        "en": [
+          "net margin",
+          "net profit margin",
+          "bottom line margin"
+        ],
+        "pt": [
+          "margem liquida",
+          "ML"
+        ]
+      },
       "category": "profitability",
       "formula": "net_income / revenue * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["gross_margin", "operating_margin"]
+      "relatedKPIs": [
+        "gross_margin",
+        "operating_margin"
+      ]
     },
     {
       "id": "operating_margin",
-      "name": { "en": "Operating Margin", "pt": "Margem Operacional" },
-      "aliases": { "en": ["operating margin", "EBIT margin", "op margin"], "pt": ["margem operacional", "MO"] },
+      "name": {
+        "en": "Operating Margin",
+        "pt": "Margem Operacional"
+      },
+      "aliases": {
+        "en": [
+          "operating margin",
+          "EBIT margin",
+          "op margin"
+        ],
+        "pt": [
+          "margem operacional",
+          "MO"
+        ]
+      },
       "category": "profitability",
       "formula": "operating_income / revenue * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["ebit", "gross_margin"]
+      "relatedKPIs": [
+        "ebit",
+        "gross_margin"
+      ]
     },
     {
       "id": "ebitda",
-      "name": { "en": "EBITDA", "pt": "EBITDA" },
-      "aliases": { "en": ["EBITDA", "earnings before interest taxes depreciation amortization"], "pt": ["EBITDA", "LAJIDA"] },
+      "name": {
+        "en": "EBITDA",
+        "pt": "EBITDA"
+      },
+      "aliases": {
+        "en": [
+          "EBITDA",
+          "earnings before interest taxes depreciation amortization"
+        ],
+        "pt": [
+          "EBITDA",
+          "LAJIDA"
+        ]
+      },
       "category": "profitability",
       "formula": "net_income + interest + taxes + depreciation + amortization",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["ebit", "operating_margin"]
+      "relatedKPIs": [
+        "ebit",
+        "operating_margin"
+      ]
     },
     {
       "id": "ebit",
-      "name": { "en": "EBIT", "pt": "EBIT" },
-      "aliases": { "en": ["EBIT", "earnings before interest and taxes", "operating profit"], "pt": ["EBIT", "LAJI", "lucro operacional"] },
+      "name": {
+        "en": "EBIT",
+        "pt": "EBIT"
+      },
+      "aliases": {
+        "en": [
+          "EBIT",
+          "earnings before interest and taxes",
+          "operating profit"
+        ],
+        "pt": [
+          "EBIT",
+          "LAJI",
+          "lucro operacional"
+        ]
+      },
       "category": "profitability",
       "formula": "revenue - cogs - operating_expenses",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["ebitda", "operating_margin"]
+      "relatedKPIs": [
+        "ebitda",
+        "operating_margin"
+      ]
     },
     {
       "id": "contribution_margin",
-      "name": { "en": "Contribution Margin", "pt": "Margem de Contribuicao" },
-      "aliases": { "en": ["contribution margin", "CM"], "pt": ["margem de contribuicao", "MC"] },
+      "name": {
+        "en": "Contribution Margin",
+        "pt": "Margem de Contribuicao"
+      },
+      "aliases": {
+        "en": [
+          "contribution margin",
+          "CM"
+        ],
+        "pt": [
+          "margem de contribuicao",
+          "MC"
+        ]
+      },
       "category": "profitability",
       "formula": "(revenue - variable_costs) / revenue * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["gross_margin", "breakeven"]
+      "relatedKPIs": [
+        "gross_margin",
+        "breakeven"
+      ]
     },
     {
       "id": "unit_economics",
-      "name": { "en": "Unit Economics", "pt": "Economia Unitaria" },
-      "aliases": { "en": ["unit economics", "per-unit profitability"], "pt": ["economia unitaria", "rentabilidade unitaria"] },
+      "name": {
+        "en": "Unit Economics",
+        "pt": "Economia Unitaria"
+      },
+      "aliases": {
+        "en": [
+          "unit economics",
+          "per-unit profitability"
+        ],
+        "pt": [
+          "economia unitaria",
+          "rentabilidade unitaria"
+        ]
+      },
       "category": "profitability",
       "formula": "revenue_per_unit - cost_per_unit",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["contribution_margin", "ltv_cac_ratio"]
+      "relatedKPIs": [
+        "contribution_margin",
+        "ltv_cac_ratio"
+      ]
     },
     {
       "id": "ltv_cac_ratio",
-      "name": { "en": "LTV/CAC Ratio", "pt": "Razao LTV/CAC" },
-      "aliases": { "en": ["LTV to CAC", "LTV/CAC", "lifetime value to acquisition cost"], "pt": ["LTV/CAC", "razao LTV CAC"] },
+      "name": {
+        "en": "LTV/CAC Ratio",
+        "pt": "Razao LTV/CAC"
+      },
+      "aliases": {
+        "en": [
+          "LTV to CAC",
+          "LTV/CAC",
+          "lifetime value to acquisition cost"
+        ],
+        "pt": [
+          "LTV/CAC",
+          "razao LTV CAC"
+        ]
+      },
       "category": "profitability",
       "formula": "ltv / cac",
       "unit": "ratio",
       "direction": "higher_is_better",
-      "relatedKPIs": ["ltv", "cac"]
+      "relatedKPIs": [
+        "ltv",
+        "cac"
+      ]
     },
     {
       "id": "payback_period",
-      "name": { "en": "CAC Payback Period", "pt": "Periodo de Retorno do CAC" },
-      "aliases": { "en": ["payback period", "CAC payback", "months to recover CAC"], "pt": ["periodo de payback", "tempo de retorno do CAC"] },
+      "name": {
+        "en": "CAC Payback Period",
+        "pt": "Periodo de Retorno do CAC"
+      },
+      "aliases": {
+        "en": [
+          "payback period",
+          "CAC payback",
+          "months to recover CAC"
+        ],
+        "pt": [
+          "periodo de payback",
+          "tempo de retorno do CAC"
+        ]
+      },
       "category": "profitability",
       "formula": "cac / (arpu * gross_margin)",
       "unit": "months",
       "direction": "lower_is_better",
-      "relatedKPIs": ["cac", "arpu"]
+      "relatedKPIs": [
+        "cac",
+        "arpu"
+      ]
     },
     {
       "id": "breakeven",
-      "name": { "en": "Breakeven Point", "pt": "Ponto de Equilibrio" },
-      "aliases": { "en": ["breakeven", "break-even", "BEP"], "pt": ["ponto de equilibrio", "PE"] },
+      "name": {
+        "en": "Breakeven Point",
+        "pt": "Ponto de Equilibrio"
+      },
+      "aliases": {
+        "en": [
+          "breakeven",
+          "break-even",
+          "BEP"
+        ],
+        "pt": [
+          "ponto de equilibrio",
+          "PE"
+        ]
+      },
       "category": "profitability",
       "formula": "fixed_costs / contribution_margin_per_unit",
       "unit": "units",
       "direction": "lower_is_better",
-      "relatedKPIs": ["contribution_margin", "operating_margin"]
+      "relatedKPIs": [
+        "contribution_margin",
+        "operating_margin"
+      ]
     },
     {
       "id": "cac",
-      "name": { "en": "Customer Acquisition Cost", "pt": "Custo de Aquisicao de Cliente" },
-      "aliases": { "en": ["CAC", "acquisition cost", "cost per acquisition"], "pt": ["CAC", "custo de aquisicao"] },
+      "name": {
+        "en": "Customer Acquisition Cost",
+        "pt": "Custo de Aquisicao de Cliente"
+      },
+      "aliases": {
+        "en": [
+          "CAC",
+          "acquisition cost",
+          "cost per acquisition"
+        ],
+        "pt": [
+          "CAC",
+          "custo de aquisicao"
+        ]
+      },
       "category": "customer",
       "formula": "total_sales_and_marketing_spend / new_customers_acquired",
       "unit": "currency",
       "direction": "lower_is_better",
-      "relatedKPIs": ["ltv", "ltv_cac_ratio"]
+      "relatedKPIs": [
+        "ltv",
+        "ltv_cac_ratio"
+      ]
     },
     {
       "id": "ltv",
-      "name": { "en": "Customer Lifetime Value", "pt": "Valor do Tempo de Vida do Cliente" },
-      "aliases": { "en": ["LTV", "CLV", "CLTV", "lifetime value"], "pt": ["LTV", "valor vitalicio do cliente"] },
+      "name": {
+        "en": "Customer Lifetime Value",
+        "pt": "Valor do Tempo de Vida do Cliente"
+      },
+      "aliases": {
+        "en": [
+          "LTV",
+          "CLV",
+          "CLTV",
+          "lifetime value"
+        ],
+        "pt": [
+          "LTV",
+          "valor vitalicio do cliente"
+        ]
+      },
       "category": "customer",
       "formula": "arpu * gross_margin / churn_rate",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["cac", "ltv_cac_ratio"]
+      "relatedKPIs": [
+        "cac",
+        "ltv_cac_ratio"
+      ]
     },
     {
       "id": "churn_rate",
-      "name": { "en": "Churn Rate", "pt": "Taxa de Cancelamento" },
-      "aliases": { "en": ["churn rate", "attrition rate", "customer churn"], "pt": ["taxa de churn", "taxa de cancelamento", "evasao"] },
+      "name": {
+        "en": "Churn Rate",
+        "pt": "Taxa de Cancelamento"
+      },
+      "aliases": {
+        "en": [
+          "churn rate",
+          "attrition rate",
+          "customer churn"
+        ],
+        "pt": [
+          "taxa de churn",
+          "taxa de cancelamento",
+          "evasao"
+        ]
+      },
       "category": "customer",
       "formula": "churned_customers / total_customers_start * 100",
       "unit": "percentage",
       "direction": "lower_is_better",
-      "relatedKPIs": ["retention_rate", "ltv"]
+      "relatedKPIs": [
+        "retention_rate",
+        "ltv"
+      ]
     },
     {
       "id": "retention_rate",
-      "name": { "en": "Retention Rate", "pt": "Taxa de Retencao" },
-      "aliases": { "en": ["retention rate", "customer retention"], "pt": ["taxa de retencao", "retencao de clientes"] },
+      "name": {
+        "en": "Retention Rate",
+        "pt": "Taxa de Retencao"
+      },
+      "aliases": {
+        "en": [
+          "retention rate",
+          "customer retention"
+        ],
+        "pt": [
+          "taxa de retencao",
+          "retencao de clientes"
+        ]
+      },
       "category": "customer",
       "formula": "1 - churn_rate",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["churn_rate", "logo_retention"]
+      "relatedKPIs": [
+        "churn_rate",
+        "logo_retention"
+      ]
     },
     {
       "id": "nps",
-      "name": { "en": "Net Promoter Score", "pt": "Net Promoter Score" },
-      "aliases": { "en": ["NPS", "net promoter"], "pt": ["NPS", "indice de promotores"] },
+      "name": {
+        "en": "Net Promoter Score",
+        "pt": "Net Promoter Score"
+      },
+      "aliases": {
+        "en": [
+          "NPS",
+          "net promoter"
+        ],
+        "pt": [
+          "NPS",
+          "indice de promotores"
+        ]
+      },
       "category": "customer",
       "formula": "percent_promoters - percent_detractors",
       "unit": "score",
       "direction": "higher_is_better",
-      "relatedKPIs": ["csat", "retention_rate"]
+      "relatedKPIs": [
+        "csat",
+        "retention_rate"
+      ]
     },
     {
       "id": "csat",
-      "name": { "en": "Customer Satisfaction Score", "pt": "Indice de Satisfacao do Cliente" },
-      "aliases": { "en": ["CSAT", "customer satisfaction"], "pt": ["CSAT", "satisfacao do cliente"] },
+      "name": {
+        "en": "Customer Satisfaction Score",
+        "pt": "Indice de Satisfacao do Cliente"
+      },
+      "aliases": {
+        "en": [
+          "CSAT",
+          "customer satisfaction"
+        ],
+        "pt": [
+          "CSAT",
+          "satisfacao do cliente"
+        ]
+      },
       "category": "customer",
       "formula": "satisfied_responses / total_responses * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["nps", "retention_rate"]
+      "relatedKPIs": [
+        "nps",
+        "retention_rate"
+      ]
     },
     {
       "id": "dau",
-      "name": { "en": "Daily Active Users", "pt": "Usuarios Ativos Diarios" },
-      "aliases": { "en": ["DAU", "daily actives"], "pt": ["DAU", "usuarios ativos diarios", "UAD"] },
+      "name": {
+        "en": "Daily Active Users",
+        "pt": "Usuarios Ativos Diarios"
+      },
+      "aliases": {
+        "en": [
+          "DAU",
+          "daily actives"
+        ],
+        "pt": [
+          "DAU",
+          "usuarios ativos diarios",
+          "UAD"
+        ]
+      },
       "category": "customer",
       "formula": "COUNT(DISTINCT users active on date)",
       "unit": "headcount",
       "direction": "higher_is_better",
-      "relatedKPIs": ["mau", "wau"]
+      "relatedKPIs": [
+        "mau",
+        "wau"
+      ]
     },
     {
       "id": "mau",
-      "name": { "en": "Monthly Active Users", "pt": "Usuarios Ativos Mensais" },
-      "aliases": { "en": ["MAU", "monthly actives"], "pt": ["MAU", "usuarios ativos mensais", "UAM"] },
+      "name": {
+        "en": "Monthly Active Users",
+        "pt": "Usuarios Ativos Mensais"
+      },
+      "aliases": {
+        "en": [
+          "MAU",
+          "monthly actives"
+        ],
+        "pt": [
+          "MAU",
+          "usuarios ativos mensais",
+          "UAM"
+        ]
+      },
       "category": "customer",
       "formula": "COUNT(DISTINCT users active in month)",
       "unit": "headcount",
       "direction": "higher_is_better",
-      "relatedKPIs": ["dau", "wau"]
+      "relatedKPIs": [
+        "dau",
+        "wau"
+      ]
     },
     {
       "id": "wau",
-      "name": { "en": "Weekly Active Users", "pt": "Usuarios Ativos Semanais" },
-      "aliases": { "en": ["WAU", "weekly actives"], "pt": ["WAU", "usuarios ativos semanais", "UAS"] },
+      "name": {
+        "en": "Weekly Active Users",
+        "pt": "Usuarios Ativos Semanais"
+      },
+      "aliases": {
+        "en": [
+          "WAU",
+          "weekly actives"
+        ],
+        "pt": [
+          "WAU",
+          "usuarios ativos semanais",
+          "UAS"
+        ]
+      },
       "category": "customer",
       "formula": "COUNT(DISTINCT users active in week)",
       "unit": "headcount",
       "direction": "higher_is_better",
-      "relatedKPIs": ["dau", "mau"]
+      "relatedKPIs": [
+        "dau",
+        "mau"
+      ]
     },
     {
       "id": "engagement_rate",
-      "name": { "en": "Engagement Rate", "pt": "Taxa de Engajamento" },
-      "aliases": { "en": ["engagement rate", "DAU/MAU ratio"], "pt": ["taxa de engajamento", "razao DAU/MAU"] },
+      "name": {
+        "en": "Engagement Rate",
+        "pt": "Taxa de Engajamento"
+      },
+      "aliases": {
+        "en": [
+          "engagement rate",
+          "DAU/MAU ratio"
+        ],
+        "pt": [
+          "taxa de engajamento",
+          "razao DAU/MAU"
+        ]
+      },
       "category": "customer",
       "formula": "dau / mau * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["dau", "mau"]
+      "relatedKPIs": [
+        "dau",
+        "mau"
+      ]
     },
     {
       "id": "activation_rate",
-      "name": { "en": "Activation Rate", "pt": "Taxa de Ativacao" },
-      "aliases": { "en": ["activation rate", "onboarding completion"], "pt": ["taxa de ativacao", "taxa de onboarding"] },
+      "name": {
+        "en": "Activation Rate",
+        "pt": "Taxa de Ativacao"
+      },
+      "aliases": {
+        "en": [
+          "activation rate",
+          "onboarding completion"
+        ],
+        "pt": [
+          "taxa de ativacao",
+          "taxa de onboarding"
+        ]
+      },
       "category": "customer",
       "formula": "users_completed_activation / total_signups * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["conversion_rate", "retention_rate"]
+      "relatedKPIs": [
+        "conversion_rate",
+        "retention_rate"
+      ]
     },
     {
       "id": "conversion_rate",
-      "name": { "en": "Conversion Rate", "pt": "Taxa de Conversao" },
-      "aliases": { "en": ["conversion rate", "CVR", "close rate"], "pt": ["taxa de conversao", "CVR"] },
+      "name": {
+        "en": "Conversion Rate",
+        "pt": "Taxa de Conversao"
+      },
+      "aliases": {
+        "en": [
+          "conversion rate",
+          "CVR",
+          "close rate"
+        ],
+        "pt": [
+          "taxa de conversao",
+          "CVR"
+        ]
+      },
       "category": "customer",
       "formula": "conversions / total_visitors * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["activation_rate", "cac"]
+      "relatedKPIs": [
+        "activation_rate",
+        "cac"
+      ]
     },
     {
       "id": "working_capital",
-      "name": { "en": "Working Capital", "pt": "Capital de Giro" },
-      "aliases": { "en": ["working capital", "net working capital", "NWC"], "pt": ["capital de giro", "capital circulante liquido"] },
+      "name": {
+        "en": "Working Capital",
+        "pt": "Capital de Giro"
+      },
+      "aliases": {
+        "en": [
+          "working capital",
+          "net working capital",
+          "NWC"
+        ],
+        "pt": [
+          "capital de giro",
+          "capital circulante liquido"
+        ]
+      },
       "category": "financial",
       "formula": "current_assets - current_liabilities",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["current_ratio", "quick_ratio"]
+      "relatedKPIs": [
+        "current_ratio",
+        "quick_ratio"
+      ]
     },
     {
       "id": "current_ratio",
-      "name": { "en": "Current Ratio", "pt": "Indice de Liquidez Corrente" },
-      "aliases": { "en": ["current ratio", "liquidity ratio"], "pt": ["liquidez corrente", "indice de liquidez"] },
+      "name": {
+        "en": "Current Ratio",
+        "pt": "Indice de Liquidez Corrente"
+      },
+      "aliases": {
+        "en": [
+          "current ratio",
+          "liquidity ratio"
+        ],
+        "pt": [
+          "liquidez corrente",
+          "indice de liquidez"
+        ]
+      },
       "category": "financial",
       "formula": "current_assets / current_liabilities",
       "unit": "ratio",
       "direction": "higher_is_better",
-      "relatedKPIs": ["quick_ratio", "working_capital"]
+      "relatedKPIs": [
+        "quick_ratio",
+        "working_capital"
+      ]
     },
     {
       "id": "quick_ratio",
-      "name": { "en": "Quick Ratio", "pt": "Indice de Liquidez Seca" },
-      "aliases": { "en": ["quick ratio", "acid-test ratio"], "pt": ["liquidez seca", "teste acido"] },
+      "name": {
+        "en": "Quick Ratio",
+        "pt": "Indice de Liquidez Seca"
+      },
+      "aliases": {
+        "en": [
+          "quick ratio",
+          "acid-test ratio"
+        ],
+        "pt": [
+          "liquidez seca",
+          "teste acido"
+        ]
+      },
       "category": "financial",
       "formula": "(current_assets - inventory) / current_liabilities",
       "unit": "ratio",
       "direction": "higher_is_better",
-      "relatedKPIs": ["current_ratio", "working_capital"]
+      "relatedKPIs": [
+        "current_ratio",
+        "working_capital"
+      ]
     },
     {
       "id": "debt_to_equity",
-      "name": { "en": "Debt-to-Equity Ratio", "pt": "Indice de Endividamento" },
-      "aliases": { "en": ["D/E ratio", "debt to equity", "leverage ratio"], "pt": ["D/E", "indice de endividamento", "alavancagem"] },
+      "name": {
+        "en": "Debt-to-Equity Ratio",
+        "pt": "Indice de Endividamento"
+      },
+      "aliases": {
+        "en": [
+          "D/E ratio",
+          "debt to equity",
+          "leverage ratio"
+        ],
+        "pt": [
+          "D/E",
+          "indice de endividamento",
+          "alavancagem"
+        ]
+      },
       "category": "financial",
       "formula": "total_debt / total_equity",
       "unit": "ratio",
       "direction": "lower_is_better",
-      "relatedKPIs": ["roi", "roe"]
+      "relatedKPIs": [
+        "roi",
+        "roe"
+      ]
     },
     {
       "id": "roi",
-      "name": { "en": "Return on Investment", "pt": "Retorno sobre Investimento" },
-      "aliases": { "en": ["ROI", "return on investment"], "pt": ["ROI", "retorno sobre investimento"] },
+      "name": {
+        "en": "Return on Investment",
+        "pt": "Retorno sobre Investimento"
+      },
+      "aliases": {
+        "en": [
+          "ROI",
+          "return on investment"
+        ],
+        "pt": [
+          "ROI",
+          "retorno sobre investimento"
+        ]
+      },
       "category": "financial",
       "formula": "(gain_from_investment - cost_of_investment) / cost_of_investment * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["roe", "roa"]
+      "relatedKPIs": [
+        "roe",
+        "roa"
+      ]
     },
     {
       "id": "roe",
-      "name": { "en": "Return on Equity", "pt": "Retorno sobre Patrimonio Liquido" },
-      "aliases": { "en": ["ROE", "return on equity"], "pt": ["ROE", "retorno sobre PL"] },
+      "name": {
+        "en": "Return on Equity",
+        "pt": "Retorno sobre Patrimonio Liquido"
+      },
+      "aliases": {
+        "en": [
+          "ROE",
+          "return on equity"
+        ],
+        "pt": [
+          "ROE",
+          "retorno sobre PL"
+        ]
+      },
       "category": "financial",
       "formula": "net_income / shareholders_equity * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["roi", "roa"]
+      "relatedKPIs": [
+        "roi",
+        "roa"
+      ]
     },
     {
       "id": "roa",
-      "name": { "en": "Return on Assets", "pt": "Retorno sobre Ativos" },
-      "aliases": { "en": ["ROA", "return on assets"], "pt": ["ROA", "retorno sobre ativos"] },
+      "name": {
+        "en": "Return on Assets",
+        "pt": "Retorno sobre Ativos"
+      },
+      "aliases": {
+        "en": [
+          "ROA",
+          "return on assets"
+        ],
+        "pt": [
+          "ROA",
+          "retorno sobre ativos"
+        ]
+      },
       "category": "financial",
       "formula": "net_income / total_assets * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["roi", "roe"]
+      "relatedKPIs": [
+        "roi",
+        "roe"
+      ]
     },
     {
       "id": "free_cash_flow",
-      "name": { "en": "Free Cash Flow", "pt": "Fluxo de Caixa Livre" },
-      "aliases": { "en": ["FCF", "free cash flow"], "pt": ["FCL", "fluxo de caixa livre"] },
+      "name": {
+        "en": "Free Cash Flow",
+        "pt": "Fluxo de Caixa Livre"
+      },
+      "aliases": {
+        "en": [
+          "FCF",
+          "free cash flow"
+        ],
+        "pt": [
+          "FCL",
+          "fluxo de caixa livre"
+        ]
+      },
       "category": "financial",
       "formula": "operating_cash_flow - capital_expenditures",
       "unit": "currency",
       "direction": "higher_is_better",
-      "relatedKPIs": ["burn_rate", "runway"]
+      "relatedKPIs": [
+        "burn_rate",
+        "runway"
+      ]
     },
     {
       "id": "burn_rate",
-      "name": { "en": "Burn Rate", "pt": "Taxa de Queima" },
-      "aliases": { "en": ["burn rate", "cash burn", "monthly burn"], "pt": ["taxa de queima", "queima de caixa", "burn rate"] },
-      "category": "operations",
+      "name": {
+        "en": "Burn Rate",
+        "pt": "Taxa de Queima"
+      },
+      "aliases": {
+        "en": [
+          "burn rate",
+          "cash burn",
+          "monthly burn"
+        ],
+        "pt": [
+          "taxa de queima",
+          "queima de caixa",
+          "burn rate"
+        ]
+      },
+      "category": "ops",
       "formula": "total_monthly_expenses - total_monthly_revenue",
       "unit": "currency",
       "direction": "lower_is_better",
-      "relatedKPIs": ["runway", "free_cash_flow"]
+      "relatedKPIs": [
+        "runway",
+        "free_cash_flow"
+      ]
     },
     {
       "id": "runway",
-      "name": { "en": "Cash Runway", "pt": "Fôlego de Caixa" },
-      "aliases": { "en": ["runway", "cash runway", "months of runway"], "pt": ["runway", "folego de caixa", "meses de caixa"] },
-      "category": "operations",
+      "name": {
+        "en": "Cash Runway",
+        "pt": "Fôlego de Caixa"
+      },
+      "aliases": {
+        "en": [
+          "runway",
+          "cash runway",
+          "months of runway"
+        ],
+        "pt": [
+          "runway",
+          "folego de caixa",
+          "meses de caixa"
+        ]
+      },
+      "category": "ops",
       "formula": "cash_balance / burn_rate",
       "unit": "months",
       "direction": "higher_is_better",
-      "relatedKPIs": ["burn_rate", "free_cash_flow"]
+      "relatedKPIs": [
+        "burn_rate",
+        "free_cash_flow"
+      ]
     },
     {
       "id": "cycle_time",
-      "name": { "en": "Cycle Time", "pt": "Tempo de Ciclo" },
-      "aliases": { "en": ["cycle time", "lead time", "process time"], "pt": ["tempo de ciclo", "lead time", "tempo de processo"] },
-      "category": "operations",
+      "name": {
+        "en": "Cycle Time",
+        "pt": "Tempo de Ciclo"
+      },
+      "aliases": {
+        "en": [
+          "cycle time",
+          "lead time",
+          "process time"
+        ],
+        "pt": [
+          "tempo de ciclo",
+          "lead time",
+          "tempo de processo"
+        ]
+      },
+      "category": "ops",
       "formula": "end_time - start_time (average across all units)",
       "unit": "days",
       "direction": "lower_is_better",
-      "relatedKPIs": ["throughput", "uptime"]
+      "relatedKPIs": [
+        "throughput",
+        "uptime"
+      ]
     },
     {
       "id": "throughput",
-      "name": { "en": "Throughput", "pt": "Vazao" },
-      "aliases": { "en": ["throughput", "output rate", "units per period"], "pt": ["vazao", "taxa de saida", "unidades por periodo"] },
-      "category": "operations",
+      "name": {
+        "en": "Throughput",
+        "pt": "Vazao"
+      },
+      "aliases": {
+        "en": [
+          "throughput",
+          "output rate",
+          "units per period"
+        ],
+        "pt": [
+          "vazao",
+          "taxa de saida",
+          "unidades por periodo"
+        ]
+      },
+      "category": "ops",
       "formula": "total_units_produced / time_period",
       "unit": "per_unit_time",
       "direction": "higher_is_better",
-      "relatedKPIs": ["cycle_time", "uptime"]
+      "relatedKPIs": [
+        "cycle_time",
+        "uptime"
+      ]
     },
     {
       "id": "uptime",
-      "name": { "en": "Uptime", "pt": "Disponibilidade" },
-      "aliases": { "en": ["uptime", "availability", "SLA uptime"], "pt": ["uptime", "disponibilidade", "tempo ativo"] },
-      "category": "operations",
+      "name": {
+        "en": "Uptime",
+        "pt": "Disponibilidade"
+      },
+      "aliases": {
+        "en": [
+          "uptime",
+          "availability",
+          "SLA uptime"
+        ],
+        "pt": [
+          "uptime",
+          "disponibilidade",
+          "tempo ativo"
+        ]
+      },
+      "category": "ops",
       "formula": "(total_time - downtime) / total_time * 100",
       "unit": "percentage",
       "direction": "higher_is_better",
-      "relatedKPIs": ["throughput", "cycle_time"]
+      "relatedKPIs": [
+        "throughput",
+        "cycle_time"
+      ]
     }
   ],
   "unitRules": [
     {
       "id": "percentage",
-      "patterns": { "en": ["percent", "%", "pct", "percentage"], "pt": ["por cento", "%", "percentual", "porcento"] },
+      "patterns": {
+        "en": [
+          "percent",
+          "%",
+          "pct",
+          "percentage"
+        ],
+        "pt": [
+          "por cento",
+          "%",
+          "percentual",
+          "porcento"
+        ]
+      },
       "formatCode": "0.00%",
       "conversionNote": "Divide by 100 if raw number exceeds 1 and context expects a ratio"
     },
     {
       "id": "currency_usd",
-      "patterns": { "en": ["dollars", "USD", "$", "US dollars"], "pt": ["dolares", "USD", "$", "dolares americanos"] },
+      "patterns": {
+        "en": [
+          "dollars",
+          "USD",
+          "$",
+          "US dollars"
+        ],
+        "pt": [
+          "dolares",
+          "USD",
+          "$",
+          "dolares americanos"
+        ]
+      },
       "formatCode": "$#,##0.00",
       "conversionNote": "Default currency for en-US locale"
     },
     {
       "id": "currency_eur",
-      "patterns": { "en": ["euros", "EUR", "euro"], "pt": ["euros", "EUR", "euro"] },
+      "patterns": {
+        "en": [
+          "euros",
+          "EUR",
+          "euro"
+        ],
+        "pt": [
+          "euros",
+          "EUR",
+          "euro"
+        ]
+      },
       "formatCode": "#,##0.00 EUR",
       "conversionNote": "Decimal comma in most European locales; decimal dot in en contexts"
     },
     {
       "id": "currency_brl",
-      "patterns": { "en": ["reais", "BRL", "R$", "Brazilian real"], "pt": ["reais", "BRL", "R$", "real brasileiro"] },
+      "patterns": {
+        "en": [
+          "reais",
+          "BRL",
+          "R$",
+          "Brazilian real"
+        ],
+        "pt": [
+          "reais",
+          "BRL",
+          "R$",
+          "real brasileiro"
+        ]
+      },
       "formatCode": "R$ #.##0,00",
       "conversionNote": "Brazilian format uses period for thousands separator and comma for decimal"
     },
     {
       "id": "currency_gbp",
-      "patterns": { "en": ["pounds", "GBP", "sterling", "British pound"], "pt": ["libras", "GBP", "libra esterlina"] },
+      "patterns": {
+        "en": [
+          "pounds",
+          "GBP",
+          "sterling",
+          "British pound"
+        ],
+        "pt": [
+          "libras",
+          "GBP",
+          "libra esterlina"
+        ]
+      },
       "formatCode": "GBP #,##0.00",
       "conversionNote": "Uses dot decimal separator"
     },
     {
       "id": "currency_jpy",
-      "patterns": { "en": ["yen", "JPY", "Japanese yen"], "pt": ["iene", "JPY", "iene japones"] },
+      "patterns": {
+        "en": [
+          "yen",
+          "JPY",
+          "Japanese yen"
+        ],
+        "pt": [
+          "iene",
+          "JPY",
+          "iene japones"
+        ]
+      },
       "formatCode": "JPY #,##0",
       "conversionNote": "No decimal places; yen is a whole-number currency"
     },
     {
       "id": "units",
-      "patterns": { "en": ["units", "qty", "quantity", "count"], "pt": ["unidades", "qtd", "quantidade", "contagem"] },
+      "patterns": {
+        "en": [
+          "units",
+          "qty",
+          "quantity",
+          "count"
+        ],
+        "pt": [
+          "unidades",
+          "qtd",
+          "quantidade",
+          "contagem"
+        ]
+      },
       "formatCode": "#,##0",
       "conversionNote": "Whole number count of discrete items"
     },
     {
       "id": "thousands",
-      "patterns": { "en": ["thousands", "K", "000s", "in thousands"], "pt": ["milhares", "K", "em milhares"] },
+      "patterns": {
+        "en": [
+          "thousands",
+          "K",
+          "000s",
+          "in thousands"
+        ],
+        "pt": [
+          "milhares",
+          "K",
+          "em milhares"
+        ]
+      },
       "formatCode": "#,##0",
       "conversionNote": "Multiply by 1,000 to get actual value when header indicates thousands"
     },
     {
       "id": "millions",
-      "patterns": { "en": ["millions", "M", "MM", "in millions", "mn"], "pt": ["milhoes", "M", "MM", "em milhoes"] },
+      "patterns": {
+        "en": [
+          "millions",
+          "M",
+          "MM",
+          "in millions",
+          "mn"
+        ],
+        "pt": [
+          "milhoes",
+          "M",
+          "MM",
+          "em milhoes"
+        ]
+      },
       "formatCode": "#,##0.0",
       "conversionNote": "Multiply by 1,000,000 to get actual value when header indicates millions"
     },
     {
       "id": "billions",
-      "patterns": { "en": ["billions", "B", "bn", "in billions"], "pt": ["bilhoes", "B", "bi", "em bilhoes"] },
+      "patterns": {
+        "en": [
+          "billions",
+          "B",
+          "bn",
+          "in billions"
+        ],
+        "pt": [
+          "bilhoes",
+          "B",
+          "bi",
+          "em bilhoes"
+        ]
+      },
       "formatCode": "#,##0.00",
       "conversionNote": "Multiply by 1,000,000,000 to get actual value when header indicates billions"
     },
     {
       "id": "basis_points",
-      "patterns": { "en": ["basis points", "bps", "bp"], "pt": ["pontos base", "bps", "pb"] },
+      "patterns": {
+        "en": [
+          "basis points",
+          "bps",
+          "bp"
+        ],
+        "pt": [
+          "pontos base",
+          "bps",
+          "pb"
+        ]
+      },
       "formatCode": "#,##0",
       "conversionNote": "1 basis point = 0.01%; divide by 10,000 to convert to a decimal ratio"
     },
     {
       "id": "multiplier",
-      "patterns": { "en": ["times", "x", "multiple", "multiplier"], "pt": ["vezes", "x", "multiplo", "multiplicador"] },
+      "patterns": {
+        "en": [
+          "times",
+          "x",
+          "multiple",
+          "multiplier"
+        ],
+        "pt": [
+          "vezes",
+          "x",
+          "multiplo",
+          "multiplicador"
+        ]
+      },
       "formatCode": "0.0x",
       "conversionNote": "Expressed as a factor, e.g. 2.5x means 2.5 times"
     },
     {
       "id": "ratio",
-      "patterns": { "en": ["ratio", "proportion", "factor"], "pt": ["razao", "proporcao", "fator"] },
+      "patterns": {
+        "en": [
+          "ratio",
+          "proportion",
+          "factor"
+        ],
+        "pt": [
+          "razao",
+          "proporcao",
+          "fator"
+        ]
+      },
       "formatCode": "0.00",
       "conversionNote": "Dimensionless numeric ratio; do not add % unless explicitly a percentage"
     },
     {
       "id": "days",
-      "patterns": { "en": ["days", "day", "d", "calendar days"], "pt": ["dias", "dia", "d", "dias corridos"] },
+      "patterns": {
+        "en": [
+          "days",
+          "day",
+          "d",
+          "calendar days"
+        ],
+        "pt": [
+          "dias",
+          "dia",
+          "d",
+          "dias corridos"
+        ]
+      },
       "formatCode": "#,##0",
       "conversionNote": "Whole number of calendar or business days"
     },
     {
       "id": "months",
-      "patterns": { "en": ["months", "month", "mo", "mos"], "pt": ["meses", "mes", "m"] },
+      "patterns": {
+        "en": [
+          "months",
+          "month",
+          "mo",
+          "mos"
+        ],
+        "pt": [
+          "meses",
+          "mes",
+          "m"
+        ]
+      },
       "formatCode": "#,##0.0",
       "conversionNote": "Can be fractional; 1.5 months = 45 days approximately"
     },
     {
       "id": "years",
-      "patterns": { "en": ["years", "year", "yr", "yrs"], "pt": ["anos", "ano", "a"] },
+      "patterns": {
+        "en": [
+          "years",
+          "year",
+          "yr",
+          "yrs"
+        ],
+        "pt": [
+          "anos",
+          "ano",
+          "a"
+        ]
+      },
       "formatCode": "#,##0.0",
       "conversionNote": "Can be fractional for CAGR or payback calculations"
     },
     {
       "id": "hours",
-      "patterns": { "en": ["hours", "hour", "hr", "hrs"], "pt": ["horas", "hora", "h"] },
+      "patterns": {
+        "en": [
+          "hours",
+          "hour",
+          "hr",
+          "hrs"
+        ],
+        "pt": [
+          "horas",
+          "hora",
+          "h"
+        ]
+      },
       "formatCode": "#,##0.0",
       "conversionNote": "Can be fractional; used for labor tracking and cycle time"
     },
     {
       "id": "headcount",
-      "patterns": { "en": ["headcount", "employees", "FTE", "people", "staff"], "pt": ["headcount", "funcionarios", "FTE", "colaboradores", "pessoas"] },
+      "patterns": {
+        "en": [
+          "headcount",
+          "employees",
+          "FTE",
+          "people",
+          "staff"
+        ],
+        "pt": [
+          "headcount",
+          "funcionarios",
+          "FTE",
+          "colaboradores",
+          "pessoas"
+        ]
+      },
       "formatCode": "#,##0",
       "conversionNote": "Whole number of people; FTE may be fractional"
     },
     {
       "id": "transactions",
-      "patterns": { "en": ["transactions", "txn", "txns", "transaction count"], "pt": ["transacoes", "txn", "numero de transacoes"] },
+      "patterns": {
+        "en": [
+          "transactions",
+          "txn",
+          "txns",
+          "transaction count"
+        ],
+        "pt": [
+          "transacoes",
+          "txn",
+          "numero de transacoes"
+        ]
+      },
       "formatCode": "#,##0",
       "conversionNote": "Discrete count of completed transactions"
     },
     {
       "id": "per_unit_time",
-      "patterns": { "en": ["per hour", "per day", "per month", "per year", "/hr", "/day", "/mo", "/yr"], "pt": ["por hora", "por dia", "por mes", "por ano", "/h", "/dia", "/mes", "/ano"] },
+      "patterns": {
+        "en": [
+          "per hour",
+          "per day",
+          "per month",
+          "per year",
+          "/hr",
+          "/day",
+          "/mo",
+          "/yr"
+        ],
+        "pt": [
+          "por hora",
+          "por dia",
+          "por mes",
+          "por ano",
+          "/h",
+          "/dia",
+          "/mes",
+          "/ano"
+        ]
+      },
       "formatCode": "#,##0.0",
       "conversionNote": "Rate expressed as quantity divided by a time period"
     }
@@ -735,7 +1949,10 @@
     {
       "code": "USD",
       "symbol": "$",
-      "name": { "en": "US Dollar", "pt": "Dolar Americano" },
+      "name": {
+        "en": "US Dollar",
+        "pt": "Dolar Americano"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
       "formatCode": "$#,##0.00",
@@ -743,17 +1960,23 @@
     },
     {
       "code": "EUR",
-      "symbol": "\u20ac",
-      "name": { "en": "Euro", "pt": "Euro" },
+      "symbol": "€",
+      "name": {
+        "en": "Euro",
+        "pt": "Euro"
+      },
       "decimalSeparator": ",",
       "thousandsSeparator": ".",
-      "formatCode": "#.##0,00 \u20ac",
+      "formatCode": "#.##0,00 €",
       "locale": "de-DE"
     },
     {
       "code": "BRL",
       "symbol": "R$",
-      "name": { "en": "Brazilian Real", "pt": "Real Brasileiro" },
+      "name": {
+        "en": "Brazilian Real",
+        "pt": "Real Brasileiro"
+      },
       "decimalSeparator": ",",
       "thousandsSeparator": ".",
       "formatCode": "R$ #.##0,00",
@@ -761,26 +1984,35 @@
     },
     {
       "code": "GBP",
-      "symbol": "\u00a3",
-      "name": { "en": "British Pound", "pt": "Libra Esterlina" },
+      "symbol": "£",
+      "name": {
+        "en": "British Pound",
+        "pt": "Libra Esterlina"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
-      "formatCode": "\u00a3#,##0.00",
+      "formatCode": "£#,##0.00",
       "locale": "en-GB"
     },
     {
       "code": "JPY",
-      "symbol": "\u00a5",
-      "name": { "en": "Japanese Yen", "pt": "Iene Japones" },
+      "symbol": "¥",
+      "name": {
+        "en": "Japanese Yen",
+        "pt": "Iene Japones"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
-      "formatCode": "\u00a5#,##0",
+      "formatCode": "¥#,##0",
       "locale": "ja-JP"
     },
     {
       "code": "CHF",
       "symbol": "CHF",
-      "name": { "en": "Swiss Franc", "pt": "Franco Suico" },
+      "name": {
+        "en": "Swiss Franc",
+        "pt": "Franco Suico"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": "'",
       "formatCode": "CHF #'##0.00",
@@ -789,7 +2021,10 @@
     {
       "code": "CAD",
       "symbol": "C$",
-      "name": { "en": "Canadian Dollar", "pt": "Dolar Canadense" },
+      "name": {
+        "en": "Canadian Dollar",
+        "pt": "Dolar Canadense"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
       "formatCode": "C$#,##0.00",
@@ -798,7 +2033,10 @@
     {
       "code": "AUD",
       "symbol": "A$",
-      "name": { "en": "Australian Dollar", "pt": "Dolar Australiano" },
+      "name": {
+        "en": "Australian Dollar",
+        "pt": "Dolar Australiano"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
       "formatCode": "A$#,##0.00",
@@ -806,26 +2044,35 @@
     },
     {
       "code": "CNY",
-      "symbol": "\u00a5",
-      "name": { "en": "Chinese Yuan", "pt": "Yuan Chines" },
+      "symbol": "¥",
+      "name": {
+        "en": "Chinese Yuan",
+        "pt": "Yuan Chines"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
-      "formatCode": "\u00a5#,##0.00",
+      "formatCode": "¥#,##0.00",
       "locale": "zh-CN"
     },
     {
       "code": "INR",
-      "symbol": "\u20b9",
-      "name": { "en": "Indian Rupee", "pt": "Rupia Indiana" },
+      "symbol": "₹",
+      "name": {
+        "en": "Indian Rupee",
+        "pt": "Rupia Indiana"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
-      "formatCode": "\u20b9#,##,##0.00",
+      "formatCode": "₹#,##,##0.00",
       "locale": "en-IN"
     },
     {
       "code": "MXN",
       "symbol": "MX$",
-      "name": { "en": "Mexican Peso", "pt": "Peso Mexicano" },
+      "name": {
+        "en": "Mexican Peso",
+        "pt": "Peso Mexicano"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
       "formatCode": "MX$#,##0.00",
@@ -833,35 +2080,47 @@
     },
     {
       "code": "KRW",
-      "symbol": "\u20a9",
-      "name": { "en": "South Korean Won", "pt": "Won Sul-Coreano" },
+      "symbol": "₩",
+      "name": {
+        "en": "South Korean Won",
+        "pt": "Won Sul-Coreano"
+      },
       "decimalSeparator": ".",
       "thousandsSeparator": ",",
-      "formatCode": "\u20a9#,##0",
+      "formatCode": "₩#,##0",
       "locale": "ko-KR"
     },
     {
       "code": "SEK",
       "symbol": "kr",
-      "name": { "en": "Swedish Krona", "pt": "Coroa Sueca" },
+      "name": {
+        "en": "Swedish Krona",
+        "pt": "Coroa Sueca"
+      },
       "decimalSeparator": ",",
       "thousandsSeparator": " ",
-      "formatCode": "#\u00a0##0,00 kr",
+      "formatCode": "# ##0,00 kr",
       "locale": "sv-SE"
     },
     {
       "code": "NOK",
       "symbol": "kr",
-      "name": { "en": "Norwegian Krone", "pt": "Coroa Norueguesa" },
+      "name": {
+        "en": "Norwegian Krone",
+        "pt": "Coroa Norueguesa"
+      },
       "decimalSeparator": ",",
       "thousandsSeparator": " ",
-      "formatCode": "#\u00a0##0,00 kr",
+      "formatCode": "# ##0,00 kr",
       "locale": "nb-NO"
     },
     {
       "code": "DKK",
       "symbol": "kr",
-      "name": { "en": "Danish Krone", "pt": "Coroa Dinamarquesa" },
+      "name": {
+        "en": "Danish Krone",
+        "pt": "Coroa Dinamarquesa"
+      },
       "decimalSeparator": ",",
       "thousandsSeparator": ".",
       "formatCode": "#.##0,00 kr",
@@ -871,7 +2130,18 @@
   "timePeriodRules": [
     {
       "id": "today",
-      "patterns": { "en": ["today", "current day", "this day"], "pt": ["hoje", "dia atual", "dia de hoje"] },
+      "patterns": {
+        "en": [
+          "today",
+          "current day",
+          "this day"
+        ],
+        "pt": [
+          "hoje",
+          "dia atual",
+          "dia de hoje"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": 0,
@@ -879,7 +2149,18 @@
     },
     {
       "id": "yesterday",
-      "patterns": { "en": ["yesterday", "prior day", "previous day"], "pt": ["ontem", "dia anterior", "dia passado"] },
+      "patterns": {
+        "en": [
+          "yesterday",
+          "prior day",
+          "previous day"
+        ],
+        "pt": [
+          "ontem",
+          "dia anterior",
+          "dia passado"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": -1,
@@ -887,7 +2168,18 @@
     },
     {
       "id": "this_week",
-      "patterns": { "en": ["this week", "current week", "CW"], "pt": ["esta semana", "semana atual", "semana corrente"] },
+      "patterns": {
+        "en": [
+          "this week",
+          "current week",
+          "CW"
+        ],
+        "pt": [
+          "esta semana",
+          "semana atual",
+          "semana corrente"
+        ]
+      },
       "resolution": "relative",
       "granularity": "week",
       "offset": 0,
@@ -895,7 +2187,18 @@
     },
     {
       "id": "last_week",
-      "patterns": { "en": ["last week", "previous week", "prior week"], "pt": ["semana passada", "semana anterior", "ultima semana"] },
+      "patterns": {
+        "en": [
+          "last week",
+          "previous week",
+          "prior week"
+        ],
+        "pt": [
+          "semana passada",
+          "semana anterior",
+          "ultima semana"
+        ]
+      },
       "resolution": "relative",
       "granularity": "week",
       "offset": -1,
@@ -903,7 +2206,18 @@
     },
     {
       "id": "this_month",
-      "patterns": { "en": ["this month", "current month", "CM"], "pt": ["este mes", "mes atual", "mes corrente"] },
+      "patterns": {
+        "en": [
+          "this month",
+          "current month",
+          "CM"
+        ],
+        "pt": [
+          "este mes",
+          "mes atual",
+          "mes corrente"
+        ]
+      },
       "resolution": "relative",
       "granularity": "month",
       "offset": 0,
@@ -911,7 +2225,18 @@
     },
     {
       "id": "last_month",
-      "patterns": { "en": ["last month", "previous month", "prior month"], "pt": ["mes passado", "mes anterior", "ultimo mes"] },
+      "patterns": {
+        "en": [
+          "last month",
+          "previous month",
+          "prior month"
+        ],
+        "pt": [
+          "mes passado",
+          "mes anterior",
+          "ultimo mes"
+        ]
+      },
       "resolution": "relative",
       "granularity": "month",
       "offset": -1,
@@ -919,7 +2244,18 @@
     },
     {
       "id": "this_quarter",
-      "patterns": { "en": ["this quarter", "current quarter", "CQ"], "pt": ["este trimestre", "trimestre atual", "trimestre corrente"] },
+      "patterns": {
+        "en": [
+          "this quarter",
+          "current quarter",
+          "CQ"
+        ],
+        "pt": [
+          "este trimestre",
+          "trimestre atual",
+          "trimestre corrente"
+        ]
+      },
       "resolution": "relative",
       "granularity": "quarter",
       "offset": 0,
@@ -927,7 +2263,20 @@
     },
     {
       "id": "last_quarter",
-      "patterns": { "en": ["last quarter", "previous quarter", "prior quarter", "Q-1"], "pt": ["ultimo trimestre", "trimestre anterior", "trimestre passado", "T-1"] },
+      "patterns": {
+        "en": [
+          "last quarter",
+          "previous quarter",
+          "prior quarter",
+          "Q-1"
+        ],
+        "pt": [
+          "ultimo trimestre",
+          "trimestre anterior",
+          "trimestre passado",
+          "T-1"
+        ]
+      },
       "resolution": "relative",
       "granularity": "quarter",
       "offset": -1,
@@ -935,7 +2284,18 @@
     },
     {
       "id": "this_year",
-      "patterns": { "en": ["this year", "current year", "CY"], "pt": ["este ano", "ano atual", "ano corrente"] },
+      "patterns": {
+        "en": [
+          "this year",
+          "current year",
+          "CY"
+        ],
+        "pt": [
+          "este ano",
+          "ano atual",
+          "ano corrente"
+        ]
+      },
       "resolution": "relative",
       "granularity": "year",
       "offset": 0,
@@ -943,7 +2303,19 @@
     },
     {
       "id": "last_year",
-      "patterns": { "en": ["last year", "previous year", "prior year", "PY"], "pt": ["ano passado", "ano anterior", "ultimo ano"] },
+      "patterns": {
+        "en": [
+          "last year",
+          "previous year",
+          "prior year",
+          "PY"
+        ],
+        "pt": [
+          "ano passado",
+          "ano anterior",
+          "ultimo ano"
+        ]
+      },
       "resolution": "relative",
       "granularity": "year",
       "offset": -1,
@@ -951,7 +2323,18 @@
     },
     {
       "id": "ytd",
-      "patterns": { "en": ["YTD", "year to date", "year-to-date"], "pt": ["YTD", "acumulado do ano", "no ano"] },
+      "patterns": {
+        "en": [
+          "YTD",
+          "year to date",
+          "year-to-date"
+        ],
+        "pt": [
+          "YTD",
+          "acumulado do ano",
+          "no ano"
+        ]
+      },
       "resolution": "relative",
       "granularity": "year",
       "offset": 0,
@@ -959,7 +2342,18 @@
     },
     {
       "id": "mtd",
-      "patterns": { "en": ["MTD", "month to date", "month-to-date"], "pt": ["MTD", "acumulado do mes", "no mes"] },
+      "patterns": {
+        "en": [
+          "MTD",
+          "month to date",
+          "month-to-date"
+        ],
+        "pt": [
+          "MTD",
+          "acumulado do mes",
+          "no mes"
+        ]
+      },
       "resolution": "relative",
       "granularity": "month",
       "offset": 0,
@@ -967,7 +2361,18 @@
     },
     {
       "id": "qtd",
-      "patterns": { "en": ["QTD", "quarter to date", "quarter-to-date"], "pt": ["QTD", "acumulado do trimestre", "no trimestre"] },
+      "patterns": {
+        "en": [
+          "QTD",
+          "quarter to date",
+          "quarter-to-date"
+        ],
+        "pt": [
+          "QTD",
+          "acumulado do trimestre",
+          "no trimestre"
+        ]
+      },
       "resolution": "relative",
       "granularity": "quarter",
       "offset": 0,
@@ -975,7 +2380,18 @@
     },
     {
       "id": "wtd",
-      "patterns": { "en": ["WTD", "week to date", "week-to-date"], "pt": ["WTD", "acumulado da semana", "na semana"] },
+      "patterns": {
+        "en": [
+          "WTD",
+          "week to date",
+          "week-to-date"
+        ],
+        "pt": [
+          "WTD",
+          "acumulado da semana",
+          "na semana"
+        ]
+      },
       "resolution": "relative",
       "granularity": "week",
       "offset": 0,
@@ -983,7 +2399,20 @@
     },
     {
       "id": "ttm",
-      "patterns": { "en": ["TTM", "trailing twelve months", "last 12 months", "L12M"], "pt": ["TTM", "ultimos doze meses", "ultimos 12 meses", "U12M"] },
+      "patterns": {
+        "en": [
+          "TTM",
+          "trailing twelve months",
+          "last 12 months",
+          "L12M"
+        ],
+        "pt": [
+          "TTM",
+          "ultimos doze meses",
+          "ultimos 12 meses",
+          "U12M"
+        ]
+      },
       "resolution": "relative",
       "granularity": "month",
       "offset": -12,
@@ -991,7 +2420,16 @@
     },
     {
       "id": "ltm",
-      "patterns": { "en": ["LTM", "last twelve months"], "pt": ["LTM", "ultimos doze meses"] },
+      "patterns": {
+        "en": [
+          "LTM",
+          "last twelve months"
+        ],
+        "pt": [
+          "LTM",
+          "ultimos doze meses"
+        ]
+      },
       "resolution": "relative",
       "granularity": "month",
       "offset": -12,
@@ -999,7 +2437,19 @@
     },
     {
       "id": "rolling_7_days",
-      "patterns": { "en": ["rolling 7 days", "last 7 days", "past 7 days", "7d"], "pt": ["ultimos 7 dias", "7 dias atras", "7d"] },
+      "patterns": {
+        "en": [
+          "rolling 7 days",
+          "last 7 days",
+          "past 7 days",
+          "7d"
+        ],
+        "pt": [
+          "ultimos 7 dias",
+          "7 dias atras",
+          "7d"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": -7,
@@ -1007,7 +2457,19 @@
     },
     {
       "id": "rolling_30_days",
-      "patterns": { "en": ["rolling 30 days", "last 30 days", "past 30 days", "30d"], "pt": ["ultimos 30 dias", "30 dias atras", "30d"] },
+      "patterns": {
+        "en": [
+          "rolling 30 days",
+          "last 30 days",
+          "past 30 days",
+          "30d"
+        ],
+        "pt": [
+          "ultimos 30 dias",
+          "30 dias atras",
+          "30d"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": -30,
@@ -1015,7 +2477,19 @@
     },
     {
       "id": "rolling_90_days",
-      "patterns": { "en": ["rolling 90 days", "last 90 days", "past 90 days", "90d"], "pt": ["ultimos 90 dias", "90 dias atras", "90d"] },
+      "patterns": {
+        "en": [
+          "rolling 90 days",
+          "last 90 days",
+          "past 90 days",
+          "90d"
+        ],
+        "pt": [
+          "ultimos 90 dias",
+          "90 dias atras",
+          "90d"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": -90,
@@ -1023,7 +2497,18 @@
     },
     {
       "id": "fiscal_year",
-      "patterns": { "en": ["fiscal year", "FY", "financial year"], "pt": ["ano fiscal", "AF", "exercicio fiscal"] },
+      "patterns": {
+        "en": [
+          "fiscal year",
+          "FY",
+          "financial year"
+        ],
+        "pt": [
+          "ano fiscal",
+          "AF",
+          "exercicio fiscal"
+        ]
+      },
       "resolution": "contextual",
       "granularity": "year",
       "offset": 0,
@@ -1031,7 +2516,19 @@
     },
     {
       "id": "h1",
-      "patterns": { "en": ["H1", "first half", "1st half", "first semester"], "pt": ["S1", "primeiro semestre", "1o semestre"] },
+      "patterns": {
+        "en": [
+          "H1",
+          "first half",
+          "1st half",
+          "first semester"
+        ],
+        "pt": [
+          "S1",
+          "primeiro semestre",
+          "1o semestre"
+        ]
+      },
       "resolution": "absolute_within_year",
       "granularity": "half",
       "offset": 0,
@@ -1039,7 +2536,19 @@
     },
     {
       "id": "h2",
-      "patterns": { "en": ["H2", "second half", "2nd half", "second semester"], "pt": ["S2", "segundo semestre", "2o semestre"] },
+      "patterns": {
+        "en": [
+          "H2",
+          "second half",
+          "2nd half",
+          "second semester"
+        ],
+        "pt": [
+          "S2",
+          "segundo semestre",
+          "2o semestre"
+        ]
+      },
       "resolution": "absolute_within_year",
       "granularity": "half",
       "offset": 0,
@@ -1047,7 +2556,20 @@
     },
     {
       "id": "q1",
-      "patterns": { "en": ["Q1", "first quarter", "1st quarter", "Jan-Mar"], "pt": ["T1", "primeiro trimestre", "1o trimestre", "jan-mar"] },
+      "patterns": {
+        "en": [
+          "Q1",
+          "first quarter",
+          "1st quarter",
+          "Jan-Mar"
+        ],
+        "pt": [
+          "T1",
+          "primeiro trimestre",
+          "1o trimestre",
+          "jan-mar"
+        ]
+      },
       "resolution": "absolute_within_year",
       "granularity": "quarter",
       "offset": 0,
@@ -1055,7 +2577,20 @@
     },
     {
       "id": "q2",
-      "patterns": { "en": ["Q2", "second quarter", "2nd quarter", "Apr-Jun"], "pt": ["T2", "segundo trimestre", "2o trimestre", "abr-jun"] },
+      "patterns": {
+        "en": [
+          "Q2",
+          "second quarter",
+          "2nd quarter",
+          "Apr-Jun"
+        ],
+        "pt": [
+          "T2",
+          "segundo trimestre",
+          "2o trimestre",
+          "abr-jun"
+        ]
+      },
       "resolution": "absolute_within_year",
       "granularity": "quarter",
       "offset": 0,
@@ -1063,7 +2598,20 @@
     },
     {
       "id": "q3",
-      "patterns": { "en": ["Q3", "third quarter", "3rd quarter", "Jul-Sep"], "pt": ["T3", "terceiro trimestre", "3o trimestre", "jul-set"] },
+      "patterns": {
+        "en": [
+          "Q3",
+          "third quarter",
+          "3rd quarter",
+          "Jul-Sep"
+        ],
+        "pt": [
+          "T3",
+          "terceiro trimestre",
+          "3o trimestre",
+          "jul-set"
+        ]
+      },
       "resolution": "absolute_within_year",
       "granularity": "quarter",
       "offset": 0,
@@ -1071,7 +2619,20 @@
     },
     {
       "id": "q4",
-      "patterns": { "en": ["Q4", "fourth quarter", "4th quarter", "Oct-Dec"], "pt": ["T4", "quarto trimestre", "4o trimestre", "out-dez"] },
+      "patterns": {
+        "en": [
+          "Q4",
+          "fourth quarter",
+          "4th quarter",
+          "Oct-Dec"
+        ],
+        "pt": [
+          "T4",
+          "quarto trimestre",
+          "4o trimestre",
+          "out-dez"
+        ]
+      },
       "resolution": "absolute_within_year",
       "granularity": "quarter",
       "offset": 0,
@@ -1079,7 +2640,18 @@
     },
     {
       "id": "last_n_days",
-      "patterns": { "en": ["last N days", "past N days", "previous N days"], "pt": ["ultimos N dias", "N dias atras", "N dias anteriores"] },
+      "patterns": {
+        "en": [
+          "last N days",
+          "past N days",
+          "previous N days"
+        ],
+        "pt": [
+          "ultimos N dias",
+          "N dias atras",
+          "N dias anteriores"
+        ]
+      },
       "resolution": "parameterized",
       "granularity": "day",
       "offset": "variable",
@@ -1087,7 +2659,18 @@
     },
     {
       "id": "previous_n_months",
-      "patterns": { "en": ["previous N months", "last N months", "past N months"], "pt": ["ultimos N meses", "N meses atras", "N meses anteriores"] },
+      "patterns": {
+        "en": [
+          "previous N months",
+          "last N months",
+          "past N months"
+        ],
+        "pt": [
+          "ultimos N meses",
+          "N meses atras",
+          "N meses anteriores"
+        ]
+      },
       "resolution": "parameterized",
       "granularity": "month",
       "offset": "variable",
@@ -1095,7 +2678,18 @@
     },
     {
       "id": "yoy_same_period",
-      "patterns": { "en": ["YoY same period", "same period last year", "vs prior year"], "pt": ["mesmo periodo YoY", "mesmo periodo ano passado", "vs ano anterior"] },
+      "patterns": {
+        "en": [
+          "YoY same period",
+          "same period last year",
+          "vs prior year"
+        ],
+        "pt": [
+          "mesmo periodo YoY",
+          "mesmo periodo ano passado",
+          "vs ano anterior"
+        ]
+      },
       "resolution": "relative",
       "granularity": "year",
       "offset": -1,
@@ -1103,7 +2697,18 @@
     },
     {
       "id": "last_business_day",
-      "patterns": { "en": ["last business day", "prior business day", "previous working day"], "pt": ["ultimo dia util", "dia util anterior", "dia de trabalho anterior"] },
+      "patterns": {
+        "en": [
+          "last business day",
+          "prior business day",
+          "previous working day"
+        ],
+        "pt": [
+          "ultimo dia util",
+          "dia util anterior",
+          "dia de trabalho anterior"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": -1,
@@ -1111,7 +2716,20 @@
     },
     {
       "id": "end_of_month",
-      "patterns": { "en": ["end of month", "EOM", "month end", "last day of month"], "pt": ["fim do mes", "EOM", "final do mes", "ultimo dia do mes"] },
+      "patterns": {
+        "en": [
+          "end of month",
+          "EOM",
+          "month end",
+          "last day of month"
+        ],
+        "pt": [
+          "fim do mes",
+          "EOM",
+          "final do mes",
+          "ultimo dia do mes"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": 0,
@@ -1119,7 +2737,19 @@
     },
     {
       "id": "beginning_of_year",
-      "patterns": { "en": ["beginning of year", "BOY", "start of year", "Jan 1"], "pt": ["inicio do ano", "comeco do ano", "1 de janeiro"] },
+      "patterns": {
+        "en": [
+          "beginning of year",
+          "BOY",
+          "start of year",
+          "Jan 1"
+        ],
+        "pt": [
+          "inicio do ano",
+          "comeco do ano",
+          "1 de janeiro"
+        ]
+      },
       "resolution": "relative",
       "granularity": "day",
       "offset": 0,
@@ -1130,112 +2760,160 @@
     {
       "id": "balance_sheet_check",
       "rule": "Assets = Liabilities + Equity",
-      "description": { "en": "Total assets must equal total liabilities plus equity", "pt": "Ativo total deve ser igual ao passivo total mais patrimonio liquido" },
+      "description": {
+        "en": "Total assets must equal total liabilities plus equity",
+        "pt": "Ativo total deve ser igual ao passivo total mais patrimonio liquido"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "trial_balance",
       "rule": "SUM(debits) = SUM(credits)",
-      "description": { "en": "Total debits must equal total credits in the trial balance", "pt": "Total de debitos deve ser igual ao total de creditos no balancete" },
+      "description": {
+        "en": "Total debits must equal total credits in the trial balance",
+        "pt": "Total de debitos deve ser igual ao total de creditos no balancete"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "cash_flow_reconciliation",
       "rule": "Beginning Cash + Net Cash Flow = Ending Cash",
-      "description": { "en": "Opening cash balance plus net cash flow from all activities must equal closing cash balance", "pt": "Saldo inicial de caixa mais fluxo de caixa liquido de todas as atividades deve ser igual ao saldo final" },
+      "description": {
+        "en": "Opening cash balance plus net cash flow from all activities must equal closing cash balance",
+        "pt": "Saldo inicial de caixa mais fluxo de caixa liquido de todas as atividades deve ser igual ao saldo final"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "intercompany_elimination",
       "rule": "SUM(intercompany_receivables) = SUM(intercompany_payables)",
-      "description": { "en": "Intercompany receivables must offset intercompany payables in consolidation", "pt": "Contas a receber intercompanhia devem compensar contas a pagar intercompanhia na consolidacao" },
+      "description": {
+        "en": "Intercompany receivables must offset intercompany payables in consolidation",
+        "pt": "Contas a receber intercompanhia devem compensar contas a pagar intercompanhia na consolidacao"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "bank_reconciliation",
       "rule": "Book Balance + Adjustments = Bank Statement Balance",
-      "description": { "en": "Adjusted book balance must match the bank statement balance after outstanding items", "pt": "Saldo contabil ajustado deve coincidir com o saldo do extrato bancario apos itens pendentes" },
+      "description": {
+        "en": "Adjusted book balance must match the bank statement balance after outstanding items",
+        "pt": "Saldo contabil ajustado deve coincidir com o saldo do extrato bancario apos itens pendentes"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "inventory_count",
       "rule": "Physical Count = System Count +/- Adjustments",
-      "description": { "en": "Physical inventory count should reconcile with system records after adjustments", "pt": "Contagem fisica de estoque deve conciliar com registros do sistema apos ajustes" },
+      "description": {
+        "en": "Physical inventory count should reconcile with system records after adjustments",
+        "pt": "Contagem fisica de estoque deve conciliar com registros do sistema apos ajustes"
+      },
       "tolerance": 0.05,
       "action": "warn_if_mismatch"
     },
     {
       "id": "revenue_recognition",
       "rule": "Recognized Revenue = Billings - Change in Deferred Revenue",
-      "description": { "en": "Recognized revenue equals billings minus the change in deferred revenue balance", "pt": "Receita reconhecida equivale ao faturamento menos a variacao no saldo de receita diferida" },
+      "description": {
+        "en": "Recognized revenue equals billings minus the change in deferred revenue balance",
+        "pt": "Receita reconhecida equivale ao faturamento menos a variacao no saldo de receita diferida"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "deferred_revenue_unwind",
       "rule": "Opening Deferred + New Billings - Recognized = Closing Deferred",
-      "description": { "en": "Deferred revenue roll-forward must reconcile from opening to closing balance", "pt": "Movimentacao da receita diferida deve conciliar do saldo inicial ao saldo final" },
+      "description": {
+        "en": "Deferred revenue roll-forward must reconcile from opening to closing balance",
+        "pt": "Movimentacao da receita diferida deve conciliar do saldo inicial ao saldo final"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "depreciation_schedule",
       "rule": "Opening NBV - Depreciation + Additions - Disposals = Closing NBV",
-      "description": { "en": "Net book value roll-forward must reconcile with depreciation and asset movements", "pt": "Movimentacao do valor contabil liquido deve conciliar com depreciacao e movimentacoes de ativos" },
+      "description": {
+        "en": "Net book value roll-forward must reconcile with depreciation and asset movements",
+        "pt": "Movimentacao do valor contabil liquido deve conciliar com depreciacao e movimentacoes de ativos"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "tax_provision",
       "rule": "Tax Expense = Current Tax + Deferred Tax",
-      "description": { "en": "Total income tax expense should equal the sum of current and deferred tax provisions", "pt": "Despesa total de imposto de renda deve ser igual a soma das provisoes de imposto corrente e diferido" },
+      "description": {
+        "en": "Total income tax expense should equal the sum of current and deferred tax provisions",
+        "pt": "Despesa total de imposto de renda deve ser igual a soma das provisoes de imposto corrente e diferido"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "fx_translation",
       "rule": "Translated Balance = Local Balance * Exchange Rate",
-      "description": { "en": "Foreign currency balances multiplied by the applicable exchange rate must match translated balances", "pt": "Saldos em moeda estrangeira multiplicados pela taxa de cambio aplicavel devem coincidir com saldos convertidos" },
+      "description": {
+        "en": "Foreign currency balances multiplied by the applicable exchange rate must match translated balances",
+        "pt": "Saldos em moeda estrangeira multiplicados pela taxa de cambio aplicavel devem coincidir com saldos convertidos"
+      },
       "tolerance": 0.02,
       "action": "warn_if_mismatch"
     },
     {
       "id": "consolidation",
       "rule": "Parent + Subsidiaries - Eliminations = Consolidated",
-      "description": { "en": "Consolidated figures must equal parent plus subsidiaries minus intercompany eliminations", "pt": "Valores consolidados devem ser iguais a controladora mais subsidiarias menos eliminacoes intercompanhia" },
+      "description": {
+        "en": "Consolidated figures must equal parent plus subsidiaries minus intercompany eliminations",
+        "pt": "Valores consolidados devem ser iguais a controladora mais subsidiarias menos eliminacoes intercompanhia"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "opening_closing_balance",
       "rule": "Opening Balance + Period Activity = Closing Balance",
-      "description": { "en": "Any account's closing balance must equal its opening balance plus net activity in the period", "pt": "Saldo final de qualquer conta deve ser igual ao saldo inicial mais atividade liquida no periodo" },
+      "description": {
+        "en": "Any account's closing balance must equal its opening balance plus net activity in the period",
+        "pt": "Saldo final de qualquer conta deve ser igual ao saldo inicial mais atividade liquida no periodo"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "journal_entry_balance",
       "rule": "SUM(debit_lines) = SUM(credit_lines) per journal entry",
-      "description": { "en": "Every journal entry must have equal debit and credit totals", "pt": "Cada lancamento contabil deve ter totais iguais de debito e credito" },
-      "tolerance": 0.00,
+      "description": {
+        "en": "Every journal entry must have equal debit and credit totals",
+        "pt": "Cada lancamento contabil deve ter totais iguais de debito e credito"
+      },
+      "tolerance": 0,
       "action": "reject_if_mismatch"
     },
     {
       "id": "sub_ledger_to_gl",
       "rule": "Sub-ledger Total = General Ledger Control Account",
-      "description": { "en": "Sub-ledger totals (AR, AP, inventory) must agree with the general ledger control accounts", "pt": "Totais dos razoes auxiliares (CR, CP, estoque) devem coincidir com as contas de controle do razao geral" },
+      "description": {
+        "en": "Sub-ledger totals (AR, AP, inventory) must agree with the general ledger control accounts",
+        "pt": "Totais dos razoes auxiliares (CR, CP, estoque) devem coincidir com as contas de controle do razao geral"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     },
     {
       "id": "retained_earnings",
       "rule": "Opening RE + Net Income - Dividends = Closing RE",
-      "description": { "en": "Retained earnings roll-forward must reconcile with net income and declared dividends", "pt": "Movimentacao de lucros acumulados deve conciliar com lucro liquido e dividendos declarados" },
+      "description": {
+        "en": "Retained earnings roll-forward must reconcile with net income and declared dividends",
+        "pt": "Movimentacao de lucros acumulados deve conciliar com lucro liquido e dividendos declarados"
+      },
       "tolerance": 0.01,
       "action": "warn_if_mismatch"
     }
@@ -1244,7 +2922,11 @@
     {
       "role": "date_column",
       "confidence": "high",
-      "signals": ["header contains 'date' or 'data'", "values match date formats (YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY)", "sequential date values detected"],
+      "signals": [
+        "header contains 'date' or 'data'",
+        "values match date formats (YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY)",
+        "sequential date values detected"
+      ],
       "inferredType": "datetime",
       "inferredAxis": "x",
       "suggestedFormat": "YYYY-MM-DD"
@@ -1252,7 +2934,11 @@
     {
       "role": "id_column",
       "confidence": "high",
-      "signals": ["header contains 'id', 'ID', 'codigo', or 'code'", "all values are unique", "values are alphanumeric identifiers"],
+      "signals": [
+        "header contains 'id', 'ID', 'codigo', or 'code'",
+        "all values are unique",
+        "values are alphanumeric identifiers"
+      ],
       "inferredType": "identifier",
       "inferredAxis": "key",
       "suggestedFormat": "text"
@@ -1260,7 +2946,11 @@
     {
       "role": "amount_column",
       "confidence": "high",
-      "signals": ["header contains 'amount', 'valor', 'value', or 'total'", "values are numeric with optional currency symbols", "values have consistent decimal places"],
+      "signals": [
+        "header contains 'amount', 'valor', 'value', or 'total'",
+        "values are numeric with optional currency symbols",
+        "values have consistent decimal places"
+      ],
       "inferredType": "currency",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1268,7 +2958,11 @@
     {
       "role": "category_column",
       "confidence": "medium",
-      "signals": ["header contains 'category', 'categoria', 'type', or 'tipo'", "limited distinct values relative to row count", "values are short text strings"],
+      "signals": [
+        "header contains 'category', 'categoria', 'type', or 'tipo'",
+        "limited distinct values relative to row count",
+        "values are short text strings"
+      ],
       "inferredType": "categorical",
       "inferredAxis": "group",
       "suggestedFormat": "text"
@@ -1276,7 +2970,11 @@
     {
       "role": "name_column",
       "confidence": "medium",
-      "signals": ["header contains 'name', 'nome', 'description', or 'descricao'", "values are text strings with mixed case", "values contain spaces and are human-readable"],
+      "signals": [
+        "header contains 'name', 'nome', 'description', or 'descricao'",
+        "values are text strings with mixed case",
+        "values contain spaces and are human-readable"
+      ],
       "inferredType": "text",
       "inferredAxis": "label",
       "suggestedFormat": "text"
@@ -1284,7 +2982,11 @@
     {
       "role": "description_column",
       "confidence": "medium",
-      "signals": ["header contains 'description', 'descricao', 'notes', or 'obs'", "values are longer text strings", "average character length exceeds 20"],
+      "signals": [
+        "header contains 'description', 'descricao', 'notes', or 'obs'",
+        "values are longer text strings",
+        "average character length exceeds 20"
+      ],
       "inferredType": "text",
       "inferredAxis": "label",
       "suggestedFormat": "text"
@@ -1292,7 +2994,11 @@
     {
       "role": "quantity_column",
       "confidence": "high",
-      "signals": ["header contains 'quantity', 'quantidade', 'qty', or 'qtd'", "values are non-negative integers or simple decimals", "no currency symbols present"],
+      "signals": [
+        "header contains 'quantity', 'quantidade', 'qty', or 'qtd'",
+        "values are non-negative integers or simple decimals",
+        "no currency symbols present"
+      ],
       "inferredType": "numeric",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0"
@@ -1300,7 +3006,11 @@
     {
       "role": "price_column",
       "confidence": "high",
-      "signals": ["header contains 'price', 'preco', 'unit price', or 'preco unitario'", "values are positive numbers with 2 decimal places", "optional currency symbol prefix"],
+      "signals": [
+        "header contains 'price', 'preco', 'unit price', or 'preco unitario'",
+        "values are positive numbers with 2 decimal places",
+        "optional currency symbol prefix"
+      ],
       "inferredType": "currency",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1308,7 +3018,11 @@
     {
       "role": "percentage_column",
       "confidence": "high",
-      "signals": ["header contains '%', 'percent', 'pct', 'percentual', or 'taxa'", "values between 0 and 100 or between 0 and 1", "optional % suffix on values"],
+      "signals": [
+        "header contains '%', 'percent', 'pct', 'percentual', or 'taxa'",
+        "values between 0 and 100 or between 0 and 1",
+        "optional % suffix on values"
+      ],
       "inferredType": "percentage",
       "inferredAxis": "y",
       "suggestedFormat": "0.00%"
@@ -1316,7 +3030,11 @@
     {
       "role": "currency_column",
       "confidence": "high",
-      "signals": ["header contains 'currency', 'moeda', or 'ccy'", "values are 3-letter ISO currency codes", "limited set of distinct values (USD, EUR, BRL, etc.)"],
+      "signals": [
+        "header contains 'currency', 'moeda', or 'ccy'",
+        "values are 3-letter ISO currency codes",
+        "limited set of distinct values (USD, EUR, BRL, etc.)"
+      ],
       "inferredType": "categorical",
       "inferredAxis": "metadata",
       "suggestedFormat": "text"
@@ -1324,7 +3042,11 @@
     {
       "role": "email_column",
       "confidence": "high",
-      "signals": ["header contains 'email' or 'e-mail'", "values match email pattern (user@domain.tld)", "values contain @ symbol"],
+      "signals": [
+        "header contains 'email' or 'e-mail'",
+        "values match email pattern (user@domain.tld)",
+        "values contain @ symbol"
+      ],
       "inferredType": "email",
       "inferredAxis": "key",
       "suggestedFormat": "text"
@@ -1332,7 +3054,11 @@
     {
       "role": "phone_column",
       "confidence": "medium",
-      "signals": ["header contains 'phone', 'telefone', 'tel', or 'celular'", "values match phone number patterns with optional country code", "values contain digits, spaces, dashes, or parentheses"],
+      "signals": [
+        "header contains 'phone', 'telefone', 'tel', or 'celular'",
+        "values match phone number patterns with optional country code",
+        "values contain digits, spaces, dashes, or parentheses"
+      ],
       "inferredType": "phone",
       "inferredAxis": "metadata",
       "suggestedFormat": "text"
@@ -1340,7 +3066,11 @@
     {
       "role": "address_column",
       "confidence": "medium",
-      "signals": ["header contains 'address', 'endereco', 'street', or 'rua'", "values contain numbers followed by text", "values are relatively long text with commas or line breaks"],
+      "signals": [
+        "header contains 'address', 'endereco', 'street', or 'rua'",
+        "values contain numbers followed by text",
+        "values are relatively long text with commas or line breaks"
+      ],
       "inferredType": "text",
       "inferredAxis": "metadata",
       "suggestedFormat": "text"
@@ -1348,7 +3078,11 @@
     {
       "role": "status_column",
       "confidence": "high",
-      "signals": ["header contains 'status', 'state', 'estado', or 'situacao'", "very few distinct values (typically 2-6)", "values suggest lifecycle states (active/inactive, open/closed, pending/approved)"],
+      "signals": [
+        "header contains 'status', 'state', 'estado', or 'situacao'",
+        "very few distinct values (typically 2-6)",
+        "values suggest lifecycle states (active/inactive, open/closed, pending/approved)"
+      ],
       "inferredType": "categorical",
       "inferredAxis": "filter",
       "suggestedFormat": "text"
@@ -1356,7 +3090,11 @@
     {
       "role": "boolean_column",
       "confidence": "high",
-      "signals": ["header contains 'is_', 'has_', 'active', 'ativo', or 'flag'", "exactly 2 distinct values", "values are true/false, yes/no, 1/0, sim/nao"],
+      "signals": [
+        "header contains 'is_', 'has_', 'active', 'ativo', or 'flag'",
+        "exactly 2 distinct values",
+        "values are true/false, yes/no, 1/0, sim/nao"
+      ],
       "inferredType": "boolean",
       "inferredAxis": "filter",
       "suggestedFormat": "text"
@@ -1364,7 +3102,11 @@
     {
       "role": "url_column",
       "confidence": "high",
-      "signals": ["header contains 'url', 'link', 'website', or 'site'", "values start with http://, https://, or www.", "values contain domain-like patterns"],
+      "signals": [
+        "header contains 'url', 'link', 'website', or 'site'",
+        "values start with http://, https://, or www.",
+        "values contain domain-like patterns"
+      ],
       "inferredType": "url",
       "inferredAxis": "metadata",
       "suggestedFormat": "text"
@@ -1372,7 +3114,11 @@
     {
       "role": "count_column",
       "confidence": "medium",
-      "signals": ["header contains 'count', 'contagem', 'number of', or 'num'", "values are non-negative integers", "no currency symbols or percentage signs"],
+      "signals": [
+        "header contains 'count', 'contagem', 'number of', or 'num'",
+        "values are non-negative integers",
+        "no currency symbols or percentage signs"
+      ],
       "inferredType": "integer",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0"
@@ -1380,7 +3126,11 @@
     {
       "role": "rate_column",
       "confidence": "medium",
-      "signals": ["header contains 'rate', 'taxa', 'ratio', or 'razao'", "values are decimal numbers typically between 0 and 1 or 0 and 100", "no currency symbols present"],
+      "signals": [
+        "header contains 'rate', 'taxa', 'ratio', or 'razao'",
+        "values are decimal numbers typically between 0 and 1 or 0 and 100",
+        "no currency symbols present"
+      ],
       "inferredType": "decimal",
       "inferredAxis": "y",
       "suggestedFormat": "0.00"
@@ -1388,7 +3138,11 @@
     {
       "role": "score_column",
       "confidence": "medium",
-      "signals": ["header contains 'score', 'pontuacao', 'rating', or 'nota'", "values are numeric within a bounded range", "often integers from 1-5 or 1-10 or 0-100"],
+      "signals": [
+        "header contains 'score', 'pontuacao', 'rating', or 'nota'",
+        "values are numeric within a bounded range",
+        "often integers from 1-5 or 1-10 or 0-100"
+      ],
       "inferredType": "numeric",
       "inferredAxis": "y",
       "suggestedFormat": "0.0"
@@ -1396,7 +3150,11 @@
     {
       "role": "rank_column",
       "confidence": "medium",
-      "signals": ["header contains 'rank', 'ranking', 'posicao', or 'position'", "values are positive integers", "values are sequential or nearly sequential"],
+      "signals": [
+        "header contains 'rank', 'ranking', 'posicao', or 'position'",
+        "values are positive integers",
+        "values are sequential or nearly sequential"
+      ],
       "inferredType": "integer",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0"
@@ -1404,7 +3162,11 @@
     {
       "role": "label_column",
       "confidence": "low",
-      "signals": ["header contains 'label', 'rotulo', 'tag', or 'etiqueta'", "values are short text strings", "moderate cardinality relative to row count"],
+      "signals": [
+        "header contains 'label', 'rotulo', 'tag', or 'etiqueta'",
+        "values are short text strings",
+        "moderate cardinality relative to row count"
+      ],
       "inferredType": "categorical",
       "inferredAxis": "group",
       "suggestedFormat": "text"
@@ -1412,7 +3174,11 @@
     {
       "role": "code_column",
       "confidence": "medium",
-      "signals": ["header contains 'code', 'codigo', 'sku', or 'part number'", "values are alphanumeric with consistent length or pattern", "all values are unique or near-unique"],
+      "signals": [
+        "header contains 'code', 'codigo', 'sku', or 'part number'",
+        "values are alphanumeric with consistent length or pattern",
+        "all values are unique or near-unique"
+      ],
       "inferredType": "identifier",
       "inferredAxis": "key",
       "suggestedFormat": "text"
@@ -1420,7 +3186,11 @@
     {
       "role": "reference_column",
       "confidence": "medium",
-      "signals": ["header contains 'ref', 'reference', 'referencia', or 'invoice'", "values are alphanumeric identifiers", "values follow a consistent pattern (e.g., INV-001, PO-2024-0001)"],
+      "signals": [
+        "header contains 'ref', 'reference', 'referencia', or 'invoice'",
+        "values are alphanumeric identifiers",
+        "values follow a consistent pattern (e.g., INV-001, PO-2024-0001)"
+      ],
       "inferredType": "identifier",
       "inferredAxis": "key",
       "suggestedFormat": "text"
@@ -1428,7 +3198,11 @@
     {
       "role": "notes_column",
       "confidence": "low",
-      "signals": ["header contains 'notes', 'notas', 'comments', 'comentarios', or 'remarks'", "many cells are empty or contain free-form text", "high average character length with high variance"],
+      "signals": [
+        "header contains 'notes', 'notas', 'comments', 'comentarios', or 'remarks'",
+        "many cells are empty or contain free-form text",
+        "high average character length with high variance"
+      ],
       "inferredType": "text",
       "inferredAxis": "metadata",
       "suggestedFormat": "text"
@@ -1436,7 +3210,11 @@
     {
       "role": "total_column",
       "confidence": "high",
-      "signals": ["header contains 'total', 'grand total', or 'total geral'", "values equal the sum of other numeric columns in the same row", "positioned as the last numeric column or in a summary row"],
+      "signals": [
+        "header contains 'total', 'grand total', or 'total geral'",
+        "values equal the sum of other numeric columns in the same row",
+        "positioned as the last numeric column or in a summary row"
+      ],
       "inferredType": "currency",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1444,7 +3222,11 @@
     {
       "role": "subtotal_column",
       "confidence": "high",
-      "signals": ["header contains 'subtotal', 'sub-total', or 'subtotal parcial'", "values are numeric and typically less than the total column", "appears before tax or discount columns"],
+      "signals": [
+        "header contains 'subtotal', 'sub-total', or 'subtotal parcial'",
+        "values are numeric and typically less than the total column",
+        "appears before tax or discount columns"
+      ],
       "inferredType": "currency",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1452,7 +3234,11 @@
     {
       "role": "tax_column",
       "confidence": "high",
-      "signals": ["header contains 'tax', 'imposto', 'vat', 'iva', 'icms', or 'iss'", "values are numeric and proportional to subtotal", "values are positive and smaller than the subtotal"],
+      "signals": [
+        "header contains 'tax', 'imposto', 'vat', 'iva', 'icms', or 'iss'",
+        "values are numeric and proportional to subtotal",
+        "values are positive and smaller than the subtotal"
+      ],
       "inferredType": "currency",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1460,7 +3246,11 @@
     {
       "role": "discount_column",
       "confidence": "high",
-      "signals": ["header contains 'discount', 'desconto', 'rebate', or 'abatimento'", "values are numeric, often negative or shown as positive deductions", "values are smaller than the subtotal"],
+      "signals": [
+        "header contains 'discount', 'desconto', 'rebate', or 'abatimento'",
+        "values are numeric, often negative or shown as positive deductions",
+        "values are smaller than the subtotal"
+      ],
       "inferredType": "currency",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1468,7 +3258,11 @@
     {
       "role": "unit_column",
       "confidence": "medium",
-      "signals": ["header contains 'unit', 'unidade', 'uom', or 'unit of measure'", "values are short text codes (kg, m, pcs, un)", "low cardinality with repeated values"],
+      "signals": [
+        "header contains 'unit', 'unidade', 'uom', or 'unit of measure'",
+        "values are short text codes (kg, m, pcs, un)",
+        "low cardinality with repeated values"
+      ],
       "inferredType": "categorical",
       "inferredAxis": "metadata",
       "suggestedFormat": "text"
@@ -1476,7 +3270,11 @@
     {
       "role": "metric_column",
       "confidence": "medium",
-      "signals": ["header contains 'metric', 'metrica', 'kpi', or 'measure'", "values are numeric with varied magnitudes", "header or context suggests a measured quantity"],
+      "signals": [
+        "header contains 'metric', 'metrica', 'kpi', or 'measure'",
+        "values are numeric with varied magnitudes",
+        "header or context suggests a measured quantity"
+      ],
       "inferredType": "numeric",
       "inferredAxis": "y",
       "suggestedFormat": "#,##0.00"
@@ -1485,133 +3283,199 @@
   "dontInferRules": [
     {
       "id": "no_infer_from_single_cell",
-      "rule": { "en": "Never infer column type from a single cell value", "pt": "Nunca inferir tipo de coluna a partir de uma unica celula" },
+      "rule": {
+        "en": "Never infer column type from a single cell value",
+        "pt": "Nunca inferir tipo de coluna a partir de uma unica celula"
+      },
       "severity": "hard",
       "reason": "Single values are unreliable; a number in one cell could be an ID, quantity, or currency amount"
     },
     {
       "id": "no_currency_from_symbol_alone",
-      "rule": { "en": "Never assume currency from a symbol alone without locale context", "pt": "Nunca assumir moeda apenas pelo simbolo sem contexto de localidade" },
+      "rule": {
+        "en": "Never assume currency from a symbol alone without locale context",
+        "pt": "Nunca assumir moeda apenas pelo simbolo sem contexto de localidade"
+      },
       "severity": "hard",
       "reason": "The $ symbol is used by USD, CAD, AUD, MXN, and others; the yen symbol is shared with CNY"
     },
     {
       "id": "no_year_from_4digit",
-      "rule": { "en": "Never infer a year from any 4-digit number without date context", "pt": "Nunca inferir um ano a partir de qualquer numero de 4 digitos sem contexto de data" },
+      "rule": {
+        "en": "Never infer a year from any 4-digit number without date context",
+        "pt": "Nunca inferir um ano a partir de qualquer numero de 4 digitos sem contexto de data"
+      },
       "severity": "hard",
       "reason": "4-digit numbers can be quantities, codes, prices, or IDs, not just years"
     },
     {
       "id": "no_percent_over_100",
-      "rule": { "en": "Never silently treat values over 100 as percentages without confirmation", "pt": "Nunca tratar silenciosamente valores acima de 100 como percentuais sem confirmacao" },
+      "rule": {
+        "en": "Never silently treat values over 100 as percentages without confirmation",
+        "pt": "Nunca tratar silenciosamente valores acima de 100 como percentuais sem confirmacao"
+      },
       "severity": "hard",
       "reason": "Values above 100 may be raw numbers mislabeled as percentages, or growth rates that legitimately exceed 100%"
     },
     {
       "id": "no_date_without_samples",
-      "rule": { "en": "Never infer date format without at least 3 sample values", "pt": "Nunca inferir formato de data sem pelo menos 3 valores de amostra" },
+      "rule": {
+        "en": "Never infer date format without at least 3 sample values",
+        "pt": "Nunca inferir formato de data sem pelo menos 3 valores de amostra"
+      },
       "severity": "hard",
       "reason": "Date formats are ambiguous (01/02/03 could be MM/DD/YY, DD/MM/YY, or YY/MM/DD); multiple samples needed"
     },
     {
       "id": "no_merge_without_instruction",
-      "rule": { "en": "Never merge cells or columns without explicit user instruction", "pt": "Nunca mesclar celulas ou colunas sem instrucao explicita do usuario" },
+      "rule": {
+        "en": "Never merge cells or columns without explicit user instruction",
+        "pt": "Nunca mesclar celulas ou colunas sem instrucao explicita do usuario"
+      },
       "severity": "hard",
       "reason": "Merging is destructive and may lose data; always requires user confirmation"
     },
     {
       "id": "no_assume_header_row",
-      "rule": { "en": "Never assume the first row is the header without structural validation", "pt": "Nunca assumir que a primeira linha e o cabecalho sem validacao estrutural" },
+      "rule": {
+        "en": "Never assume the first row is the header without structural validation",
+        "pt": "Nunca assumir que a primeira linha e o cabecalho sem validacao estrutural"
+      },
       "severity": "hard",
       "reason": "Spreadsheets may have title rows, blank rows, or metadata rows above the actual header"
     },
     {
       "id": "no_infer_kpi_direction",
-      "rule": { "en": "Never infer whether higher or lower is better for an unknown metric", "pt": "Nunca inferir se maior ou menor e melhor para uma metrica desconhecida" },
+      "rule": {
+        "en": "Never infer whether higher or lower is better for an unknown metric",
+        "pt": "Nunca inferir se maior ou menor e melhor para uma metrica desconhecida"
+      },
       "severity": "hard",
       "reason": "Direction depends on business context; cost vs revenue, churn vs retention have opposite semantics"
     },
     {
       "id": "no_assume_usd_default",
-      "rule": { "en": "Never default to USD when no currency is specified", "pt": "Nunca assumir USD como padrao quando nenhuma moeda e especificada" },
+      "rule": {
+        "en": "Never default to USD when no currency is specified",
+        "pt": "Nunca assumir USD como padrao quando nenhuma moeda e especificada"
+      },
       "severity": "hard",
       "reason": "Currency assumption depends on user locale, document origin, and business context"
     },
     {
       "id": "no_infer_causation",
-      "rule": { "en": "Never infer causal relationships from correlated columns", "pt": "Nunca inferir relacoes causais a partir de colunas correlacionadas" },
+      "rule": {
+        "en": "Never infer causal relationships from correlated columns",
+        "pt": "Nunca inferir relacoes causais a partir de colunas correlacionadas"
+      },
       "severity": "hard",
       "reason": "Correlation does not imply causation; statistical relationships require domain validation"
     },
     {
       "id": "no_extrapolate_beyond_data",
-      "rule": { "en": "Never extrapolate trends beyond the range of available data", "pt": "Nunca extrapolar tendencias alem do intervalo dos dados disponiveis" },
+      "rule": {
+        "en": "Never extrapolate trends beyond the range of available data",
+        "pt": "Nunca extrapolar tendencias alem do intervalo dos dados disponiveis"
+      },
       "severity": "hard",
       "reason": "Extrapolation assumes patterns continue unchanged, which is unreliable without domain justification"
     },
     {
       "id": "no_assume_calendar_year",
-      "rule": { "en": "Never assume calendar year when fiscal year might apply", "pt": "Nunca assumir ano civil quando o ano fiscal pode ser aplicavel" },
+      "rule": {
+        "en": "Never assume calendar year when fiscal year might apply",
+        "pt": "Nunca assumir ano civil quando o ano fiscal pode ser aplicavel"
+      },
       "severity": "soft",
       "reason": "Many companies use fiscal years starting in months other than January"
     },
     {
       "id": "no_infer_negative_means_loss",
-      "rule": { "en": "Never assume negative values represent losses without context", "pt": "Nunca assumir que valores negativos representam prejuizo sem contexto" },
+      "rule": {
+        "en": "Never assume negative values represent losses without context",
+        "pt": "Nunca assumir que valores negativos representam prejuizo sem contexto"
+      },
       "severity": "hard",
       "reason": "Negative values can represent credits, reversals, returns, adjustments, or sign conventions"
     },
     {
       "id": "no_auto_fill_missing",
-      "rule": { "en": "Never auto-fill missing values with zeros or averages without instruction", "pt": "Nunca preencher automaticamente valores ausentes com zeros ou medias sem instrucao" },
+      "rule": {
+        "en": "Never auto-fill missing values with zeros or averages without instruction",
+        "pt": "Nunca preencher automaticamente valores ausentes com zeros ou medias sem instrucao"
+      },
       "severity": "hard",
       "reason": "Missing data may represent nulls, not-applicable, or not-yet-available; filling changes semantics"
     },
     {
       "id": "no_infer_time_zone",
-      "rule": { "en": "Never assume time zone for timestamps without explicit information", "pt": "Nunca assumir fuso horario para timestamps sem informacao explicita" },
+      "rule": {
+        "en": "Never assume time zone for timestamps without explicit information",
+        "pt": "Nunca assumir fuso horario para timestamps sem informacao explicita"
+      },
       "severity": "soft",
       "reason": "Time zone assumptions can shift dates across day boundaries, affecting period-based calculations"
     },
     {
       "id": "no_round_without_instruction",
-      "rule": { "en": "Never round numeric values without explicit user instruction", "pt": "Nunca arredondar valores numericos sem instrucao explicita do usuario" },
+      "rule": {
+        "en": "Never round numeric values without explicit user instruction",
+        "pt": "Nunca arredondar valores numericos sem instrucao explicita do usuario"
+      },
       "severity": "hard",
       "reason": "Rounding can introduce material errors in financial calculations and reconciliations"
     },
     {
       "id": "no_dedupe_without_instruction",
-      "rule": { "en": "Never remove duplicate rows without explicit user instruction", "pt": "Nunca remover linhas duplicadas sem instrucao explicita do usuario" },
+      "rule": {
+        "en": "Never remove duplicate rows without explicit user instruction",
+        "pt": "Nunca remover linhas duplicadas sem instrucao explicita do usuario"
+      },
       "severity": "hard",
       "reason": "Apparent duplicates may represent legitimate repeated transactions or entries"
     },
     {
       "id": "no_change_column_order",
-      "rule": { "en": "Never reorder columns without explicit user instruction", "pt": "Nunca reordenar colunas sem instrucao explicita do usuario" },
+      "rule": {
+        "en": "Never reorder columns without explicit user instruction",
+        "pt": "Nunca reordenar colunas sem instrucao explicita do usuario"
+      },
       "severity": "hard",
       "reason": "Column order may be significant for downstream processes, formulas, or user workflows"
     },
     {
       "id": "no_infer_hierarchy",
-      "rule": { "en": "Never infer parent-child hierarchy from indentation or naming patterns alone", "pt": "Nunca inferir hierarquia pai-filho apenas a partir de indentacao ou padroes de nomenclatura" },
+      "rule": {
+        "en": "Never infer parent-child hierarchy from indentation or naming patterns alone",
+        "pt": "Nunca inferir hierarquia pai-filho apenas a partir de indentacao ou padroes de nomenclatura"
+      },
       "severity": "soft",
       "reason": "Visual indentation may be decorative; naming patterns may be coincidental"
     },
     {
       "id": "no_infer_formula_intent",
-      "rule": { "en": "Never assume the intent of a formula beyond its literal computation", "pt": "Nunca assumir a intencao de uma formula alem de sua computacao literal" },
+      "rule": {
+        "en": "Never assume the intent of a formula beyond its literal computation",
+        "pt": "Nunca assumir a intencao de uma formula alem de sua computacao literal"
+      },
       "severity": "hard",
       "reason": "A SUM formula might be a subtotal, a total, a running balance, or a validation check"
     },
     {
       "id": "no_assume_locale",
-      "rule": { "en": "Never assume number format locale without explicit signals", "pt": "Nunca assumir localidade de formato numerico sem sinais explicitos" },
+      "rule": {
+        "en": "Never assume number format locale without explicit signals",
+        "pt": "Nunca assumir localidade de formato numerico sem sinais explicitos"
+      },
       "severity": "hard",
       "reason": "1.234 means 1234 in pt-BR but 1.234 in en-US; misinterpretation changes values by 1000x"
     },
     {
       "id": "no_assume_data_clean",
-      "rule": { "en": "Never assume data is clean, validated, or free of errors", "pt": "Nunca assumir que os dados estao limpos, validados ou livres de erros" },
+      "rule": {
+        "en": "Never assume data is clean, validated, or free of errors",
+        "pt": "Nunca assumir que os dados estao limpos, validados ou livres de erros"
+      },
       "severity": "hard",
       "reason": "Real-world spreadsheets contain typos, mixed formats, merged cells, and manual entry errors"
     }

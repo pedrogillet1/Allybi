@@ -146,7 +146,7 @@
           {
             "path": "metrics.topConfidence",
             "op": "lt",
-            "value": 0.55
+            "value": 0.28
           }
         ]
       },
@@ -156,7 +156,8 @@
         "strategy": "ask_clarification_or_hedge"
       },
       "reasonCode": "low_confidence",
-      "severity": "medium"
+      "severity": "medium",
+      "_note": "threshold lowered from 0.55 to 0.28: encrypted-only mode disables lexical/structural search, so finalScore is capped at ~0.52 (semantic weight). Original 0.55 was unreachable."
     },
     {
       "id": "fp_doc_ambiguous",
@@ -177,6 +178,71 @@
       },
       "reasonCode": "doc_ambiguous",
       "severity": "medium"
+    },
+    {
+      "id": "fp_indexing_in_progress",
+      "priority": 95,
+      "when": {
+        "all": [
+          {
+            "path": "signals.indexingInProgress",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "indexing_in_progress",
+        "strategy": "retry_after_short_backoff"
+      },
+      "reasonCode": "indexing_in_progress",
+      "severity": "medium"
+    },
+    {
+      "id": "fp_needs_doc_choice",
+      "priority": 75,
+      "when": {
+        "all": [
+          {
+            "path": "signals.needsDocChoice",
+            "op": "eq",
+            "value": true
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "doc_ambiguous",
+        "strategy": "ask_minimal_disambiguation"
+      },
+      "reasonCode": "needs_doc_choice",
+      "severity": "medium"
+    },
+    {
+      "id": "fp_explicit_doc_not_found",
+      "priority": 85,
+      "when": {
+        "all": [
+          {
+            "path": "signals.explicitDocRef",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.resolvedDocId",
+            "op": "eq",
+            "value": ""
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "doc_not_found",
+        "strategy": "request_precise_doc_selection"
+      },
+      "reasonCode": "explicit_doc_not_found",
+      "severity": "high"
     }
   ]
 }

@@ -41,7 +41,8 @@ export class EvidenceValidator {
                 ) / 1000
               : 0,
           validated:
-            currentProvenance.validated === true && scopedSnippetRefs.length > 0,
+            currentProvenance.validated === true &&
+            scopedSnippetRefs.length > 0,
           failureCode:
             scopedSnippetRefs.length > 0 ? null : "out_of_scope_provenance",
         }
@@ -64,11 +65,15 @@ export class EvidenceValidator {
       next.scopeRelaxReason = "out_of_scope_sources_removed";
     }
 
-    let provenanceMissing =
+    const hasScopedSources = scopedSources.length > 0;
+    const provenanceMissing =
       Boolean(nextProvenance?.required) &&
       (nextProvenance?.snippetRefs?.length ?? 0) === 0;
 
-    if (evidenceRequired && (scopedSources.length === 0 || provenanceMissing)) {
+    // Lexical snippetRefs can be empty even for grounded answers (cross-language
+    // paraphrases, numeric extracts). If scoped sources remain, do not surface a
+    // hard missing_provenance failure.
+    if (evidenceRequired && !hasScopedSources) {
       next.status = "partial";
       next.failureCode =
         next.failureCode ||

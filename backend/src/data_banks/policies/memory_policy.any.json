@@ -136,10 +136,10 @@
       "gateway": {
         "userTextCharCap": 12000,
         "systemBlockCharCap": 5000,
-        "dialogueTurnLimit": 48,
+        "dialogueTurnLimit": 20,
         "dialogueMessageCharCap": 1600,
-        "dialogueCharBudget": 26000,
-        "memoryPackCharCap": 32000
+        "dialogueCharBudget": 12000,
+        "memoryPackCharCap": 16000
       },
       "semanticRetrieval": {
         "enableGlobalEvidenceSearch": true,

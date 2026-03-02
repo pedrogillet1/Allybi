@@ -3,6 +3,7 @@ import { URLSearchParams } from "url";
 import { google, gmail_v1 } from "googleapis";
 
 import type { ConnectorProvider } from "../connectorsRegistry";
+import { markOAuthStateNonceUsedDurable } from "../oauthStateNonceStore.service";
 import { TokenVaultService } from "../tokenVault.service";
 
 export interface GmailOAuthContext {
@@ -52,6 +53,8 @@ interface SignedStatePayload {
   userId: string;
   provider: "gmail";
   issuedAt: number;
+  iat: number;
+  nonce: string;
   redirectAfter?: string;
   extState?: string;
   callbackUrl?: string;
@@ -202,6 +205,20 @@ function resolveStateSigningKey(): Buffer {
   return crypto.createHash("sha256").update(fallback).digest();
 }
 
+function resolveIssuedAtMs(payload: SignedStatePayload): number {
+  if (Number.isFinite(payload.issuedAt)) return payload.issuedAt;
+  if (Number.isFinite(payload.iat)) return payload.iat * 1000;
+  return Number.NaN;
+}
+
+function resolveIssuedAtSec(payload: SignedStatePayload): number {
+  if (Number.isFinite(payload.iat)) return Math.floor(payload.iat);
+  if (Number.isFinite(payload.issuedAt)) {
+    return Math.floor(payload.issuedAt / 1000);
+  }
+  return Number.NaN;
+}
+
 function signState(payload: SignedStatePayload): string {
   const key = resolveStateSigningKey();
   const payloadEncoded = base64UrlEncode(JSON.stringify(payload));
@@ -265,13 +282,23 @@ function verifyState(
     );
   }
 
-  if (
-    !Number.isFinite(payload.issuedAt) ||
-    Date.now() - payload.issuedAt > DEFAULT_STATE_TTL_MS
-  ) {
+  const issuedAtMs = resolveIssuedAtMs(payload);
+  if (!Number.isFinite(issuedAtMs) || Date.now() - issuedAtMs > DEFAULT_STATE_TTL_MS) {
     throw new GmailOAuthError(
       "OAuth state expired. Retry connect flow.",
       "STATE_EXPIRED",
+    );
+  }
+  if (!payload.nonce?.trim()) {
+    throw new GmailOAuthError(
+      "OAuth state nonce is missing.",
+      "STATE_NONCE_MISSING",
+    );
+  }
+  if (!Number.isFinite(resolveIssuedAtSec(payload))) {
+    throw new GmailOAuthError(
+      "OAuth state timing is invalid.",
+      "STATE_INVALID_TIMING",
     );
   }
 
@@ -323,13 +350,23 @@ function verifyStateWithoutExpectedUser(state: string): SignedStatePayload {
     );
   }
 
-  if (
-    !Number.isFinite(payload.issuedAt) ||
-    Date.now() - payload.issuedAt > DEFAULT_STATE_TTL_MS
-  ) {
+  const issuedAtMs = resolveIssuedAtMs(payload);
+  if (!Number.isFinite(issuedAtMs) || Date.now() - issuedAtMs > DEFAULT_STATE_TTL_MS) {
     throw new GmailOAuthError(
       "OAuth state expired. Retry connect flow.",
       "STATE_EXPIRED",
+    );
+  }
+  if (!payload.nonce?.trim()) {
+    throw new GmailOAuthError(
+      "OAuth state nonce is missing.",
+      "STATE_NONCE_MISSING",
+    );
+  }
+  if (!Number.isFinite(resolveIssuedAtSec(payload))) {
+    throw new GmailOAuthError(
+      "OAuth state timing is invalid.",
+      "STATE_INVALID_TIMING",
     );
   }
 
@@ -344,6 +381,22 @@ export class GmailOAuthService {
 
   constructor(tokenVault: TokenVaultService = new TokenVaultService()) {
     this.tokenVault = tokenVault;
+  }
+
+  private async consumeStateNonce(payload: SignedStatePayload): Promise<void> {
+    const issuedAtSec = resolveIssuedAtSec(payload);
+    const ok = await markOAuthStateNonceUsedDurable(
+      "gmail",
+      payload.userId,
+      payload.nonce,
+      issuedAtSec,
+    );
+    if (!ok) {
+      throw new GmailOAuthError(
+        "OAuth state was already used. Retry connect flow.",
+        "STATE_REPLAY_DETECTED",
+      );
+    }
   }
 
   createAuthUrl(input: GmailAuthUrlInput): GmailAuthUrlResult {
@@ -366,6 +419,8 @@ export class GmailOAuthService {
       userId,
       provider: "gmail",
       issuedAt: Date.now(),
+      iat: Math.floor(Date.now() / 1000),
+      nonce: crypto.randomUUID(),
       redirectAfter: input.redirectAfter?.trim() || undefined,
     };
 
@@ -415,6 +470,8 @@ export class GmailOAuthService {
       userId,
       provider: "gmail",
       issuedAt: Date.now(),
+      iat: Math.floor(Date.now() / 1000),
+      nonce: crypto.randomUUID(),
       extState: input.state?.trim() || undefined,
       callbackUrl,
     });
@@ -463,6 +520,7 @@ export class GmailOAuthService {
 
     if (input.state?.trim()) {
       const verified = verifyState(input.state.trim(), userId);
+      await this.consumeStateNonce(verified);
       redirectUri =
         resolveCallbackUrlOverride(verified.callbackUrl) || redirectUri;
     }
@@ -604,6 +662,7 @@ export class GmailOAuthService {
     }
 
     const verified = verifyStateWithoutExpectedUser(state);
+    await this.consumeStateNonce(verified);
     const code = input.code?.trim();
     if (!code) {
       throw new GmailOAuthError(
@@ -615,7 +674,6 @@ export class GmailOAuthService {
     const result = await this.exchangeCodeAndStoreToken({
       userId: verified.userId,
       code,
-      state,
       callbackUrlOverride: verified.callbackUrl,
     });
 

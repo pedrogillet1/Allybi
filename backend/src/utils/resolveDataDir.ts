@@ -124,8 +124,8 @@ export const REQUIRED_PROMPT_CONFIG_FILES = [
 export const OPTIONAL_PROMPT_CONFIG_FILES = [
   "normalizers/language_profiles.any.json",
   "quality/debug_labels.any.json",
-  "policies/capabilities_catalog.any.json",
-  "routing/fallback_router.any.json",
+  "semantics/capabilities_catalog.any.json",
+  "fallbacks/fallback_router.any.json",
   "routing/intent_patterns.any.json",
   "microcopy/koda_product_help.any.json",
 ];

@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "id": "clarification_policy_excel_calc",
     "bankId": "clarification_policy_excel_calc",
     "version": "1.0.0",
     "description": "Clarification and disambiguation policy for the Excel Calculation Agent enforcing ASK_ONE_BEST_QUESTION when required slots are missing or ambiguous, with domain-specific disambiguation rules for statistical and financial calculations.",

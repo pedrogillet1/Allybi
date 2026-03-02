@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "id": "citation_styles",
+    "version": "1.0.0",
+    "description": "Citation cleanup policies for inline evidence artifact stripping.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "stripInlineArtifacts": true,
+    "allowInlineBracketRefs": false
+  },
+  "rules": [
+    {
+      "id": "CS_001_strip_bracket_refs",
+      "description": "Strip [1], [2] refs from answer",
+      "action": "STRIP",
+      "pattern": "\\[\\d+\\]"
+    },
+    {
+      "id": "CS_002_strip_inline_source_labels",
+      "description": "Strip Source:/Fonte: inline",
+      "action": "STRIP",
+      "pattern": "\\b(?:Source|Fonte|Fuente)\\s*:"
+    },
+    {
+      "id": "CS_003_attribution_via_buttons_only",
+      "description": "Attribution via source_buttons only",
+      "action": "ENFORCE"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "CS_T01",
+        "input": "Revenue was $5M [1].",
+        "expect": "Revenue was $5M."
+      }
+    ]
+  }
+}

@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "description": "English intent patterns for DOCX editing operations.",
     "domain": "docx",
-    "lastUpdated": "2026-02-28",
+    "lastUpdated": "2026-03-02",
     "languages": [
       "en"
     ]
@@ -127,7 +127,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -178,7 +179,6 @@
           "reword",
           "formal",
           "professional",
-          "more",
           "tone",
           "paragraph"
         ]
@@ -249,7 +249,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -368,7 +369,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -488,7 +490,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -512,8 +515,6 @@
         "tokens_any": [
           "replace",
           "substitute",
-          "text",
-          "change",
           "hello",
           "goodbye",
           "paragraph"
@@ -526,7 +527,8 @@
           "page break",
           "section break",
           "chart",
-          "spreadsheet"
+          "spreadsheet",
+          "find"
         ]
       },
       "slotExtractors": [
@@ -735,7 +737,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -749,7 +752,7 @@
       "id": "docx.find_replace",
       "domain": "docx",
       "lang": "en",
-      "priority": 85,
+      "priority": 90,
       "triggers": {
         "tokens_any": [
           "find",
@@ -924,7 +927,7 @@
           "Case sensitive find and replace \"Name\" with \"FullName\"",
           "Replace \"ID\" with \"Identifier\" matching exact case",
           "Find and replace \"API\" with \"Interface\" case sensitive",
-          "Apply find_replace case_sensitive to the selected paragraph."
+          "Run a case-sensitive find and replace on the selected paragraph."
         ],
         "negative": [
           "Find and replace all occurrences",
@@ -1711,7 +1714,12 @@
       "priority": 76,
       "triggers": {
         "tokens_any": [
-          "size"
+          "font_size",
+          "font size",
+          "pt",
+          "points",
+          "bigger",
+          "smaller"
         ],
         "tokens_none": [
           "convert",
@@ -2030,11 +2038,9 @@
           "\\balign\\b.*\\b(?:to the)?\\s*left\\b"
         ],
         "tokens_any": [
-          "align",
-          "alignment",
-          "left",
-          "paragraph",
-          "text"
+          "align left",
+          "left-align",
+          "left align"
         ],
         "tokens_none": [
           "rewrite",
@@ -2073,7 +2079,7 @@
           "Left align this paragraph",
           "Align left",
           "Align the text to the left",
-          "Apply align left to the selected paragraph."
+          "Align text to the left on the selected paragraph."
         ],
         "negative": [
           "Center this",
@@ -2127,11 +2133,9 @@
           "\\balign\\b.*\\b(?:to the)?\\s*right\\b"
         ],
         "tokens_any": [
-          "align",
-          "alignment",
-          "right",
-          "paragraph",
-          "text"
+          "align right",
+          "right-align",
+          "right align"
         ],
         "tokens_none": [
           "rewrite",
@@ -2170,7 +2174,7 @@
           "Right align this paragraph",
           "Align right",
           "Align the text to the right",
-          "Apply align right to the selected paragraph."
+          "Align text to the right on the selected paragraph."
         ],
         "negative": [
           "Center this",
@@ -2316,12 +2320,9 @@
           "\\b(?:change|set|increase|decrease)\\b.*\\bline\\s*spacing\\b"
         ],
         "tokens_any": [
-          "spacing",
-          "line",
-          "double",
-          "change",
-          "single",
-          "paragraph"
+          "line spacing",
+          "single spacing",
+          "double spacing"
         ],
         "tokens_none": [
           "rewrite",
@@ -2422,12 +2423,9 @@
           "\\b(?:before|after)\\b.*\\bspacing\\b"
         ],
         "tokens_any": [
-          "spacing",
-          "paragraph",
-          "increase",
-          "space",
-          "after",
-          "before"
+          "paragraph spacing",
+          "space before",
+          "space after"
         ],
         "tokens_none": [
           "rewrite",
@@ -2721,7 +2719,6 @@
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
@@ -2741,8 +2738,7 @@
       "priority": 78,
       "triggers": {
         "tokens_any": [
-          "number",
-          "numbered",
+          "numbered list",
           "numbering"
         ],
         "tokens_none": [
@@ -2832,7 +2828,6 @@
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
@@ -2945,7 +2940,6 @@
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
@@ -3065,7 +3059,6 @@
         "docx.list.remove",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
@@ -3189,7 +3182,6 @@
         "docx.list.remove",
         "docx.list.promote",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
@@ -3308,125 +3300,6 @@
         "docx.list.remove",
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
-        "docx.list.bullets_to_paragraph",
-        "docx.list.numbered_to_bullets",
-        "docx.list.bullets_to_numbered",
-        "docx.list.restart_numbering"
-      ],
-      "clarifyIfMissing": [
-        {
-          "slot": "target",
-          "ask_en": "Which target should I change?",
-          "ask_pt": "Qual alvo devo alterar?"
-        }
-      ]
-    },
-    {
-      "id": "docx.list.bullets_to_paragraph",
-      "domain": "docx",
-      "lang": "en",
-      "priority": 84,
-      "triggers": {
-        "tokens_none": [
-          "add",
-          "create",
-          "apply",
-          "numbering",
-          "numbered",
-          "rewrite",
-          "summarize",
-          "bold",
-          "italic",
-          "underline",
-          "color",
-          "font",
-          "size",
-          "align",
-          "rephrase",
-          "translate",
-          "table of contents",
-          "toc",
-          "page break",
-          "section break"
-        ],
-        "regex_any": [
-          "\\b(?:convert|turn|change|transform)\\b.*\\bbullets?\\b.*\\b(?:to|into)\\b.*\\b(?:paragraph|text|prose|plain)\\b",
-          "\\b(?:remove)\\b.*\\b(?:bullets?|list)\\b.*\\b(?:and\\s+)?(?:convert|make)\\b.*\\bparagraph\\b"
-        ],
-        "tokens_any": [
-          "list",
-          "bullets",
-          "bullet",
-          "paragraph",
-          "paragraphs",
-          "convert",
-          "turn"
-        ]
-      },
-      "slotExtractors": [
-        {
-          "type": "LOCATOR_TEXT",
-          "out": "target"
-        }
-      ],
-      "scopeRules": {
-        "defaultScope": "selection",
-        "allowScopeOverrideByExplicitRange": false,
-        "allowNoSelectionIfRangeProvided": false,
-        "allowMultiSelection": true
-      },
-      "planTemplate": [
-        {
-          "op": "DOCX_LIST_REMOVE",
-          "targets": [
-            "$target"
-          ]
-        }
-      ],
-      "examples": {
-        "positive": [
-          "Convert bullets to paragraphs",
-          "Turn bullet list into plain text",
-          "Change bullets to regular paragraphs",
-          "Apply list bullets_to_paragraph to the selected paragraph."
-        ],
-        "negative": [
-          "Convert paragraphs to bullets",
-          "Add bullet points",
-          "Summarize"
-        ]
-      },
-      "disambiguationGroup": "docx.list_transform",
-      "scoreAdjustments": {
-        "boostIfTokensPresent": [
-          "list",
-          "bullets"
-        ],
-        "penalizeIfTokensPresent": [
-          "add",
-          "create",
-          "apply",
-          "numbering",
-          "numbered",
-          "rewrite",
-          "summarize",
-          "bold",
-          "italic",
-          "underline",
-          "color",
-          "font"
-        ],
-        "boostPoints": 14,
-        "penaltyPoints": 12
-      },
-      "requiresContext": {},
-      "mutuallyExclusiveWith": [
-        "docx.list.bullets",
-        "docx.list.numbering",
-        "docx.list.remove",
-        "docx.list.promote",
-        "docx.list.convert_to_paragraphs",
-        "docx.list.paragraph_to_bullets",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
@@ -3546,7 +3419,6 @@
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.bullets_to_numbered",
         "docx.list.restart_numbering"
       ],
@@ -3664,7 +3536,6 @@
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.restart_numbering"
       ],
@@ -4056,13 +3927,8 @@
           "\\b(?:new|add)\\b.*\\bparagraph\\b.*\\b(?:after|below)\\b"
         ],
         "tokens_any": [
-          "insert",
-          "add",
-          "after",
-          "paragraph",
-          "below",
-          "introduction",
-          "blank"
+          "insert after",
+          "add paragraph after"
         ]
       },
       "slotExtractors": [
@@ -4173,13 +4039,8 @@
           "\\b(?:new|add)\\b.*\\bparagraph\\b.*\\b(?:before|above)\\b"
         ],
         "tokens_any": [
-          "insert",
-          "add",
-          "before",
-          "paragraph",
-          "above",
-          "conclusion",
-          "blank"
+          "insert before",
+          "add paragraph before"
         ]
       },
       "slotExtractors": [
@@ -4289,12 +4150,8 @@
           "\\bparagraph\\b(?!.*\\b(?:format(?:ting)?|style|styles?)\\b).*\\b(?:delete|remove|drop)\\b"
         ],
         "tokens_any": [
-          "delete",
-          "remove",
-          "paragraph",
-          "selected",
-          "drop",
-          "above"
+          "delete paragraph",
+          "remove paragraph"
         ]
       },
       "slotExtractors": [
@@ -4967,10 +4824,8 @@
           "rephrase",
           "reword",
           "casual",
-          "more",
           "tone",
-          "friendlier",
-          "text"
+          "friendlier"
         ]
       },
       "slotExtractors": [
@@ -5039,6 +4894,127 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "target",
+          "ask_en": "Which target should I change?",
+          "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
+    },
+    {
+      "id": "docx.rewrite.informal",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 81,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:make|rewrite|rephrase)\\b.*\\b(?:informal|casual|relaxed|colloquial)\\b",
+          "\\bmore\\s+(?:informal|casual|colloquial)\\b"
+        ],
+        "tokens_none": [
+          "convert",
+          "transform",
+          "merge",
+          "split",
+          "insert",
+          "delete",
+          "remove",
+          "table of contents",
+          "TOC",
+          "summary",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "align",
+          "heading",
+          "bullets",
+          "numbering",
+          "page break",
+          "section break",
+          "translate"
+        ],
+        "tokens_any": [
+          "rewrite",
+          "rephrase",
+          "informal",
+          "casual",
+          "colloquial",
+          "relaxed",
+          "tone"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$target",
+          "tone": "informal"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Make this more informal",
+          "Rewrite in a casual tone",
+          "Make it more colloquial",
+          "Use a more relaxed tone"
+        ],
+        "negative": [
+          "Make this more formal",
+          "Summarize the text"
+        ]
+      },
+      "disambiguationGroup": "docx.rewrite_variant",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "rewrite",
+          "rephrase"
+        ],
+        "penalizeIfTokensPresent": [
+          "convert",
+          "transform",
+          "merge",
+          "split",
+          "insert",
+          "delete",
+          "remove",
+          "table of contents",
+          "TOC",
+          "summary",
+          "bold",
+          "italic"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.rewrite.paragraph",
+        "docx.rewrite.formal",
+        "docx.rewrite.concise",
+        "docx.rewrite.expand",
+        "docx.rewrite.section",
+        "docx.rewrite.friendly",
+        "docx.rewrite.correct_grammar",
+        "docx.rewrite.casual",
+        "docx.rewrite.instructions",
+        "docx.translate.section",
+        "docx.translate.document",
         "docx.summarize.to_bullets"
       ],
       "clarifyIfMissing": [
@@ -5080,11 +5056,9 @@
           "format",
           "style",
           "bold",
-          "text",
           "remove",
           "unbold",
-          "selected",
-          "turn"
+          "selected"
         ]
       },
       "slotExtractors": [
@@ -5190,8 +5164,6 @@
           "style",
           "italic",
           "remove",
-          "text",
-          "turn",
           "clear",
           "formatting"
         ]
@@ -5298,8 +5270,6 @@
           "style",
           "underline",
           "remove",
-          "text",
-          "turn",
           "clear",
           "formatting"
         ]
@@ -5414,7 +5384,6 @@
           "rephrase",
           "reword",
           "instructions",
-          "more",
           "paragraph",
           "sounds",
           "persuasive"
@@ -5491,7 +5460,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -5608,7 +5578,6 @@
         "docx.list.promote",
         "docx.list.convert_to_paragraphs",
         "docx.list.paragraph_to_bullets",
-        "docx.list.bullets_to_paragraph",
         "docx.list.numbered_to_bullets",
         "docx.list.bullets_to_numbered"
       ],
@@ -5827,7 +5796,8 @@
         "docx.rewrite.friendly",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -5883,9 +5853,7 @@
           "friendly",
           "friendlier",
           "warmer",
-          "tone",
-          "text",
-          "more"
+          "tone"
         ]
       },
       "slotExtractors": [
@@ -5953,7 +5921,8 @@
         "docx.rewrite.correct_grammar",
         "docx.translate.section",
         "docx.translate.document",
-        "docx.summarize.to_bullets"
+        "docx.summarize.to_bullets",
+        "docx.rewrite.informal"
       ],
       "clarifyIfMissing": [
         {
@@ -6477,22 +6446,15 @@
       "id": "docx.toc.insert",
       "domain": "docx",
       "lang": "en",
-      "priority": 78,
+      "priority": 77,
       "triggers": {
         "regex_any": [
           "\\b(?:insert|add|create|generate)\\b.*\\b(?:table\\s+of\\s+contents?|TOC|toc)\\b",
           "\\b(?:table\\s+of\\s+contents?|TOC)\\b.*\\b(?:automatic|auto)\\b"
         ],
         "tokens_any": [
-          "toc",
           "table of contents",
-          "insert",
-          "add",
-          "table",
-          "contents",
-          "create",
-          "generate",
-          "automatic"
+          "toc"
         ],
         "tokens_none": [
           "rewrite",
@@ -6502,13 +6464,18 @@
           "bullets",
           "numbering",
           "font",
-          "color"
+          "color",
+          "update",
+          "refresh",
+          "regenerate",
+          "rebuild"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "target"
+          "out": "target",
+          "defaultValue": "document"
         }
       ],
       "scopeRules": {
@@ -6529,9 +6496,8 @@
       },
       "planTemplate": [
         {
-          "op": "DOCX_INSERT_BEFORE",
-          "targetId": "$target",
-          "afterText": "$llmGenerated",
+          "op": "DOCX_UPDATE_TOC",
+          "targets": "$target",
           "_hint": "toc_insert"
         }
       ],
@@ -6566,9 +6532,7 @@
         "boostPoints": 14,
         "penaltyPoints": 12
       },
-      "requiresContext": {
-        "selectionHint": true
-      },
+      "requiresContext": {},
       "mutuallyExclusiveWith": [
         "docx.toc.update",
         "docx.page_break",
@@ -6579,11 +6543,6 @@
           "slot": "target",
           "ask_en": "Which target should I change?",
           "ask_pt": "Qual alvo devo alterar?"
-        },
-        {
-          "slot": "llmGenerated",
-          "ask_en": "What value should I use?",
-          "ask_pt": "Qual valor devo usar?"
         }
       ]
     },
@@ -6591,7 +6550,7 @@
       "id": "docx.toc.update",
       "domain": "docx",
       "lang": "en",
-      "priority": 78,
+      "priority": 79,
       "triggers": {
         "regex_any": [
           "\\b(?:update|refresh|regenerate|rebuild)\\b.*\\b(?:table\\s+of\\s+contents?|TOC|toc)\\b",
@@ -6614,13 +6573,18 @@
           "bullets",
           "numbering",
           "font",
-          "color"
+          "color",
+          "insert",
+          "add",
+          "create",
+          "generate"
         ]
       },
       "slotExtractors": [
         {
           "type": "LOCATOR_TEXT",
-          "out": "target"
+          "out": "target",
+          "defaultValue": "document"
         }
       ],
       "scopeRules": {
@@ -6641,8 +6605,8 @@
       },
       "planTemplate": [
         {
-          "op": "DOCX_REWRITE_SECTION",
-          "sectionId": "$target",
+          "op": "DOCX_UPDATE_TOC",
+          "targets": "$target",
           "_hint": "toc_update"
         }
       ],
@@ -6677,9 +6641,7 @@
         "boostPoints": 14,
         "penaltyPoints": 12
       },
-      "requiresContext": {
-        "selectionHint": true
-      },
+      "requiresContext": {},
       "mutuallyExclusiveWith": [
         "docx.toc.insert",
         "docx.page_break",
@@ -6753,7 +6715,7 @@
           "Insert a page break before this paragraph",
           "Add a page break here",
           "Put a page break after the introduction",
-          "Apply page_break to the selected paragraph."
+          "Insert a page break on the selected paragraph."
         ],
         "negative": [
           "Insert a section break",
@@ -6856,7 +6818,7 @@
           "Insert a section break here",
           "Add a continuous section break",
           "Insert next-page section break before chapter 3",
-          "Apply section_break to the selected paragraph."
+          "Insert a section break on the selected paragraph."
         ],
         "negative": [
           "Insert a page break",
@@ -6895,6 +6857,398 @@
           "slot": "target",
           "ask_en": "Which target should I change?",
           "ask_pt": "Qual alvo devo alterar?"
+        }
+      ]
+    },
+    {
+      "id": "docx.table.create",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 79,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:create|insert|add)\\b.*\\b(?:table)\\b",
+          "\\b(?:table)\\b.*\\b(?:with)\\b.*\\b(?:rows?|columns?|cols?)\\b"
+        ],
+        "tokens_any": [
+          "table",
+          "create table",
+          "insert table"
+        ],
+        "tokens_none": [
+          "rewrite",
+          "rephrase",
+          "translate",
+          "summarize",
+          "toc",
+          "table of contents"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets",
+          "defaultValue": "document_end"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "rows",
+          "regex": "\\b(?:rows?)\\s*(?:=|:)?\\s*(\\d{1,2})\\b",
+          "defaultValue": 3
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "cols",
+          "regex": "\\b(?:columns?|cols?)\\s*(?:=|:)?\\s*(\\d{1,2})\\b",
+          "defaultValue": 3
+        },
+        {
+          "type": "BOOLEAN_FLAG",
+          "out": "headerRow",
+          "defaultValue": true
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_CREATE_TABLE",
+          "targets": "$targets",
+          "rows": "$rows",
+          "cols": "$cols",
+          "headerRow": "$headerRow"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Create a table with 4 rows and 3 columns",
+          "Insert a table here",
+          "Add table rows 5 columns 2"
+        ],
+        "negative": [
+          "Update table of contents",
+          "Rewrite this paragraph"
+        ]
+      },
+      "disambiguationGroup": "docx.table_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "table",
+          "rows",
+          "columns"
+        ],
+        "penalizeIfTokensPresent": [
+          "table of contents",
+          "toc"
+        ],
+        "boostPoints": 12,
+        "penaltyPoints": 18
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.toc.insert",
+        "docx.toc.update"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "targets",
+          "ask_en": "Where should I insert the table?",
+          "ask_pt": "Onde devo inserir a tabela?"
+        }
+      ]
+    },
+    {
+      "id": "docx.table.add_row",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 79,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:add|insert)\\b.*\\b(?:row)\\b.*\\b(?:table)\\b",
+          "\\b(?:table)\\s*(\\d+)\\b.*\\b(?:add|insert)\\b.*\\b(?:row)\\b"
+        ],
+        "tokens_any": [
+          "add row",
+          "insert row",
+          "table row"
+        ],
+        "tokens_none": [
+          "rewrite",
+          "rephrase",
+          "translate",
+          "toc",
+          "table of contents"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "tableIndex",
+          "regex": "\\b(?:table)\\s*(\\d+)\\b",
+          "defaultValue": 1
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "rowIndex",
+          "regex": "\\b(?:row)\\s*(\\d+)\\b"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "position",
+          "regex": "\\b(before|after|top|bottom|start|end)\\b",
+          "defaultValue": "end"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_ADD_TABLE_ROW",
+          "tableIndex": "$tableIndex",
+          "rowIndex": "$rowIndex",
+          "position": "$position"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Add a row to table 1",
+          "Insert row after row 2 in table 3"
+        ],
+        "negative": [
+          "Delete row 2 from table 1",
+          "Create a new table"
+        ]
+      },
+      "disambiguationGroup": "docx.table_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "table",
+          "row",
+          "add"
+        ],
+        "penalizeIfTokensPresent": [
+          "delete",
+          "toc",
+          "table of contents"
+        ],
+        "boostPoints": 12,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.table.delete_row",
+        "docx.table.set_cell"
+      ]
+    },
+    {
+      "id": "docx.table.delete_row",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 79,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:delete|remove)\\b.*\\b(?:row)\\b.*\\b(?:table)\\b",
+          "\\b(?:table)\\s*(\\d+)\\b.*\\b(?:delete|remove)\\b.*\\b(?:row)\\s*(\\d+)\\b"
+        ],
+        "tokens_any": [
+          "delete row",
+          "remove row",
+          "table row"
+        ],
+        "tokens_none": [
+          "rewrite",
+          "rephrase",
+          "translate",
+          "toc",
+          "table of contents"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "tableIndex",
+          "regex": "\\b(?:table)\\s*(\\d+)\\b",
+          "defaultValue": 1
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "rowIndex",
+          "regex": "\\b(?:row)\\s*(\\d+)\\b"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_DELETE_TABLE_ROW",
+          "tableIndex": "$tableIndex",
+          "rowIndex": "$rowIndex"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Delete row 2 from table 1",
+          "Remove row 5 in table 3"
+        ],
+        "negative": [
+          "Add a row in table 1",
+          "Set table cell value"
+        ]
+      },
+      "disambiguationGroup": "docx.table_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "table",
+          "row",
+          "delete",
+          "remove"
+        ],
+        "penalizeIfTokensPresent": [
+          "add",
+          "toc",
+          "table of contents"
+        ],
+        "boostPoints": 12,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.table.add_row",
+        "docx.table.set_cell"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "tableIndex",
+          "ask_en": "Which table should I edit?",
+          "ask_pt": "Qual tabela devo editar?"
+        },
+        {
+          "slot": "rowIndex",
+          "ask_en": "Which row should I delete?",
+          "ask_pt": "Qual linha devo remover?"
+        }
+      ]
+    },
+    {
+      "id": "docx.table.set_cell",
+      "domain": "docx",
+      "lang": "en",
+      "priority": 80,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:set|update|change)\\b.*\\b(?:table)\\b.*\\b(?:row)\\b.*\\b(?:col(?:umn)?)\\b",
+          "\\b(?:table)\\s*(\\d+)\\b.*\\b(?:row)\\s*(\\d+)\\b.*\\b(?:col(?:umn)?)\\s*(\\d+)\\b"
+        ],
+        "tokens_any": [
+          "set cell",
+          "update cell",
+          "table cell"
+        ],
+        "tokens_none": [
+          "rewrite",
+          "rephrase",
+          "translate",
+          "toc",
+          "table of contents"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "tableIndex",
+          "regex": "\\b(?:table)\\s*(\\d+)\\b",
+          "defaultValue": 1
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "rowIndex",
+          "regex": "\\b(?:row)\\s*(\\d+)\\b"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "colIndex",
+          "regex": "\\b(?:col(?:umn)?)\\s*(\\d+)\\b"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "text",
+          "regex": "\\b(?:to|as|=|with)\\s+[\"']?([^\"']+)[\"']?\\s*$"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_TABLE_CELL",
+          "tableIndex": "$tableIndex",
+          "rowIndex": "$rowIndex",
+          "colIndex": "$colIndex",
+          "text": "$text"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Set table 1 row 2 column 3 to Revenue",
+          "Update table 2 row 4 col 1 to Total"
+        ],
+        "negative": [
+          "Delete row 2 from table 1",
+          "Create a table"
+        ]
+      },
+      "disambiguationGroup": "docx.table_action",
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "table",
+          "row",
+          "column",
+          "cell"
+        ],
+        "penalizeIfTokensPresent": [
+          "delete",
+          "toc",
+          "table of contents"
+        ],
+        "boostPoints": 13,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {},
+      "mutuallyExclusiveWith": [
+        "docx.table.add_row",
+        "docx.table.delete_row"
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "tableIndex",
+          "ask_en": "Which table should I edit?",
+          "ask_pt": "Qual tabela devo editar?"
+        },
+        {
+          "slot": "rowIndex",
+          "ask_en": "Which row should I edit?",
+          "ask_pt": "Qual linha devo editar?"
+        },
+        {
+          "slot": "colIndex",
+          "ask_en": "Which column should I edit?",
+          "ask_pt": "Qual coluna devo editar?"
+        },
+        {
+          "slot": "text",
+          "ask_en": "What text should I place in that cell?",
+          "ask_pt": "Qual texto devo colocar nessa célula?"
         }
       ]
     }

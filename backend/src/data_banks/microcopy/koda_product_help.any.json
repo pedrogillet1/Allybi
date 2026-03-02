@@ -1,260 +1,255 @@
 {
   "_meta": {
     "id": "koda_product_help",
-    "version": "1.0.0",
-    "description": "Product help content with capability claims mapped to real operators.",
-    "languages": [
-      "any",
-      "en",
-      "pt",
-      "es"
-    ],
+    "version": "1.1.0",
+    "description": "Deterministic product-help bank aligned to capabilities_catalog and allybi_capabilities.",
+    "languages": ["any", "en", "pt", "es"],
     "lastUpdated": "2026-03-01",
     "owner": "koda-product"
   },
   "config": {
     "enabled": true,
-    "defaultLanguage": "en",
-    "maxStarterPrompts": 8,
-    "maxFollowUpPrompts": 8
+    "defaultTopic": "capabilities_overview",
+    "maxSnippetChars": 260
   },
-  "capabilitiesOverview": [
-    {
-      "id": "doc_grounded_answers",
-      "title": {
-        "en": "Document-grounded answers",
-        "pt": "Respostas baseadas em documentos",
-        "es": "Respuestas basadas en documentos"
+  "sources": {
+    "capabilitiesCatalog": "semantics/capabilities_catalog.any.json",
+    "allybiCapabilities": "semantics/allybi_capabilities.any.json"
+  },
+  "sections": {
+    "capabilities_overview": {
+      "copy": {
+        "en": "Supports document Q&A, navigation, DOCX editing, XLSX editing, and connector/email actions when available.",
+        "pt": "Suporta perguntas e respostas em documentos, navegacao, edicao de DOCX, edicao de XLSX e acoes de conectores/email quando disponiveis.",
+        "es": "Admite preguntas y respuestas sobre documentos, navegacion, edicion de DOCX, edicion de XLSX y acciones de conectores/email cuando esten disponibles."
       },
-      "summary": {
-        "en": "Summarize, extract, quote, and compare using retrieved evidence.",
-        "pt": "Resuma, extraia, cite e compare usando evidencia recuperada.",
-        "es": "Resume, extrae, cita y compara usando evidencia recuperada."
+      "sourceGroups": ["docs_qa", "search_nav", "editing", "connectors_email"]
+    },
+    "by_domain_capabilities": {
+      "docs_qa": {
+        "copy": {
+          "en": "Summarize, extract, quote, and compare grounded content.",
+          "pt": "Resumir, extrair, citar e comparar conteudo fundamentado.",
+          "es": "Resumir, extraer, citar y comparar contenido fundamentado."
+        },
+        "sourceGroup": "docs_qa"
       },
-      "operators": [
-        "summarize",
-        "extract",
-        "quote",
-        "compare",
-        "locate_content"
+      "docx_editing": {
+        "copy": {
+          "en": "Rewrite/replace text, insert/delete structure, and apply formatting with preview before apply.",
+          "pt": "Reescrever/substituir texto, inserir/excluir estrutura e aplicar formatacao com previa antes de aplicar.",
+          "es": "Reescribir/reemplazar texto, insertar/eliminar estructura y aplicar formato con vista previa antes de aplicar."
+        },
+        "sourceOperators": [
+          "DOCX_REWRITE_PARAGRAPH",
+          "DOCX_REPLACE_SPAN",
+          "DOCX_INSERT_AFTER",
+          "DOCX_INSERT_BEFORE",
+          "DOCX_DELETE_PARAGRAPH",
+          "DOCX_SET_RUN_STYLE",
+          "DOCX_SET_ALIGNMENT"
+        ]
+      },
+      "xlsx_editing": {
+        "copy": {
+          "en": "Edit values/ranges, formulas, tables, sort/filter, and chart operations via supported XLSX operators.",
+          "pt": "Editar valores/intervalos, formulas, tabelas, ordenacao/filtro e operacoes de graficos via operadores XLSX suportados.",
+          "es": "Editar valores/rangos, formulas, tablas, ordenacion/filtro y operaciones de graficos mediante operadores XLSX soportados."
+        },
+        "sourceOperators": [
+          "XLSX_SET_CELL_VALUE",
+          "XLSX_SET_RANGE_VALUES",
+          "XLSX_SET_CELL_FORMULA",
+          "XLSX_SET_RANGE_FORMULAS",
+          "XLSX_TABLE_CREATE",
+          "XLSX_SORT_RANGE",
+          "XLSX_FILTER_APPLY",
+          "XLSX_CHART_CREATE",
+          "XLSX_CHART_SET_SERIES",
+          "XLSX_CHART_SET_TITLES",
+          "XLSX_CHART_SET_AXES",
+          "XLSX_CHART_MOVE_RESIZE",
+          "XLSX_CHART_DELETE"
+        ]
+      },
+      "connectors_email": {
+        "copy": {
+          "en": "Connector/email actions require active connection; send actions require permission.",
+          "pt": "Acoes de conector/email exigem conexao ativa; acoes de envio exigem permissao.",
+          "es": "Las acciones de conector/email requieren conexion activa; las acciones de envio requieren permiso."
+        },
+        "sourceGroup": "connectors_email"
+      },
+      "navigation": {
+        "copy": {
+          "en": "Locate files, open matched results, and list folders/files.",
+          "pt": "Localizar arquivos, abrir resultados e listar pastas/arquivos.",
+          "es": "Localizar archivos, abrir resultados y listar carpetas/archivos."
+        },
+        "sourceGroup": "search_nav"
+      }
+    },
+    "limitations_memory_scope": {
+      "notes": [
+        {
+          "id": "memory_window_finite",
+          "copy": {
+            "en": "Chat context is finite; older turns can drop as the thread grows.",
+            "pt": "O contexto do chat e finito; turnos antigos podem sair da janela conforme a conversa cresce.",
+            "es": "El contexto del chat es finito; los turnos antiguos pueden salir de la ventana a medida que crece la conversacion."
+          }
+        },
+        {
+          "id": "new_chat_no_full_carryover",
+          "copy": {
+            "en": "A new chat does not automatically carry full prior conversation state.",
+            "pt": "Um novo chat nao carrega automaticamente todo o estado da conversa anterior.",
+            "es": "Un chat nuevo no arrastra automaticamente todo el estado previo de la conversacion."
+          }
+        },
+        {
+          "id": "xlsx_chart_runtime_requirement",
+          "copy": {
+            "en": "XLSX chart edits require sheets bridge runtime.",
+            "pt": "Edicoes de graficos em XLSX exigem runtime de sheets bridge.",
+            "es": "Las ediciones de graficos en XLSX requieren runtime de sheets bridge."
+          },
+          "source": "capabilities_catalog.groups.xlsx_charts.constraints.runtime.engineRequirement"
+        },
+        {
+          "id": "connector_permission_requirement",
+          "copy": {
+            "en": "Connector/email actions depend on active connector and permissions.",
+            "pt": "Acoes de conector/email dependem de conector ativo e permissoes.",
+            "es": "Las acciones de conector/email dependen de conector activo y permisos."
+          },
+          "source": "capabilities_catalog.groups.connectors_email.constraints.availability"
+        }
       ]
     },
-    {
-      "id": "file_navigation_and_open",
-      "title": {
-        "en": "Find and open files",
-        "pt": "Encontrar e abrir arquivos",
-        "es": "Encontrar y abrir archivos"
-      },
-      "summary": {
-        "en": "Locate files and set active context before deeper actions.",
-        "pt": "Localize arquivos e defina o contexto ativo antes de acoes mais profundas.",
-        "es": "Localiza archivos y define el contexto activo antes de acciones mas profundas."
-      },
-      "operators": [
-        "locate_docs",
-        "locate_file",
-        "open",
-        "set_active_doc",
-        "list"
+    "starter_prompts": {
+      "en": [
+        "Summarize this document in 5 bullets.",
+        "Quote the lines that support this claim.",
+        "Rewrite this paragraph to be clearer.",
+        "Update this Excel range with corrected values."
+      ],
+      "pt": [
+        "Resuma este documento em 5 bullets.",
+        "Cite as linhas que sustentam esta afirmacao.",
+        "Reescreva este paragrafo para ficar mais claro.",
+        "Atualize este intervalo do Excel com valores corrigidos."
+      ],
+      "es": [
+        "Resume este documento en 5 bullets.",
+        "Cita las lineas que respaldan esta afirmacion.",
+        "Reescribe este parrafo para que sea mas claro.",
+        "Actualiza este rango de Excel con valores corregidos."
       ]
+    },
+    "follow_up_prompts": {
+      "en": [
+        "Now restrict to section <name> only.",
+        "Show only rows for <period/entity>.",
+        "Apply the draft changes.",
+        "Undo the last edit."
+      ],
+      "pt": [
+        "Agora restrinja para a secao <nome> apenas.",
+        "Mostre somente linhas de <periodo/entidade>.",
+        "Aplique as alteracoes do rascunho.",
+        "Desfaca a ultima edicao."
+      ],
+      "es": [
+        "Ahora limita la respuesta solo a la seccion <nombre>.",
+        "Muestra solo filas de <periodo/entidad>.",
+        "Aplica los cambios del borrador.",
+        "Deshaz la ultima edicion."
+      ]
+    }
+  },
+  "editableOperationClaims": [
+    { "id": "docx_rewrite_paragraph", "operators": ["DOCX_REWRITE_PARAGRAPH"] },
+    { "id": "docx_replace_span", "operators": ["DOCX_REPLACE_SPAN"] },
+    { "id": "docx_structure_edit", "operators": ["DOCX_INSERT_AFTER", "DOCX_INSERT_BEFORE", "DOCX_DELETE_PARAGRAPH"] },
+    { "id": "docx_formatting_edit", "operators": ["DOCX_SET_RUN_STYLE", "DOCX_SET_ALIGNMENT"] },
+    { "id": "xlsx_values_ranges", "operators": ["XLSX_SET_CELL_VALUE", "XLSX_SET_RANGE_VALUES"] },
+    { "id": "xlsx_formulas", "operators": ["XLSX_SET_CELL_FORMULA", "XLSX_SET_RANGE_FORMULAS"] },
+    { "id": "xlsx_table_sort_filter", "operators": ["XLSX_TABLE_CREATE", "XLSX_SORT_RANGE", "XLSX_FILTER_APPLY"] },
+    { "id": "xlsx_chart_ops", "operators": ["XLSX_CHART_CREATE", "XLSX_CHART_SET_SERIES", "XLSX_CHART_SET_TITLES", "XLSX_CHART_SET_AXES", "XLSX_CHART_MOVE_RESIZE", "XLSX_CHART_DELETE"] }
+  ],
+  "tests": {
+    "examples": [
+      { "id": "help_overview_en", "query": "What can you do?", "expectedTopic": "capabilities_overview", "language": "en" },
+      { "id": "help_docx_pt", "query": "Quais edicoes em DOCX voce faz?", "expectedTopic": "docx_editing", "language": "pt" },
+      { "id": "help_xlsx_es", "query": "Puedes editar formulas y graficos en Excel?", "expectedTopic": "xlsx_editing", "language": "es" }
+    ],
+    "editableOperatorConsistency": {
+      "description": "Every editable claim maps to real allybi_capabilities operators.",
+      "nodeOneLiner": "node -e \"const fs=require('fs');const help=JSON.parse(fs.readFileSync('backend/src/data_banks/microcopy/koda_product_help.any.json','utf8'));const caps=JSON.parse(fs.readFileSync('backend/src/data_banks/semantics/allybi_capabilities.any.json','utf8'));const missing=[];for(const claim of help.editableOperationClaims||[]){for(const op of claim.operators||[]){if(!caps.operators||!caps.operators[op]) missing.push({claim:claim.id,operator:op});}}if(missing.length){console.error(JSON.stringify({ok:false,missing},null,2));process.exit(1);}console.log(JSON.stringify({ok:true,claims:(help.editableOperationClaims||[]).length},null,2));\""
+    }
+  },
+  "topics": [
+    {
+      "id": "capabilities_overview",
+      "aliases": ["capabilities", "features", "overview", "help"],
+      "triggers": {
+        "en": ["what can you do", "capabilities", "help"],
+        "pt": ["o que voce pode fazer", "capacidades", "ajuda"],
+        "es": ["que puedes hacer", "capacidades", "ayuda"]
+      },
+      "snippets": {
+        "en": "Supports document Q&A, navigation, DOCX/XLSX editing, and connector/email actions when available.",
+        "pt": "Suporta perguntas e respostas em documentos, navegacao, edicao DOCX/XLSX e acoes de conectores/email quando disponiveis.",
+        "es": "Admite preguntas y respuestas sobre documentos, navegacion, edicion DOCX/XLSX y acciones de conectores/email cuando esten disponibles."
+      }
     },
     {
       "id": "docx_editing",
-      "title": {
-        "en": "DOCX editing",
-        "pt": "Edicao de DOCX",
-        "es": "Edicion de DOCX"
-      },
-      "summary": {
-        "en": "Target, rewrite, format, and structure DOCX content with preview/apply flows.",
-        "pt": "Selecione alvos, reescreva, formate e ajuste estrutura em DOCX com fluxo de previa/aplicacao.",
-        "es": "Selecciona objetivos, reescribe, da formato y ajusta estructura en DOCX con flujo de vista previa/aplicar."
-      },
-      "operators": [
-        "DOCX_GET_TARGETS",
-        "DOCX_LOCK_TARGETS",
-        "DOCX_REWRITE_SECTION",
-        "DOCX_SET_TEXT_CASE",
-        "DOCX_UPDATE_TOC",
-        "DOCX_ENRICH_FROM_SOURCES"
-      ]
+      "aliases": ["docx", "word", "rewrite", "format"],
+      "operatorHints": ["DOCX_REWRITE_PARAGRAPH", "DOCX_REPLACE_SPAN", "DOCX_SET_RUN_STYLE"],
+      "snippets": {
+        "en": "DOCX editing supports rewrite/replace, structure edits, and formatting with preview before apply.",
+        "pt": "A edicao de DOCX suporta reescrita/substituicao, edicoes estruturais e formatacao com previa antes de aplicar.",
+        "es": "La edicion de DOCX admite reescritura/sustitucion, ediciones estructurales y formato con vista previa antes de aplicar."
+      }
     },
     {
       "id": "xlsx_editing",
-      "title": {
-        "en": "XLSX editing and calculations",
-        "pt": "Edicao e calculos em XLSX",
-        "es": "Edicion y calculos en XLSX"
-      },
-      "summary": {
-        "en": "Edit cells/ranges, manage sheets, and run structured aggregations.",
-        "pt": "Edite celulas/faixas, gerencie abas e execute agregacoes estruturadas.",
-        "es": "Edita celdas/rangos, gestiona hojas y ejecuta agregaciones estructuradas."
-      },
-      "operators": [
-        "XLSX_SET_CELL_VALUE",
-        "XLSX_SET_RANGE_VALUES",
-        "XLSX_INSERT_ROWS",
-        "XLSX_DELETE_COLUMNS",
-        "XLSX_ADD_SHEET",
-        "XLSX_AGGREGATION"
-      ]
-    },
-    {
-      "id": "connectors_and_email",
-      "title": {
-        "en": "Connectors and email",
-        "pt": "Conectores e email",
-        "es": "Conectores y email"
-      },
-      "summary": {
-        "en": "Use connector sync/search flows and email actions when enabled.",
-        "pt": "Use fluxos de sincronizacao/pesquisa de conectores e acoes de email quando habilitados.",
-        "es": "Usa flujos de sincronizacion/busqueda de conectores y acciones de email cuando esten habilitados."
-      },
-      "operators": [
-        "CONNECT_START",
-        "CONNECTOR_SYNC",
-        "CONNECTOR_SEARCH",
-        "EMAIL_LATEST",
-        "EMAIL_DRAFT"
-      ]
-    }
-  ],
-  "limits": [
-    {
-      "id": "requires_indexed_docs",
-      "text": {
-        "en": "Document-grounded answers require indexed files.",
-        "pt": "Respostas baseadas em documentos exigem arquivos indexados.",
-        "es": "Las respuestas basadas en documentos requieren archivos indexados."
+      "aliases": ["xlsx", "excel", "formula", "table", "chart"],
+      "operatorHints": ["XLSX_SET_CELL_VALUE", "XLSX_SET_RANGE_FORMULAS", "XLSX_CHART_CREATE"],
+      "snippets": {
+        "en": "XLSX editing supports values/ranges, formulas, tables, and chart edits (charts require sheets bridge runtime).",
+        "pt": "A edicao de XLSX suporta valores/intervalos, formulas, tabelas e edicoes de graficos (graficos exigem sheets bridge).",
+        "es": "La edicion de XLSX admite valores/rangos, formulas, tablas y ediciones de graficos (los graficos requieren sheets bridge)."
       }
     },
     {
-      "id": "scope_lock_behavior",
-      "text": {
-        "en": "With explicit doc lock, answers stay inside the selected scope.",
-        "pt": "Com bloqueio explicito de documento, as respostas ficam no escopo selecionado.",
-        "es": "Con bloqueo explicito de documento, las respuestas se mantienen en el alcance seleccionado."
+      "id": "connectors_email",
+      "aliases": ["connector", "connectors", "email", "slack"],
+      "snippets": {
+        "en": "Connector/email actions require active connector and permissions.",
+        "pt": "Acoes de conector/email exigem conector ativo e permissoes.",
+        "es": "Las acciones de conector/email requieren conector activo y permisos."
       }
     },
     {
-      "id": "extraction_quality_dependency",
-      "text": {
-        "en": "Low extraction quality can reduce confidence or trigger fallback guidance.",
-        "pt": "Qualidade baixa de extracao pode reduzir confianca ou acionar orientacao de fallback.",
-        "es": "La baja calidad de extraccion puede reducir confianza o activar guia de fallback."
+      "id": "navigation",
+      "aliases": ["find", "open", "folders", "files", "navigation"],
+      "snippets": {
+        "en": "Can locate files, open results, and list folders/files.",
+        "pt": "Pode localizar arquivos, abrir resultados e listar pastas/arquivos.",
+        "es": "Puede localizar archivos, abrir resultados y listar carpetas/archivos."
       }
-    }
-  ],
-  "starterPrompts": {
-    "en": [
-      "Summarize this file in 5 bullets.",
-      "Extract the key metrics into a table.",
-      "Quote the exact lines supporting this claim.",
-      "Compare these two files by risks and deadlines.",
-      "Find the file about vendor onboarding and open it.",
-      "Rewrite this DOCX section in a more concise style.",
-      "Insert 3 rows below this range and fill formulas.",
-      "Create a short draft email with the action items."
-    ],
-    "pt": [
-      "Resuma este arquivo em 5 bullets.",
-      "Extraia os principais indicadores em uma tabela.",
-      "Cite as linhas exatas que sustentam esta afirmacao.",
-      "Compare estes dois arquivos por riscos e prazos.",
-      "Encontre o arquivo sobre onboarding de fornecedores e abra.",
-      "Reescreva esta secao DOCX em estilo mais conciso.",
-      "Insira 3 linhas abaixo deste intervalo e preencha formulas.",
-      "Crie um rascunho curto de email com os itens de acao."
-    ],
-    "es": [
-      "Resume este archivo en 5 bullets.",
-      "Extrae los indicadores clave en una tabla.",
-      "Cita las lineas exactas que respaldan esta afirmacion.",
-      "Compara estos dos archivos por riesgos y plazos.",
-      "Encuentra el archivo sobre onboarding de proveedores y abrelo.",
-      "Reescribe esta seccion DOCX con estilo mas conciso.",
-      "Inserta 3 filas debajo de este rango y completa formulas.",
-      "Crea un borrador corto de email con los puntos de accion."
-    ]
-  },
-  "followUpPrompts": {
-    "en": [
-      "Now narrow this to only payment terms.",
-      "Show where each point appears in the source.",
-      "Turn this into a checklist with owners.",
-      "Rewrite for executive audience in under 120 words.",
-      "Apply this wording only to the selected DOCX targets.",
-      "Run the same extraction for the previous quarter file.",
-      "Group the results by vendor and total amount.",
-      "Draft a reply email using these findings."
-    ],
-    "pt": [
-      "Agora restrinja isso apenas aos termos de pagamento.",
-      "Mostre onde cada ponto aparece na fonte.",
-      "Transforme isso em checklist com responsaveis.",
-      "Reescreva para audiencia executiva em ate 120 palavras.",
-      "Aplique essa redacao apenas aos alvos DOCX selecionados.",
-      "Execute a mesma extracao para o arquivo do trimestre anterior.",
-      "Agrupe os resultados por fornecedor e valor total.",
-      "Rascunhe uma resposta de email usando esses achados."
-    ],
-    "es": [
-      "Ahora limita esto solo a terminos de pago.",
-      "Muestra donde aparece cada punto en la fuente.",
-      "Convierte esto en un checklist con responsables.",
-      "Reescribe para audiencia ejecutiva en menos de 120 palabras.",
-      "Aplica esta redaccion solo a los objetivos DOCX seleccionados.",
-      "Ejecuta la misma extraccion para el archivo del trimestre anterior.",
-      "Agrupa los resultados por proveedor y monto total.",
-      "Redacta una respuesta de email usando estos hallazgos."
-    ]
-  },
-  "topicSnippets": [
-    {
-      "topic": "limitations_memory_scope",
-      "snippet": {
-        "en": "Answers are grounded in indexed content and active scope; when scope is locked, broaden scope only with explicit user confirmation.",
-        "pt": "As respostas sao baseadas em conteudo indexado e escopo ativo; quando o escopo esta bloqueado, amplie apenas com confirmacao explicita do usuario.",
-        "es": "Las respuestas se basan en contenido indexado y alcance activo; cuando el alcance esta bloqueado, amplialo solo con confirmacion explicita del usuario."
-      },
-      "operators": [
-        "set_active_doc",
-        "locate_docs",
-        "extract",
-        "quote"
-      ]
     },
     {
-      "topic": "docx_editing",
-      "snippet": {
-        "en": "DOCX editing is target-first: resolve targets, preview changes, then apply.",
-        "pt": "A edicao DOCX e orientada por alvo: resolva alvos, veja previa e depois aplique.",
-        "es": "La edicion DOCX es orientada por objetivo: resuelve objetivos, revisa vista previa y luego aplica."
-      },
-      "operators": [
-        "DOCX_GET_TARGETS",
-        "DOCX_LOCK_TARGETS",
-        "DOCX_REWRITE_SECTION",
-        "DOCX_CLEAR_LOCK"
-      ]
-    },
-    {
-      "topic": "xlsx_editing",
-      "snippet": {
-        "en": "XLSX workflows support value/formula updates, structural edits, and sheet operations.",
-        "pt": "Fluxos XLSX suportam atualizacao de valores/formulas, edicao estrutural e operacoes de abas.",
-        "es": "Los flujos XLSX admiten actualizacion de valores/formulas, edicion estructural y operaciones de hojas."
-      },
-      "operators": [
-        "XLSX_SET_CELL_VALUE",
-        "XLSX_SET_RANGE_FORMULAS",
-        "XLSX_INSERT_ROWS",
-        "XLSX_RENAME_SHEET",
-        "XLSX_DELETE_SHEET"
-      ]
+      "id": "limitations_memory_scope",
+      "aliases": ["memory", "context", "limitations", "scope"],
+      "snippets": {
+        "en": "Context is finite in each chat; old turns can drop. New chats do not automatically carry full prior state.",
+        "pt": "O contexto e finito em cada chat; turnos antigos podem sair da janela. Novos chats nao carregam automaticamente todo o estado anterior.",
+        "es": "El contexto es finito en cada chat; los turnos antiguos pueden salir de la ventana. Los chats nuevos no arrastran automaticamente todo el estado previo."
+      }
     }
   ]
 }

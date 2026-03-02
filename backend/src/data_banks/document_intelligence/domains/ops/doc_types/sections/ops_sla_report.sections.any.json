@@ -1,0 +1,147 @@
+{
+  "_meta": {
+    "id": "di_ops_sections_ops_sla_report",
+    "version": "1.0.0",
+    "description": "Section map for SLA report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_sla_report"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "SLA report",
+        "KPI report",
+        "service level",
+        "relatorio de SLA",
+        "relatorio de indicadores"
+      ]
+    },
+    {
+      "id": "service_overview",
+      "name": {
+        "en": "Service Overview",
+        "pt": "Visao Geral do Servico"
+      },
+      "required": false,
+      "order": 2,
+      "headingAnchors": [
+        "service",
+        "contract",
+        "provider",
+        "servico",
+        "contrato"
+      ]
+    },
+    {
+      "id": "compliance_summary",
+      "name": {
+        "en": "Compliance Summary",
+        "pt": "Resumo de Conformidade"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "summary",
+        "compliance",
+        "overview",
+        "resumo",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "kpi_details",
+      "name": {
+        "en": "KPI Details",
+        "pt": "Detalhes dos KPIs"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "KPI",
+        "metric",
+        "indicator",
+        "target",
+        "indicador",
+        "meta"
+      ]
+    },
+    {
+      "id": "breaches",
+      "name": {
+        "en": "Breaches",
+        "pt": "Violacoes"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "breach",
+        "violation",
+        "non-compliance",
+        "violacao",
+        "descumprimento"
+      ]
+    },
+    {
+      "id": "penalties",
+      "name": {
+        "en": "Penalties",
+        "pt": "Penalidades"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "penalty",
+        "credit",
+        "deduction",
+        "penalidade",
+        "multa"
+      ]
+    },
+    {
+      "id": "improvement_actions",
+      "name": {
+        "en": "Improvement Actions",
+        "pt": "Acoes de Melhoria"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "improvement",
+        "action plan",
+        "recommendation",
+        "melhoria",
+        "plano de acao"
+      ]
+    },
+    {
+      "id": "footer_metadata",
+      "name": {
+        "en": "Footer Metadata",
+        "pt": "Rodape e Metadados"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "prepared by",
+        "approved by",
+        "page",
+        "document id",
+        "elaborado por"
+      ]
+    }
+  ]
+}

@@ -54,6 +54,10 @@ export interface PromptContext {
   intentFamily?: string | null;
   operator?: string | null;
   operatorFamily?: string | null;
+  uiSurface?: string | null;
+  usedBy?: string[] | null;
+  semanticFlags?: string[] | null;
+  runtimeSignals?: Record<string, any> | null;
 
   maxQuestions?: number;
   maxOptions?: number;
@@ -122,8 +126,14 @@ function normalizeWs(s: string): string {
 
 function localizedText(value: any, lang: LangCode): string {
   if (typeof value === "string") return value;
+  if (Array.isArray(value)) return value.join("\n");
   if (!value || typeof value !== "object") return "";
-  return value[lang] ?? value.any ?? value.en ?? value.pt ?? value.es ?? "";
+  const selected =
+    value[lang] ?? value.any ?? value.en ?? value.pt ?? value.es ?? "";
+  if (Array.isArray(selected)) return selected.join("\n");
+  if (typeof selected === "string") return selected;
+  if (selected == null) return "";
+  return String(selected);
 }
 
 function interpolate(
@@ -148,6 +158,84 @@ function interpolate(
   return out;
 }
 
+function hasUnresolvedTemplateToken(content: string): boolean {
+  return /\{\{[^}]+\}\}/.test(content) || /\$\{[^}]+\}/.test(content);
+}
+
+function asSlotString(value: any): string {
+  if (value == null) return "";
+  if (typeof value === "string") return value;
+  if (
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    typeof value === "bigint"
+  ) {
+    return String(value);
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function asStringArray(value: any): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((entry) => safeStr(entry).trim())
+      .filter((entry) => entry.length > 0);
+  }
+  const one = safeStr(value).trim();
+  return one ? [one] : [];
+}
+
+function toBool(value: any): boolean {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return Number.isFinite(value) && value !== 0;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return false;
+    return ["1", "true", "yes", "on"].includes(normalized);
+  }
+  return false;
+}
+
+function parseJsonObject(value: unknown): Record<string, any> | null {
+  if (!value) return null;
+  if (typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, any>;
+  }
+  if (typeof value !== "string") return null;
+  try {
+    const parsed = JSON.parse(value);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed as Record<string, any>;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function collectSignalTags(ctx: PromptContext): Set<string> {
+  const tags = new Set<string>();
+  for (const flag of asStringArray((ctx as any).semanticFlags)) {
+    tags.add(flag);
+  }
+  const signals = parseJsonObject((ctx as any).runtimeSignals)
+    ?? parseJsonObject((ctx as any).slots?.runtimeSignals);
+  if (!signals) return tags;
+
+  for (const [key, value] of Object.entries(signals)) {
+    if (toBool(value)) {
+      const normalized = safeStr(key).trim();
+      if (normalized) tags.add(normalized);
+    }
+  }
+
+  return tags;
+}
+
 function matchesWhen(when: any, ctx: PromptContext): boolean {
   if (!when || typeof when !== "object") return true;
 
@@ -155,6 +243,9 @@ function matchesWhen(when: any, ctx: PromptContext): boolean {
   const op = safeStr(ctx.operator || "");
   const of = safeStr(ctx.operatorFamily || "");
   const inf = safeStr(ctx.intentFamily || "");
+  const uiSurface = safeStr((ctx as any).uiSurface || "");
+  const usedBy = new Set(asStringArray((ctx as any).usedBy));
+  const signalTags = collectSignalTags(ctx);
 
   if (Array.isArray(when.answerModes) && when.answerModes.length) {
     if (!when.answerModes.includes(am)) return false;
@@ -170,6 +261,22 @@ function matchesWhen(when: any, ctx: PromptContext): boolean {
   }
   if (Array.isArray(when.intentFamilies) && when.intentFamilies.length) {
     if (!when.intentFamilies.includes(inf)) return false;
+  }
+  if (typeof when.uiSurfaceEquals === "string" && when.uiSurfaceEquals) {
+    if (safeStr(when.uiSurfaceEquals) !== uiSurface) return false;
+  }
+  if (Array.isArray(when.uiSurfaces) && when.uiSurfaces.length > 0) {
+    if (!when.uiSurfaces.includes(uiSurface)) return false;
+  }
+  if (Array.isArray(when.usedByAny) && when.usedByAny.length > 0) {
+    const candidates = new Set(asStringArray(when.usedByAny));
+    const match = Array.from(usedBy).some((value) => candidates.has(value));
+    if (!match) return false;
+  }
+  if (Array.isArray(when.signalsAny) && when.signalsAny.length > 0) {
+    const candidates = new Set(asStringArray(when.signalsAny));
+    const match = Array.from(signalTags).some((value) => candidates.has(value));
+    if (!match) return false;
   }
   if (typeof when.fallbackTriggered === "boolean") {
     if (Boolean(ctx.fallback?.triggered) !== Boolean(when.fallbackTriggered)) {
@@ -268,6 +375,11 @@ export class PromptRegistryService {
           const content = normalizeWs(
             interpolate(contentRaw, slots, slotsFilled),
           );
+          if (hasUnresolvedTemplateToken(content)) {
+            throw new Error(
+              `prompt_unresolved_placeholders:${bankId}:${selection.templateId}`,
+            );
+          }
           return { role, content };
         })
         .filter((m: PromptMessage) => m.content.length > 0);
@@ -404,11 +516,7 @@ export class PromptRegistryService {
       };
     }
 
-    const templates = Array.isArray(bank?.templates)
-      ? bank.templates
-      : Array.isArray(bank?.rules)
-        ? bank.rules
-        : null;
+    const templates = this.resolveTemplateEntries(bank);
 
     if (templates && templates.length) {
       const candidates = templates
@@ -500,6 +608,36 @@ export class PromptRegistryService {
   private buildSlots(ctx: PromptContext): Record<string, any> {
     const maxQuestions = clampInt(ctx.maxQuestions ?? 1, 0, 3, 1);
     const maxOptions = clampInt(ctx.maxOptions ?? 4, 2, 6, 4);
+    const customSlots =
+      ctx.slots && typeof ctx.slots === "object"
+        ? Object.fromEntries(
+            Object.entries(ctx.slots).map(([k, v]) => [k, asSlotString(v)]),
+          )
+        : {};
+    const scope =
+      (ctx as any).scope ??
+      customSlots.scope ??
+      customSlots.scopeSummary ??
+      "";
+    const docContext =
+      (ctx as any).docContext ??
+      customSlots.docContext ??
+      customSlots.docScopeSummary ??
+      "";
+    const userQuery =
+      (ctx as any).userQuery ?? (ctx as any).query ?? customSlots.userQuery ?? "";
+    const candidates =
+      (ctx as any).candidates ??
+      customSlots.candidates ??
+      customSlots.disambiguationOptions ??
+      "";
+    const candidateCount =
+      (ctx as any).candidateCount ??
+      customSlots.candidateCount ??
+      (ctx as any).disambiguation?.options?.length ??
+      0;
+    const runtimeSignals =
+      (ctx as any).runtimeSignals ?? customSlots.runtimeSignals ?? "";
 
     return {
       env: ctx.env,
@@ -518,7 +656,31 @@ export class PromptRegistryService {
       fallbackReasonCode: ctx.fallback?.reasonCode ?? "",
       toolName: ctx.tool?.toolName ?? "",
       toolHint: ctx.tool?.toolHint ?? "",
-      ...(ctx.slots ?? {}),
+      userQuery: asSlotString(userQuery),
+      domainId: asSlotString((ctx as any).domainId ?? customSlots.domainId ?? ""),
+      scope: asSlotString(scope),
+      docContext: asSlotString(docContext),
+      candidates: asSlotString(candidates),
+      candidateCount: asSlotString(candidateCount),
+      selectedDoc: asSlotString(
+        (ctx as any).selectedDoc ?? customSlots.selectedDoc ?? "",
+      ),
+      fileListMeta: asSlotString(
+        (ctx as any).fileListMeta ?? customSlots.fileListMeta ?? "",
+      ),
+      topic: asSlotString((ctx as any).topic ?? customSlots.topic ?? ""),
+      format: asSlotString((ctx as any).format ?? customSlots.format ?? ""),
+      navType: asSlotString((ctx as any).navType ?? customSlots.navType ?? ""),
+      uiSurface: asSlotString(
+        (ctx as any).uiSurface ?? customSlots.uiSurface ?? "",
+      ),
+      usedBy: asSlotString((ctx as any).usedBy ?? customSlots.usedBy ?? ""),
+      semanticFlags: asSlotString(
+        (ctx as any).semanticFlags ?? customSlots.semanticFlags ?? "",
+      ),
+      state: asSlotString((ctx as any).state ?? customSlots.state ?? ""),
+      runtimeSignals: asSlotString(runtimeSignals),
+      ...customSlots,
     };
   }
 
@@ -548,6 +710,17 @@ export class PromptRegistryService {
     guards.push(
       "- Do NOT include a Sources section in the text — sources are provided separately via UI buttons.",
     );
+    guards.push(
+      "- Never emit control/protocol wrappers like [KODA_...] blocks in user-facing output.",
+    );
+    const reasoningGuidance = String(
+      (ctx.slots as Record<string, unknown> | undefined)
+        ?.reasoningPolicyGuidance || "",
+    ).trim();
+    if (reasoningGuidance) {
+      guards.push("REASONING_POLICY:");
+      guards.push(reasoningGuidance);
+    }
 
     const guardMsg: PromptMessage = {
       role: "system",
@@ -606,6 +779,92 @@ export class PromptRegistryService {
     } catch {
       return null;
     }
+  }
+
+  private resolveTemplateEntries(bank: any): any[] | null {
+    if (Array.isArray(bank?.templates)) return bank.templates;
+    if (Array.isArray(bank?.rules)) return bank.rules;
+    if (Array.isArray(bank?.tools)) {
+      return this.convertToolEntriesToTemplates(bank.tools);
+    }
+    return null;
+  }
+
+  private convertToolEntriesToTemplates(tools: any[]): any[] {
+    return tools
+      .filter((entry) => entry && typeof entry === "object")
+      .map((entry, index) => {
+        const appliesTo = entry.appliesTo || {};
+        const appliesToKeys = Object.keys(appliesTo);
+        const supportedKeys = new Set([
+          "operators",
+          "answerMode",
+          "intentFamily",
+          "uiSurface",
+          "usedBy",
+          "signalsAny",
+        ]);
+        const unsupported = appliesToKeys.filter(
+          (key) => !supportedKeys.has(key),
+        );
+        if (unsupported.length > 0) {
+          throw new Error(
+            `prompt_tool_applies_to_unsupported_keys:${safeStr(entry.id || `tool_template_${index + 1}`)}:${unsupported.sort().join(",")}`,
+          );
+        }
+        const when: Record<string, any> = {};
+        const operators = asStringArray(appliesTo.operators);
+        if (operators.length > 0) {
+          when.operators = operators;
+        }
+        const answerModes = asStringArray(appliesTo.answerMode);
+        if (answerModes.length === 1) {
+          when.answerModeEquals = answerModes[0];
+        } else if (answerModes.length > 1) {
+          when.answerModes = answerModes;
+        }
+        const intentFamilies = asStringArray(appliesTo.intentFamily);
+        if (intentFamilies.length > 0) {
+          when.intentFamilies = intentFamilies;
+        }
+        const uiSurfaces = asStringArray(appliesTo.uiSurface);
+        if (uiSurfaces.length === 1) {
+          when.uiSurfaceEquals = uiSurfaces[0];
+        } else if (uiSurfaces.length > 1) {
+          when.uiSurfaces = uiSurfaces;
+        }
+        const usedBy = asStringArray(appliesTo.usedBy);
+        if (usedBy.length > 0) {
+          when.usedByAny = usedBy;
+        }
+        const signalsAny = asStringArray(appliesTo.signalsAny);
+        if (signalsAny.length > 0) {
+          when.signalsAny = signalsAny;
+        }
+
+        const localized: Record<string, string> = {};
+        const system = entry.system;
+        if (system && typeof system === "object") {
+          for (const [lang, raw] of Object.entries(system)) {
+            if (Array.isArray(raw)) localized[lang] = raw.join("\n");
+            else if (typeof raw === "string") localized[lang] = raw;
+          }
+        }
+
+        const content =
+          Object.keys(localized).length > 0
+            ? localized
+            : safeStr(entry.prompt || entry.text || "");
+
+        return {
+          id: safeStr(entry.id || `tool_template_${index + 1}`),
+          priority: Number.isFinite(Number(entry.priority))
+            ? Number(entry.priority)
+            : 50,
+          when,
+          messages: [{ role: "system", content }],
+        };
+      });
   }
 }
 

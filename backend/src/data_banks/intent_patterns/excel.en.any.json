@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "English intent patterns for Excel/XLSX editing operations.",
     "domain": "excel",
-    "lastUpdated": "2026-02-28",
+    "lastUpdated": "2026-03-01",
     "languages": [
       "en"
     ]
@@ -20,13 +20,14 @@
       "priority": 80,
       "triggers": {
         "tokens_any": [
-          "set",
           "change",
           "replace",
           "update",
           "put",
           "write",
-          "enter"
+          "enter",
+          "set value",
+          "set cell"
         ],
         "tokens_all": [
           "value"
@@ -390,7 +391,7 @@
           "Convert SUMMARY 1!D35:D48 to numeric values",
           "Change text numbers to actual numbers in A1:A50",
           "Convert the range to numbers",
-          "In Sheet1!A1:A10, apply set_value numeric_convert."
+          "Convert values to numbers in Sheet1!A1:A10."
         ],
         "negative": [
           "Convert to PDF",
@@ -774,7 +775,7 @@
           "Fill down from A1 to A100",
           "Copy down the formula",
           "Drag down B2:B50",
-          "In Sheet1!A1:A10, apply fill_down."
+          "Fill down in Sheet1!A1:A10."
         ],
         "negative": [
           "Fill right",
@@ -891,8 +892,8 @@
         "positive": [
           "Fill right from A1 to E1",
           "Copy right the formula",
-          "In Sheet1!A1:A10, apply fill_right.",
-          "Apply fill_right on the selected range."
+          "Fill right in Sheet1!A1:A10.",
+          "Fill right on the selected range."
         ],
         "negative": [
           "Fill down",
@@ -1529,7 +1530,7 @@
         },
         {
           "slot": "fontFamily",
-          "ask_en": "What value should I use?",
+          "ask_en": "Which font should I apply?",
           "ask_pt": "Qual valor devo usar?"
         }
       ]
@@ -1546,7 +1547,7 @@
           "percent",
           "percentage",
           "date",
-          "number"
+          "number format"
         ],
         "regex_any": [
           "\\bformat\\b.*\\b(?:as|to)\\b.*\\b(?:currency|percent|date|number|accounting)\\b",
@@ -2579,11 +2580,9 @@
         "tokens_any": [
           "chart",
           "graph",
-          "change",
           "title",
           "revenue",
-          "update",
-          "type"
+          "update"
         ]
       },
       "slotExtractors": [
@@ -2706,7 +2705,8 @@
           "heat",
           "range",
           "conditional",
-          "formatting"
+          "formatting",
+          "color scale"
         ]
       },
       "slotExtractors": [
@@ -2736,7 +2736,7 @@
           "Apply color scale to A1:A50",
           "Add a heat map to the range",
           "Conditional formatting with color scale",
-          "In Sheet1!A1:A10, apply cond_format color_scale."
+          "Apply color scale conditional formatting in Sheet1!A1:A10."
         ],
         "negative": [
           "Change font color",
@@ -2820,7 +2820,8 @@
           "style",
           "data",
           "bars",
-          "selection"
+          "selection",
+          "data bars"
         ]
       },
       "slotExtractors": [
@@ -2849,8 +2850,8 @@
         "positive": [
           "Add data bars to the selection",
           "Apply data bars to A1:A50",
-          "In Sheet1!A1:A10, apply cond_format data_bars.",
-          "Apply cond_format data_bars on the selected range."
+          "Apply data bars conditional formatting in Sheet1!A1:A10.",
+          "Apply data bars conditional formatting on the selected range."
         ],
         "negative": [
           "Create a bar chart",
@@ -2971,7 +2972,7 @@
           "Highlight the top 10 values",
           "Format top 5 in green",
           "Show top 3 values in bold",
-          "In Sheet1!A1:A10, apply cond_format top_n."
+          "Highlight top values with conditional formatting in Sheet1!A1:A10."
         ],
         "negative": [
           "Sort descending",
@@ -3056,8 +3057,7 @@
           "dropdown",
           "data",
           "create",
-          "list",
-          "maybe"
+          "list"
         ]
       },
       "slotExtractors": [
@@ -3092,7 +3092,7 @@
           "Add data validation to A1:A10",
           "Create a dropdown list in B2",
           "Add a dropdown with Yes, No, Maybe",
-          "In Sheet1!A1:A10, apply data_validation."
+          "Set data validation rules in Sheet1!A1:A10."
         ],
         "negative": [
           "Validate the formula",
@@ -3325,8 +3325,8 @@
         "positive": [
           "Merge cells A1:D1",
           "Merge the selected cells",
-          "In Sheet1!A1:A10, apply merge_cells.",
-          "Apply merge_cells on the selected range."
+          "Merge the selected cells in Sheet1!A1:A10.",
+          "Merge the selected cells on the selected range."
         ],
         "negative": [
           "Merge paragraphs",
@@ -3451,7 +3451,7 @@
           "Wrap text in A1:A10",
           "Enable text wrap",
           "Turn on text wrapping",
-          "In Sheet1!A1:A10, apply wrap_text."
+          "Wrap text in cells in Sheet1!A1:A10."
         ],
         "negative": [
           "Unwrap text",
@@ -3571,7 +3571,7 @@
           "Auto fit columns",
           "Resize columns to fit content",
           "Auto fit column widths",
-          "In Sheet1!A1:A10, apply auto_fit."
+          "Auto-fit column widths in Sheet1!A1:A10."
         ],
         "negative": [
           "Fit to page",
@@ -3662,7 +3662,8 @@
           "rows",
           "above",
           "after",
-          "header"
+          "header",
+          "insert row"
         ]
       },
       "slotExtractors": [
@@ -3698,7 +3699,7 @@
           "Insert 3 rows above row 5",
           "Add a row after the header",
           "Insert rows at A10",
-          "In Sheet1!A1:A10, apply insert_rows."
+          "Insert rows in Sheet1!A1:A10."
         ],
         "negative": [
           "Delete rows",
@@ -3786,7 +3787,8 @@
           "remove",
           "rows",
           "through",
-          "selected"
+          "selected",
+          "delete row"
         ]
       },
       "slotExtractors": [
@@ -3815,8 +3817,8 @@
         "positive": [
           "Delete rows 5 through 10",
           "Remove the selected rows",
-          "In Sheet1!A1:A10, apply delete_rows.",
-          "Apply delete_rows on the selected range."
+          "Delete rows in Sheet1!A1:A10.",
+          "Delete rows on the selected range."
         ],
         "negative": [
           "Insert rows",
@@ -3905,7 +3907,8 @@
           "columns",
           "column",
           "before",
-          "after"
+          "after",
+          "insert column"
         ]
       },
       "slotExtractors": [
@@ -3940,8 +3943,8 @@
         "positive": [
           "Insert 2 columns before column D",
           "Add a column after B",
-          "In Sheet1!A1:A10, apply insert_columns.",
-          "Apply insert_columns on the selected range."
+          "Insert columns in Sheet1!A1:A10.",
+          "Insert columns on the selected range."
         ],
         "negative": [
           "Delete columns",
@@ -4029,7 +4032,8 @@
           "remove",
           "columns",
           "through",
-          "column"
+          "column",
+          "delete column"
         ]
       },
       "slotExtractors": [
@@ -4058,8 +4062,8 @@
         "positive": [
           "Delete columns C through E",
           "Remove column D",
-          "In Sheet1!A1:A10, apply delete_columns.",
-          "Apply delete_columns on the selected range."
+          "Delete columns in Sheet1!A1:A10.",
+          "Delete columns on the selected range."
         ],
         "negative": [
           "Delete rows",
@@ -4148,7 +4152,8 @@
           "summary",
           "create",
           "worksheet",
-          "insert"
+          "insert",
+          "add sheet"
         ]
       },
       "slotExtractors": [
@@ -4173,7 +4178,7 @@
           "Add a new sheet called Summary",
           "Create a new worksheet",
           "Insert a new tab",
-          "In Sheet1!A1:A10, apply add_sheet."
+          "Add a new sheet in Sheet1!A1:A10."
         ],
         "negative": [
           "Rename sheet",
@@ -4258,7 +4263,8 @@
           "rename",
           "revenue",
           "sheet1",
-          "data"
+          "data",
+          "rename sheet"
         ]
       },
       "slotExtractors": [
@@ -4299,8 +4305,8 @@
         "positive": [
           "Rename the sheet to Revenue",
           "Rename Sheet1 to Data",
-          "In Sheet1!A1:A10, apply rename_sheet.",
-          "Apply rename_sheet on the selected range."
+          "Rename the sheet in Sheet1!A1:A10.",
+          "Rename the sheet on the selected range."
         ],
         "negative": [
           "Delete sheet",
@@ -4377,7 +4383,8 @@
           "remove",
           "sheet",
           "sheet2",
-          "summary"
+          "summary",
+          "delete sheet"
         ]
       },
       "slotExtractors": [
@@ -4401,8 +4408,8 @@
         "positive": [
           "Delete Sheet2",
           "Remove the Summary tab",
-          "In Sheet1!A1:A10, apply delete_sheet.",
-          "Apply delete_sheet on the selected range."
+          "Delete the sheet in Sheet1!A1:A10.",
+          "Delete the sheet on the selected range."
         ],
         "negative": [
           "Add sheet",
@@ -4513,8 +4520,8 @@
         "positive": [
           "Hide rows 5 through 10",
           "Hide the selected rows",
-          "In Sheet1!A1:A10, apply hide_rows.",
-          "Apply hide_rows on the selected range."
+          "Hide rows in Sheet1!A1:A10.",
+          "Hide rows on the selected range."
         ],
         "negative": [
           "Show rows",
@@ -4629,8 +4636,8 @@
         "positive": [
           "Hide columns C through E",
           "Hide column D",
-          "In Sheet1!A1:A10, apply hide_columns.",
-          "Apply hide_columns on the selected range."
+          "Hide columns in Sheet1!A1:A10.",
+          "Hide columns on the selected range."
         ],
         "negative": [
           "Show columns",
@@ -4745,8 +4752,8 @@
         "positive": [
           "Show hidden rows",
           "Unhide rows 5 to 10",
-          "In Sheet1!A1:A10, apply show_rows.",
-          "Apply show_rows on the selected range."
+          "Show hidden rows in Sheet1!A1:A10.",
+          "Show hidden rows on the selected range."
         ],
         "negative": [
           "Hide rows",
@@ -4862,8 +4869,8 @@
         "positive": [
           "Show hidden columns",
           "Unhide column D",
-          "In Sheet1!A1:A10, apply show_columns.",
-          "Apply show_columns on the selected range."
+          "Show hidden columns in Sheet1!A1:A10.",
+          "Show hidden columns on the selected range."
         ],
         "negative": [
           "Hide columns",
@@ -5615,7 +5622,7 @@
           "If any cell is blank in D35:D48, fill it with 0",
           "Fill blank cells with N/A",
           "Replace empty cells with 0",
-          "In Sheet1!A1:A10, apply fill_blank_cells."
+          "Fill blank cells in Sheet1!A1:A10."
         ],
         "negative": [
           "Delete blank rows",
@@ -6398,7 +6405,7 @@
           "Trim whitespace from these cells",
           "Clean up extra spaces",
           "Strip leading and trailing spaces",
-          "In Sheet1!A1:A10, apply trim_whitespace."
+          "Trim extra whitespace in Sheet1!A1:A10."
         ],
         "negative": [
           "Trim the first 5 rows",
@@ -6524,7 +6531,7 @@
           "Normalize dates in this column",
           "Standardize the text to uppercase",
           "Normalize numbers in range A1:A50",
-          "In Sheet1!A1:A10, apply normalize_values."
+          "Normalize values in Sheet1!A1:A10."
         ],
         "negative": [
           "Format as currency",
@@ -6558,6 +6565,1047 @@
         "penaltyPoints": 12
       },
       "disambiguationGroup": "excel.data_cleaning",
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.forecast",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 86,
+      "triggers": {
+        "tokens_any": [
+          "forecast",
+          "project",
+          "predict",
+          "projection",
+          "trend"
+        ],
+        "regex_any": [
+          "\\b(?:forecast|project|predict|projection)\\b.*\\b(?:sales|revenue|demand|trend)\\b",
+          "\\bnext\\s+(?:quarter|month|year)\\b.*\\b(?:sales|revenue|demand)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "dateColumn",
+          "regex": "(?:date|time)\\s+column\\s*(?:is|=|:)?\\s*['\"]?([A-Za-z][A-Za-z0-9_ ]{0,40})",
+          "defaultValue": "date"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "valueColumn",
+          "regex": "\\b(sales|revenue|demand|cost|profit|volume|churn)\\b",
+          "defaultValue": "sales"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "periods",
+          "regex": "\\b(?:next|for)\\s+(\\d+)\\s+(?:periods?|months?|quarters?|years?)\\b",
+          "defaultValue": 1
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_TIME_SERIES_FORECAST",
+          "sheetName": "$sheetName",
+          "dateColumn": "$dateColumn",
+          "valueColumn": "$valueColumn",
+          "periods": "$periods"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        },
+        {
+          "slot": "dateColumn",
+          "ask_en": "Which date column should I use?",
+          "ask_pt": "Qual coluna de data devo usar?"
+        },
+        {
+          "slot": "valueColumn",
+          "ask_en": "Which value column should I forecast?",
+          "ask_pt": "Qual coluna de valores devo prever?"
+        },
+        {
+          "slot": "periods",
+          "ask_en": "How many periods should I forecast?",
+          "ask_pt": "Quantos períodos devo prever?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Forecast next quarter sales",
+          "Project revenue for the next 3 months",
+          "Predict demand trend for next year",
+          "Build a sales projection from this sheet"
+        ],
+        "negative": [
+          "Insert rows in this sheet",
+          "Make these cells bold"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.what_if",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.pivot_table",
+        "excel.python_calc.segment_clusters",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "forecast",
+          "predict",
+          "next quarter"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.compute_metric",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 83,
+      "triggers": {
+        "tokens_any": [
+          "calculate",
+          "compute",
+          "statistics",
+          "median",
+          "variance",
+          "standard deviation"
+        ],
+        "regex_any": [
+          "\\b(?:calculate|compute)\\b.*\\b(?:statistics|metric|median|variance|std|standard deviation)\\b",
+          "\\bdescriptive\\s+statistics\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "columns",
+          "regex": "\\bfor\\s+([A-Za-z0-9_,\\s]+?)\\s*(?:columns?|metrics?)?\\b",
+          "defaultValue": "sales"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_STATS_DESCRIPTIVE",
+          "sheetName": "$sheetName",
+          "columns": "$columns"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        },
+        {
+          "slot": "columns",
+          "ask_en": "Which columns should I compute metrics for?",
+          "ask_pt": "Quais colunas devo usar para calcular as métricas?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Calculate descriptive statistics for sales columns",
+          "Compute variance and median for this dataset",
+          "Give me summary statistics for revenue and cost"
+        ],
+        "negative": [
+          "Insert a new sheet",
+          "Freeze panes"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.what_if",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.pivot_table",
+        "excel.python_calc.segment_clusters",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "calculate",
+          "statistics",
+          "median"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.growth_rate",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 84,
+      "triggers": {
+        "tokens_any": [
+          "growth rate",
+          "year over year",
+          "month over month",
+          "trend analysis",
+          "growth"
+        ],
+        "regex_any": [
+          "\\b(?:growth\\s+rate|year\\s+over\\s+year|month\\s+over\\s+month)\\b",
+          "\\bcalculate\\b.*\\bgrowth\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "dependentColumn",
+          "regex": "\\b(revenue|sales|profit|demand|cost|margin)\\b",
+          "defaultValue": "sales"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "independentColumns",
+          "regex": "\\b(price|marketing|volume|seasonality|discount|ad spend)\\b(?:\\s*,\\s*\\b(?:price|marketing|volume|seasonality|discount|ad spend)\\b)*",
+          "defaultValue": "price"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_STATS_REGRESSION",
+          "sheetName": "$sheetName",
+          "dependentColumn": "$dependentColumn",
+          "independentColumns": "$independentColumns"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        },
+        {
+          "slot": "dependentColumn",
+          "ask_en": "Which metric should be the target growth column?",
+          "ask_pt": "Qual métrica deve ser a coluna alvo de crescimento?"
+        },
+        {
+          "slot": "independentColumns",
+          "ask_en": "Which driver columns should I use?",
+          "ask_pt": "Quais colunas explicativas devo usar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Calculate month over month growth rate",
+          "Run growth trend analysis for revenue",
+          "Estimate year over year growth drivers"
+        ],
+        "negative": [
+          "Rename this sheet",
+          "Delete these columns"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.what_if",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.pivot_table",
+        "excel.python_calc.segment_clusters",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "growth rate",
+          "month over month",
+          "trend"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.what_if",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "what if",
+          "scenario",
+          "simulate",
+          "sensitivity",
+          "assume"
+        ],
+        "regex_any": [
+          "\\bwhat\\s+if\\b.*\\b(?:sales|revenue|cost|price)\\b",
+          "\\b(?:simulate|scenario|sensitivity)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "sourceColumns",
+          "regex": "\\b(price|cost|revenue|sales|margin|demand)\\b",
+          "defaultValue": "sales"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "expression",
+          "regex": "\\b(?:increase|decrease|raise|drop|reduce)\\b[^.]*",
+          "defaultValue": "source * 1.05"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "outputColumn",
+          "regex": "\\boutput\\s+column\\s*(?:is|=|:)?\\s*['\"]?([A-Za-z][A-Za-z0-9_ ]{0,40})",
+          "defaultValue": "scenario_result"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_CALC_DERIVE_COLUMN",
+          "sheetName": "$sheetName",
+          "sourceColumns": "$sourceColumns",
+          "expression": "$expression",
+          "outputColumn": "$outputColumn"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I run the scenario on?",
+          "ask_pt": "Em qual planilha devo rodar o cenário?"
+        },
+        {
+          "slot": "sourceColumns",
+          "ask_en": "Which source columns should I use?",
+          "ask_pt": "Quais colunas de origem devo usar?"
+        },
+        {
+          "slot": "expression",
+          "ask_en": "What scenario formula should I apply?",
+          "ask_pt": "Qual fórmula de cenário devo aplicar?"
+        },
+        {
+          "slot": "outputColumn",
+          "ask_en": "What should the output column be called?",
+          "ask_pt": "Como devo chamar a coluna de saída?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "What if price increases by 5 percent",
+          "Simulate a scenario where costs drop by 10 percent",
+          "Run a sensitivity scenario for margin"
+        ],
+        "negative": [
+          "Create a chart",
+          "Set cell A1 to 100"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.pivot_table",
+        "excel.python_calc.segment_clusters",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "what if",
+          "scenario",
+          "simulate"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.clean_missing_values",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 85,
+      "triggers": {
+        "tokens_any": [
+          "missing values",
+          "nulls",
+          "impute",
+          "fill missing",
+          "clean missing"
+        ],
+        "regex_any": [
+          "\\b(?:clean\\s+up|handle|impute|fill)\\b.*\\b(?:missing\\s+values?|nulls?|na\\s+values?)\\b",
+          "\\b(?:missing\\s+values?|nulls?|na\\s+values?)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "strategy",
+          "regex": "\\b(?:using|with|strategy\\s*(?:is|=|:)?)\\s*(mean|median|mode|drop|zero|ffill|bfill)\\b",
+          "defaultValue": "median"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "columns",
+          "regex": "\\b(?:in|for|on)\\s+([A-Za-z][A-Za-z0-9_ ]{0,40})\\b"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_CLEAN_MISSING_VALUES",
+          "sheetName": "$sheetName",
+          "strategy": "$strategy",
+          "columns": "$columns"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Clean up missing values in revenue",
+          "Handle nulls using median",
+          "Impute missing values with mean in Sales sheet"
+        ],
+        "negative": [
+          "Create a bar chart",
+          "Insert 3 rows above"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.what_if",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.pivot_table",
+        "excel.python_calc.segment_clusters",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "missing values",
+          "nulls",
+          "impute",
+          "median"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "chart",
+          "sort",
+          "filter"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.outlier_detect",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 86,
+      "triggers": {
+        "tokens_any": [
+          "outlier",
+          "anomaly",
+          "anomalies",
+          "abnormal values"
+        ],
+        "regex_any": [
+          "\\b(?:find|detect|flag|identify)\\b.*\\b(?:outliers?|anomal(?:y|ies)|abnormal\\s+values?)\\b",
+          "\\b(?:outliers?|anomal(?:y|ies))\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "columns",
+          "regex": "\\b(?:in|for|on)\\s+([A-Za-z][A-Za-z0-9_ ]{0,40})\\b",
+          "defaultValue": "revenue"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "method",
+          "regex": "\\b(iqr|z[- ]?score|mad)\\b",
+          "defaultValue": "iqr"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "threshold",
+          "regex": "\\b(?:threshold|cutoff|sigma|z)\\s*(?:is|=|:)?\\s*(\\d+(?:\\.\\d+)?)\\b"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "outputColumn",
+          "regex": "\\b(?:output\\s+column|flag\\s+column)\\s*(?:is|=|:)?\\s*['\"]?([A-Za-z][A-Za-z0-9_ ]{0,40})",
+          "defaultValue": "_outlier"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_OUTLIER_DETECT",
+          "sheetName": "$sheetName",
+          "columns": "$columns",
+          "method": "$method",
+          "threshold": "$threshold",
+          "outputColumn": "$outputColumn"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Find outliers in revenue",
+          "Detect anomalies in churn using z-score",
+          "Flag abnormal values in the sales column"
+        ],
+        "negative": [
+          "Rename the sheet to Revenue",
+          "Freeze panes"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.what_if",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.pivot_table",
+        "excel.python_calc.segment_clusters",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "outlier",
+          "anomaly",
+          "detect"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "chart",
+          "sort",
+          "filter"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.pivot_table",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 89,
+      "triggers": {
+        "tokens_any": [
+          "pivot table",
+          "pivot",
+          "summarize by",
+          "group by"
+        ],
+        "regex_any": [
+          "\\b(?:pivot\\s+table|create\\s+a\\s+pivot)\\b",
+          "\\b(?:summarize|group)\\b.*\\bby\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "merge",
+          "wrap text",
+          "cluster",
+          "clusters",
+          "clustering",
+          "segmentation",
+          "segment",
+          "segmentar",
+          "segmentacao",
+          "segmentação",
+          "clusterizacao",
+          "clusterização"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "rowFields",
+          "regex": "\\bby\\s+([A-Za-z][A-Za-z0-9_ ]{0,40})\\b",
+          "defaultValue": "category"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "valueFields",
+          "regex": "\\b(?:for|of|values?\\s+of|sum\\s+of|total\\s+of|average\\s+of|count\\s+of)\\s+([A-Za-z][A-Za-z0-9_ ]{0,40})\\b",
+          "defaultValue": "value"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "aggFunc",
+          "regex": "\\b(sum|average|avg|count|min|max)\\b",
+          "defaultValue": "sum"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_PIVOT_TABLE",
+          "sheetName": "$sheetName",
+          "rowFields": "$rowFields",
+          "valueFields": "$valueFields",
+          "aggFunc": "$aggFunc"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Create a pivot table by region",
+          "Pivot table for sales by month",
+          "Summarize revenue by product in a pivot"
+        ],
+        "negative": [
+          "Format as table",
+          "Create a bar chart"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.what_if",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.segment_clusters",
+        "excel.table.create",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "pivot table",
+          "pivot",
+          "by"
+        ],
+        "penalizeIfTokensPresent": [
+          "format as table",
+          "chart",
+          "graph"
+        ],
+        "boostPoints": 16,
+        "penaltyPoints": 12
+      },
+      "requiresContext": {}
+    },
+    {
+      "id": "excel.python_calc.segment_clusters",
+      "domain": "excel",
+      "lang": "en",
+      "priority": 84,
+      "triggers": {
+        "tokens_any": [
+          "cluster",
+          "clustering",
+          "segment",
+          "segmentation",
+          "bucket"
+        ],
+        "regex_any": [
+          "\\b(?:cluster(?:s|ing)?|segment(?:ation)?|bucket(?:ize)?)\\b.*\\b(?:customers?|users?|accounts?|data)\\b",
+          "\\b(?:customers?|users?|accounts?|data)\\b.*\\b(?:cluster(?:s|ing)?|segment(?:ation)?|bucket(?:ize)?)\\b",
+          "\\b(?:cluster(?:s|ing)?|segment(?:ation)?)\\b"
+        ],
+        "tokens_none": [
+          "format",
+          "formatted",
+          "bold",
+          "italic",
+          "underline",
+          "font",
+          "color",
+          "chart",
+          "graph",
+          "plot",
+          "insert row",
+          "delete row",
+          "insert column",
+          "delete column",
+          "add sheet",
+          "rename sheet",
+          "delete sheet",
+          "merge",
+          "wrap text"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "column",
+          "regex": "\\b(?:by|on|using)\\s+([A-Za-z][A-Za-z0-9_ ]{0,40})\\b",
+          "defaultValue": "customer"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "bins",
+          "regex": "\\b(?:k|clusters?|bins?)\\s*(?:=|:|is)?\\s*(\\d+)\\b",
+          "defaultValue": 4
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "method",
+          "regex": "\\b(kmeans|quantile|equal[- ]?width)\\b",
+          "defaultValue": "quantile"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "outputColumn",
+          "regex": "\\b(?:output\\s+column)\\s*(?:is|=|:)?\\s*['\"]?([A-Za-z][A-Za-z0-9_ ]{0,40})",
+          "defaultValue": "segment"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "PY_BINNING",
+          "sheetName": "$sheetName",
+          "column": "$column",
+          "bins": "$bins",
+          "method": "$method",
+          "outputColumn": "$outputColumn"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I analyze?",
+          "ask_pt": "Qual planilha devo analisar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Cluster these customers by spend",
+          "Create customer segmentation using 5 clusters",
+          "Segment accounts into buckets by revenue"
+        ],
+        "negative": [
+          "Sort A1:D100 by date",
+          "Merge cells A1:D1"
+        ]
+      },
+      "disambiguationGroup": "excel.python_calc",
+      "mutuallyExclusiveWith": [
+        "excel.python_calc.forecast",
+        "excel.python_calc.compute_metric",
+        "excel.python_calc.growth_rate",
+        "excel.python_calc.what_if",
+        "excel.python_calc.clean_missing_values",
+        "excel.python_calc.outlier_detect",
+        "excel.python_calc.pivot_table",
+        "excel.aggregation.sum",
+        "excel.aggregation.average",
+        "excel.aggregation.count"
+      ],
+      "scoreAdjustments": {
+        "boostIfTokensPresent": [
+          "cluster",
+          "segment",
+          "segmentation"
+        ],
+        "penalizeIfTokensPresent": [
+          "format",
+          "chart",
+          "sort",
+          "filter"
+        ],
+        "boostPoints": 14,
+        "penaltyPoints": 12
+      },
       "requiresContext": {}
     },
     {
@@ -6597,7 +7645,12 @@
           "\\b(?:protect\\\\s+sheet|protect\\\\s+this\\\\s+sheet|lock\\\\s+sheet|sheet\\\\s+protection|password\\\\s+protect)\\b"
         ]
       },
-      "slotExtractors": [],
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
       "scopeRules": {
         "defaultScope": "document",
         "allowScopeOverrideByExplicitRange": false,
@@ -6605,7 +7658,8 @@
       },
       "planTemplate": [
         {
-          "op": "XLSX_SET_PROTECTION"
+          "op": "XLSX_SET_PROTECTION",
+          "sheetName": "$sheetName"
         }
       ],
       "examples": {
@@ -6613,7 +7667,7 @@
           "Protect this sheet",
           "Lock the sheet",
           "Add sheet protection",
-          "In Sheet1!A1:A10, apply set_protection."
+          "Enable sheet protection in Sheet1!A1:A10."
         ],
         "negative": [
           "Lock cells A1:B5",
@@ -6646,7 +7700,14 @@
         "penaltyPoints": 12
       },
       "disambiguationGroup": "excel.protection",
-      "requiresContext": {}
+      "requiresContext": {},
+      "clarifyIfMissing": [
+        {
+          "slot": "sheetName",
+          "ask_en": "Which sheet should I protect?",
+          "ask_pt": "Qual planilha devo proteger?"
+        }
+      ]
     },
     {
       "id": "excel.lock_cells",
@@ -6709,7 +7770,7 @@
           "Lock cells A1:D10",
           "Protect these cells",
           "Unlock the header row",
-          "In Sheet1!A1:A10, apply lock_cells."
+          "Lock selected cells in Sheet1!A1:A10."
         ],
         "negative": [
           "Protect the sheet",

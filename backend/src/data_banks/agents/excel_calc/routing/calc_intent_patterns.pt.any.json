@@ -46,7 +46,21 @@
           "adj r squared"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\badj(?:usted)?\\s+r[- ]?(?:squared|2)\\b",
           "\\br2 ajustado\\b",
@@ -99,7 +113,21 @@
           "mortgage table"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:amortizat|loan\\s+schedule|repayment\\s+schedule|mortgage\\s+table)\\b",
           "\\btabela de amortização\\b",
@@ -158,7 +186,21 @@
         "tokens_all": [
           "amortization"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|generate|create)\\s+(?:an?\\s+)?amortization\\b",
           "\\btabela de amortização\\b",
@@ -215,7 +257,21 @@
           "lagged correlation"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:auto[- ]?correlation|acf|serial\\s+corr|lagged?\\s+corr)\\b",
           "\\bautocorrelação\\b",
@@ -271,7 +327,21 @@
         "tokens_all": [
           "autocorrelation"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?(?:auto[- ]?correlation|acf)\\b",
           "\\bautocorrelação\\b",
@@ -318,7 +388,21 @@
           "beta probability"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bbeta\\s+(?:dist|distribution|prob)\\b",
           "\\bdistribuição beta\\b",
@@ -436,7 +520,21 @@
           "equal size bins"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bequal\\s+(?:width|size)\\s+bins?\\b",
           "\\bbinagem\\b",
@@ -486,7 +584,21 @@
           "bernoulli"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:binomial|bernoulli)\\b",
           "\\bdistribuição binomial\\b",
@@ -543,7 +655,21 @@
           "no more"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:at\\s+(?:least|most)|no\\s+more\\s+than)\\s+\\d+\\s+(?:success|time)\\b",
           "\\bdistribuição binomial\\b",
@@ -597,7 +723,21 @@
           "exactly"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:exactly|precisely)\\s+\\d+\\s+(?:success|heads|times)\\b",
           "\\bdistribuição binomial\\b",
@@ -656,7 +796,21 @@
           "options valuation"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bblack[- ]?scholes\\b|\\boption\\s+pric\\b|\\bbs\\s+model\\b",
           "\\bblack-scholes\\b",
@@ -942,7 +1096,21 @@
           "bond",
           "price"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?bond\\s+price\\b",
           "\\bpreço do título\\b",
@@ -1072,7 +1240,21 @@
           "bep"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bbreak[- ]?even\\b|\\bbep\\b",
           "\\bponto de equilíbrio\\b",
@@ -1130,7 +1312,21 @@
           "breakeven units"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bhow\\s+many\\s+units\\s+(?:to|for)\\s+break\\b|\\bbreakeven\\s+units\\b",
           "\\bponto de equilíbrio\\b",
@@ -1186,7 +1382,21 @@
           "annualized return"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcagr\\b|\\bcompound\\s+(?:annual\\s+)?growth\\b|\\bannualized\\s+return\\b",
           "\\bcagr\\b",
@@ -1248,7 +1458,21 @@
         "tokens_all": [
           "cagr"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?cagr\\b",
           "\\bcagr\\b",
@@ -1305,7 +1529,21 @@
           "required return"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcapm\\b|\\bcapital\\s+asset\\s+pricing\\b|\\brequired\\s+return\\b",
           "\\bcapm\\b",
@@ -1365,7 +1603,21 @@
         "tokens_all": [
           "expected return"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?expected\\s+return\\b",
           "\\bcapm\\b",
@@ -1483,7 +1735,21 @@
         "tokens_all": [
           "chi"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+chi\\b.*\\bprob\\b",
           "\\bdistribuição qui-quadrado\\b",
@@ -1657,7 +1923,21 @@
           "cross tabulation"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:contingency\\s+table|crosstab|cross\\s+tabul)\\b.*\\btest\\b",
           "\\bqui-quadrado de independência\\b",
@@ -1816,7 +2096,21 @@
         "tokens_all": [
           "mean"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bconfidence\\s+interval\\s+(?:for|of)\\s+(?:the\\s+)?mean\\b",
           "\\bintervalo de confiança\\b",
@@ -1868,7 +2162,21 @@
         "tokens_all": [
           "proportion"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bconfidence\\s+interval\\s+(?:for|of)\\s+(?:the\\s+)?proportion\\b",
           "\\bintervalo de confiança\\b",
@@ -2029,7 +2337,21 @@
           "correlation",
           "matrix"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|build|create)\\s+(?:a\\s+)?correlation\\s+matrix\\b",
           "\\bmatriz de correlação\\b",
@@ -2132,7 +2454,21 @@
           "covariance.p"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcovariance\\.(?:s|p)\\b",
           "\\bcovariância\\b",
@@ -2359,7 +2695,21 @@
           "cumulative distribution"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:cdf|cumulative\\s+(?:prob|dist))\\b",
           "\\bfda\\b",
@@ -2417,7 +2767,21 @@
         "tokens_all": [
           "cumulative"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?cumulative\\b",
           "\\bfda\\b",
@@ -2520,7 +2884,21 @@
           "running sum"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\brunning\\s+(?:total|sum)\\b",
           "\\bsoma acumulada\\b",
@@ -2630,7 +3008,21 @@
           "0-1"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bscale\\s+(?:to|between)\\s+0\\s*(?:to|and|-|–)\\s*1\\b",
           "\\bnormalizar\\b",
@@ -2738,7 +3130,21 @@
           "center"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:zero\\s+mean|unit\\s+variance|center\\s+(?:the\\s+)?data)\\b",
           "\\bpadronizar\\b",
@@ -2842,7 +3248,21 @@
           "two-way table"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:two[- ]?variable\\s+data\\s+table|2[- ]?var\\s+table|2d\\s+sensitiv|two[- ]?way\\s+table)\\b",
           "\\btabela de dados de duas variáveis\\b",
@@ -2905,7 +3325,21 @@
           "cast type"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:(?:convert|cast|coerce)\\s+type|text\\s+to\\s+num|num\\s+to\\s+text)\\b",
           "\\bconverter tipo\\b",
@@ -2960,7 +3394,21 @@
           "numbers stored as text"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:text\\s+to\\s+num|convert\\s+text|numbers?\\s+stored\\s+as\\s+text)\\b",
           "\\bconverter tipo\\b",
@@ -3015,7 +3463,21 @@
           "constraint check"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:(?:data\\s+)?validat|add\\s+validat|constraint\\s+check)\\b",
           "\\bvalidar dados\\b",
@@ -3141,7 +3603,21 @@
           "dedupe"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:dedup(?:licat)?|remove\\s+dup|unique\\s+(?:values|rows)|distinct)\\b",
           "\\bdeduplicar\\b",
@@ -3193,7 +3669,21 @@
         "tokens_all": [
           "duplicate"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:remove|delete)\\s+(?:the\\s+)?duplicate\\b",
           "\\bdeduplicar\\b",
@@ -3300,7 +3790,21 @@
           "dpb"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bdiscounted\\s+payback\\b|\\bdpb\\b",
           "\\bpayback descontado\\b",
@@ -3474,7 +3978,21 @@
           "practical significance"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:effect\\s+size|cohen(?:'?s)?\\s+d|hedges?(?:'?s)?\\s+g|eta\\s+squared)\\b",
           "\\btamanho do efeito\\b",
@@ -3528,7 +4046,21 @@
           "cohen's d"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcohen(?:'?s)?\\s+d\\b",
           "\\btamanho do efeito\\b",
@@ -3581,7 +4113,21 @@
           "hedges g"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bhedges?(?:'?s)?\\s+g\\b",
           "\\btamanho do efeito\\b",
@@ -3636,7 +4182,21 @@
           "spectral"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:eigen(?:value|vector|decomp)|spectral\\s+decomp)\\b",
           "\\bautovalores\\b",
@@ -3688,7 +4248,21 @@
           "l1 l2 regression"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\belastic[- ]?net\\b|\\bl1\\s*l2\\b",
           "\\belastic net\\b",
@@ -3804,7 +4378,21 @@
           "exponential",
           "probability"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+exponential\\s+(?:prob|dist)\\b",
           "\\bdistribuição exponencial\\b",
@@ -3916,7 +4504,21 @@
         "tokens_all": [
           "ema"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?ema\\b",
           "\\bmme\\b",
@@ -4085,7 +4687,21 @@
           "forecast.linear"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bforecast\\.(?:ets|linear)\\b",
           "\\bprevisão\\b",
@@ -4135,7 +4751,21 @@
           "next"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:forecast|predict)\\s+(?:the\\s+)?next\\s+\\d+\\b",
           "\\bprevisão\\b",
@@ -4364,7 +4994,21 @@
           "worth"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:how\\s+much.*\\bgrow|savings.*\\b(?:worth|grow)|invest.*\\b(?:worth|grow))\\b",
           "\\bvalor futuro\\b",
@@ -4416,7 +5060,21 @@
           "gamma probability"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bgamma\\s+(?:dist|distribution|prob)\\b",
           "\\bdistribuição gama\\b",
@@ -4539,7 +5197,21 @@
           "target"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bmake\\s+(?:cell\\s+)?\\w+\\s+equal\\s+to\\b|\\breach\\s+(?:a\\s+)?target\\b",
           "\\batingir meta\\b",
@@ -4653,7 +5325,21 @@
         "tokens_all": [
           "growth rate"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?growth\\s+rate\\b",
           "\\btaxa de crescimento\\b",
@@ -4882,7 +5568,21 @@
         "tokens_all": [
           "irr"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?irr\\b",
           "\\btir\\b",
@@ -4986,7 +5686,21 @@
           "lerp"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\blinear\\s+interpol\\b|\\blerp\\b",
           "\\binterpolar\\b",
@@ -5033,7 +5747,21 @@
           "interquartile"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:iqr|interquartile)\\b",
           "\\biqr\\b",
@@ -5085,7 +5813,21 @@
           "inverse distribution"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:inverse\\s+(?:cdf|dist)|quantile\\s+func|ppf)\\b",
           "\\bcdf inversa\\b",
@@ -5144,7 +5886,21 @@
           "z for"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:norm\\.?inv|inverse\\s+normal|z\\s+(?:value\\s+)?for)\\b",
           "\\bcdf inversa\\b",
@@ -5196,7 +5952,21 @@
           "critical t"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:t\\.?inv|inverse\\s+t|critical\\s+t)\\b",
           "\\bcdf inversa\\b",
@@ -5252,7 +6022,21 @@
           "rank anova"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:kruskal|kw\\s+test|nonparametric\\s+anova|rank\\s+anova)\\b",
           "\\bkruskal-wallis\\b",
@@ -5310,7 +6094,21 @@
           "three",
           "groups"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bnonparametric(?:ally)?\\s+compare\\s+(?:three|3|multiple)\\b",
           "\\bkruskal-wallis\\b",
@@ -5357,7 +6155,21 @@
           "tail weight"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bkurtosis\\b",
           "\\bcurtose\\b",
@@ -5406,7 +6218,21 @@
           "excess kurtosis"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bexcess\\s+kurtosis\\b",
           "\\bcurtose\\b",
@@ -5626,7 +6452,21 @@
           "log normal"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\blog[- ]?normal\\b",
           "\\blog-normal\\b",
@@ -5744,7 +6584,21 @@
         "tokens_all": [
           "two groups"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bnonparametric(?:ally)?\\s+compare\\s+two\\b",
           "\\bmann-whitney\\b",
@@ -5796,7 +6650,21 @@
           "mdeterm"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:determinant|det(?:erm)?|mdeterm)\\b",
           "\\bdeterminante\\b",
@@ -5845,7 +6713,21 @@
           "mdeterm"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bmdeterm\\b",
           "\\bdeterminante\\b",
@@ -5893,7 +6775,21 @@
           "minverse"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:(?:matrix\\s+)?inverse|invert\\s+matrix|minverse)\\b",
           "\\bmatriz inversa\\b",
@@ -5941,7 +6837,21 @@
           "minverse"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bminverse\\b",
           "\\bmatriz inversa\\b",
@@ -5989,7 +6899,21 @@
           "mmult"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:matrix\\s+(?:multipli|product)|matmul|mmult)\\b",
           "\\bmultiplicação de matrizes\\b",
@@ -6041,7 +6965,21 @@
           "mmult"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bmmult\\b",
           "\\bmultiplicação de matrizes\\b",
@@ -6145,7 +7083,21 @@
           "diagonal sum"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:matrix\\s+)?trace\\b|\\bdiagonal\\s+sum\\b",
           "\\btraço\\b",
@@ -6196,7 +7148,21 @@
           "flip matrix"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\btranspose\\b|\\bswap\\s+rows.*col\\b|\\bflip\\s+matrix\\b",
           "\\btransposta\\b",
@@ -6244,7 +7210,21 @@
           "transpose"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\btranspose\\s*\\(",
           "\\btransposta\\b",
@@ -6515,7 +7495,21 @@
           "geometric mean"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:geometric\\s+mean|geomean|geo\\s+mean)\\b",
           "\\bmédia geométrica\\b",
@@ -6562,7 +7556,21 @@
           "harmonic mean"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:harmonic\\s+mean|harmean)\\b",
           "\\bmédia harmônica\\b",
@@ -6612,7 +7620,21 @@
           "trimmean"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:trimmed|truncated)\\s+mean\\b|\\btrimmean\\b",
           "\\bmédia aparada\\b",
@@ -6725,7 +7747,21 @@
           "middle value"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bmedian\\b",
           "\\bmediana\\b",
@@ -6777,7 +7813,21 @@
         "tokens_all": [
           "median"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|find|calculate)\\s+(?:the\\s+)?median\\b",
           "\\bmediana\\b",
@@ -6888,7 +7938,21 @@
           "last observation"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:forward\\s+fill|ffill|last\\s+observation)\\b",
           "\\bpreencher faltantes\\b",
@@ -6943,7 +8007,21 @@
           "average"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bfill\\s+(?:missing|blank).*\\b(?:mean|average)\\b|\\bimpute\\s+(?:with\\s+)?(?:the\\s+)?mean\\b",
           "\\bpreencher faltantes\\b",
@@ -6995,7 +8073,21 @@
           "most common"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bmode\\b|\\bmost\\s+(?:frequent|common)\\b",
           "\\bmoda\\b",
@@ -7045,7 +8137,21 @@
         "tokens_all": [
           "all"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:all\\s+modes|multi[- ]?modal|multiple\\s+modes)\\b",
           "\\bmoda\\b",
@@ -7093,7 +8199,21 @@
           "modified internal rate"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bmirr\\b|\\bmodified\\s+(?:irr|internal\\s+rate)\\b",
           "\\btirm\\b",
@@ -7154,7 +8274,21 @@
           "stochastic"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:monte\\s+carlo|stochastic\\s+sim|random\\s+simul)\\b",
           "\\bmonte carlo\\b",
@@ -7214,7 +8348,21 @@
         "tokens_all": [
           "simulation"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:run|perform)\\s+(?:a\\s+)?(?:monte\\s+carlo\\s+)?simulation\\b",
           "\\bmonte carlo\\b",
@@ -7332,7 +8480,21 @@
         "tokens_all": [
           "multiple predictors"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:multiple|several)\\s+predictor\\b|\\bregression\\s+with\\s+\\d+\\s+(?:predictor|variable)\\b",
           "\\bregressão múltipla\\b",
@@ -7385,7 +8547,21 @@
           "dcf"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:npv|net\\s+present\\s+value|discounted\\s+cash\\s+flow|dcf)\\b",
           "\\bvpl\\b",
@@ -7440,7 +8616,21 @@
         "tokens_all": [
           "npv"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?(?:npv|net\\s+present)\\b",
           "\\bvpl\\b",
@@ -7672,7 +8862,21 @@
           "time to payoff"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bnper\\b|\\bnumber\\s+of\\s+periods\\b|\\bhow\\s+many\\s+periods\\b|\\btime\\s+to\\s+payoff\\b",
           "\\bnper\\b",
@@ -7789,7 +8993,21 @@
           "against",
           "mean"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bt[- ]?test\\s+(?:against|vs|compared?\\s+to)\\s+(?:a\\s+)?mean\\b",
           "\\bteste t de uma amostra\\b",
@@ -7901,7 +9119,21 @@
           "means"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcompare\\s+(?:the\\s+)?(?:means\\s+(?:of|across|between)\\s+)?(?:3|three|4|four|5|five|multiple|several)\\s+(?:groups|samples)\\b",
           "\\banova de um fator\\b",
@@ -7952,7 +9184,21 @@
           "flag outliers"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:outlier|anomal(?:y|ies)\\s+detect|flag\\s+outlier)\\b",
           "\\bdetectar outliers\\b",
@@ -8004,7 +9250,21 @@
           "fence"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:iqr|fence)\\s+(?:method|rule)?.*\\boutlier\\b|\\boutlier.*\\b(?:iqr|fence)\\b",
           "\\bdetectar outliers\\b",
@@ -8055,7 +9315,21 @@
           "sigma"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:z[- ]?score|\\d+\\s*sigma)\\s+(?:method)?.*\\boutlier\\b|\\boutlier.*\\bz[- ]?score\\b",
           "\\bdetectar outliers\\b",
@@ -8166,7 +9440,21 @@
         "tokens_all": [
           "t"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bp[- ]?value\\s+(?:for|from|of)\\s+(?:a\\s+)?t\\b",
           "\\bvalor p\\b",
@@ -8220,7 +9508,21 @@
         "tokens_all": [
           "z"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bp[- ]?value\\s+(?:for|from|of)\\s+(?:a\\s+)?z\\b",
           "\\bvalor p\\b",
@@ -8330,7 +9632,21 @@
           "post"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:before\\s+(?:and\\s+)?after|pre\\s*[- ]?\\s*post)\\s+(?:test|comparison)\\b",
           "\\bteste t pareado\\b",
@@ -8507,7 +9823,21 @@
           "auto loan"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:(?:car|auto|personal)\\s+)?loan\\s+payment\\b",
           "\\bpmt\\b",
@@ -8564,7 +9894,21 @@
           "monthly mortgage"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:mortgage|monthly\\s+mortgage)\\s+payment\\b",
           "\\bpmt\\b",
@@ -8685,7 +10029,21 @@
         "tokens_all": [
           "correlation"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?(?:linear\\s+)?correlation\\b",
           "\\bcorrelação de pearson\\b",
@@ -8792,7 +10150,21 @@
           "percentile"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:25th|50th|75th|90th|95th|99th)\\s+percentile\\b",
           "\\bpercentil\\b",
@@ -8848,7 +10220,21 @@
           "period over period"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:yoy|mom|qoq|year\\s+over\\s+year|month\\s+over\\s+month|period\\s+over\\s+period)\\b",
           "\\bperíodo a período\\b",
@@ -8900,7 +10286,21 @@
           "monthly comparison"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:month\\s+over\\s+month|mom|monthly\\s+comparison)\\b",
           "\\bperíodo a período\\b",
@@ -8950,7 +10350,21 @@
           "annual comparison"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:year\\s+over\\s+year|yoy|annual\\s+comparison)\\b",
           "\\bperíodo a período\\b",
@@ -8996,7 +10410,21 @@
           "poisson distribution"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bpoisson\\b",
           "\\bdistribuição de poisson\\b",
@@ -9049,7 +10477,21 @@
         "tokens_all": [
           "poisson"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+poisson\\b",
           "\\bpoisson\\b",
@@ -9103,7 +10545,21 @@
           "poly fit"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:polynomial|quadratic|cubic)\\s+reg\\b|\\bpoly\\s+fit\\b",
           "\\bregressão polinomial\\b",
@@ -9162,7 +10618,21 @@
           "degree 3"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:cubic|third\\s+order|degree\\s+3)\\s+(?:regression|fit)\\b",
           "\\bregressão polinomial\\b",
@@ -9219,7 +10689,21 @@
           "degree 2"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:quadratic|second\\s+order|degree\\s+2)\\s+(?:regression|fit)\\b",
           "\\bregressão polinomial\\b",
@@ -9276,7 +10760,21 @@
           "portfolio std"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bportfolio\\s+(?:variance|risk|volatility|std)\\b",
           "\\bvariância do portfólio\\b",
@@ -9452,7 +10950,21 @@
           "present value of future"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bdiscount\\s+(?:future|a)\\s+(?:value|cash|amount)\\b|\\bpresent\\s+value\\s+of\\s+future\\b",
           "\\bvalor presente\\b",
@@ -9505,7 +11017,21 @@
           "density function"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:pdf|prob(?:ability)?\\s+density|density\\s+func)\\b",
           "\\bfdp\\b",
@@ -9622,7 +11148,21 @@
           "lower quartile"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:q1|first\\s+quartile|lower\\s+quartile|25th\\s+percentile)\\b",
           "\\bquartil\\b",
@@ -9678,7 +11218,21 @@
           "upper quartile"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:q3|third\\s+quartile|upper\\s+quartile|75th\\s+percentile)\\b",
           "\\bquartil\\b",
@@ -9796,7 +11350,21 @@
         "tokens_all": [
           "regression"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\br[- ]?(?:squared|2)\\s+(?:of|for|from)\\s+(?:the\\s+)?regression\\b",
           "\\br quadrado\\b",
@@ -9851,7 +11419,21 @@
           "randarray"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:random\\s+(?:sample|numbers|generat)|randarray)\\b",
           "\\bamostra aleatória\\b",
@@ -9906,7 +11488,21 @@
           "generate normal"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:random|generate)\\s+(?:normal|gaussian)\\b",
           "\\bamostra aleatória\\b",
@@ -9956,7 +11552,21 @@
           "randbetween"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\brandom\\s+(?:uniform|between)|\\brandbetween\\b",
           "\\bamostra aleatória\\b",
@@ -10069,7 +11679,21 @@
         "tokens_all": [
           "range"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate|find)\\s+(?:the\\s+)?(?:data\\s+)?range\\b",
           "\\bamplitude\\b",
@@ -10175,7 +11799,21 @@
           "percentrank"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:rank\\.eq|rank\\.avg|percentrank)\\b",
           "\\bposto\\b",
@@ -10225,7 +11863,21 @@
           "error terms"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bresidual(?:s|\\s+analysis)?\\b|\\berror\\s+terms\\b",
           "\\bresíduos\\b",
@@ -10281,7 +11933,21 @@
         "tokens_all": [
           "residual"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|analyze)\\s+(?:the\\s+)?residuals?\\b",
           "\\bresíduos\\b",
@@ -10394,7 +12060,21 @@
           "sliding window"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:rolling|sliding\\s+window|windowed)\\s+(?:stat|mean|stdev|avg|sum|min|max)\\b",
           "\\bestatísticas móveis\\b",
@@ -10515,7 +12195,21 @@
         "tokens_all": [
           "power"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bsample\\s+size.*\\bpower\\b|\\bpower.*\\bsample\\s+size\\b",
           "\\btamanho da amostra\\b",
@@ -10571,7 +12265,21 @@
           "scenario comparison"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:scenario\\s+(?:analysis|comparison)|best\\s+case.*worst\\s+case)\\b",
           "\\banálise de cenários\\b",
@@ -10619,7 +12327,21 @@
           "scenarios"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcompare\\s+(?:different\\s+)?scenarios\\b",
           "\\banálise de cenários\\b",
@@ -10668,7 +12390,21 @@
           "stl"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:seasonal\\s+decomp|decompose\\s+(?:time|series)|stl\\b|trend.*seasonal.*resid)\\b",
           "\\bdecomposição sazonal\\b",
@@ -10721,7 +12457,21 @@
           "period 12"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:monthly|period\\s+12)\\s+(?:seasonal\\s+)?decompos\\b",
           "\\bdecomposição sazonal\\b",
@@ -10773,7 +12523,21 @@
           "period 4"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:quarterly|period\\s+4)\\s+(?:seasonal\\s+)?decompos\\b",
           "\\bdecomposição sazonal\\b",
@@ -10885,7 +12649,21 @@
           "tornado diagram"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\btornado\\s+(?:chart|diagram|analysis)\\b",
           "\\banálise de sensibilidade\\b",
@@ -10995,7 +12773,21 @@
         "tokens_all": [
           "sharpe"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?sharpe\\b",
           "\\bíndice de sharpe\\b",
@@ -11118,7 +12910,21 @@
           "best fit"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bfit\\s+(?:a\\s+)?(?:line|linear)\\b|\\bbest\\s+fit\\b",
           "\\bregressão linear\\b",
@@ -11171,7 +12977,21 @@
           "intercept"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:slope|intercept)\\s+(?:of|for)\\b",
           "\\bregressão linear\\b",
@@ -11294,7 +13114,21 @@
           "month",
           "period"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:\\d+)[- ]?(?:day|week|month|period)\\s+(?:moving\\s+)?average\\b",
           "\\bmédia móvel simples\\b",
@@ -11346,7 +13180,21 @@
           "matrix factorization"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bsvd\\b|\\bsingular\\s+value\\s+decomp\\b|\\bmatrix\\s+factoriz\\b",
           "\\bsvd\\b",
@@ -11395,7 +13243,21 @@
           "asymmetry"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:skew(?:ness)?|asymmetry)\\b",
           "\\bassimetria\\b",
@@ -11448,7 +13310,21 @@
         "tokens_all": [
           "skew"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?skew\\b",
           "\\bassimetria\\b",
@@ -11562,7 +13438,21 @@
           "optimization"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:optimize|optimization)\\b(?!.*nonlinear)",
           "\\bprogramação linear\\b",
@@ -11856,7 +13746,21 @@
           "stdevpa"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bstdev(?:a|\\.s|\\.p|pa)\\b",
           "\\bdesvio padrão\\b",
@@ -12222,7 +14126,21 @@
           "basic stats"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:summary\\s+stat|descriptive\\s+stat|describe\\s+(?:the\\s+)?data|basic\\s+stats)\\b",
           "\\bestatísticas resumo\\b",
@@ -12387,7 +14305,21 @@
         "tokens_all": [
           "t distribution"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+t\\s+dist\\b",
           "\\bdistribuição t\\b",
@@ -12495,7 +14427,21 @@
           "trend"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bfit\\s+(?:a\\s+)?trend\\b",
           "\\btendência\\b",
@@ -12606,7 +14552,21 @@
           "trim values"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:trim\\s+(?:extreme|outlier)|clip\\s+(?:extreme|outlier))\\b",
           "\\btrimar\\b",
@@ -12659,7 +14619,21 @@
           "winsorization"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bwinsoriz\\b",
           "\\btrimar\\b",
@@ -12778,7 +14752,21 @@
           "two groups"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bcompare\\s+(?:the\\s+)?means\\s+of\\s+(?:two|2)\\s+(?:groups|samples)\\b",
           "\\bteste t de duas amostras\\b",
@@ -12832,7 +14820,21 @@
           "interaction test"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:two[- ]?way|factorial)\\s+anova\\b|\\binteraction\\s+(?:test|effect)\\b",
           "\\banova de dois fatores\\b",
@@ -12892,7 +14894,21 @@
           "rectangular"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\buniform\\s+dist\\b|\\bflat\\s+dist\\b|\\brectangular\\s+dist\\b",
           "\\bdistribuição uniforme\\b",
@@ -13009,7 +15025,21 @@
           "varpa"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bvar(?:a|\\.s|\\.p|pa)\\b",
           "\\bvariância\\b",
@@ -13246,7 +15276,21 @@
         "tokens_all": [
           "wacc"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+(?:the\\s+)?(?:wacc|cost\\s+of\\s+capital)\\b",
           "\\bwacc\\b",
@@ -13310,7 +15354,21 @@
           "reliability"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bweibull\\b|\\bfailure\\s+dist\\b|\\breliability\\s+dist\\b",
           "\\bweibull\\b",
@@ -13425,7 +15483,21 @@
           "heteroscedastic"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bwelch\\b|\\bunequal\\s+var(?:iance)?\\s+t\\b|\\bheteroscedastic\\b",
           "\\bteste t de welch\\b",
@@ -13541,7 +15613,21 @@
           "what would"
         ],
         "tokens_all": [],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\bwhat\\s+(?:happens|would\\s+happen|if).*\\bchange\\b",
           "\\banálise e-se\\b",
@@ -13709,7 +15795,21 @@
         "tokens_all": [
           "z-score"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|calculate)\\s+z[- ]?scores?\\b",
           "\\bescore z\\b",
@@ -13821,7 +15921,21 @@
         "tokens_all": [
           "z-test"
         ],
-        "tokens_none": [],
+        "tokens_none": [
+          "excluir",
+          "remover",
+          "negrito",
+          "italico",
+          "sublinhado",
+          "fonte",
+          "titulo",
+          "paragrafo",
+          "reescrever",
+          "traduzir",
+          "substituir",
+          "formatar texto",
+          "alinhar"
+        ],
         "regex_any": [
           "\\b(?:compute|run)\\s+(?:a\\s+)?z[- ]?test\\b",
           "\\bteste z\\b",

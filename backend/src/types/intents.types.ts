@@ -62,9 +62,13 @@ export type OutputShape =
   | "paragraph"
   | "bullets"
   | "numbered_list"
+  | "steps"
   | "table"
+  | "quote"
+  | "breadcrumbs"
   | "file_list"
-  | "button_only";
+  | "button_only"
+  | "doc_discovery_list";
 
 /** Domain ids should match data_banks/semantics/domain_ontology.any.json */
 export type DomainId =

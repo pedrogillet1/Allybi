@@ -61,8 +61,8 @@
       "discourse.discourseScore"
     ],
     "integrationHooks": {
-      "dependsOn": ["scope_hints", "followup_indicators", "format_triggers", "nav_triggers"],
-      "consumedBy": ["routing_overlays", "retrieval_overlays", "clarification_policy"]
+      "dependsOn": ["scope_hints", "followup_indicators", "language_triggers", "ui_contracts"],
+      "consumedBy": ["clarification_policy", "disambiguation_policies", "scope_resolution"]
     }
   },
   "rules": [

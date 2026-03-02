@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "id": "di_ops_entities_ops_work_order",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for work order documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_work_order"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "workOrderNumber",
+      "type": "string",
+      "required": true,
+      "description": "Work order or service order number"
+    },
+    {
+      "id": "workOrderType",
+      "type": "enum",
+      "required": false,
+      "description": "Type of work order",
+      "values": [
+        "preventive",
+        "corrective",
+        "emergency",
+        "inspection",
+        "installation",
+        "unknown"
+      ]
+    },
+    {
+      "id": "priority",
+      "type": "enum",
+      "required": false,
+      "description": "Work order priority level",
+      "values": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    {
+      "id": "status",
+      "type": "enum",
+      "required": true,
+      "description": "Current status of the work order",
+      "values": [
+        "open",
+        "in_progress",
+        "on_hold",
+        "completed",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    {
+      "id": "requestorName",
+      "type": "string",
+      "required": false,
+      "description": "Person or department that requested the work"
+    },
+    {
+      "id": "assigneeName",
+      "type": "string",
+      "required": false,
+      "description": "Technician or team assigned"
+    },
+    {
+      "id": "equipmentId",
+      "type": "string",
+      "required": false,
+      "description": "Equipment asset ID or tag"
+    },
+    {
+      "id": "equipmentName",
+      "type": "string",
+      "required": false,
+      "description": "Equipment or asset description"
+    },
+    {
+      "id": "locationName",
+      "type": "string",
+      "required": false,
+      "description": "Physical location or site"
+    },
+    {
+      "id": "issueDate",
+      "type": "date",
+      "required": true,
+      "description": "Date the work order was created"
+    },
+    {
+      "id": "scheduledDate",
+      "type": "date",
+      "required": false,
+      "description": "Scheduled execution date"
+    },
+    {
+      "id": "completionDate",
+      "type": "date",
+      "required": false,
+      "description": "Actual completion date"
+    },
+    {
+      "id": "workDescription",
+      "type": "string",
+      "required": true,
+      "description": "Description of the work to be performed"
+    },
+    {
+      "id": "rootCause",
+      "type": "string",
+      "required": false,
+      "description": "Identified root cause, if applicable"
+    },
+    {
+      "id": "partsUsed",
+      "type": "array_string",
+      "required": false,
+      "description": "List of parts or materials consumed"
+    },
+    {
+      "id": "laborHours",
+      "type": "number",
+      "required": false,
+      "description": "Total labor hours expended"
+    },
+    {
+      "id": "totalCost",
+      "type": "currency",
+      "required": false,
+      "description": "Total cost of work order (parts + labor)"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code"
+    },
+    {
+      "id": "approverName",
+      "type": "string",
+      "required": false,
+      "description": "Name of the person who approved or signed off"
+    },
+    {
+      "id": "remarks",
+      "type": "string",
+      "required": false,
+      "description": "Additional notes or observations"
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

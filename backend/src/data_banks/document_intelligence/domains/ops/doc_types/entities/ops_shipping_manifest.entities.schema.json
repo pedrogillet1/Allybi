@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "id": "di_ops_entities_ops_shipping_manifest",
+    "version": "1.0.0",
+    "description": "Entity extraction schema for shipping manifest documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_shipping_manifest"
+  },
+  "entities": [
+    {
+      "id": "docType",
+      "type": "string",
+      "required": true,
+      "description": "Detected document type identifier"
+    },
+    {
+      "id": "manifestNumber",
+      "type": "string",
+      "required": true,
+      "description": "Shipping manifest or bill of lading number"
+    },
+    {
+      "id": "shipmentDate",
+      "type": "date",
+      "required": true,
+      "description": "Date of shipment"
+    },
+    {
+      "id": "expectedDeliveryDate",
+      "type": "date",
+      "required": false,
+      "description": "Expected delivery date"
+    },
+    {
+      "id": "actualDeliveryDate",
+      "type": "date",
+      "required": false,
+      "description": "Actual delivery date"
+    },
+    {
+      "id": "shipperName",
+      "type": "string",
+      "required": true,
+      "description": "Shipper or consignor name"
+    },
+    {
+      "id": "shipperAddress",
+      "type": "string",
+      "required": false,
+      "description": "Shipper address"
+    },
+    {
+      "id": "consigneeName",
+      "type": "string",
+      "required": true,
+      "description": "Consignee or receiver name"
+    },
+    {
+      "id": "consigneeAddress",
+      "type": "string",
+      "required": false,
+      "description": "Consignee address"
+    },
+    {
+      "id": "carrierName",
+      "type": "string",
+      "required": false,
+      "description": "Carrier or transport company name"
+    },
+    {
+      "id": "transportMode",
+      "type": "enum",
+      "required": false,
+      "description": "Mode of transport",
+      "values": [
+        "road",
+        "rail",
+        "sea",
+        "air",
+        "multimodal",
+        "unknown"
+      ]
+    },
+    {
+      "id": "vehicleId",
+      "type": "string",
+      "required": false,
+      "description": "Vehicle plate, container number, or vessel name"
+    },
+    {
+      "id": "originLocation",
+      "type": "string",
+      "required": false,
+      "description": "Origin warehouse or port"
+    },
+    {
+      "id": "destinationLocation",
+      "type": "string",
+      "required": false,
+      "description": "Destination warehouse or port"
+    },
+    {
+      "id": "totalItems",
+      "type": "number",
+      "required": false,
+      "description": "Total number of line items or packages"
+    },
+    {
+      "id": "totalWeight",
+      "type": "number",
+      "required": false,
+      "description": "Total gross weight"
+    },
+    {
+      "id": "weightUnit",
+      "type": "string",
+      "required": false,
+      "description": "Weight unit (kg, lb, ton)"
+    },
+    {
+      "id": "totalVolume",
+      "type": "number",
+      "required": false,
+      "description": "Total volume"
+    },
+    {
+      "id": "volumeUnit",
+      "type": "string",
+      "required": false,
+      "description": "Volume unit (m3, ft3, CBM)"
+    },
+    {
+      "id": "declaredValue",
+      "type": "currency",
+      "required": false,
+      "description": "Declared value of the shipment"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": false,
+      "description": "Currency code"
+    },
+    {
+      "id": "incoterms",
+      "type": "string",
+      "required": false,
+      "description": "Incoterms designation (FOB, CIF, etc.)"
+    },
+    {
+      "id": "purchaseOrderNumber",
+      "type": "string",
+      "required": false,
+      "description": "Associated purchase order number"
+    },
+    {
+      "id": "languageDetected",
+      "type": "enum",
+      "required": true,
+      "description": "Detected language",
+      "values": [
+        "en",
+        "pt",
+        "mixed",
+        "unknown"
+      ]
+    },
+    {
+      "id": "documentPages",
+      "type": "number",
+      "required": false,
+      "description": "Page count"
+    },
+    {
+      "id": "confidenceScore",
+      "type": "number",
+      "required": false,
+      "description": "Overall extraction confidence"
+    }
+  ]
+}

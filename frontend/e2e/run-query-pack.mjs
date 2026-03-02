@@ -18,6 +18,14 @@ const OUT_FILE = String(arg('--out', 'frontend/e2e/reports/test1-bilingual-100-r
 const WAIT_MS = Number(arg('--wait-ms', '180000'));
 const READY_WAIT_MS = Number(arg('--wait-ready-ms', '90000'));
 const READY_POLL_MS = Number(arg('--ready-poll-ms', '3000'));
+const START_INDEX = Math.max(1, Number(arg('--start-index', '1')) || 1);
+const MAX_QUERIES = Math.max(0, Number(arg('--max-queries', '0')) || 0);
+const INITIAL_CONVERSATION_ID = String(arg('--conversation-id', '') || '').trim() || null;
+const APPEND_MODE = process.argv.includes('--append');
+const QUIET = process.argv.includes('--quiet');
+const REQUIRE_DOCUMENTS = String(
+  arg('--require-documents', process.env.E2E_REQUIRE_DOCUMENTS || ''),
+).trim().toLowerCase();
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 const httpAgent = new http.Agent();
@@ -109,19 +117,26 @@ function streamChat(body) {
       let evidence = null;
       let traceId = null;
       let conversationId = null;
+      let assistantTelemetry = null;
+      let streamError = null;
 
       res.on('data', (chunk) => {
         raw += chunk.toString();
         const lines = raw.split('\n');
         raw = lines.pop() || '';
         for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
+          if (!line.startsWith('data:')) continue;
           try {
-            const evt = JSON.parse(line.slice(6));
+            const evt = JSON.parse(line.replace(/^data:\s?/, ''));
             events.push(evt);
             if (evt.type === 'delta' && evt.text) fullText += evt.text;
             if (evt.type === 'sources' && Array.isArray(evt.sources)) sources = evt.sources;
             if (evt.type === 'meta' && evt.answerMode) answerMode = evt.answerMode;
+            if (evt.type === 'error' && evt.message) {
+              streamError = String(evt.message);
+              if (!fullText) fullText = streamError;
+              status = status || 'failed';
+            }
             if (evt.type === 'final') {
               if (evt.content) fullText = evt.content;
               else if (evt.assistantText) fullText = evt.assistantText;
@@ -135,6 +150,9 @@ function streamChat(body) {
               if (evt.evidence) evidence = evt.evidence;
               if (evt.traceId) traceId = evt.traceId;
               if (evt.conversationId) conversationId = evt.conversationId;
+              if (evt.assistantTelemetry && typeof evt.assistantTelemetry === 'object') {
+                assistantTelemetry = evt.assistantTelemetry;
+              }
             }
           } catch {}
         }
@@ -143,7 +161,7 @@ function streamChat(body) {
       res.on('end', () => {
         resolve({
           httpStatus: res.statusCode || 0,
-          error: null,
+          error: streamError,
           fullText,
           sources,
           answerMode,
@@ -154,6 +172,7 @@ function streamChat(body) {
           truncation,
           evidence,
           traceId,
+          assistantTelemetry,
           events,
           conversationId,
         });
@@ -254,10 +273,53 @@ function validateResolvedDocsReadiness(resolvedDocs) {
   return issues;
 }
 
+function normalizeDocTarget(target) {
+  if (!target || typeof target !== 'object') return null;
+  const id = String(target.id || target.documentId || '').trim();
+  const filename = String(target.filename || target.name || '').trim();
+  const alias = String(target.alias || target.key || '').trim();
+  if (!id && !filename && !alias) return null;
+  return { id, filename, alias };
+}
+
+function shouldRequireDocuments(packFile, explicitFlag) {
+  if (explicitFlag === '1' || explicitFlag === 'true' || explicitFlag === 'yes') {
+    return true;
+  }
+  if (explicitFlag === '0' || explicitFlag === 'false' || explicitFlag === 'no') {
+    return false;
+  }
+  // Default strict mode for curated human-style packs.
+  return /allybi-human-style/i.test(String(packFile || ''));
+}
+
 async function main() {
   const pack = JSON.parse(fs.readFileSync(PACK_FILE, 'utf8'));
-  const queryRows = Array.isArray(pack.queries) ? pack.queries : [];
-  if (queryRows.length === 0) throw new Error(`No queries in ${PACK_FILE}`);
+  const allQueryRows = Array.isArray(pack.queries) ? pack.queries : [];
+  if (allQueryRows.length === 0) throw new Error(`No queries in ${PACK_FILE}`);
+  if (START_INDEX > allQueryRows.length) {
+    throw new Error(
+      `--start-index ${START_INDEX} out of range for ${allQueryRows.length} queries in ${PACK_FILE}`,
+    );
+  }
+  const startOffset = START_INDEX - 1;
+  const queryRows = MAX_QUERIES > 0
+    ? allQueryRows.slice(startOffset, startOffset + MAX_QUERIES)
+    : allQueryRows.slice(startOffset);
+  if (queryRows.length === 0) {
+    throw new Error(
+      `No queries selected after slicing with --start-index ${START_INDEX} --max-queries ${MAX_QUERIES}`,
+    );
+  }
+  const requireDocuments = shouldRequireDocuments(PACK_FILE, REQUIRE_DOCUMENTS);
+  const docTargets = Array.isArray(pack.documents)
+    ? pack.documents.map(normalizeDocTarget).filter(Boolean)
+    : [];
+  if (requireDocuments && docTargets.length === 0) {
+    throw new Error(
+      `Pack ${PACK_FILE} must define at least one document target (id + filename recommended).`,
+    );
+  }
 
   const loginRes = await requestJson('POST', '/api/auth/login', { email: EMAIL, password: PASSWORD });
   if (loginRes.status !== 200) throw new Error(`Login failed HTTP ${loginRes.status}: ${loginRes.raw}`);
@@ -268,7 +330,25 @@ async function main() {
   let resolvedDocs = [];
   while (true) {
     const docsRes = await requestJson('GET', '/api/documents?limit=1000');
-    if (docsRes.status !== 200) throw new Error(`Documents list failed HTTP ${docsRes.status}`);
+    if (docsRes.status !== 200) {
+      // Localhost fallback: if pack is id-pinned, proceed without list endpoint.
+      // Some local DBs contain legacy enum data that can break /api/documents listing.
+      const allTargetsHaveIds = docTargets.length > 0 && docTargets.every((t) => t.id);
+      if (!allTargetsHaveIds) {
+        throw new Error(`Documents list failed HTTP ${docsRes.status}`);
+      }
+      console.warn(
+        `[run-query-pack] warning: /api/documents failed HTTP ${docsRes.status}; using id-only fallback for attachedDocuments`,
+      );
+      resolvedDocs = docTargets.map((target) => ({
+        id: target.id,
+        name: target.filename || target.alias || target.id,
+        type: 'application/octet-stream',
+        status: 'ready',
+        chunkCount: null,
+      }));
+      break;
+    }
     const availableDocs = docsFromResponse(docsRes.json)
       .map((d) => ({
         id: String(d.id || d.docId || d.documentId || '').trim(),
@@ -280,12 +360,35 @@ async function main() {
       .filter((d) => d.id && d.name);
 
     const nextResolved = [];
-    for (const target of pack.documents || []) {
-      const needle = normalizeName(target.filename || target.alias || target.key);
-      const match = availableDocs.find((d) => normalizeName(d.name) === needle) ||
-        availableDocs.find((d) => normalizeName(d.name).includes(needle) || needle.includes(normalizeName(d.name)));
-      if (!match) {
-        throw new Error(`Required document not found for pack target: ${target.filename || target.alias || target.key}`);
+    for (const target of docTargets) {
+      let match = null;
+      if (target.id) {
+        match = availableDocs.find((d) => d.id === target.id) || null;
+        if (!match) {
+          throw new Error(
+            `Required document id not found for pack target: ${target.id} (${target.filename || target.alias || 'unnamed'})`,
+          );
+        }
+      } else {
+        const needle = normalizeName(target.filename || target.alias);
+        const candidates = availableDocs.filter((d) => {
+          const normalized = normalizeName(d.name);
+          return normalized === needle ||
+            normalized.includes(needle) ||
+            needle.includes(normalized);
+        });
+        if (candidates.length === 0) {
+          throw new Error(
+            `Required document not found for pack target: ${target.filename || target.alias}`,
+          );
+        }
+        if (candidates.length > 1) {
+          const names = candidates.slice(0, 5).map((c) => `${c.name} (${c.id})`).join(', ');
+          throw new Error(
+            `Ambiguous document target "${target.filename || target.alias}" matched ${candidates.length} docs. Add explicit id. Candidates: ${names}`,
+          );
+        }
+        match = candidates[0];
       }
       if (!nextResolved.find((d) => d.id === match.id)) {
         nextResolved.push({
@@ -308,13 +411,39 @@ async function main() {
   }
 
   const documentIds = resolvedDocs.map((d) => d.id);
-  console.log(`Resolved ${resolvedDocs.length} attached documents for ${queryRows.length} queries.`);
+  if (!QUIET) {
+    console.log(
+      `Resolved ${resolvedDocs.length} attached documents for ${queryRows.length} queries (from index ${START_INDEX} of ${allQueryRows.length}).`,
+    );
+  }
 
-  let conversationId = null;
-  const results = [];
+  let conversationId = INITIAL_CONVERSATION_ID;
+  const resultsByIndex = new Map();
+  if (APPEND_MODE && fs.existsSync(OUT_FILE)) {
+    const previous = JSON.parse(fs.readFileSync(OUT_FILE, 'utf8'));
+    const prevRows = Array.isArray(previous?.results) ? previous.results : [];
+    for (const row of prevRows) {
+      const idx = Number(row?.index);
+      if (Number.isFinite(idx) && idx > 0) resultsByIndex.set(idx, row);
+    }
+    if (!conversationId) {
+      conversationId = String(
+        previous?.meta?.conversationId ||
+        prevRows
+          .slice()
+          .reverse()
+          .find((r) => r?.conversationId)?.conversationId ||
+        '',
+      ).trim() || null;
+    }
+  }
+  const chunkResults = [];
   for (let idx = 0; idx < queryRows.length; idx += 1) {
     const q = queryRows[idx];
-    process.stdout.write(`Q${String(idx + 1).padStart(3, '0')}/${queryRows.length} [${q.language}] ... `);
+    const globalIndex = startOffset + idx + 1;
+    if (!QUIET) {
+      process.stdout.write(`Q${String(globalIndex).padStart(3, '0')}/${allQueryRows.length} [${q.language}] ... `);
+    }
     const start = Date.now();
     const preferredLanguage = q.language || 'pt';
     let response;
@@ -333,22 +462,63 @@ async function main() {
     }
 
     if (response.conversationId) conversationId = response.conversationId;
+    const responseMetadata =
+      response.metadata && typeof response.metadata === 'object'
+        ? response.metadata
+        : {};
+    const rawTelemetry =
+      response.assistantTelemetry &&
+      typeof response.assistantTelemetry === 'object'
+        ? response.assistantTelemetry
+        : responseMetadata.telemetry &&
+          typeof responseMetadata.telemetry === 'object'
+          ? responseMetadata.telemetry
+          : null;
+    const assistantTelemetry = rawTelemetry
+      ? {
+          provider: typeof rawTelemetry.provider === 'string' ? rawTelemetry.provider : null,
+          model: typeof rawTelemetry.model === 'string' ? rawTelemetry.model : null,
+          finishReason:
+            typeof rawTelemetry.finishReason === 'string' ? rawTelemetry.finishReason : null,
+          promptType: typeof rawTelemetry.promptType === 'string' ? rawTelemetry.promptType : null,
+          requestedMaxOutputTokens:
+            Number.isFinite(Number(rawTelemetry.requestedMaxOutputTokens))
+              ? Number(rawTelemetry.requestedMaxOutputTokens)
+              : null,
+          usage:
+            rawTelemetry.usage && typeof rawTelemetry.usage === 'object'
+              ? {
+                  promptTokens: Number.isFinite(Number(rawTelemetry.usage.promptTokens))
+                    ? Number(rawTelemetry.usage.promptTokens)
+                    : null,
+                  completionTokens: Number.isFinite(Number(rawTelemetry.usage.completionTokens))
+                    ? Number(rawTelemetry.usage.completionTokens)
+                    : null,
+                  totalTokens: Number.isFinite(Number(rawTelemetry.usage.totalTokens))
+                    ? Number(rawTelemetry.usage.totalTokens)
+                    : null,
+                }
+              : null,
+        }
+      : null;
 
     const row = {
-      index: idx + 1,
+      index: globalIndex,
       query: q.text,
       expectedLanguage: q.language || 'pt',
       queryType: q.type || null,
       queryTargets: q.targets || [],
       response: String(response.fullText || '').trim(),
+      assistantTelemetry,
+      conversationId: conversationId || null,
       sources: Array.isArray(response.sources) ? response.sources : [],
       answerMode: response.answerMode || null,
-      truncation: response.truncation || (Boolean(response.metadata?.truncation?.occurred || response.metadata?.truncated === true) ? response.metadata?.truncation || { occurred: true } : null),
-      failureCode: response.failureCode || response.metadata?.failureCode || null,
-      fallbackReasonCode: response.fallbackReasonCode || response.metadata?.fallbackReasonCode || null,
-      responseStatus: response.status || response.metadata?.status || null,
-      traceId: response.traceId || response.metadata?.traceId || null,
-      evidence: response.evidence || response.metadata?.evidence || null,
+      truncation: response.truncation || (Boolean(responseMetadata?.truncation?.occurred || responseMetadata?.truncated === true) ? responseMetadata?.truncation || { occurred: true } : null),
+      failureCode: response.failureCode || responseMetadata?.failureCode || null,
+      fallbackReasonCode: response.fallbackReasonCode || responseMetadata?.fallbackReasonCode || null,
+      responseStatus: response.status || responseMetadata?.status || null,
+      traceId: response.traceId || responseMetadata?.traceId || null,
+      evidence: response.evidence || responseMetadata?.evidence || null,
       status: response.error || response.httpStatus >= 400 ? 'error' : 'ok',
       errorDetail: response.error || null,
       durationMs: Date.now() - start,
@@ -358,9 +528,13 @@ async function main() {
         errorBody: response.error || null,
       },
     };
-    results.push(row);
-    process.stdout.write(`${row.status.toUpperCase()} (${row.durationMs}ms)\n`);
+    chunkResults.push(row);
+    resultsByIndex.set(row.index, row);
+    if (!QUIET) {
+      process.stdout.write(`${row.status.toUpperCase()} (${row.durationMs}ms)\n`);
+    }
 
+    const mergedResults = [...resultsByIndex.values()].sort((a, b) => Number(a.index) - Number(b.index));
     fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
     fs.writeFileSync(OUT_FILE, JSON.stringify({
       meta: {
@@ -369,15 +543,23 @@ async function main() {
         base: BASE,
         account: EMAIL,
         documentsAttached: resolvedDocs,
-        totalQueries: queryRows.length,
+        totalQueries: allQueryRows.length,
+        selectedStartIndex: START_INDEX,
+        selectedCount: queryRows.length,
+        conversationId: conversationId || null,
+        appendMode: APPEND_MODE,
       },
-      results,
+      results: mergedResults,
     }, null, 2));
   }
 
-  const errors = results.filter((r) => r.status !== 'ok').length;
-  console.log(`Completed. ok=${results.length - errors} error=${errors} output=${OUT_FILE}`);
-  if (errors > 0) process.exit(2);
+  const chunkErrors = chunkResults.filter((r) => r.status !== 'ok').length;
+  if (!QUIET) {
+    console.log(
+      `Completed chunk. ok=${chunkResults.length - chunkErrors} error=${chunkErrors} output=${OUT_FILE} conversationId=${conversationId || 'none'}`,
+    );
+  }
+  if (chunkErrors > 0) process.exit(2);
 }
 
 main().catch((err) => {

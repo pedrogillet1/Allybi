@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "id": "di_ops_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for operations domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "language": "pt"
+  },
+  "domain": "ops",
+  "terms": [
+    {
+      "id": "ops_lex_pt_ordem_servico",
+      "canonical": "ordem de servico",
+      "synonyms": [
+        "OS",
+        "requisicao de manutencao"
+      ],
+      "display": "Ordem de Servico"
+    },
+    {
+      "id": "ops_lex_pt_incidente",
+      "canonical": "incidente",
+      "synonyms": [
+        "ocorrencia",
+        "evento de falha"
+      ],
+      "display": "Incidente"
+    },
+    {
+      "id": "ops_lex_pt_manutencao_preventiva",
+      "canonical": "manutencao preventiva",
+      "synonyms": [
+        "manutencao programada",
+        "manutencao planejada"
+      ],
+      "display": "Manutencao Preventiva"
+    },
+    {
+      "id": "ops_lex_pt_manutencao_corretiva",
+      "canonical": "manutencao corretiva",
+      "synonyms": [
+        "manutencao nao planejada",
+        "reparo"
+      ],
+      "display": "Manutencao Corretiva"
+    },
+    {
+      "id": "ops_lex_pt_romaneio",
+      "canonical": "romaneio",
+      "synonyms": [
+        "conhecimento de embarque",
+        "manifesto de carga"
+      ],
+      "display": "Romaneio"
+    },
+    {
+      "id": "ops_lex_pt_lista_embalagem",
+      "canonical": "lista de embalagem",
+      "synonyms": [
+        "nota de entrega"
+      ],
+      "display": "Lista de Embalagem"
+    },
+    {
+      "id": "ops_lex_pt_inspecao_qualidade",
+      "canonical": "inspecao de qualidade",
+      "synonyms": [
+        "verificacao de qualidade",
+        "auditoria de qualidade"
+      ],
+      "display": "Inspecao de Qualidade"
+    },
+    {
+      "id": "ops_lex_pt_nao_conformidade",
+      "canonical": "nao conformidade",
+      "synonyms": [
+        "defeito",
+        "desvio",
+        "RNC"
+      ],
+      "display": "Nao Conformidade"
+    },
+    {
+      "id": "ops_lex_pt_vazao",
+      "canonical": "vazao",
+      "synonyms": [
+        "taxa de producao",
+        "throughput"
+      ],
+      "display": "Vazao"
+    },
+    {
+      "id": "ops_lex_pt_tempo_ciclo",
+      "canonical": "tempo de ciclo",
+      "synonyms": [
+        "takt time",
+        "tempo de processamento"
+      ],
+      "display": "Tempo de Ciclo"
+    },
+    {
+      "id": "ops_lex_pt_parada",
+      "canonical": "parada",
+      "synonyms": [
+        "indisponibilidade",
+        "tempo inativo"
+      ],
+      "display": "Parada"
+    },
+    {
+      "id": "ops_lex_pt_disponibilidade",
+      "canonical": "disponibilidade",
+      "synonyms": [
+        "tempo operacional",
+        "uptime"
+      ],
+      "display": "Disponibilidade"
+    },
+    {
+      "id": "ops_lex_pt_lead_time",
+      "canonical": "lead time",
+      "synonyms": [
+        "prazo de entrega",
+        "prazo de aquisicao"
+      ],
+      "display": "Lead Time"
+    },
+    {
+      "id": "ops_lex_pt_estoque_seguranca",
+      "canonical": "estoque de seguranca",
+      "synonyms": [
+        "estoque reserva",
+        "estoque minimo"
+      ],
+      "display": "Estoque de Seguranca"
+    },
+    {
+      "id": "ops_lex_pt_ponto_reposicao",
+      "canonical": "ponto de reposicao",
+      "synonyms": [
+        "nivel minimo de estoque"
+      ],
+      "display": "Ponto de Reposicao"
+    },
+    {
+      "id": "ops_lex_pt_ordem_compra",
+      "canonical": "ordem de compra",
+      "synonyms": [
+        "OC",
+        "pedido de compra"
+      ],
+      "display": "Ordem de Compra"
+    },
+    {
+      "id": "ops_lex_pt_lista_materiais",
+      "canonical": "lista de materiais",
+      "synonyms": [
+        "BOM",
+        "lista de pecas"
+      ],
+      "display": "Lista de Materiais"
+    },
+    {
+      "id": "ops_lex_pt_acordo_nivel_servico",
+      "canonical": "acordo de nivel de servico",
+      "synonyms": [
+        "SLA",
+        "contrato de servico"
+      ],
+      "display": "Acordo de Nivel de Servico"
+    },
+    {
+      "id": "ops_lex_pt_eficiencia_equipamento",
+      "canonical": "eficiencia global do equipamento",
+      "synonyms": [
+        "OEE",
+        "eficiencia de equipamento"
+      ],
+      "display": "Eficiencia Global do Equipamento"
+    },
+    {
+      "id": "ops_lex_pt_causa_raiz",
+      "canonical": "causa raiz",
+      "synonyms": [
+        "analise de causa raiz",
+        "ACR"
+      ],
+      "display": "Causa Raiz"
+    }
+  ]
+}

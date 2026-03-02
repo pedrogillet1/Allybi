@@ -177,6 +177,65 @@ function parseFindReplaceDirective(instruction: string): {
   };
 }
 
+function parseOrdinalIndex(
+  instruction: string,
+  labels: string[],
+): number | null {
+  const labelGroup = labels.map((label) => label.replace(/\s+/g, "\\s+")).join("|");
+  const rx = new RegExp(
+    `\\b(?:${labelGroup})\\s*(?:#|n(?:o|º)?\\.?\\s*)?(\\d{1,3})\\b`,
+    "i",
+  );
+  const match = String(instruction || "").match(rx);
+  if (!match?.[1]) return null;
+  const n = Number(match[1]);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : null;
+}
+
+function parseTableDimensions(instruction: string): {
+  rows?: number;
+  cols?: number;
+} {
+  const text = String(instruction || "");
+  const rowsMatch = text.match(/\b(?:rows?|linhas?)\s*(?:=|:)?\s*(\d{1,2})\b/i);
+  const colsMatch = text.match(
+    /\b(?:cols?|columns?|colunas?)\s*(?:=|:)?\s*(\d{1,2})\b/i,
+  );
+  const compactMatch = text.match(/\b(\d{1,2})\s*(?:x|by)\s*(\d{1,2})\b/i);
+  const rows = rowsMatch?.[1]
+    ? Number(rowsMatch[1])
+    : compactMatch?.[1]
+      ? Number(compactMatch[1])
+      : undefined;
+  const cols = colsMatch?.[1]
+    ? Number(colsMatch[1])
+    : compactMatch?.[2]
+      ? Number(compactMatch[2])
+      : undefined;
+  return { rows, cols };
+}
+
+function parseTablePosition(instruction: string): string | null {
+  const low = String(instruction || "").toLowerCase();
+  if (/\b(?:top|start|beginning|in[ií]cio)\b/.test(low)) return "top";
+  if (/\b(?:end|bottom|append|fim)\b/.test(low)) return "end";
+  if (/\b(?:before|antes)\b/.test(low)) return "before";
+  if (/\b(?:after|depois)\b/.test(low)) return "after";
+  return null;
+}
+
+function normalizePositiveInt(
+  value: unknown,
+  fallback: number,
+  bounds?: { min?: number; max?: number },
+): number {
+  const min = Number.isFinite(Number(bounds?.min)) ? Number(bounds!.min) : 1;
+  const max = Number.isFinite(Number(bounds?.max)) ? Number(bounds!.max) : 99;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return Math.min(max, Math.max(min, Math.floor(n)));
+}
+
 function postProcessTaskOutput(taskId: PromptTaskId, rawText: string): string {
   const cleaned = normalizeOutput(rawText);
   if (!cleaned) return "";
@@ -323,6 +382,194 @@ export class EditingTextGenerationService {
             {
               kind: "docx_find_replace",
               ...directive,
+            },
+          ],
+        }),
+      };
+    }
+
+    if (canonical === "DOCX_UPDATE_TOC") {
+      return {
+        ok: true,
+        generated: true,
+        proposedText: JSON.stringify({
+          patches: [{ kind: "docx_update_toc" }],
+        }),
+      };
+    }
+
+    if (canonical === "DOCX_CREATE_TABLE") {
+      const metadata = ((input.plan as any)?.metadata || {}) as Record<
+        string,
+        unknown
+      >;
+      const dims = parseTableDimensions(input.plan.normalizedInstruction);
+      const rows = normalizePositiveInt(
+        metadata.rows ?? metadata.rowCount ?? dims.rows,
+        3,
+        { min: 1, max: 50 },
+      );
+      const cols = normalizePositiveInt(
+        metadata.cols ?? metadata.colCount ?? dims.cols,
+        3,
+        { min: 1, max: 20 },
+      );
+      const headerRow =
+        metadata.headerRow == null ? true : Boolean(metadata.headerRow);
+      const targetId = String(
+        metadata.targets ?? metadata.targetId ?? metadata.paragraphId ?? "",
+      ).trim();
+
+      return {
+        ok: true,
+        generated: true,
+        proposedText: JSON.stringify({
+          patches: [
+            {
+              kind: "docx_create_table",
+              ...(targetId ? { paragraphId: targetId } : {}),
+              rows,
+              cols,
+              headerRow,
+            },
+          ],
+        }),
+      };
+    }
+
+    if (canonical === "DOCX_ADD_TABLE_ROW") {
+      const metadata = ((input.plan as any)?.metadata || {}) as Record<
+        string,
+        unknown
+      >;
+      const tableIndex =
+        normalizePositiveInt(
+          metadata.tableIndex ??
+            parseOrdinalIndex(input.plan.normalizedInstruction, [
+              "table",
+              "tabela",
+            ]),
+          1,
+          { min: 1, max: 500 },
+        ) || 1;
+      const parsedRowIndex = parseOrdinalIndex(input.plan.normalizedInstruction, [
+        "row",
+        "linha",
+      ]);
+      const rowIndexRaw =
+        metadata.rowIndex != null ? Number(metadata.rowIndex) : parsedRowIndex;
+      const position =
+        String(metadata.position || parseTablePosition(input.plan.normalizedInstruction) || "end")
+          .trim()
+          .toLowerCase();
+
+      return {
+        ok: true,
+        generated: true,
+        proposedText: JSON.stringify({
+          patches: [
+            {
+              kind: "docx_add_table_row",
+              tableIndex,
+              ...(typeof rowIndexRaw === "number" &&
+              Number.isFinite(rowIndexRaw) &&
+              rowIndexRaw > 0
+                ? { rowIndex: Math.floor(rowIndexRaw) }
+                : {}),
+              position,
+            },
+          ],
+        }),
+      };
+    }
+
+    if (canonical === "DOCX_DELETE_TABLE_ROW") {
+      const metadata = ((input.plan as any)?.metadata || {}) as Record<
+        string,
+        unknown
+      >;
+      const tableIndex = normalizePositiveInt(
+        metadata.tableIndex ??
+          parseOrdinalIndex(input.plan.normalizedInstruction, ["table", "tabela"]),
+        1,
+        { min: 1, max: 500 },
+      );
+      const rowIndex = normalizePositiveInt(
+        metadata.rowIndex ??
+          parseOrdinalIndex(input.plan.normalizedInstruction, ["row", "linha"]),
+        0,
+        { min: 0, max: 5000 },
+      );
+      if (rowIndex <= 0) {
+        return {
+          ok: false,
+          error:
+            "DOCX_DELETE_TABLE_ROW requires an explicit row index (for example: delete row 2 in table 1).",
+        };
+      }
+      return {
+        ok: true,
+        generated: true,
+        proposedText: JSON.stringify({
+          patches: [
+            {
+              kind: "docx_delete_table_row",
+              tableIndex,
+              rowIndex,
+            },
+          ],
+        }),
+      };
+    }
+
+    if (canonical === "DOCX_SET_TABLE_CELL") {
+      const metadata = ((input.plan as any)?.metadata || {}) as Record<
+        string,
+        unknown
+      >;
+      const tableIndex = normalizePositiveInt(
+        metadata.tableIndex ??
+          parseOrdinalIndex(input.plan.normalizedInstruction, ["table", "tabela"]),
+        1,
+        { min: 1, max: 500 },
+      );
+      const rowIndex = normalizePositiveInt(
+        metadata.rowIndex ??
+          parseOrdinalIndex(input.plan.normalizedInstruction, ["row", "linha"]),
+        0,
+        { min: 0, max: 5000 },
+      );
+      const colIndex = normalizePositiveInt(
+        metadata.colIndex ??
+          parseOrdinalIndex(input.plan.normalizedInstruction, [
+            "column",
+            "col",
+            "coluna",
+          ]),
+        0,
+        { min: 0, max: 5000 },
+      );
+      const textValue =
+        String(metadata.text || extractQuotedValues(input.plan.normalizedInstruction)[0] || "")
+          .trim();
+      if (rowIndex <= 0 || colIndex <= 0 || !textValue) {
+        return {
+          ok: false,
+          error:
+            'DOCX_SET_TABLE_CELL requires row, column, and text (for example: set table 1 row 2 column 3 to "Revenue").',
+        };
+      }
+      return {
+        ok: true,
+        generated: true,
+        proposedText: JSON.stringify({
+          patches: [
+            {
+              kind: "docx_set_table_cell",
+              tableIndex,
+              rowIndex,
+              colIndex,
+              text: textValue,
             },
           ],
         }),

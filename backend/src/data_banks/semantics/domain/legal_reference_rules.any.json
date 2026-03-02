@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "legal_reference_rules",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Legal reference rules enforcing exact quote/location fidelity, ambiguity handling, and cross-document comparison gates.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "legal"
+    "domain": "legal",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "legal",
   "definitions": [
@@ -2166,6 +2181,21 @@
           "en": "I found more than one matching clause. Which section should I use?",
           "pt": "Encontrei mais de uma cláusula correspondente. Qual seção devo usar?"
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:ambiguous_location_requires_one_disambiguation_question",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2209,6 +2239,21 @@
           "en": "The amendment chain appears incomplete or out of sequence. Should I flag the gap?",
           "pt": "A cadeia de aditivos parece incompleta ou fora de sequência. Devo sinalizar a lacuna?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:amendment_chains_must_be_sequential_and_complete",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2252,6 +2297,21 @@
           "en": "An annex/schedule reference does not match an attached document. Should I flag the mismatch?",
           "pt": "Uma referência a anexo/cronograma não corresponde a um documento anexado. Devo sinalizar a incompatibilidade?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:annex_schedule_references_must_match_actual_attached_documents",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2294,6 +2354,21 @@
           "en": "I need to apply Ambiguity Marker. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Ambiguity Marker. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -2336,6 +2411,21 @@
           "en": "I need to apply Amendment Chain Integrity. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Amendment Chain Integrity. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2378,6 +2468,21 @@
           "en": "I need to apply Annex/Schedule Reference Validation. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Annex/Schedule Reference Validation. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2420,6 +2525,21 @@
           "en": "I need to apply Applicable Law Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Applicable Law Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2462,6 +2582,21 @@
           "en": "I need to apply Arbitration Institution Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Arbitration Institution Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2504,6 +2639,21 @@
           "en": "I need to apply Authority Delegation Chain. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Authority Delegation Chain. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2546,6 +2696,21 @@
           "en": "I need to apply Beneficial Ownership Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Beneficial Ownership Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2588,6 +2753,21 @@
           "en": "I need to apply Boilerplate Clause Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Boilerplate Clause Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2630,6 +2810,21 @@
           "en": "I need to apply Capitalized Term Tracking. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Capitalized Term Tracking. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2672,6 +2867,21 @@
           "en": "I need to apply Certificate Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Certificate Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2714,6 +2924,21 @@
           "en": "I need to apply Change Log Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Change Log Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2756,6 +2981,21 @@
           "en": "I need to apply Citation Conflict Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Citation Conflict Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2798,6 +3038,21 @@
           "en": "I need to apply Citation Format Standard. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Citation Format Standard. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2840,6 +3095,21 @@
           "en": "I need to apply Citation Order Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Citation Order Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2882,6 +3152,21 @@
           "en": "I need to apply Citation Uniqueness Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Citation Uniqueness Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2924,6 +3209,21 @@
           "en": "I need to apply Clause Family Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Clause Family Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -2966,6 +3266,21 @@
           "en": "I need to apply Closing Condition Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Closing Condition Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3008,6 +3323,21 @@
           "en": "I need to apply Collateral Description Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Collateral Description Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3050,6 +3380,21 @@
           "en": "I need to apply Commencement Date Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Commencement Date Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3092,6 +3437,21 @@
           "en": "I need to apply Comparison Alignment Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Comparison Alignment Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3134,6 +3494,21 @@
           "en": "I need to apply Compliance Standard Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Compliance Standard Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3176,6 +3551,21 @@
           "en": "I need to apply Condition Precedent Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Condition Precedent Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3218,6 +3608,21 @@
           "en": "I need to apply Confidentiality Exception Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Confidentiality Exception Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3260,6 +3665,21 @@
           "en": "I need to apply Consent Authority Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Consent Authority Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3302,6 +3722,21 @@
           "en": "I need to apply Corporate Charter Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Corporate Charter Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3344,6 +3779,21 @@
           "en": "I need to apply Counterpart Execution Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Counterpart Execution Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3386,6 +3836,21 @@
           "en": "I need to apply Counterparty Role Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Counterparty Role Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3428,6 +3893,21 @@
           "en": "I need to apply Covenant Compliance Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Covenant Compliance Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3470,6 +3950,21 @@
           "en": "I need to apply Cross-Reference Resolution. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Cross-Reference Resolution. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3512,6 +4007,21 @@
           "en": "I need to apply Cross-Reference Validation. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Cross-Reference Validation. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3554,6 +4064,21 @@
           "en": "I need to apply Currency Specification Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Currency Specification Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3596,6 +4121,21 @@
           "en": "I need to apply Data Processing Agreement Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Data Processing Agreement Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3638,6 +4178,21 @@
           "en": "I need to apply Defined Term Consistency. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Defined Term Consistency. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3680,6 +4235,21 @@
           "en": "I need to apply Defined Term Resolution. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Defined Term Resolution. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3722,6 +4292,21 @@
           "en": "I need to apply Definition Section Completeness. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Definition Section Completeness. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3764,6 +4349,21 @@
           "en": "I need to apply Designated Account Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Designated Account Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3806,6 +4406,21 @@
           "en": "I need to apply Disclosure Schedule Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Disclosure Schedule Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3848,6 +4463,21 @@
           "en": "I need to apply Dispute Notice Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Dispute Notice Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3890,6 +4520,21 @@
           "en": "I need to apply Document Hierarchy Linkage. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Document Hierarchy Linkage. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3932,6 +4577,21 @@
           "en": "I need to apply Document ID Anchor. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Document ID Anchor. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3974,6 +4634,21 @@
           "en": "I need to apply Due Diligence Item Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Due Diligence Item Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4016,6 +4691,21 @@
           "en": "I need to apply Electronic Signature Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Electronic Signature Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4058,6 +4748,21 @@
           "en": "I need to apply Escrow Agent Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Escrow Agent Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4100,6 +4805,21 @@
           "en": "I need to apply Exception/Carve-out Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Exception/Carve-out Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 84,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4142,6 +4862,21 @@
           "en": "I need to apply Exhibit Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Exhibit Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 85,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4184,6 +4919,21 @@
           "en": "I need to apply Expert Determination Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Expert Determination Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 86,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4226,6 +4976,21 @@
           "en": "I need to apply Fallback Disambiguation Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Fallback Disambiguation Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 87,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4268,6 +5033,21 @@
           "en": "I need to apply Filing Requirement Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Filing Requirement Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 88,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4310,6 +5090,21 @@
           "en": "I need to apply Financial Covenant Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Financial Covenant Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 89,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4352,6 +5147,21 @@
           "en": "I need to apply Forum Selection Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Forum Selection Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 90,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4394,6 +5204,21 @@
           "en": "I need to apply Funding Condition Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Funding Condition Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 91,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4436,6 +5261,21 @@
           "en": "I need to apply Governing Document Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Governing Document Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 92,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4478,6 +5318,21 @@
           "en": "I need to apply Governing Law Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Governing Law Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 93,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4520,6 +5375,21 @@
           "en": "I need to apply Guarantor Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Guarantor Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 94,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4562,6 +5432,21 @@
           "en": "I need to apply Insurance Policy Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Insurance Policy Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 95,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4604,6 +5489,21 @@
           "en": "I need to apply Intellectual Property Schedule Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Intellectual Property Schedule Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 96,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4646,6 +5546,21 @@
           "en": "I need to apply Interest Rate Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Interest Rate Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 97,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4688,6 +5603,21 @@
           "en": "I need to apply Joinder Agreement Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Joinder Agreement Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 98,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4730,6 +5660,21 @@
           "en": "I need to apply Jurisdictional Term Normalization. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Jurisdictional Term Normalization. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 99,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4772,6 +5717,21 @@
           "en": "I need to apply Key Employee Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Key Employee Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 100,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4814,6 +5774,21 @@
           "en": "I need to apply Landlord Consent Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Landlord Consent Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 101,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4856,6 +5831,21 @@
           "en": "I need to apply Lender Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Lender Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 102,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4898,6 +5888,21 @@
           "en": "I need to apply License Agreement Reference. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar License Agreement Reference. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 103,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4940,6 +5945,21 @@
           "en": "I need to apply Clause Number Location. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Clause Number Location. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 104,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4982,6 +6002,21 @@
           "en": "I need to apply Location Format Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Location Format Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 105,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5024,6 +6059,21 @@
           "en": "I need to apply Heading Path Location. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Heading Path Location. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 106,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5066,6 +6116,21 @@
           "en": "I need to apply Page + Line Location. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Page + Line Location. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 107,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5108,6 +6173,21 @@
           "en": "I need to apply Table Cell Location. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Table Cell Location. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 108,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5150,6 +6230,21 @@
           "en": "I need to apply Missing Location Marker. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Missing Location Marker. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 109,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5192,6 +6287,21 @@
           "en": "I need to apply Monetary Cap Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Monetary Cap Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 110,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5234,6 +6344,21 @@
           "en": "I need to apply Notice Mechanism Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Notice Mechanism Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 111,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5276,6 +6401,21 @@
           "en": "I need to apply Obligation Direction Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Obligation Direction Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 112,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5318,6 +6458,21 @@
           "en": "I need to apply Provenance Block Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Provenance Block Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 113,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5360,6 +6515,21 @@
           "en": "I need to apply Quote Integrity Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Quote Integrity Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 114,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5402,6 +6572,21 @@
           "en": "I need to apply Quote Language Marker. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Quote Language Marker. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 115,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5444,6 +6629,21 @@
           "en": "I need to apply Exact Quote Mode. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Exact Quote Mode. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 116,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5486,6 +6686,21 @@
           "en": "I need to apply Snippet Quote Mode. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Snippet Quote Mode. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 117,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5528,6 +6743,21 @@
           "en": "I need to apply Quote Redaction Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Quote Redaction Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 118,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5570,6 +6800,21 @@
           "en": "I need to apply Quote Truncation Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Quote Truncation Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 119,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5612,6 +6857,21 @@
           "en": "I need to apply Quote Word Limit Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Quote Word Limit Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 120,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5654,6 +6914,21 @@
           "en": "I need to apply Redline Anchor Policy. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Redline Anchor Policy. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 121,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5696,6 +6971,21 @@
           "en": "I need to apply Section Confidence Score. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Section Confidence Score. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 122,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5738,6 +7028,21 @@
           "en": "I need to apply Single Question Gate. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Single Question Gate. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 123,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5782,6 +7087,21 @@
           "en": "I need to apply Source Request Gate. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Source Request Gate. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 124,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5824,6 +7144,21 @@
           "en": "I need to apply Structured Output Blocks. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Structured Output Blocks. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 125,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5866,6 +7201,21 @@
           "en": "I need to apply Temporal Scope Tagging. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Temporal Scope Tagging. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 126,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5907,6 +7257,21 @@
           "en": "I need to apply Translation Guard. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Translation Guard. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 127,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5949,6 +7314,21 @@
           "en": "I need to apply Version Lock. Should I continue with strict quote+location enforcement?",
           "pt": "Preciso aplicar Version Lock. Devo continuar com aplicação estrita de citação+localização?"
         }
+      },
+      "precedence": 128,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:reference_policy_enforcement",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5992,6 +7372,21 @@
           "en": "The arbitration institution may no longer be active. Should I verify its current status?",
           "pt": "A instituição arbitral pode não estar mais ativa. Devo verificar seu status atual?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:arbitration_institution_must_be_verified_as_current",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6031,6 +7426,21 @@
           "en": "I found cap text but missing currency/period. Which basis should I use?",
           "pt": "Encontrei texto de limite, mas faltam moeda/período. Qual base devo usar?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:liability_cap_references_must_include_amount,_currency,_and_period_basis",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6074,6 +7484,21 @@
           "en": "A referenced certificate template is not attached as an exhibit. Should I flag the missing attachment?",
           "pt": "Um modelo de certificado referenciado não está anexado como anexo. Devo sinalizar o anexo ausente?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:certificate_templates_referenced_must_be_attached_as_exhibits",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6117,6 +7542,21 @@
           "en": "Closing conditions do not cross-reference specific representations. Should I flag for linkage?",
           "pt": "As condições de fechamento não fazem referência cruzada a declarações específicas. Devo sinalizar para vinculação?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:closing_conditions_must_cross_reference_to_specific_representations",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6160,6 +7600,21 @@
           "en": "Collateral description does not cross-reference the security agreement. Should I flag the gap?",
           "pt": "A descrição da garantia não faz referência cruzada ao contrato de garantia. Devo sinalizar a lacuna?"
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:collateral_descriptions_must_cross_reference_to_security_agreement",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6203,6 +7658,21 @@
           "en": "Compliance standard reference lacks version specification. Should I flag for clarification?",
           "pt": "A referência ao padrão de conformidade não especifica a versão. Devo sinalizar para esclarecimento?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:compliance_standard_references_need_version_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6246,6 +7716,21 @@
           "en": "Confidentiality exceptions do not cross-reference specific permitted disclosures. Should I flag?",
           "pt": "As exceções de confidencialidade não fazem referência cruzada a divulgações permitidas específicas. Devo sinalizar?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:confidentiality_exceptions_must_cross_reference_to_specific_permitted_disclosures",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6287,6 +7772,21 @@
           "en": "I found conflicting clauses. Should I present both with confidence labels?",
           "pt": "Encontrei cláusulas conflitantes. Devo apresentar ambas com rótulo de confiança?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:conflicting_clause_evidence_should_be_surfaced,_not_merged_silently",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6330,6 +7830,21 @@
           "en": "Corporate charter reference lacks jurisdiction and filing number. Should I flag for completion?",
           "pt": "A referência ao estatuto social não possui jurisdição e número de registro. Devo sinalizar para completar?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:corporate_charter_references_need_jurisdiction_and_filing_number",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6369,6 +7884,21 @@
           "en": "Should I tag this obligation as vendor-to-client or client-to-vendor?",
           "pt": "Devo marcar esta obrigação como fornecedor-para-cliente ou cliente-para-fornecedor?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:references_must_include_counterparty_direction_when_obligations_differ",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6412,6 +7942,21 @@
           "en": "Covenant compliance certificate lacks measurement period specification. Should I flag?",
           "pt": "O certificado de conformidade com convênios não especifica o período de medição. Devo sinalizar?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:covenant_compliance_certificates_need_measurement_period_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6455,6 +8000,21 @@
           "en": "Conditions precedent are not enumerable or verifiable. Should I flag for specification?",
           "pt": "As condições precedentes não são enumeráveis ou verificáveis. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:condition_precedents_must_be_enumerable_and_verifiable",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6494,6 +8054,21 @@
           "en": "To compare clauses, which two documents should I lock?",
           "pt": "Para comparar cláusulas, quais dois documentos devo fixar?"
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:cross-document_compare_requires_explicit_2+_resolved_docs",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6537,6 +8112,21 @@
           "en": "Currency specification lacks conversion rate date. Should I flag for clarification?",
           "pt": "A especificação de moeda não possui data da taxa de conversão. Devo sinalizar para esclarecimento?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:currency_specifications_need_conversion_rate_date",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6580,6 +8170,21 @@
           "en": "Some defined terms cannot be traced to the definitions section. Should I flag the unresolved terms?",
           "pt": "Alguns termos definidos não podem ser rastreados à seção de definições. Devo sinalizar os termos não resolvidos?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:all_defined_terms_must_be_traced_to_definitions_section",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6623,6 +8228,21 @@
           "en": "Disclosure schedule lacks section-by-section mapping. Should I flag for alignment?",
           "pt": "O cronograma de divulgação não possui mapeamento seção por seção. Devo sinalizar para alinhamento?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:disclosure_schedules_need_section_by_section_mapping",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6662,6 +8282,21 @@
           "en": "Should I lock to the latest signed version only?",
           "pt": "Devo fixar apenas na versão assinada mais recente?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:lock_references_to_one_document_version_unless_compare_requested",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6705,6 +8340,21 @@
           "en": "DPA does not clearly identify controller/processor roles. Should I flag for specification?",
           "pt": "O DPA não identifica claramente os papéis de controlador/operador. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:data_processing_agreements_need_controller_processor_role_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6748,6 +8398,21 @@
           "en": "Electronic signature clause may not be compatible with governing law. Should I verify?",
           "pt": "A cláusula de assinatura eletrônica pode não ser compatível com a lei aplicável. Devo verificar?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:electronic_signature_clauses_need_governing_law_compatibility_check",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6789,6 +8454,21 @@
           "en": "Should I block this conclusion until I can attach an exact quote?",
           "pt": "Devo bloquear esta conclusão até anexar uma citação exata?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:exact_quote_required_for_legal_conclusion",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6832,6 +8512,21 @@
           "en": "Expert determination clause lacks appointing body identification. Should I flag for specification?",
           "pt": "A cláusula de determinação por perito não identifica o órgão nomeador. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:expert_determination_clauses_need_appointing_body_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6875,6 +8570,21 @@
           "en": "Filing requirement lacks jurisdiction and deadline. Should I flag for completion?",
           "pt": "O requisito de registro não possui jurisdição e prazo. Devo sinalizar para completar?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:filing_requirements_need_jurisdiction_and_deadline_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6918,6 +8628,21 @@
           "en": "Financial covenant lacks calculation methodology attachment. Should I flag?",
           "pt": "O convênio financeiro não possui anexo de metodologia de cálculo. Devo sinalizar?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:financial_covenant_references_need_calculation_methodology_attachment",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6961,6 +8686,21 @@
           "en": "Guarantor reference lacks guarantee instrument identification. Should I flag for completion?",
           "pt": "A referência ao fiador não identifica o instrumento de garantia. Devo sinalizar para completar?"
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:guarantor_references_need_guarantee_instrument_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7004,6 +8744,21 @@
           "en": "Insurance policy reference lacks minimum coverage amounts. Should I flag for specification?",
           "pt": "A referência à apólice de seguro não possui valores mínimos de cobertura. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:insurance_policy_references_need_minimum_coverage_amounts",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7049,6 +8804,21 @@
           "en": "Interest rate reference lacks fallback rate specification (e.g., SOFR). Should I flag?",
           "pt": "A referência à taxa de juros não possui especificação de taxa de fallback (ex.: SOFR). Devo sinalizar?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:interest_rate_references_need_fallback_rate_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7088,6 +8858,21 @@
           "en": "Which location format do you prefer: clause number or heading path?",
           "pt": "Qual formato de localização você prefere: número da cláusula ou caminho de seção?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:location_metadata_required_for_each_quote",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7127,6 +8912,21 @@
           "en": "I could not find support text. Which exact clause heading should I search next?",
           "pt": "Não encontrei texto de suporte. Qual título exato de cláusula devo buscar em seguida?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:if_evidence_missing,_ask_one_crisp_question_and_stop",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7168,6 +8968,21 @@
           "en": "For navigation, which clause family should I jump to first?",
           "pt": "Para navegação, para qual família de cláusula devo ir primeiro?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:navigate/open_should_not_request_sources;_only_nav_pills_+_disambiguation",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7211,6 +9026,21 @@
           "en": "A cross-reference does not resolve to an existing section. Should I flag the dangling reference?",
           "pt": "Uma referência cruzada não remete a uma seção existente. Devo sinalizar a referência pendente?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:cross_references_must_resolve_to_existing_sections",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7250,6 +9080,21 @@
           "en": "Should I capture notice by email, courier, and deemed receipt timing separately?",
           "pt": "Devo capturar notificação por email, courier e prazo de recebimento separadamente?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:notice_clause_references_must_capture_channel_and_deemed_receipt_timing",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7291,6 +9136,21 @@
           "en": "Should I format the answer as Answer, Quote, Location, Risk, and Next Step?",
           "pt": "Devo formatar a resposta como Resposta, Citação, Localização, Risco e Próximo Passo?"
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:enforce_deterministic_output_blocks_for_legal_answers",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7330,6 +9190,21 @@
           "en": "I detected paraphrase in quote block. Should I replace with exact source text?",
           "pt": "Detectei paráfrase no bloco de citação. Devo substituir pelo texto exato da fonte?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:no_paraphrase_text_may_be_marked_as_quote",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7369,6 +9244,21 @@
           "en": "Should I keep the exact quote but trim to the operative sentence only?",
           "pt": "Devo manter a citação exata, mas reduzir para apenas a sentença operativa?"
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:enforce_quote_length_while_preserving_legal_force",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7412,6 +9302,21 @@
           "en": "Applicable law reference lacks proper statutory citation format. Should I flag for standardization?",
           "pt": "A referência à lei aplicável não possui formato adequado de citação legal. Devo sinalizar para padronização?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:applicable_law_references_need_statutory_citation_format",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7451,6 +9356,21 @@
           "en": "Should I keep the original quote and provide translation separately?",
           "pt": "Devo manter a citação original e fornecer tradução separadamente?"
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:if_translating,_keep_source_quote_untouched_and_translate_outside_block",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -7494,6 +9414,21 @@
           "en": "A capitalized term is used without definition. Should I flag for addition to definitions?",
           "pt": "Um termo em maiúscula é usado sem definição. Devo sinalizar para adição às definições?"
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:capitalized_terms_used_without_definition_must_be_flagged",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     }
   ]

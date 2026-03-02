@@ -1,0 +1,278 @@
+{
+  "_meta": {
+    "id": "operator_collision_matrix",
+    "version": "1.0.0",
+    "description": "Collision-prevention matrix for operator disambiguation. Guards against routing content questions into file actions and other high-risk operator confusions.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-03-01",
+    "owner": "koda-routing"
+  },
+  "config": {
+    "enabled": true,
+    "strict": false,
+    "defaultAction": "allow"
+  },
+  "rules": [
+    {
+      "id": "CM_0001_file_actions_vs_content_questions",
+      "priority": 100,
+      "action": "suppress_candidate",
+      "reasonCode": "content_question_not_file_action",
+      "when": {
+        "operators": [
+          "open",
+          "file_move",
+          "file_delete",
+          "file_copy",
+          "file_rename",
+          "file_bulk_move",
+          "file_bulk_delete",
+          "file_bulk_copy",
+          "file_multi_move",
+          "folder_create",
+          "folder_move",
+          "folder_delete"
+        ],
+        "queryRegexAny": {
+          "en": [
+            "\\bwhere\\s+in\\s+the\\s+document\\b",
+            "\\bon\\s+which\\s+page\\b",
+            "\\bwhich\\s+section\\b",
+            "\\bwhat\\s+does\\s+it\\s+say\\b"
+          ],
+          "pt": [
+            "\\bonde\\s+no\\s+documento\\b",
+            "\\bem\\s+qual\\s+p[aá]gina\\b",
+            "\\bqual\\s+se[cç][aã]o\\b",
+            "\\bo\\s+que\\s+diz\\b"
+          ],
+          "es": [
+            "\\bd[oó]nde\\s+en\\s+el\\s+documento\\b",
+            "\\ben\\s+qu[eé]\\s+p[aá]gina\\b",
+            "\\bqu[eé]\\s+secci[oó]n\\b",
+            "\\bqu[eé]\\s+dice\\b"
+          ]
+        }
+      }
+    },
+    {
+      "id": "CM_0002_file_actions_vs_extraction_intents",
+      "priority": 95,
+      "action": "suppress_candidate",
+      "reasonCode": "analysis_intent_not_file_action",
+      "when": {
+        "operators": [
+          "open",
+          "file_move",
+          "file_delete",
+          "file_copy",
+          "file_rename",
+          "folder_create",
+          "folder_move",
+          "folder_delete"
+        ],
+        "queryRegexAny": {
+          "en": [
+            "\\b(summarize|summary|extract|quote|compare|analyze|explain)\\b"
+          ],
+          "pt": [
+            "\\b(resumir|resumo|extrair|citar|comparar|analisar|explicar)\\b"
+          ],
+          "es": [
+            "\\b(resumir|resumen|extraer|citar|comparar|analizar|explicar)\\b"
+          ]
+        }
+      }
+    },
+    {
+      "id": "CM_0003_open_vs_doc_location_questions",
+      "priority": 90,
+      "action": "suppress_candidate",
+      "reasonCode": "doc_location_question_not_open_action",
+      "when": {
+        "operators": ["open"],
+        "queryRegexAny": {
+          "en": [
+            "\\bwhere\\s+is\\s+the\\s+clause\\b",
+            "\\bfind\\s+all\\s+mentions\\b"
+          ],
+          "pt": [
+            "\\bonde\\s+est[aá]\\s+a\\s+cl[aá]usula\\b",
+            "\\bencontre\\s+todas\\s+as\\s+men[cç][oõ]es\\b"
+          ],
+          "es": [
+            "\\bd[oó]nde\\s+est[aá]\\s+la\\s+cl[aá]usula\\b",
+            "\\bencuentra\\s+todas\\s+las\\s+menciones\\b"
+          ]
+        }
+      }
+    },
+    {
+      "id": "CM_0004_edit_ops_vs_retrieval_questions",
+      "priority": 85,
+      "action": "suppress_candidate",
+      "reasonCode": "retrieval_question_not_edit_action",
+      "when": {
+        "operators": [
+          "insert_row", "delete_row", "set_cell", "add_column",
+          "delete_column", "merge_cells", "replace_text", "insert_paragraph"
+        ],
+        "signals": ["question_mark", "what_is", "how_much", "show_me"]
+      }
+    },
+    {
+      "id": "CM_0005_compute_vs_summarize",
+      "priority": 80,
+      "action": "suppress_candidate",
+      "reasonCode": "summarize_request_not_compute",
+      "when": {
+        "operators": ["compute", "python_calc", "excel_formula"],
+        "signals": ["summarize", "summary", "describe", "explain"]
+      }
+    },
+    {
+      "id": "CM_0006_connector_vs_doc_retrieval",
+      "priority": 82,
+      "action": "suppress_candidate",
+      "reasonCode": "connector_request_not_file_action",
+      "when": {
+        "operators": [
+          "open",
+          "file_move",
+          "file_multi_move",
+          "file_copy",
+          "file_rename",
+          "file_delete",
+          "folder_create",
+          "folder_move",
+          "folder_delete"
+        ],
+        "queryRegexAny": {
+          "en": [
+            "\\b(connect|authorize|link|sync|synchronize|resync|refresh|disconnect|unlink|revoke)\\b.{0,30}\\b(gmail|outlook|slack|connector|integration)\\b",
+            "\\b(search|find|lookup|query)\\b.{0,40}\\b(gmail|outlook|slack|inbox|channels?)\\b",
+            "\\b(connector|integration)\\b.{0,20}\\b(status|state|health)\\b"
+          ],
+          "pt": [
+            "\\b(conectar|autorizar|vincular|sincronizar|ressincronizar|atualizar|desconectar|desvincular|revogar)\\b.{0,30}\\b(gmail|outlook|slack|conector|integra[cç][aã]o)\\b",
+            "\\b(pesquisar|buscar|procurar|consultar)\\b.{0,40}\\b(gmail|outlook|slack|caixa|canais?)\\b",
+            "\\b(conector|integra[cç][aã]o)\\b.{0,20}\\b(status|estado|sa[uú]de)\\b"
+          ],
+          "es": [
+            "\\b(conectar|autorizar|vincular|sincronizar|resincronizar|actualizar|desconectar|desvincular|revocar)\\b.{0,30}\\b(gmail|outlook|slack|conector|integraci[oó]n)\\b",
+            "\\b(buscar|encontrar|consultar)\\b.{0,40}\\b(gmail|outlook|slack|bandeja|canales?)\\b",
+            "\\b(conector|integraci[oó]n)\\b.{0,20}\\b(estado|salud)\\b"
+          ]
+        }
+      }
+    },
+    {
+      "id": "CM_0007_greeting_vs_help",
+      "priority": 75,
+      "action": "suppress_candidate",
+      "reasonCode": "help_question_not_greeting",
+      "when": {
+        "operators": ["greeting"],
+        "signals": ["how_do_i", "can_you", "help_me"]
+      }
+    },
+    {
+      "id": "CM_0008_email_draft_vs_email_explain",
+      "priority": 78,
+      "action": "suppress_candidate",
+      "reasonCode": "email_request_not_file_action",
+      "when": {
+        "operators": [
+          "open",
+          "file_move",
+          "file_multi_move",
+          "file_copy",
+          "file_rename",
+          "file_delete",
+          "folder_create",
+          "folder_move",
+          "folder_delete"
+        ],
+        "queryRegexAny": {
+          "en": [
+            "\\b(latest|last|most recent)\\b.{0,10}\\b(email|message|mail)\\b",
+            "\\b(read|show|summarize|summarise|explain|draft|compose|send|reply)\\b.{0,20}\\b(email|message|mail)\\b",
+            "\\b[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b"
+          ],
+          "pt": [
+            "\\b([uú]ltimo|mais recente)\\b.{0,10}\\b(email|mensagem|e-mail)\\b",
+            "\\b(ler|mostrar|resumir|explicar|redigir|compor|enviar|responder)\\b.{0,20}\\b(email|mensagem|e-mail)\\b",
+            "\\b[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b"
+          ],
+          "es": [
+            "\\b([uú]ltimo|m[aá]s reciente)\\b.{0,10}\\b(correo|email|mensaje)\\b",
+            "\\b(leer|mostrar|resumir|explicar|redactar|enviar|responder)\\b.{0,20}\\b(correo|email|mensaje)\\b",
+            "\\b[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b"
+          ]
+        }
+      }
+    },
+    {
+      "id": "CM_0009_chart_vs_compute",
+      "priority": 77,
+      "action": "suppress_candidate",
+      "reasonCode": "pure_calculation_not_chart",
+      "when": {
+        "operators": ["insert_chart", "create_chart", "chart_update"],
+        "signals": ["calculate", "compute", "sum", "average", "total"]
+      }
+    },
+    {
+      "id": "CM_0010_slide_edit_vs_doc_edit",
+      "priority": 88,
+      "action": "suppress_candidate",
+      "reasonCode": "file_type_mismatch",
+      "when": {
+        "operators": [
+          "slide_insert", "slide_delete", "slide_duplicate",
+          "insert_paragraph", "replace_text", "delete_paragraph"
+        ],
+        "signals": ["active_file_type_mismatch"]
+      }
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "CM_T01_content_question_blocks_open",
+        "input": "where in the document is the indemnity clause?",
+        "candidateOperator": "open",
+        "expect": {
+          "suppressed": true,
+          "reasonCode": "content_question_not_file_action"
+        }
+      },
+      {
+        "id": "CM_T02_plain_open_not_blocked",
+        "input": "open budget.xlsx",
+        "candidateOperator": "open",
+        "expect": {
+          "suppressed": false
+        }
+      },
+      {
+        "id": "CM_T03_connector_query_blocks_open",
+        "input": "connect slack and sync channels",
+        "candidateOperator": "open",
+        "expect": {
+          "suppressed": true,
+          "reasonCode": "connector_request_not_file_action"
+        }
+      },
+      {
+        "id": "CM_T04_email_query_blocks_file_move",
+        "input": "summarize my latest email",
+        "candidateOperator": "file_move",
+        "expect": {
+          "suppressed": true,
+          "reasonCode": "email_request_not_file_action"
+        }
+      }
+    ]
+  }
+}

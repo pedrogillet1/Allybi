@@ -3,7 +3,9 @@
     "id": "document_intelligence_usage_manifest",
     "version": "1.1.0",
     "description": "Runtime usage manifest for document intelligence banks. Declares consumer wiring and coverage rules used to prevent orphan runtime banks.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-02-28"
   },
   "config": {
@@ -46,7 +48,9 @@
     {
       "id": "document_reference_resolver",
       "path": "src/services/core/scope/documentReferenceResolver.service.ts",
-      "uses": ["doc_aliases_*"]
+      "uses": [
+        "doc_aliases_*"
+      ]
     },
     {
       "id": "quality_gate_runner",
@@ -61,22 +65,34 @@
     {
       "id": "retrieval_engine",
       "path": "src/services/core/retrieval/retrievalEngine.service.ts",
-      "uses": ["boost_rules_*", "query_rewrites_*", "section_priority_*"]
+      "uses": [
+        "boost_rules_*",
+        "query_rewrites_*",
+        "section_priority_*"
+      ]
     },
     {
       "id": "scope_gate",
       "path": "src/services/core/scope/scopeGate.service.ts",
-      "uses": ["doc_aliases_*", "doc_taxonomy"]
+      "uses": [
+        "doc_aliases_*",
+        "doc_taxonomy"
+      ]
     },
     {
       "id": "turn_route_policy",
       "path": "src/services/chat/turnRoutePolicy.service.ts",
-      "uses": ["connectors_routing", "email_routing"]
+      "uses": [
+        "connectors_routing",
+        "email_routing"
+      ]
     },
     {
       "id": "turn_router",
       "path": "src/services/chat/turnRouter.service.ts",
-      "uses": ["file_action_operators"]
+      "uses": [
+        "file_action_operators"
+      ]
     }
   ],
   "consumedBankIds": [
@@ -110,24 +126,13 @@
   "consumedIdPrefixes": [
     "boost_rules_",
     "decision_support_",
-    "di_abbreviation_",
     "di_accounting_",
-    "di_banking_",
-    "di_billing_",
     "di_doc_type_",
     "di_domain_",
-    "di_education_",
     "di_entity_",
     "di_finance_",
-    "di_housing_",
-    "di_hr_payroll_",
-    "di_identity_",
-    "di_insurance_",
     "di_metric_",
-    "di_normalization_",
     "di_section_",
-    "di_tax_",
-    "di_travel_",
     "di_unit_and_measurement_",
     "doc_aliases_",
     "doc_archetypes_",
@@ -142,7 +147,7 @@
     "table_header_ontology_"
   ],
   "consumedIdPatterns": [
-    "^(money_patterns|date_patterns|party_patterns|identifier_patterns|telecom_usage_patterns|lab_result_patterns)$",
+    "^(money_patterns|date_patterns|party_patterns|identifier_patterns)$",
     "^document_intelligence_(schema_registry|dependency_graph|usage_manifest|orphan_allowlist|runtime_wiring_gates)$",
     "^pattern_library$"
   ]

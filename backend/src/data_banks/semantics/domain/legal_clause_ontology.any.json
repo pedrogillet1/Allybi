@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "legal_clause_ontology",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Legal clause ontology with clause families, multilingual synonym mapping, extraction anchors, and deterministic clause rules.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "legal"
+    "domain": "legal",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "legal",
   "definitions": [
@@ -3768,6 +3783,21 @@
           "en": "I found multiple clause variants. Which document version should I use?",
           "pt": "Encontrei múltiplas variantes de cláusula. Qual versão do documento devo usar?"
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:when_ambiguity_remains,_ask_only_one_crisp_disambiguation_question",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3809,6 +3839,21 @@
           "en": "The anti-dilution clause does not specify full ratchet vs weighted average. Should I flag this?",
           "pt": "A cláusula antidiluição não especifica ratchet integral vs média ponderada. Devo sinalizar?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:anti_dilution_clauses_need_mechanism_type_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3848,6 +3893,21 @@
           "en": "Should I assume fraud/wilful misconduct/data breach are uncapped only when explicitly written?",
           "pt": "Devo assumir fraude/dolo/vazamento de dados sem limite apenas quando explicitamente escrito?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:liability_caps_must_list_uncapped_categories_explicitly",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3887,6 +3947,21 @@
           "en": "Should I treat confidentiality as surviving termination and for how long?",
           "pt": "Devo tratar confidencialidade como obrigação sobrevivente à rescisão e por quanto tempo?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:confidentiality_obligations_should_be_checked_for_survival_period",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3928,6 +4003,21 @@
           "en": "Cross-default clause does not enumerate covered obligations. Should I flag for specification?",
           "pt": "A cláusula de inadimplemento cruzado não enumera as obrigações cobertas. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:cross_default_provisions_need_covered_obligation_enumeration",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -3967,6 +4057,21 @@
           "en": "Should I evaluate cross-border transfer restrictions in this data clause?",
           "pt": "Devo avaliar restrições de transferência internacional de dados nesta cláusula?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:data_protection_clauses_require_transfer/localization_qualifiers",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -4010,6 +4115,21 @@
           "en": "I found multiple candidates for Acceleration Clause. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Acceleration Clause. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4053,6 +4173,21 @@
           "en": "I found multiple candidates for Amendments. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Amendments. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4096,6 +4231,21 @@
           "en": "I found multiple candidates for Anti-Corruption. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Anti-Corruption. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4139,6 +4289,21 @@
           "en": "I found multiple candidates for Anti-Dilution. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Anti-Dilution. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4182,6 +4347,21 @@
           "en": "I found multiple candidates for Assignment. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Assignment. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4225,6 +4405,21 @@
           "en": "I found multiple candidates for Audit Rights. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Audit Rights. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4269,6 +4464,21 @@
           "en": "I found multiple candidates for Automatic Renewal. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Automatic Renewal. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4314,6 +4524,21 @@
           "en": "I found multiple candidates for Bankruptcy/Insolvency. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Bankruptcy/Insolvency. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4356,6 +4581,21 @@
           "en": "I found multiple candidates for Benchmarking. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Benchmarking. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4401,6 +4641,21 @@
           "en": "I found multiple candidates for Best Efforts/Reasonable Efforts. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Best Efforts/Reasonable Efforts. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4445,6 +4700,21 @@
           "en": "I found multiple candidates for Buy-Sell Agreement. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Buy-Sell Agreement. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4488,6 +4758,21 @@
           "en": "I found multiple candidates for Change Control. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Change Control. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4532,6 +4817,21 @@
           "en": "I found multiple candidates for Clawback. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Clawback. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4576,6 +4876,21 @@
           "en": "I found multiple candidates for Compliance Certification. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Compliance Certification. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4619,6 +4934,21 @@
           "en": "I found multiple candidates for Compliance with Laws. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Compliance with Laws. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4662,6 +4992,21 @@
           "en": "I found multiple candidates for Confidentiality. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Confidentiality. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4705,6 +5050,21 @@
           "en": "I found multiple candidates for Consequential Damages. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Consequential Damages. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4749,6 +5109,21 @@
           "en": "I found multiple candidates for Cross-Default. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Cross-Default. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4792,6 +5167,21 @@
           "en": "I found multiple candidates for Cumulative Remedies. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Cumulative Remedies. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4835,6 +5225,21 @@
           "en": "I found multiple candidates for Cure Period. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Cure Period. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4880,6 +5285,21 @@
           "en": "I found multiple candidates for Damage Liquidation. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Damage Liquidation. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4925,6 +5345,21 @@
           "en": "I found multiple candidates for Data Protection. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Data Protection. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4969,6 +5404,21 @@
           "en": "I found multiple candidates for Default Interest. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Default Interest. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5012,6 +5462,21 @@
           "en": "I found multiple candidates for Definitions. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Definitions. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5055,6 +5520,21 @@
           "en": "I found multiple candidates for Dispute Resolution. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Dispute Resolution. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5100,6 +5580,21 @@
           "en": "I found multiple candidates for Drag-Along Rights. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Drag-Along Rights. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5145,6 +5640,21 @@
           "en": "I found multiple candidates for Earn-Out Provisions. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Earn-Out Provisions. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5188,6 +5698,21 @@
           "en": "I found multiple candidates for Entire Agreement. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Entire Agreement. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5233,6 +5758,21 @@
           "en": "I found multiple candidates for Escrow Terms. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Escrow Terms. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5277,6 +5817,21 @@
           "en": "I found multiple candidates for Exclusivity/No-Shop. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Exclusivity/No-Shop. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5320,6 +5875,21 @@
           "en": "I found multiple candidates for Export Controls. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Export Controls. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5365,6 +5935,21 @@
           "en": "I found multiple candidates for Fees and Charges. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Fees and Charges. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5410,6 +5995,21 @@
           "en": "I found multiple candidates for First Refusal/First Offer. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para First Refusal/First Offer. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5453,6 +6053,21 @@
           "en": "I found multiple candidates for Force Majeure. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Force Majeure. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5497,6 +6112,21 @@
           "en": "I found multiple candidates for Good Faith Negotiation. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Good Faith Negotiation. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5540,6 +6170,21 @@
           "en": "I found multiple candidates for Governing Law. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Governing Law. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5585,6 +6230,21 @@
           "en": "I found multiple candidates for Gross Negligence Carve-Out. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Gross Negligence Carve-Out. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5630,6 +6290,21 @@
           "en": "I found multiple candidates for Holdback Provision. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Holdback Provision. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5675,6 +6350,21 @@
           "en": "I found multiple candidates for Indemnity Basket/Deductible. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Indemnity Basket/Deductible. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5718,6 +6408,21 @@
           "en": "I found multiple candidates for Indemnity. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Indemnity. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5761,6 +6466,21 @@
           "en": "I found multiple candidates for Insurance. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Insurance. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5805,6 +6525,21 @@
           "en": "I found multiple candidates for Integration Clause. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Integration Clause. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5848,6 +6583,21 @@
           "en": "I found multiple candidates for Intellectual Property Ownership. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Intellectual Property Ownership. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5891,6 +6641,21 @@
           "en": "I found multiple candidates for IP Indemnity. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para IP Indemnity. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5934,6 +6699,21 @@
           "en": "I found multiple candidates for Jurisdiction and Venue. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Jurisdiction and Venue. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5978,6 +6758,21 @@
           "en": "I found multiple candidates for Key Person Clause. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Key Person Clause. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6021,6 +6816,21 @@
           "en": "I found multiple candidates for Late Payment Interest. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Late Payment Interest. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6064,6 +6874,21 @@
           "en": "I found multiple candidates for Liability Cap. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Liability Cap. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6107,6 +6932,21 @@
           "en": "I found multiple candidates for Liability Exclusions. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Liability Exclusions. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6150,6 +6990,21 @@
           "en": "I found multiple candidates for License Grant. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para License Grant. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6193,6 +7048,21 @@
           "en": "I found multiple candidates for License Restrictions. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para License Restrictions. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6237,6 +7107,21 @@
           "en": "I found multiple candidates for Lien Subordination. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Lien Subordination. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6280,6 +7165,21 @@
           "en": "I found multiple candidates for Limitation Period. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Limitation Period. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 84,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6325,6 +7225,21 @@
           "en": "I found multiple candidates for Lock-Up Period. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Lock-Up Period. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 85,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6370,6 +7285,21 @@
           "en": "I found multiple candidates for MAC/MAE Clause. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para MAC/MAE Clause. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 86,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6414,6 +7344,21 @@
           "en": "I found multiple candidates for Milestone Payments. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Milestone Payments. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 87,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6459,6 +7404,21 @@
           "en": "I found multiple candidates for Most Favored Nation (MFN). Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Most Favored Nation (MFN). Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 88,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6503,6 +7463,21 @@
           "en": "I found multiple candidates for Non-Circumvention. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Non-Circumvention. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 89,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6546,6 +7521,21 @@
           "en": "I found multiple candidates for Non-Compete. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Non-Compete. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 90,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6589,6 +7579,21 @@
           "en": "I found multiple candidates for Non-Solicitation. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Non-Solicitation. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 91,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6632,6 +7637,21 @@
           "en": "I found multiple candidates for Notices. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Notices. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 92,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6676,6 +7696,21 @@
           "en": "I found multiple candidates for Offset Rights. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Offset Rights. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 93,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6720,6 +7755,21 @@
           "en": "I found multiple candidates for Option to Extend. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Option to Extend. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 94,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6764,6 +7814,21 @@
           "en": "I found multiple candidates for Parent Guarantee. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Parent Guarantee. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 95,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6809,6 +7874,21 @@
           "en": "I found multiple candidates for Pari Passu. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Pari Passu. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 96,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6854,6 +7934,21 @@
           "en": "I found multiple candidates for Payment Terms. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Payment Terms. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 97,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6898,6 +7993,21 @@
           "en": "I found multiple candidates for Permitted Encumbrances. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Permitted Encumbrances. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 98,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6942,6 +8052,21 @@
           "en": "I found multiple candidates for Pre-Emption Rights. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Pre-Emption Rights. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 99,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6986,6 +8111,21 @@
           "en": "I found multiple candidates for Price Adjustment Mechanism. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Price Adjustment Mechanism. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 100,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7030,6 +8170,21 @@
           "en": "I found multiple candidates for Pro Rata Sharing. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Pro Rata Sharing. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 101,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7074,6 +8229,21 @@
           "en": "I found multiple candidates for Publicity. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Publicity. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 102,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7118,6 +8288,21 @@
           "en": "I found multiple candidates for Quiet Enjoyment. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Quiet Enjoyment. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 103,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7163,6 +8348,21 @@
           "en": "I found multiple candidates for Ratchet Mechanism. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Ratchet Mechanism. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 104,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7208,6 +8408,21 @@
           "en": "I found multiple candidates for Regulatory Approval Condition. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Regulatory Approval Condition. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 105,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7252,6 +8467,21 @@
           "en": "I found multiple candidates for Reliance on Representations. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Reliance on Representations. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 106,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7295,6 +8525,21 @@
           "en": "I found multiple candidates for Renewal. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Renewal. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 107,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7339,6 +8584,21 @@
           "en": "I found multiple candidates for Representations and Warranties. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Representations and Warranties. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 108,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7383,6 +8643,21 @@
           "en": "I found multiple candidates for Right of Set-Off. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Right of Set-Off. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 109,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7427,6 +8702,21 @@
           "en": "I found multiple candidates for Safe Harbor. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Safe Harbor. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 110,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7472,6 +8762,21 @@
           "en": "I found multiple candidates for Scope of Services. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Scope of Services. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 111,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7515,6 +8820,21 @@
           "en": "I found multiple candidates for Security Controls. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Security Controls. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 112,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7558,6 +8878,21 @@
           "en": "I found multiple candidates for Service Credits. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Service Credits. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 113,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7601,6 +8936,21 @@
           "en": "I found multiple candidates for Service Levels. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Service Levels. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 114,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7644,6 +8994,21 @@
           "en": "I found multiple candidates for Severability. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Severability. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 115,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7689,6 +9054,21 @@
           "en": "I found multiple candidates for Standstill Agreement. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Standstill Agreement. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 116,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7732,6 +9112,21 @@
           "en": "I found multiple candidates for Statement of Work. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Statement of Work. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 117,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7776,6 +9171,21 @@
           "en": "I found multiple candidates for Step-In Rights. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Step-In Rights. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 118,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7819,6 +9229,21 @@
           "en": "I found multiple candidates for Subcontracting. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Subcontracting. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 119,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7862,6 +9287,21 @@
           "en": "I found multiple candidates for Survival. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Survival. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 120,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7907,6 +9347,21 @@
           "en": "I found multiple candidates for Tag-Along Rights. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Tag-Along Rights. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 121,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7950,6 +9405,21 @@
           "en": "I found multiple candidates for Taxes. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Taxes. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 122,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -7994,6 +9464,21 @@
           "en": "I found multiple candidates for Term. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Term. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 123,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8037,6 +9522,21 @@
           "en": "I found multiple candidates for Termination for Cause. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Termination for Cause. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 124,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8080,6 +9580,21 @@
           "en": "I found multiple candidates for Termination for Convenience. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Termination for Convenience. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 125,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8124,6 +9639,21 @@
           "en": "I found multiple candidates for Third-Party Beneficiary. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Third-Party Beneficiary. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 126,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8169,6 +9699,21 @@
           "en": "I found multiple candidates for Time is of the Essence. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Time is of the Essence. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 127,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8213,6 +9758,21 @@
           "en": "I found multiple candidates for Variation Clause. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Variation Clause. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 128,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8256,6 +9816,21 @@
           "en": "I found multiple candidates for Waiver. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Waiver. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 129,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8299,6 +9874,21 @@
           "en": "I found multiple candidates for Warranties. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Warranties. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 130,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8342,6 +9932,21 @@
           "en": "I found multiple candidates for Warranty Disclaimer. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Warranty Disclaimer. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 131,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8386,6 +9991,21 @@
           "en": "I found multiple candidates for Waterfall Provisions. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Waterfall Provisions. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 132,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8430,6 +10050,21 @@
           "en": "I found multiple candidates for Whistleblower Protection. Which section heading should I lock onto?",
           "pt": "Encontrei múltiplos candidatos para Whistleblower Protection. Em qual título de seção devo fixar?"
         }
+      },
+      "precedence": 133,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+locate+compare",
+          "check:clause_presence_and_location",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8471,6 +10106,21 @@
           "en": "Drag-along/tag-along thresholds are not specified. Should I flag the missing percentages?",
           "pt": "Os limiares de drag-along/tag-along não estão especificados. Devo sinalizar as porcentagens ausentes?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:drag_along_tag_along_rights_need_threshold_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8512,6 +10162,21 @@
           "en": "Earn-out metrics are not clearly defined. Should I identify the missing metrics?",
           "pt": "As métricas de earn-out não estão claramente definidas. Devo identificar as métricas ausentes?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:earn_out_provisions_need_clear_metric_definitions_before_summarizing",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8553,6 +10218,21 @@
           "en": "Escrow release conditions are not specified. Should I flag the missing release triggers?",
           "pt": "As condições de liberação da custódia não estão especificadas. Devo sinalizar os gatilhos ausentes?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:escrow_terms_need_release_conditions_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8594,6 +10274,21 @@
           "en": "The exclusivity period lacks clear start/end dates. Should I flag for specification?",
           "pt": "O período de exclusividade não possui datas de início/fim claras. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:exclusivity_periods_need_start_end_date_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8633,6 +10328,21 @@
           "en": "Should I present governing law and jurisdiction together as one risk block?",
           "pt": "Devo apresentar lei aplicável e foro juntos em um único bloco de risco?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:governing_law_and_jurisdiction_should_be_reported_together_when_both_exist",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8674,6 +10384,21 @@
           "en": "Gross negligence carve-out may be interpreted differently across jurisdictions. Should I add a jurisdiction note?",
           "pt": "A exceção por culpa grave pode ser interpretada diferentemente entre jurisdições. Devo adicionar nota jurisdicional?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:gross_negligence_carve_outs_need_jurisdiction_specific_interpretation_note",
+          "scope:global",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "core",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -8715,6 +10440,21 @@
           "en": "Indemnity basket lacks cap/floor specification. Should I identify the missing thresholds?",
           "pt": "A franquia de indenização não tem especificação de teto/piso. Devo identificar os limiares ausentes?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:indemnity_baskets_need_cap_floor_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8752,6 +10492,21 @@
           "en": "Should indemnity be interpreted as mutual or one-way in this clause?",
           "pt": "A indenização deve ser interpretada como mútua ou unilateral nesta cláusula?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:indemnity_scope_should_identify_beneficiary,_trigger,_and_carve-outs",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8793,6 +10548,21 @@
           "en": "Some representations use \"to knowledge\" qualifiers. Should I distinguish flat vs knowledge-qualified reps?",
           "pt": "Algumas declarações usam qualificadores \"até onde se sabe\". Devo distinguir representações absolutas das qualificadas?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:representations_must_distinguish_to_knowledge_qualifiers",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8832,6 +10602,21 @@
           "en": "I need clause location format. Do you prefer section heading or clause number + heading?",
           "pt": "Preciso do formato de localização da cláusula. Você prefere título da seção ou número + título da cláusula?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:every_legal_conclusion_must_include_clause_location",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8873,6 +10658,21 @@
           "en": "Lock-up period triggering event is not defined. Should I flag this gap?",
           "pt": "O evento-gatilho do período de lock-up não está definido. Devo sinalizar esta lacuna?"
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:lock_up_periods_need_triggering_event_identification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8914,6 +10714,21 @@
           "en": "The MAC/MAE clause lacks a materiality threshold. Should I flag this for negotiation?",
           "pt": "A cláusula MAC/MAE não possui limiar de materialidade. Devo sinalizar para negociação?"
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:mac_mae_requires_materiality_threshold_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8955,6 +10770,21 @@
           "en": "MFN clause does not define the comparison set. Should I flag for specification?",
           "pt": "A cláusula MFN não define o conjunto de comparação. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:mfn_clauses_need_comparison_set_definition",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -8994,6 +10824,21 @@
           "en": "I could not find the clause text. Which section title should I search next?",
           "pt": "Não encontrei o texto da cláusula. Qual título de seção devo buscar em seguida?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:if_no_clause_evidence_exists,_do_not_infer_legal_terms",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9035,6 +10880,21 @@
           "en": "Parent guarantee scope is not explicitly bounded. Should I flag for limitation?",
           "pt": "O escopo da garantia da controladora não é explicitamente delimitado. Devo sinalizar para limitação?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:parent_guarantee_scope_must_be_explicitly_bounded",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9074,6 +10934,21 @@
           "en": "Should I include late-payment interest and suspension rights in the payment summary?",
           "pt": "Devo incluir juros de mora e direitos de suspensão no resumo de pagamento?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:payment_terms_should_include_late-payment_consequences_if_present",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9115,6 +10990,21 @@
           "en": "Permitted encumbrances are not exhaustively listed. Should I flag for specification?",
           "pt": "Os gravames permitidos não estão listados exaustivamente. Devo sinalizar para especificação?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:permitted_encumbrances_need_exhaustive_list_requirement",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9156,6 +11046,21 @@
           "en": "Pre-emption rights lack exercise period specification. Should I flag for clarification?",
           "pt": "Os direitos de preferência não especificam período de exercício. Devo sinalizar para esclarecimento?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:pre_emption_rights_need_exercise_period_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9197,6 +11102,21 @@
           "en": "Quiet enjoyment clause does not define the scope of \"quiet\". Should I flag for clarification?",
           "pt": "A cláusula de gozo pacífico não define o escopo de \"pacífico\". Devo sinalizar para esclarecimento?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:quiet_enjoyment_obligations_need_scope_definition",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9236,6 +11156,21 @@
           "en": "Should I provide an exact quote with section reference for this legal point?",
           "pt": "Devo fornecer citação exata com referência de seção para este ponto jurídico?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:require_exact_quote_fidelity_for_legal_assertions",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9279,6 +11214,21 @@
           "en": "Is this a right of first refusal or first offer? These must not be conflated.",
           "pt": "Trata-se de direito de primeira recusa ou primeira oferta? Estes não devem ser confundidos."
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:first_refusal_vs_first_offer_never_conflate",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9320,6 +11270,21 @@
           "en": "Safe harbor qualifying conditions are not enumerated. Should I identify the missing conditions?",
           "pt": "As condições qualificadoras do porto seguro não estão enumeradas. Devo identificar as condições ausentes?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:safe_harbor_provisions_need_qualifying_conditions_enumeration",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9361,6 +11326,21 @@
           "en": "Step-in rights lack triggering conditions. Should I identify the missing trigger events?",
           "pt": "Os direitos de intervenção não possuem condições-gatilho. Devo identificar os eventos-gatilho ausentes?"
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:step_in_rights_need_triggering_conditions_specification",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9400,6 +11380,21 @@
           "en": "Should I cross-reference termination rights with liability cap exceptions?",
           "pt": "Devo cruzar direitos de rescisão com exceções ao limite de responsabilidade?"
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:termination_and_liability_cap_interplay_must_be_highlighted",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -9441,6 +11436,21 @@
           "en": "Waterfall priority order is not explicitly enumerated. Should I identify the missing hierarchy?",
           "pt": "A ordem de prioridade da cascata não está explicitamente enumerada. Devo identificar a hierarquia ausente?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:extract+evaluate+validate",
+          "check:waterfall_priority_must_be_enumerated_in_order",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     }
   ]

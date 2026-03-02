@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "id": "di_ops_validation_policies",
+    "version": "1.0.0",
+    "description": "Validation policies for operations extraction and reasoning.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops"
+  },
+  "domain": "ops",
+  "policies": [
+    {
+      "id": "ops_val_001_measurement_unit_consistency",
+      "severity": "error",
+      "description": "Measurement values must use consistent units within the same metric category throughout the document.",
+      "applies": [
+        "extract",
+        "validate",
+        "calculate"
+      ],
+      "check": "measurement_unit_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "ops_val_002_date_sequence_validation",
+      "severity": "error",
+      "description": "Event dates in work orders and logs must follow chronological order (start <= end, reported <= resolved).",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "date_sequence_validation",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "ops_val_003_sla_threshold_verification",
+      "severity": "warning",
+      "description": "SLA metrics must be compared against documented thresholds; flag when target is missing or ambiguous.",
+      "applies": [
+        "validate",
+        "calculate",
+        "compare"
+      ],
+      "check": "sla_threshold_verification",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "ops_val_004_work_order_completeness",
+      "severity": "warning",
+      "description": "Work orders should contain order number, date, assignee, and status for strong confidence.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "work_order_completeness",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "ops_val_005_quantity_sign_consistency",
+      "severity": "error",
+      "description": "Inventory and production quantities must be non-negative unless explicitly flagged as adjustments.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "quantity_sign_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

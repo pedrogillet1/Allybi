@@ -15,8 +15,11 @@ import { matchSegment } from "./matcher";
 
 function mkPattern(input: {
   id: string;
+  domain?: "excel" | "docx";
   priority?: number;
   tokensAny?: string[];
+  tokensAll?: string[];
+  regexAny?: string[];
   tokensNone?: string[];
   disambiguationGroup?: string;
   mutuallyExclusiveWith?: string[];
@@ -25,13 +28,14 @@ function mkPattern(input: {
 }): IntentPattern {
   return {
     id: input.id,
-    domain: "excel",
+    domain: input.domain ?? "excel",
     lang: "en",
     priority: input.priority ?? 80,
     triggers: {
       tokens_any: input.tokensAny ?? [],
+      tokens_all: input.tokensAll ?? [],
+      regex_any: input.regexAny ?? [],
       tokens_none: input.tokensNone ?? [],
-      regex_any: [],
     },
     disambiguationGroup: input.disambiguationGroup,
     mutuallyExclusiveWith: input.mutuallyExclusiveWith,
@@ -132,5 +136,187 @@ describe("intentRuntime matcher determinism", () => {
 
     expect(withoutRange.bestMatch).toBeNull();
     expect(withRange.bestMatch?.pattern.id).toBe("excel.range.only");
+  });
+
+  test("returns ambiguity instead of lexicographic pick for fill direction ties", () => {
+    const fillDown = mkPattern({
+      id: "excel.fill_down",
+      tokensAny: ["fill"],
+      disambiguationGroup: "excel.fill_direction",
+    });
+    const fillRight = mkPattern({
+      id: "excel.fill_right",
+      tokensAny: ["fill"],
+      disambiguationGroup: "excel.fill_direction",
+    });
+    mockLoadPatterns.mockReturnValue([fillDown, fillRight]);
+
+    const result = matchSegment(
+      { text: "fill this selection", index: 0 },
+      "excel",
+      "en",
+    );
+
+    expect(result.bestMatch).toBeNull();
+    expect(result.ambiguity?.group).toBe("excel.fill_direction");
+    expect(result.ambiguity?.reason).toBe("tie_score");
+    expect(result.ambiguity?.candidateIds).toEqual([
+      "excel.fill_down",
+      "excel.fill_right",
+    ]);
+  });
+
+  test("keeps deterministic winner when directional evidence exists", () => {
+    const fillDown = mkPattern({
+      id: "excel.fill_down",
+      tokensAny: ["fill"],
+      disambiguationGroup: "excel.fill_direction",
+      scoreAdjustments: {
+        boostIfTokensPresent: ["down"],
+        boostPoints: 18,
+      },
+    });
+    const fillRight = mkPattern({
+      id: "excel.fill_right",
+      tokensAny: ["fill"],
+      disambiguationGroup: "excel.fill_direction",
+      scoreAdjustments: {
+        boostIfTokensPresent: ["right"],
+        boostPoints: 18,
+      },
+    });
+    mockLoadPatterns.mockReturnValue([fillDown, fillRight]);
+
+    const result = matchSegment(
+      { text: "fill right on the selected range", index: 0 },
+      "excel",
+      "en",
+    );
+
+    expect(result.ambiguity).toBeUndefined();
+    expect(result.bestMatch?.pattern.id).toBe("excel.fill_right");
+  });
+
+  test("returns ambiguity for align mode ties without direction", () => {
+    const alignLeft = mkPattern({
+      id: "docx.align.left",
+      domain: "docx",
+      tokensAny: ["align"],
+      disambiguationGroup: "docx.align_mode",
+    });
+    const alignRight = mkPattern({
+      id: "docx.align.right",
+      domain: "docx",
+      tokensAny: ["align"],
+      disambiguationGroup: "docx.align_mode",
+    });
+    mockLoadPatterns.mockReturnValue([alignLeft, alignRight]);
+
+    const result = matchSegment(
+      { text: "align this paragraph", index: 0 },
+      "docx",
+      "en",
+    );
+
+    expect(result.bestMatch).toBeNull();
+    expect(result.ambiguity?.group).toBe("docx.align_mode");
+    expect(result.ambiguity?.candidateIds).toEqual([
+      "docx.align.left",
+      "docx.align.right",
+    ]);
+  });
+
+  test("returns ambiguity for rows structural ties without insert/delete evidence", () => {
+    const insertRows = mkPattern({
+      id: "excel.insert_rows",
+      tokensAny: ["rows"],
+      disambiguationGroup: "excel.rows_structural",
+    });
+    const deleteRows = mkPattern({
+      id: "excel.delete_rows",
+      tokensAny: ["rows"],
+      disambiguationGroup: "excel.rows_structural",
+    });
+    mockLoadPatterns.mockReturnValue([insertRows, deleteRows]);
+
+    const result = matchSegment(
+      { text: "change these rows", index: 0 },
+      "excel",
+      "en",
+    );
+
+    expect(result.bestMatch).toBeNull();
+    expect(result.ambiguity?.group).toBe("excel.rows_structural");
+    expect(result.ambiguity?.candidateIds).toEqual([
+      "excel.delete_rows",
+      "excel.insert_rows",
+    ]);
+  });
+
+  test("resolves rows structural intent when insert evidence is present", () => {
+    const insertRows = mkPattern({
+      id: "excel.insert_rows",
+      tokensAny: ["rows"],
+      disambiguationGroup: "excel.rows_structural",
+      scoreAdjustments: {
+        boostIfTokensPresent: ["insert"],
+        boostPoints: 20,
+      },
+    });
+    const deleteRows = mkPattern({
+      id: "excel.delete_rows",
+      tokensAny: ["rows"],
+      disambiguationGroup: "excel.rows_structural",
+      scoreAdjustments: {
+        boostIfTokensPresent: ["delete"],
+        boostPoints: 20,
+      },
+    });
+    mockLoadPatterns.mockReturnValue([insertRows, deleteRows]);
+
+    const result = matchSegment(
+      { text: "insert rows after row 5", index: 0 },
+      "excel",
+      "en",
+    );
+
+    expect(result.ambiguity).toBeUndefined();
+    expect(result.bestMatch?.pattern.id).toBe("excel.insert_rows");
+  });
+
+  test("requires regex evidence when pattern defines regex_any", () => {
+    const pattern = mkPattern({
+      id: "excel.pivot.regex_guarded",
+      tokensAny: ["table"],
+      regexAny: ["\\bpivot\\b"],
+    });
+    mockLoadPatterns.mockReturnValue([pattern]);
+
+    const result = matchSegment(
+      { text: "create a table from this range", index: 0 },
+      "excel",
+      "en",
+    );
+
+    expect(result.bestMatch).toBeNull();
+  });
+
+  test("normalizes double-escaped regex patterns from bank JSON", () => {
+    const pattern = mkPattern({
+      id: "excel.remove_duplicates.escaped_regex",
+      tokensAny: ["remove duplicates"],
+      regexAny: ["\\bremove\\\\s+duplicates\\b"],
+    });
+    mockLoadPatterns.mockReturnValue([pattern]);
+
+    const result = matchSegment(
+      { text: "remove duplicates from this range", index: 0 },
+      "excel",
+      "en",
+    );
+
+    expect(result.bestMatch?.pattern.id).toBe(
+      "excel.remove_duplicates.escaped_regex",
+    );
   });
 });

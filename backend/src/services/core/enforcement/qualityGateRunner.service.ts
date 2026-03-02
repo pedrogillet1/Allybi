@@ -56,7 +56,11 @@ export interface QualityGateContext {
   diPolicyOutput?: Record<string, unknown>;
   diPolicyAttachments?: Record<string, unknown>;
   diPolicySource?: Record<string, unknown>;
-  diPolicyConfig?: Record<string, unknown>;
+  diPolicyConfig?: (Record<string, unknown> & {
+    limits?: {
+      maxSourcesButtonsHard?: number;
+    };
+  }) | null;
 }
 
 type QualityGatesBank = {

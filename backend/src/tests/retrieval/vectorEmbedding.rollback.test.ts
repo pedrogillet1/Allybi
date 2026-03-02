@@ -21,7 +21,9 @@ jest.mock("../../config/database", () => ({
       findUnique: (...args: any[]) => mockFindDocument(...args),
       update: (...args: any[]) => mockUpdateDocument(...args),
     },
-    documentEmbedding: { count: (...args: any[]) => mockEmbeddingCount(...args) },
+    documentEmbedding: {
+      count: (...args: any[]) => mockEmbeddingCount(...args),
+    },
     documentChunk: { count: (...args: any[]) => mockChunkCount(...args) },
     $transaction: (...args: any[]) => mockTransaction(...args),
   },
@@ -91,7 +93,7 @@ describe("vectorEmbedding rollback", () => {
     mockIsAvailable.mockReturnValue(true);
     mockUpsert.mockResolvedValue({ upserted: 1, skipped: 0 });
     mockGetDocumentKey.mockResolvedValue(Buffer.alloc(32, 1));
-    mockEncryptChunkText.mockReturnValue("{\"v\":1}");
+    mockEncryptChunkText.mockReturnValue('{"v":1}');
     mockTransaction.mockImplementation(
       async () =>
         await new Promise((_, reject) =>
@@ -129,7 +131,8 @@ describe("vectorEmbedding rollback", () => {
     expect(mockDeleteDocumentEmbeddings).toHaveBeenCalledTimes(1);
     expect(mockDeleteByOperationId).toHaveBeenCalledTimes(1);
 
-    const [documentId, operationId, opts] = mockDeleteByOperationId.mock.calls[0];
+    const [documentId, operationId, opts] =
+      mockDeleteByOperationId.mock.calls[0];
     expect(documentId).toBe("doc-1");
     expect(String(operationId)).toMatch(/^op_/);
     expect(opts).toEqual({ userId: "user-1" });
@@ -178,6 +181,6 @@ describe("vectorEmbedding rollback", () => {
     expect(mockGetDocumentKey).toHaveBeenCalledWith("user-1", "doc-1");
     expect(createdChunkRows).toHaveLength(1);
     expect(createdChunkRows[0].text).toBeNull();
-    expect(createdChunkRows[0].textEncrypted).toBe("{\"v\":1}");
+    expect(createdChunkRows[0].textEncrypted).toBe('{"v":1}');
   });
 });

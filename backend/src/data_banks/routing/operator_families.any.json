@@ -257,6 +257,9 @@
         "CREATE_CHART",
         "COMPUTE",
         "COMPUTE_BUNDLE",
+        "PY_COMPUTE",
+        "PY_CHART",
+        "PY_WRITEBACK",
         "ADD_SLIDE",
         "REWRITE_SLIDE_TEXT",
         "REPLACE_SLIDE_IMAGE"
@@ -315,7 +318,7 @@
       "intentFamily": "email",
       "description": "Email actions: read/explain/summarize previous/draft/send and email+document fusion.",
       "priority": 94,
-      "defaultAnswerMode": "action_receipt",
+      "defaultAnswerMode": "general_answer",
       "defaultOutputShape": "paragraph",
       "operators": [
         "EMAIL_LATEST",

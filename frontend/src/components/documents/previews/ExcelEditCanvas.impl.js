@@ -208,7 +208,9 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const [draftOpsById, setDraftOpsById] = useState({}); // { [draftId]: ops[] }
   const [dragAnchor, setDragAnchor] = useState(null);   // { rowIdx, colIdx } — where drag started
   const [dragEnd, setDragEnd] = useState(null);          // { rowIdx, colIdx } — current drag position
+  const [isInlineEditing, setIsInlineEditing] = useState(false);
   const isDraggingRef = React.useRef(false);
+  const inlineEditorRef = useRef(null);
   const editUndoStackRef = useRef([]); // [{ kind, revisionId, payload }]
   const editRedoStackRef = useRef([]); // [{ kind, revisionId, payload }]
   const [editHistoryVersion, setEditHistoryVersion] = useState(0);
@@ -299,6 +301,15 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const currentSheetName = useMemo(() => asSheetName(sheets[activeSheet]), [sheets, activeSheet]);
   const current = sheetData[activeSheet] || null;
   currentRef.current = current;
+  const gridBounds = useMemo(() => {
+    const rows = Array.isArray(current?.rows) ? current.rows : [];
+    const maxRowIdx = Math.max(1, rows.length - 1);
+    const maxColIdx = Math.max(
+      1,
+      ...rows.map((row) => Math.max(1, (Array.isArray(row) ? row.length : 0) - 1)),
+    );
+    return { maxRowIdx, maxColIdx };
+  }, [current]);
 
   // Per-sheet highlight rects — derived from the ref + version counter.
   const appliedHighlightRects = useMemo(
@@ -402,6 +413,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setSelected(next.selected);
     setSelectedRange(next.selectedRange);
     setLockedCells(new Set(next.lockedKeys));
+    setIsInlineEditing(false);
     setDragAnchor(null);
     setDragEnd(null);
     setUserHasSelected(next.userHasSelected);
@@ -841,6 +853,49 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     return rowsOut.join('\n');
   }, [current]);
 
+  const clampCellToGrid = useCallback((rowIdx, colIdx) => {
+    const r = Math.max(1, Math.min(gridBounds.maxRowIdx, Number(rowIdx) || 1));
+    const c = Math.max(1, Math.min(gridBounds.maxColIdx, Number(colIdx) || 1));
+    return { rowIdx: r, colIdx: c };
+  }, [gridBounds.maxColIdx, gridBounds.maxRowIdx]);
+
+  const applySelectionRect = useCallback((startRaw, endRaw, opts = {}) => {
+    const start = clampCellToGrid(startRaw?.rowIdx, startRaw?.colIdx);
+    const end = clampCellToGrid(endRaw?.rowIdx, endRaw?.colIdx);
+    const minR = Math.min(start.rowIdx, end.rowIdx);
+    const maxR = Math.max(start.rowIdx, end.rowIdx);
+    const minC = Math.min(start.colIdx, end.colIdx);
+    const maxC = Math.max(start.colIdx, end.colIdx);
+    const nextLocked = new Set();
+    const lockedKeys = [];
+    for (let r = minR; r <= maxR; r += 1) {
+      for (let c = minC; c <= maxC; c += 1) {
+        const key = `${r}:${c}`;
+        nextLocked.add(key);
+        lockedKeys.push(key);
+      }
+    }
+    setLockedCells(nextLocked);
+    setSelected(start);
+    setSelectedRange(
+      (start.rowIdx === end.rowIdx && start.colIdx === end.colIdx)
+        ? null
+        : { start, end },
+    );
+    setDragAnchor(null);
+    setDragEnd(null);
+    setUserHasSelected(true);
+    const inlineEdit = Boolean(opts?.inlineEdit) && start.rowIdx === end.rowIdx && start.colIdx === end.colIdx;
+    setIsInlineEditing(inlineEdit);
+    if (opts?.recordHistory !== false) {
+      pushSelectionSnapshot({
+        selected: start,
+        selectedRange: (start.rowIdx === end.rowIdx && start.colIdx === end.colIdx) ? null : { start, end },
+        lockedKeys,
+      });
+    }
+  }, [clampCellToGrid, pushSelectionSnapshot]);
+
   const selectionPayloadKey = useCallback((sel) => {
     if (!sel || typeof sel !== 'object') return '';
     const domain = String(sel?.domain || '').trim().toLowerCase();
@@ -869,6 +924,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setSelected(null);
     setDragAnchor(null);
     setDragEnd(null);
+    setIsInlineEditing(false);
     setFlashRect(null);
     setUserHasSelected(false);
     if (lastEmittedSelectionKeyRef.current !== '') {
@@ -1279,6 +1335,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     pendingSelectionHintRef.current = null;
     setSelected(start);
     setSelectedRange(nextHasRange ? { start, end } : null);
+    setIsInlineEditing(false);
     setUserHasSelected(true);
     setDragAnchor(null);
     setDragEnd(null);
@@ -1355,6 +1412,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setLockedCells(new Set());
     setDragAnchor(null);
     setDragEnd(null);
+    setIsInlineEditing(false);
     setFlashRect(null);
     // Highlights are now per-sheet; no need to clear on sheet change.
     selectionHistoryRef.current = {
@@ -1404,6 +1462,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         ? null
         : { start: { rowIdx: r1, colIdx: c1 }, end: { rowIdx: r2, colIdx: c2 } }
     );
+    setIsInlineEditing(r1 === r2 && c1 === c2);
     setDragAnchor(null);
     setDragEnd(null);
     setUserHasSelected(true);
@@ -1524,6 +1583,19 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [userHasSelected]);
 
   const effectiveDraftValue = controlledDraftValue != null ? controlledDraftValue : draftValue;
+
+  useEffect(() => {
+    if (!isInlineEditing) return;
+    window.requestAnimationFrame(() => {
+      const el = inlineEditorRef.current;
+      if (!el) return;
+      try {
+        el.focus();
+        const textLength = String(el.value || '').length;
+        el.setSelectionRange(textLength, textLength);
+      } catch {}
+    });
+  }, [isInlineEditing, selected?.rowIdx, selected?.colIdx]);
 
   const pendingState = useMemo(() => {
     if (!selectedInfo?.a1 || !selected) return { isGrid: false, isDirty: false, overrides: {}, rect: null };
@@ -2000,6 +2072,53 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     return draft.trim() !== before.trim();
   }, [effectiveDraftValue, selectedInfo?.a1, selectedInfo?.beforeText]);
 
+  const commitDraftIfDirty = useCallback(async () => {
+    if (!hasPendingEdits()) return true;
+    const result = await apply();
+    return Boolean(result?.ok);
+  }, [apply, hasPendingEdits]);
+
+  const applyBlankToCurrentRect = useCallback(async () => {
+    const rect = getClipboardRect();
+    if (!rect) return false;
+    const rows = Math.max(1, Number(rect.r2) - Number(rect.r1) + 1);
+    const cols = Math.max(1, Number(rect.c2) - Number(rect.c1) + 1);
+    const blankPayload = (rows === 1 && cols === 1)
+      ? ''
+      : Array.from({ length: rows }, () => Array.from({ length: cols }, () => '').join('\t')).join('\n');
+    const result = await apply(blankPayload);
+    return Boolean(result?.ok);
+  }, [apply, getClipboardRect]);
+
+  const moveSelectionBy = useCallback((deltaRow, deltaCol, opts = {}) => {
+    const extend = Boolean(opts?.extendRange);
+    const currentCell = selectedRef.current || { rowIdx: 1, colIdx: 1 };
+    const next = clampCellToGrid(
+      Number(currentCell.rowIdx) + Number(deltaRow || 0),
+      Number(currentCell.colIdx) + Number(deltaCol || 0),
+    );
+    if (!extend) {
+      applySelectionRect(next, next, { inlineEdit: false });
+      return;
+    }
+    const existingRange = selectedRangeRef.current;
+    const anchor = existingRange?.start || currentCell;
+    applySelectionRect(anchor, next, { inlineEdit: false });
+  }, [applySelectionRect, clampCellToGrid]);
+
+  const moveSelectionTo = useCallback((targetRaw, opts = {}) => {
+    const extend = Boolean(opts?.extendRange);
+    const target = clampCellToGrid(targetRaw?.rowIdx, targetRaw?.colIdx);
+    if (!extend) {
+      applySelectionRect(target, target, { inlineEdit: false });
+      return;
+    }
+    const currentCell = selectedRef.current || { rowIdx: 1, colIdx: 1 };
+    const existingRange = selectedRangeRef.current;
+    const anchor = existingRange?.start || currentCell;
+    applySelectionRect(anchor, target, { inlineEdit: false });
+  }, [applySelectionRect, clampCellToGrid]);
+
   const saveAllManualEdits = useCallback(async () => {
     if (!hasPendingEdits()) return [];
     const result = await apply();
@@ -2058,8 +2177,11 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       if (text == null) return;
       if (event.clipboardData) {
         event.clipboardData.setData('text/plain', text);
-        // Keep data unchanged on cut for now; this behaves like copy and avoids accidental deletes.
         event.preventDefault();
+        if (!isApplying) {
+          setIsInlineEditing(false);
+          void applyBlankToCurrentRect();
+        }
       }
     };
 
@@ -2085,7 +2207,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       window.removeEventListener('cut', onCut, true);
       window.removeEventListener('paste', onPaste, true);
     };
-  }, [apply, controlledDraftValue, getClipboardRect, getClipboardTextForRect, onDraftValueChange]);
+  }, [apply, applyBlankToCurrentRect, controlledDraftValue, getClipboardRect, getClipboardTextForRect, isApplying, onDraftValueChange]);
 
   const applyFormat = useCallback((formatProps) => {
     if (!formatProps || typeof formatProps !== 'object') return;
@@ -2240,6 +2362,125 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     window.addEventListener('keydown', onKeyDown, true);
     return () => window.removeEventListener('keydown', onKeyDown, true);
   }, [canRedoSelection, canUndoSelection, redoSelection, undoSelection, undoAction, redoAction, canUndoEdit, canRedoEdit]);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const tag = String(e.target?.tagName || '').toLowerCase();
+      const isEditable =
+        tag === 'input' ||
+        tag === 'textarea' ||
+        tag === 'select' ||
+        Boolean(e.target?.isContentEditable);
+      if (isEditable) return;
+
+      const hasSelection = Boolean(selectedRef.current?.rowIdx && selectedRef.current?.colIdx);
+      if (!hasSelection) return;
+
+      const key = String(e.key || '');
+      const lower = key.toLowerCase();
+      const isMod = Boolean(e.metaKey || e.ctrlKey);
+
+      if (isMod && !e.altKey && lower === 'a') {
+        e.preventDefault();
+        applySelectionRect(
+          { rowIdx: 1, colIdx: 1 },
+          { rowIdx: gridBounds.maxRowIdx, colIdx: gridBounds.maxColIdx },
+          { inlineEdit: false },
+        );
+        return;
+      }
+
+      if (key === 'F2') {
+        e.preventDefault();
+        setIsInlineEditing(true);
+        return;
+      }
+
+      if ((key === 'Escape' || key === 'Esc') && isInlineEditing) {
+        e.preventDefault();
+        setIsInlineEditing(false);
+        revert();
+        return;
+      }
+
+      if (key === 'Delete' || key === 'Backspace') {
+        e.preventDefault();
+        if (isApplying) return;
+        setIsInlineEditing(false);
+        void applyBlankToCurrentRect();
+        return;
+      }
+
+      if (key === 'Tab' || key === 'Enter') {
+        e.preventDefault();
+        if (isApplying) return;
+        setIsInlineEditing(false);
+        const deltaRow = key === 'Enter' ? (e.shiftKey ? -1 : 1) : 0;
+        const deltaCol = key === 'Tab' ? (e.shiftKey ? -1 : 1) : 0;
+        void (async () => {
+          const ok = await commitDraftIfDirty();
+          if (!ok) return;
+          moveSelectionBy(deltaRow, deltaCol, { extendRange: false });
+        })();
+        return;
+      }
+
+      if (key === 'Home' || key === 'End') {
+        e.preventDefault();
+        const currentCell = selectedRef.current || { rowIdx: 1, colIdx: 1 };
+        const toStart = key === 'Home';
+        const target = isMod
+          ? {
+            rowIdx: toStart ? 1 : gridBounds.maxRowIdx,
+            colIdx: toStart ? 1 : gridBounds.maxColIdx,
+          }
+          : {
+            rowIdx: currentCell.rowIdx,
+            colIdx: toStart ? 1 : gridBounds.maxColIdx,
+          };
+        moveSelectionTo(target, { extendRange: e.shiftKey });
+        return;
+      }
+
+      if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+        e.preventDefault();
+        if (isMod) {
+          const currentCell = selectedRef.current || { rowIdx: 1, colIdx: 1 };
+          const target = {
+            rowIdx: key === 'ArrowUp'
+              ? 1
+              : key === 'ArrowDown'
+                ? gridBounds.maxRowIdx
+                : currentCell.rowIdx,
+            colIdx: key === 'ArrowLeft'
+              ? 1
+              : key === 'ArrowRight'
+                ? gridBounds.maxColIdx
+                : currentCell.colIdx,
+          };
+          moveSelectionTo(target, { extendRange: e.shiftKey });
+          return;
+        }
+        const deltaRow = key === 'ArrowUp' ? -1 : key === 'ArrowDown' ? 1 : 0;
+        const deltaCol = key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : 0;
+        moveSelectionBy(deltaRow, deltaCol, { extendRange: e.shiftKey });
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [
+    applyBlankToCurrentRect,
+    applySelectionRect,
+    commitDraftIfDirty,
+    gridBounds.maxColIdx,
+    gridBounds.maxRowIdx,
+    isApplying,
+    isInlineEditing,
+    moveSelectionTo,
+    moveSelectionBy,
+    revert,
+  ]);
 
   useEffect(() => {
     editUndoStackRef.current = [];
@@ -2464,7 +2705,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       {!hideToolbar ? (
         <EditorToolbar
           title={`Editing ${cleanDocumentName(document?.filename)}`}
-          subtitle="Drag to select cells. Shift+click to select a range. Paste a TSV/CSV grid to edit a range."
+          subtitle="Click to edit. Drag or Shift+click to select ranges. Arrow keys navigate, Enter/Tab commits, Ctrl/Cmd+A selects all."
           scopeLabel={selectedRangeInfo?.targetId || selectedInfo?.targetId || `${currentSheetName}!A1`}
           format="sheets"
           canFormatText={false}
@@ -2662,6 +2903,18 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                       <th
                         key={colIdx}
                         className={`excel-cell excel-header-cell ${colIdx === 0 ? 'excel-corner-cell' : ''}`}
+                        onMouseDown={(e) => {
+                          if (colIdx === 0) return;
+                          if (e.button !== 0) return;
+                          e.preventDefault();
+                          isDraggingRef.current = false;
+                          applySelectionRect(
+                            { rowIdx: 1, colIdx },
+                            { rowIdx: gridBounds.maxRowIdx, colIdx },
+                            { inlineEdit: false },
+                          );
+                        }}
+                        title={colIdx === 0 ? '' : 'Select column'}
                       >
                         {cell.value}
                       </th>
@@ -2676,7 +2929,21 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                         {row.map((cell, colIdx) => {
                           if (colIdx === 0) {
                             return (
-                              <th key={colIdx} className="excel-cell excel-row-header">
+                              <th
+                                key={colIdx}
+                                className="excel-cell excel-row-header"
+                                onMouseDown={(e) => {
+                                  if (e.button !== 0) return;
+                                  e.preventDefault();
+                                  isDraggingRef.current = false;
+                                  applySelectionRect(
+                                    { rowIdx, colIdx: 1 },
+                                    { rowIdx, colIdx: gridBounds.maxColIdx },
+                                    { inlineEdit: false },
+                                  );
+                                }}
+                                title="Select row"
+                              >
                                 {cell.value}
                               </th>
                             );
@@ -2772,13 +3039,28 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                               onMouseDown={(e) => {
                                 if (e.button !== 0) return; // left-click only
                                 e.preventDefault(); // prevent text selection during drag
+                                if (e.shiftKey && selectedRef.current) {
+                                  isDraggingRef.current = false;
+                                  applySelectionRect(
+                                    selectedRef.current,
+                                    { rowIdx, colIdx },
+                                    { inlineEdit: false },
+                                  );
+                                  return;
+                                }
+                                setIsInlineEditing(false);
                                 setUserHasSelected(true);
-                                setLockedCells(new Set());
+                                setLockedCells(new Set([`${rowIdx}:${colIdx}`]));
                                 setSelected({ rowIdx, colIdx });
                                 setSelectedRange(null);
                                 isDraggingRef.current = true;
                                 setDragAnchor({ rowIdx, colIdx });
                                 setDragEnd({ rowIdx, colIdx });
+                              }}
+                              onDoubleClick={(e) => {
+                                if (e.button !== 0) return;
+                                e.preventDefault();
+                                setIsInlineEditing(true);
                               }}
                               onMouseEnter={() => {
                                 if (isDraggingRef.current) {
@@ -2817,11 +3099,47 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                                           ? 'rgba(17, 24, 39, 0.035)'
                                           : undefined,
                               }}
-                              title={isLocked ? 'Locked' : 'Drag to select'}
+                              title={isLocked ? 'Locked' : 'Click to edit. Drag to select.'}
                             >
                               {(() => {
                                 const pending = keyHere ? pendingState?.overrides?.[keyHere] : null;
                                 const ovr = keyHere ? draftCellOverrides?.[keyHere] : null;
+                                if (isSelected && isInlineEditing && !isApplying) {
+                                  return (
+                                    <input
+                                      ref={inlineEditorRef}
+                                      className="excel-inline-editor"
+                                      value={effectiveDraftValue}
+                                      onMouseDown={(evt) => evt.stopPropagation()}
+                                      onChange={(evt) => {
+                                        const nextValue = evt.target.value;
+                                        if (controlledDraftValue != null) onDraftValueChange?.(nextValue);
+                                        else setDraftValue(nextValue);
+                                      }}
+                                      onBlur={() => setIsInlineEditing(false)}
+                                      onKeyDown={(evt) => {
+                                        if (evt.key === 'Escape') {
+                                          evt.preventDefault();
+                                          setIsInlineEditing(false);
+                                          revert();
+                                          return;
+                                        }
+                                        if (evt.key !== 'Enter' && evt.key !== 'Tab') return;
+                                        evt.preventDefault();
+                                        if (isApplying) return;
+                                        const deltaRow = evt.key === 'Enter' ? (evt.shiftKey ? -1 : 1) : 0;
+                                        const deltaCol = evt.key === 'Tab' ? (evt.shiftKey ? -1 : 1) : 0;
+                                        setIsInlineEditing(false);
+                                        void (async () => {
+                                          const ok = await commitDraftIfDirty();
+                                          if (!ok) return;
+                                          moveSelectionBy(deltaRow, deltaCol, { extendRange: false });
+                                        })();
+                                      }}
+                                      aria-label={`Edit cell ${a1Here || ''}`}
+                                    />
+                                  );
+                                }
                                 if (pending) return formatNumericLike(String(pending.value ?? ''), colIdx);
                                 if (!ovr) return formatNumericLike(cell.value, colIdx);
                                 const isFormula = String(ovr.kind || '') === 'formula';

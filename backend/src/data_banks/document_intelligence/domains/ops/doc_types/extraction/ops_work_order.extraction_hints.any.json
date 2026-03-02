@@ -1,0 +1,224 @@
+{
+  "_meta": {
+    "id": "di_ops_extraction_ops_work_order",
+    "version": "1.0.0",
+    "description": "Extraction hints for work order documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_work_order"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "work order",
+        "service order",
+        "maintenance request",
+        "ops_work_order"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_workOrderNumber",
+      "entity": "workOrderNumber",
+      "anchors": [
+        "work order no",
+        "WO #",
+        "order number",
+        "numero da OS"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_03_workOrderType",
+      "entity": "workOrderType",
+      "anchors": [
+        "type",
+        "category",
+        "maintenance type",
+        "tipo"
+      ],
+      "location": "header",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_04_priority",
+      "entity": "priority",
+      "anchors": [
+        "priority",
+        "urgency",
+        "prioridade"
+      ],
+      "location": "header",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_05_status",
+      "entity": "status",
+      "anchors": [
+        "status",
+        "state",
+        "situacao"
+      ],
+      "location": "header",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_06_requestorName",
+      "entity": "requestorName",
+      "anchors": [
+        "requested by",
+        "requestor",
+        "solicitante"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_07_assigneeName",
+      "entity": "assigneeName",
+      "anchors": [
+        "assigned to",
+        "technician",
+        "responsavel"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_08_equipmentId",
+      "entity": "equipmentId",
+      "anchors": [
+        "equipment id",
+        "asset tag",
+        "asset id",
+        "codigo equipamento"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_09_equipmentName",
+      "entity": "equipmentName",
+      "anchors": [
+        "equipment",
+        "asset",
+        "machine",
+        "equipamento"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_10_locationName",
+      "entity": "locationName",
+      "anchors": [
+        "location",
+        "site",
+        "plant",
+        "local",
+        "unidade"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_11_issueDate",
+      "entity": "issueDate",
+      "anchors": [
+        "date created",
+        "issue date",
+        "data criacao"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_12_scheduledDate",
+      "entity": "scheduledDate",
+      "anchors": [
+        "scheduled date",
+        "planned date",
+        "data programada"
+      ],
+      "location": "scheduling",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_13_completionDate",
+      "entity": "completionDate",
+      "anchors": [
+        "completion date",
+        "closed date",
+        "data conclusao"
+      ],
+      "location": "scheduling",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_14_workDescription",
+      "entity": "workDescription",
+      "anchors": [
+        "description",
+        "work performed",
+        "descricao do servico"
+      ],
+      "location": "work_description",
+      "extractionMethod": "block_capture"
+    },
+    {
+      "id": "hint_15_partsUsed",
+      "entity": "partsUsed",
+      "anchors": [
+        "parts",
+        "materials",
+        "pecas",
+        "materiais"
+      ],
+      "location": "parts_and_materials",
+      "extractionMethod": "list_capture"
+    },
+    {
+      "id": "hint_16_laborHours",
+      "entity": "laborHours",
+      "anchors": [
+        "labor hours",
+        "hours worked",
+        "horas trabalhadas"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_17_totalCost",
+      "entity": "totalCost",
+      "anchors": [
+        "total cost",
+        "cost",
+        "custo total"
+      ],
+      "location": "summary",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_18_approverName",
+      "entity": "approverName",
+      "anchors": [
+        "approved by",
+        "sign off",
+        "aprovado por"
+      ],
+      "location": "footer_metadata",
+      "extractionMethod": "heading_proximity"
+    }
+  ]
+}

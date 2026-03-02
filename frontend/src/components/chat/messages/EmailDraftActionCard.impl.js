@@ -11,6 +11,8 @@ import AttachmentPickerModal from "../../documents/AttachmentPickerModal";
 import EmailCard from "../../attachments/cards/EmailCard";
 import Modal from "../../ui/Modal";
 
+const EMAIL_RE_GLOBAL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
+
 function safeString(x) {
   return typeof x === "string" ? x : x == null ? "" : String(x);
 }
@@ -101,6 +103,67 @@ function cleanFilename(name) {
   return safeString(name).trim().replace(/\s+/g, " ");
 }
 
+function parseRecipientList(value) {
+  const raw = safeString(value);
+  const emailMatches = raw.match(EMAIL_RE_GLOBAL) || [];
+  const parts = emailMatches.length
+    ? emailMatches.map((part) => part.trim()).filter(Boolean)
+    : raw
+        .split(/[,\n;]+/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+  const deduped = [];
+  const seen = new Set();
+  for (const part of parts) {
+    const normalized = part.toLowerCase();
+    if (seen.has(normalized)) continue;
+    seen.add(normalized);
+    deduped.push(part);
+  }
+  return deduped;
+}
+
+function formatRecipientList(value) {
+  return parseRecipientList(value).join(", ");
+}
+
+function inferSubjectFromBody(bodyValue) {
+  const raw = normalizeDraftBody(bodyValue)
+    .replace(/\bhes\b/gi, "his")
+    .trim();
+  if (!raw) return "Quick follow-up";
+
+  if (/^how (?:is|was) (?:your|his|her|their) day[.?!]*$/i.test(raw)) {
+    return "How is your day?";
+  }
+
+  const normalized = raw
+    .replace(/^[,.:;\- ]+/, "")
+    .replace(/[.?!\s]+$/, "")
+    .trim();
+  if (!normalized) return "Quick follow-up";
+
+  let subject = normalized
+    .replace(
+      /^(please\s+)?(?:ask(?:ing)?|write(?:ing)?|compose|draft|send)\s+(?:them|him|her|the team)?\s*/i,
+      "",
+    )
+    .trim();
+  subject = subject.replace(/^for\s+(?:an?\s+|the\s+)?/i, "").trim();
+  if (!subject) subject = normalized;
+  subject = subject.charAt(0).toUpperCase() + subject.slice(1);
+  if (subject.length > 72) {
+    subject = `${subject.slice(0, 69).trim()}...`;
+  }
+  return subject || "Quick follow-up";
+}
+
+function resolveDraftSubject(subjectValue, bodyValue) {
+  const explicit = safeString(subjectValue).trim();
+  if (explicit) return explicit;
+  return inferSubjectFromBody(bodyValue);
+}
+
 export default function EmailDraftActionCard({
   message,
   confirmationToken,
@@ -122,16 +185,22 @@ export default function EmailDraftActionCard({
   const parsed = useMemo(() => {
     if (draft && typeof draft === "object") {
       const provider = normalizeProvider(draft.provider || "");
+      const body = normalizeDraftBody(draft.body || "");
+      const subject = resolveDraftSubject(draft.subject, body);
       return {
         providerLabel: safeString(draft.providerLabel) || (provider ? (provider === "gmail" ? "Gmail" : "Outlook") : ""),
         provider,
         to: safeString(draft.to),
-        subject: safeString(draft.subject),
+        subject,
         attachmentNames: [],
-        body: normalizeDraftBody(draft.body || ""),
+        body,
       };
     }
-    return parseEmailDraftFromMarkdown(message?.content || "");
+    const parsedFromMarkdown = parseEmailDraftFromMarkdown(message?.content || "");
+    return {
+      ...parsedFromMarkdown,
+      subject: resolveDraftSubject(parsedFromMarkdown.subject, parsedFromMarkdown.body),
+    };
   }, [draft, message?.content]);
   const provider = useMemo(() => normalizeProvider(parsed.provider), [parsed.provider]);
   const providerIcon = useMemo(() => providerIconSrc(provider), [provider]);
@@ -212,6 +281,9 @@ export default function EmailDraftActionCard({
   const [attachmentIds, setAttachmentIds] = useState(initialAttachmentIds);
   // Replaced legacy inline picker with a full library picker modal.
 
+  const recipientList = useMemo(() => parseRecipientList(to), [to]);
+  const toDisplay = useMemo(() => formatRecipientList(to), [to]);
+
   const attachmentDocs = useMemo(() => {
     const byId = new Map((documents || []).map((d) => [d.id, d]));
     return (attachmentIds || []).map((id) => byId.get(id)).filter(Boolean);
@@ -262,7 +334,7 @@ export default function EmailDraftActionCard({
   useEffect(() => {
     if (userEditedRef.current) return;
     setTo(parsed.to || "");
-    setSubject(parsed.subject || "");
+    setSubject(resolveDraftSubject(parsed.subject, parsed.body));
     setBody(normalizeDraftBody(parsed.body || ""));
   }, [parsed.body, parsed.subject, parsed.to]);
 
@@ -276,15 +348,16 @@ export default function EmailDraftActionCard({
     setError("");
     const provider = parsed.provider || "";
     if (!provider) { setError("Email provider is missing."); return; }
-    const toTrim = safeString(to).trim();
+    const toTrim = toDisplay;
     if (!toTrim) { setError("Recipient is required."); return; }
+    const subjectToSend = resolveDraftSubject(subject, body);
 
     // If the user didn't change anything, use the original signed token so we don't lose attachments.
     if (!isDirty && confirmationToken) {
       await onConfirmToken?.(confirmationToken, {
         provider,
         to: toTrim,
-        subject: safeString(subject),
+        subject: subjectToSend,
         body: safeString(body),
         attachmentDocumentIds: Array.isArray(attachmentIds) ? attachmentIds : [],
       });
@@ -304,7 +377,7 @@ export default function EmailDraftActionCard({
       const res = await api.post("/api/integrations/email/send-token", {
         provider,
         to: toTrim,
-        subject: safeString(subject),
+        subject: subjectToSend,
         body: safeString(body),
         attachmentDocumentIds: Array.isArray(attachmentIds) ? attachmentIds : [],
       });
@@ -319,7 +392,7 @@ export default function EmailDraftActionCard({
       await onConfirmToken?.(token, {
         provider,
         to: toTrim,
-        subject: safeString(subject),
+        subject: subjectToSend,
         body: safeString(body),
         attachmentDocumentIds: Array.isArray(attachmentIds) ? attachmentIds : [],
       });
@@ -332,20 +405,24 @@ export default function EmailDraftActionCard({
   };
 
   const sendLabel = sending ? "Sending…" : "Send";
+  const resolvedSubject = useMemo(
+    () => resolveDraftSubject(subject, body),
+    [body, subject],
+  );
 
   const cardModel = useMemo(() => {
     return {
       cardTitle: "Email draft",
       actionLabel: "Open",
       provider,
-      subject: safeString(subject).trim() || "(subject)",
-      to: safeString(to).trim() || "(recipient)",
+      subject: safeString(resolvedSubject).trim() || "(subject)",
+      to: toDisplay || "(recipient)",
       // Card should be clean like the mock: subject + To only (no body preview).
       preview: "",
       previewIsPlaceholder: false,
       ...(isSent ? { status: "sent", statusLabel: "Sent" } : {}),
     };
-  }, [provider, subject, to, isSent]);
+  }, [provider, resolvedSubject, toDisplay, isSent]);
 
   const closeModal = () => {
     setOpen(false);
@@ -404,7 +481,7 @@ export default function EmailDraftActionCard({
             </div>
 
             <div style={{ color: "#6B7280", fontWeight: 650, fontSize: 13, whiteSpace: "nowrap" }}>
-              {safeString(to).trim() ? `To: ${safeString(to).trim()}` : ""}
+              {toDisplay ? `To: ${toDisplay}` : ""}
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-end" }}>
@@ -442,10 +519,17 @@ export default function EmailDraftActionCard({
             <input
               value={to}
               onChange={(e) => { userEditedRef.current = true; setTo(e.target.value); }}
-              placeholder="name@company.com"
+              placeholder="name@company.com, teammate@company.com"
               className="allybi-emailDraftInput"
               disabled={readOnly}
             />
+          </div>
+          <div className="allybi-emailDraftRow" style={{ paddingTop: 6, paddingBottom: 8 }}>
+            <div />
+            <div className="allybi-emailDraftMuted">
+              Add multiple recipients separated by comma or semicolon.
+              {recipientList.length > 1 ? ` (${recipientList.length} recipients)` : ""}
+            </div>
           </div>
 
           <div className={`allybi-emailDraftRow ${isMobile ? "allybi-emailDraftRowMobile" : ""}`}>

@@ -46,7 +46,7 @@ describe("LlmRequestBuilderService", () => {
     }),
   };
 
-  test("respects requested maxOutputTokens override for table mode", () => {
+  test("applies a doc-grounded token floor when not explicitly short", () => {
     const builder = new LlmRequestBuilderService(prompts);
     const req = builder.build(
       createInput({
@@ -56,7 +56,7 @@ describe("LlmRequestBuilderService", () => {
       }),
     );
 
-    expect(req.options?.maxOutputTokens).toBe(1200);
+    expect(req.options?.maxOutputTokens).toBe(1600);
   });
 
   test("keeps nav/disambiguation short caps intact", () => {
@@ -136,7 +136,8 @@ describe("LlmRequestBuilderService", () => {
           ...createInput().signals,
           answerMode: "help_steps",
           productHelpTopic: "docx_editing",
-          productHelpSnippet: "Edit DOCX text and formatting on scoped targets.",
+          productHelpSnippet:
+            "Edit DOCX text and formatting on scoped targets.",
         },
       }),
     );
@@ -144,5 +145,95 @@ describe("LlmRequestBuilderService", () => {
     const promptCtx = buildPrompt.mock.calls[0]?.[1] as Record<string, any>;
     expect(promptCtx?.slots?.productHelpTopic).toBe("docx_editing");
     expect(promptCtx?.slots?.productHelpSnippet).toContain("Edit DOCX");
+  });
+
+  test("does not route locate_docs to retrieval prompt unless explicitly requested", () => {
+    const buildPrompt = jest.fn().mockReturnValue({
+      messages: [{ role: "system", content: "compose" }],
+    });
+    const builder = new LlmRequestBuilderService({
+      buildPrompt,
+    } as unknown as PromptRegistryService);
+
+    builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+          operator: "locate_docs",
+          intentFamily: "retrieval",
+        },
+      }),
+    );
+    expect(buildPrompt.mock.calls[0]?.[0]).toBe("compose_answer");
+  });
+
+  test("routes retrieval prompt only when promptMode is retrieval_plan", () => {
+    const buildPrompt = jest.fn().mockReturnValue({
+      messages: [{ role: "system", content: "retrieval" }],
+    });
+    const builder = new LlmRequestBuilderService({
+      buildPrompt,
+    } as unknown as PromptRegistryService);
+
+    builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+          operator: "locate_docs",
+          intentFamily: "retrieval",
+          promptMode: "retrieval_plan",
+        },
+      }),
+    );
+
+    expect(buildPrompt.mock.calls[0]?.[0]).toBe("retrieval");
+  });
+
+  test("does not apply style token cap to doc-grounded mode unless explicitly short", () => {
+    const buildPrompt = jest.fn().mockReturnValue({
+      messages: [{ role: "system", content: "compose" }],
+    });
+    const builder = new LlmRequestBuilderService({
+      buildPrompt,
+    } as unknown as PromptRegistryService);
+
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          styleProfile: "brief",
+          styleMaxChars: 180,
+          boldingEnabled: false,
+        },
+        options: {
+          maxOutputTokens: 1200,
+        },
+      }),
+    );
+
+    expect(req.options?.maxOutputTokens).toBe(1600);
+    const promptCtx = buildPrompt.mock.calls[0]?.[1] as Record<string, any>;
+    expect(promptCtx?.runtimeSignals?.styleProfile).toBe("brief");
+    expect(promptCtx?.runtimeSignals?.boldingEnabled).toBe(false);
+  });
+
+  test("applies style token cap when user explicitly requests short output", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          styleMaxChars: 180,
+          userRequestedShort: true,
+        },
+        options: {
+          maxOutputTokens: 1200,
+        },
+      }),
+    );
+
+    expect(req.options?.maxOutputTokens).toBe(64);
   });
 });

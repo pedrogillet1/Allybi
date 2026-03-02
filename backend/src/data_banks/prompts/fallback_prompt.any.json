@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-03-01",
+    "lastUpdated": "2026-03-02",
     "owner": "koda-prompts",
     "compat": ">=1.0.0"
   },
@@ -194,5 +194,109 @@
         }
       ]
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FP_1001_reason_code_template_selection",
+        "input": {
+          "fallbackTriggered": true,
+          "fallbackReasonCodeEquals": "scope_hard_constraints_empty"
+        },
+        "expect": {
+          "selectedTemplateId": "fallback_scope_hard_constraints_empty"
+        }
+      },
+      {
+        "id": "FP_1002_max_one_clarification_question",
+        "input": {
+          "fallbackTriggered": true,
+          "fallbackReasonCodeEquals": "doc_ambiguous"
+        },
+        "expect": {
+          "maxClarificationQuestions": 1,
+          "requiresDisambiguation": true
+        }
+      },
+      {
+        "id": "FP_1003_no_fact_fabrication",
+        "input": {
+          "fallbackTriggered": true,
+          "fallbackReasonCodeEquals": "low_confidence"
+        },
+        "expect": {
+          "forbidUnsupportedClaims": true,
+          "requiresTransparentUncertainty": true
+        }
+      },
+      {
+        "id": "FP_1004_extraction_failed_guidance",
+        "input": {
+          "fallbackTriggered": true,
+          "fallbackReasonCodeEquals": "extraction_failed"
+        },
+        "expect": {
+          "selectedTemplateId": "fallback_extraction_failed",
+          "mustSuggestNextSteps": ["re-upload cleaner file", "try another format", "narrow request"]
+        }
+      },
+      {
+        "id": "FP_1005_explicit_doc_not_found_behavior",
+        "input": {
+          "fallbackTriggered": true,
+          "fallbackReasonCodeEquals": "explicit_doc_not_found"
+        },
+        "expect": {
+          "selectedTemplateId": "fallback_explicit_doc_not_found",
+          "mustAskForPreciseFilenameOrSelection": true,
+          "mustNotAssumeAlternatives": true
+        }
+      },
+      {
+        "id": "FP_TEST_001_reason_code_template_selection",
+        "input": "Query about document with reasonCode: 'scope_empty'",
+        "expect": {
+          "promptApplied": true,
+          "selectsTemplateByReasonCode": true,
+          "templateMatchesReasonCode": true
+        }
+      },
+      {
+        "id": "FP_TEST_002_one_question_clarification_max",
+        "input": "Tell me about the financials",
+        "expect": {
+          "promptApplied": true,
+          "maxOneClarificationQuestion": true,
+          "noMultipleQuestions": true
+        }
+      },
+      {
+        "id": "FP_TEST_003_no_fabricated_facts",
+        "input": "What is the revenue? (no documents available)",
+        "expect": {
+          "promptApplied": true,
+          "noFabricatedFacts": true,
+          "acknowledgesLackOfEvidence": true
+        }
+      },
+      {
+        "id": "FP_TEST_004_extraction_failed_guidance",
+        "input": "Query with reasonCode: 'extraction_failed'",
+        "expect": {
+          "promptApplied": true,
+          "providesActionableGuidance": true,
+          "suggestsReuploadOrAlternative": true
+        }
+      },
+      {
+        "id": "FP_TEST_005_explicit_doc_not_found",
+        "input": "Query with reasonCode: 'explicit_doc_not_found'",
+        "expect": {
+          "promptApplied": true,
+          "acknowledgesDocumentAbsence": true,
+          "noHallucinatedContent": true
+        }
+      }
+    ]
+  }
 }

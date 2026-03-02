@@ -81,6 +81,51 @@
       },
       "reasonCode": "no_relevant_chunks_in_scoped_docs",
       "severity": "low"
+    },
+    {
+      "id": "fns_scope_hard_constraints_empty",
+      "priority": 110,
+      "when": {
+        "all": [
+          {
+            "path": "signals.hardScopeActive",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "metrics.retrievedChunks",
+            "op": "eq",
+            "value": 0
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "scope_empty",
+        "strategy": "offer_scope_adjustment"
+      },
+      "reasonCode": "scope_hard_constraints_empty",
+      "severity": "high"
+    },
+    {
+      "id": "fns_low_confidence_not_found",
+      "priority": 80,
+      "when": {
+        "all": [
+          {
+            "path": "metrics.topConfidence",
+            "op": "lt",
+            "value": 0.28
+          }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "low_confidence",
+        "strategy": "ask_clarification_or_hedge"
+      },
+      "reasonCode": "low_confidence",
+      "severity": "medium"
     }
   ]
 }

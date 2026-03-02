@@ -4,7 +4,7 @@
     "version": "1.2.0",
     "description": "Task-level answer formatting with structured sources contract.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-03-02"
   },
   "config": {
     "enabled": true
@@ -75,5 +75,108 @@
         }
       ]
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "TAWS_1001_no_inline_sources_block",
+        "input": {
+          "answerMode": "doc_grounded_single"
+        },
+        "expect": {
+          "forbidInlineSourcesSection": true,
+          "requiresAttachmentBasedCitations": true
+        }
+      },
+      {
+        "id": "TAWS_1002_mode_mapping_doc_grounded_quote",
+        "input": {
+          "answerMode": "doc_grounded_quote"
+        },
+        "expect": {
+          "selectedTemplateId": "answer_with_quote_sources",
+          "requiresExactQuoteWhenRequested": true
+        }
+      },
+      {
+        "id": "TAWS_1003_mode_mapping_doc_grounded_table",
+        "input": {
+          "answerMode": "doc_grounded_table"
+        },
+        "expect": {
+          "selectedTemplateId": "answer_with_table_sources",
+          "requiresCompactTable": true
+        }
+      },
+      {
+        "id": "TAWS_1004_help_steps_uses_product_help_snippet",
+        "input": {
+          "answerMode": "help_steps",
+          "productHelpSnippet": "Use the draft card to review recipient and subject."
+        },
+        "expect": {
+          "selectedTemplateId": "answer_help_steps_scoped",
+          "mustReferenceProductHelpSnippetSafely": true
+        }
+      },
+      {
+        "id": "TAWS_1005_general_mode_concise_no_sources",
+        "input": {
+          "answerMode": "general_answer"
+        },
+        "expect": {
+          "selectedTemplateId": "answer_without_sources",
+          "mustBeConcise": true,
+          "forbidInlineSourcesSection": true
+        }
+      },
+      {
+        "id": "TAWS_TEST_001_no_inline_sources_section",
+        "input": "Summarize the contract terms",
+        "expect": {
+          "promptApplied": true,
+          "noInlineSourcesSection": true,
+          "noSourcesHeader": true
+        }
+      },
+      {
+        "id": "TAWS_TEST_002_answer_mode_mapping",
+        "input": "What is the total revenue? (mode: doc_grounded_single)",
+        "expect": {
+          "promptApplied": true,
+          "respectsAnswerMode": true,
+          "validModes": ["doc_grounded_single", "doc_grounded_multi", "doc_grounded_quote", "doc_grounded_table", "general"]
+        }
+      },
+      {
+        "id": "TAWS_TEST_003_help_steps_uses_snippet_safely",
+        "input": "How do I upload a document? (mode: help_steps)",
+        "expect": {
+          "promptApplied": true,
+          "usesProductHelpSnippetSafely": true,
+          "noRawSnippetDump": true
+        }
+      },
+      {
+        "id": "TAWS_TEST_004_concise_output_contract",
+        "input": "What are the key findings?",
+        "expect": {
+          "promptApplied": true,
+          "conciseOutput": true,
+          "noFillerPhrases": true,
+          "maxParagraphs": 4
+        }
+      },
+      {
+        "id": "TAWS_TEST_005_citation_via_attachments_only",
+        "input": "Quote the relevant clause",
+        "expect": {
+          "promptApplied": true,
+          "citationsDelegatedToAttachments": true,
+          "noInlineBracketRefs": true,
+          "noFootnotes": true
+        }
+      }
+    ]
+  }
 }

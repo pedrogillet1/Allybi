@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 
 const TEST_EMAIL = process.env.E2E_TEST_EMAIL || "test@allybi.com";
 const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "test123";
@@ -21,6 +21,53 @@ const TARGET_DOCUMENT_IDS = [
   "5708e5f5-42d4-45e7-803b-ae490c45a766", // TRABALHO_FINAL__1_.PNG
   "ce276bc4-bed3-41c2-b965-05ceb9ea0913", // guarda_bens_self_storage.pptx
 ];
+
+const TARGET_CHAT_DOCUMENT = {
+  id: "8938fa6a-730f-4d12-8d6a-4416ea9a6438",
+  name: "Capítulo_8__Framework_Scrum_.pdf",
+  type: "application/pdf",
+};
+
+async function dismissOnboardingIfPresent(page: Page): Promise<void> {
+  const selectors = [
+    page.getByRole("button", { name: /Skip introduction/i }),
+    page.getByRole("button", { name: /^Skip$/i }),
+    page.getByRole("button", { name: /^Done$/i }),
+  ];
+  for (let i = 0; i < 4; i++) {
+    let clicked = false;
+    for (const locator of selectors) {
+      if (await locator.isVisible({ timeout: 400 }).catch(() => false)) {
+        await locator.click().catch(() => undefined);
+        await page.waitForTimeout(250);
+        clicked = true;
+        break;
+      }
+    }
+    if (!clicked) break;
+  }
+  await page.keyboard.press("Escape").catch(() => undefined);
+}
+
+async function ensureLoggedIn(page: Page): Promise<void> {
+  await page.goto("/a/r9p3q1?mode=login");
+  await page.waitForTimeout(2000);
+  const chatInput = page.locator("textarea.chat-v3-textarea");
+  if (await chatInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await dismissOnboardingIfPresent(page);
+    return;
+  }
+
+  const emailInput = page.locator('input[type="email"]');
+  await emailInput.waitFor({ state: "visible", timeout: 10_000 });
+  await emailInput.fill(TEST_EMAIL);
+  await page.locator('input[type="password"]').fill(TEST_PASSWORD);
+  await page.locator('button[type="submit"]').click();
+  await page.waitForURL((url) => !url.pathname.startsWith("/a/"), {
+    timeout: 30_000,
+  });
+  await dismissOnboardingIfPresent(page);
+}
 
 test.describe("Preflight Gate", () => {
   test.setTimeout(60_000);
@@ -48,51 +95,19 @@ test.describe("Preflight Gate", () => {
   });
 
   test("test user can log in and reach chat", async ({ page }) => {
-    await page.goto("/a/r9p3q1?mode=login");
-    await page.waitForTimeout(2000);
-
-    // Check if already logged in
-    const chatInput = page.locator("textarea.chat-v3-textarea");
-    if (await chatInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-      return; // already logged in
-    }
-
-    const emailInput = page.locator('input[type="email"]');
-    await emailInput.waitFor({ state: "visible", timeout: 10_000 });
-    await emailInput.fill(TEST_EMAIL);
-    await page.locator('input[type="password"]').fill(TEST_PASSWORD);
-    await page.locator('button[type="submit"]').click();
-
-    await page.waitForURL((url) => !url.pathname.startsWith("/a/"), {
-      timeout: 30_000,
-    });
+    await ensureLoggedIn(page);
 
     // Navigate to chat and verify input is available
     await page.goto("/c/k4r8f5");
+    const chatInput = page.locator("textarea.chat-v3-textarea");
+    await dismissOnboardingIfPresent(page);
     await chatInput.waitFor({ state: "visible", timeout: 15_000 });
   });
 
   test("all 6 target documents exist and are ready with chunks", async ({
     page,
   }) => {
-    // Login first
-    await page.goto("/a/r9p3q1?mode=login");
-    await page.waitForTimeout(2000);
-    const chatInput = page.locator("textarea.chat-v3-textarea");
-    if (!(await chatInput.isVisible({ timeout: 2000 }).catch(() => false))) {
-      await page.locator('input[type="email"]').fill(TEST_EMAIL);
-      await page.locator('input[type="password"]').fill(TEST_PASSWORD);
-      await page.locator('button[type="submit"]').click();
-      await page.waitForURL((url) => !url.pathname.startsWith("/a/"), {
-        timeout: 30_000,
-      });
-    }
-
-    // Fetch documents via API
-    const cookies = await page.context().cookies();
-    const tokenCookie = cookies.find(
-      (c) => c.name === "token" || c.name === "jwt" || c.name === "access_token",
-    );
+    await ensureLoggedIn(page);
 
     // Use the documents API to check each target doc
     for (const docId of TARGET_DOCUMENT_IDS) {
@@ -103,8 +118,9 @@ test.describe("Preflight Gate", () => {
       ).toBe(true);
 
       const doc = await res.json();
-      const status = doc.status || doc.document?.status;
-      const filename = doc.filename || doc.document?.filename || docId;
+      const status = doc.status || doc.document?.status || doc.data?.status;
+      const filename =
+        doc.filename || doc.document?.filename || doc.data?.filename || docId;
 
       expect(
         ["ready", "indexed"].includes(status),
@@ -116,24 +132,13 @@ test.describe("Preflight Gate", () => {
   });
 
   test("chat stream endpoint accepts authenticated POST", async ({ page }) => {
-    // Login first
-    await page.goto("/a/r9p3q1?mode=login");
-    await page.waitForTimeout(2000);
-    const chatInput = page.locator("textarea.chat-v3-textarea");
-    if (!(await chatInput.isVisible({ timeout: 2000 }).catch(() => false))) {
-      await page.locator('input[type="email"]').fill(TEST_EMAIL);
-      await page.locator('input[type="password"]').fill(TEST_PASSWORD);
-      await page.locator('button[type="submit"]').click();
-      await page.waitForURL((url) => !url.pathname.startsWith("/a/"), {
-        timeout: 30_000,
-      });
-    }
+    await ensureLoggedIn(page);
 
     // Send a minimal chat request to verify the stream endpoint
     const res = await page.request.post("/api/chat/stream", {
       data: {
         message: "ping",
-        attachedDocuments: [],
+        attachedDocuments: [TARGET_CHAT_DOCUMENT],
         language: "en",
         client: { wantsStreaming: true },
       },

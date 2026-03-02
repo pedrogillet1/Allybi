@@ -387,12 +387,24 @@ router.post(
         error: e?.message,
         stack: e?.stack,
       });
+      const exposeDebugError =
+        String(process.env.CHAT_STREAM_DEBUG_ERRORS || "")
+          .trim()
+          .toLowerCase() === "true";
+      const genericMessage = resolveGenericChatFailureMessage(
+        preferredLanguage,
+        "stream_route_error",
+      );
+      const debugSuffix =
+        exposeDebugError && e?.message
+          ? ` [debug: ${String(e.message).slice(0, 500)}]`
+          : "";
       if (!res.writableEnded) {
         res.write(
           `data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`,
         );
         res.write(
-          `data: ${JSON.stringify({ type: "error", message: resolveGenericChatFailureMessage(preferredLanguage, "stream_route_error") })}\n\n`,
+          `data: ${JSON.stringify({ type: "error", message: `${genericMessage}${debugSuffix}` })}\n\n`,
         );
       }
     } finally {

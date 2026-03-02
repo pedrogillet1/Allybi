@@ -1,0 +1,162 @@
+{
+  "_meta": {
+    "id": "di_ops_sections_ops_work_order",
+    "version": "1.0.0",
+    "description": "Section map for work order documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_work_order"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "name": {
+        "en": "Header",
+        "pt": "Cabecalho"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "work order",
+        "service order",
+        "WO",
+        "OS",
+        "ordem de servico"
+      ]
+    },
+    {
+      "id": "requestor_and_assignee",
+      "name": {
+        "en": "Requestor and Assignee",
+        "pt": "Solicitante e Responsavel"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "requested by",
+        "assigned to",
+        "technician",
+        "solicitante",
+        "responsavel"
+      ]
+    },
+    {
+      "id": "equipment_details",
+      "name": {
+        "en": "Equipment Details",
+        "pt": "Detalhes do Equipamento"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "equipment",
+        "asset",
+        "machine",
+        "location",
+        "equipamento",
+        "local"
+      ]
+    },
+    {
+      "id": "scheduling",
+      "name": {
+        "en": "Scheduling",
+        "pt": "Agendamento"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "schedule",
+        "planned date",
+        "due date",
+        "completion",
+        "agendamento"
+      ]
+    },
+    {
+      "id": "work_description",
+      "name": {
+        "en": "Work Description",
+        "pt": "Descricao do Servico"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "description",
+        "work performed",
+        "task details",
+        "descricao",
+        "servico executado"
+      ]
+    },
+    {
+      "id": "parts_and_materials",
+      "name": {
+        "en": "Parts and Materials",
+        "pt": "Pecas e Materiais"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "parts",
+        "materials",
+        "spare parts",
+        "pecas",
+        "materiais"
+      ]
+    },
+    {
+      "id": "summary",
+      "name": {
+        "en": "Summary",
+        "pt": "Resumo"
+      },
+      "required": false,
+      "order": 7,
+      "headingAnchors": [
+        "summary",
+        "total",
+        "labor hours",
+        "cost",
+        "resumo"
+      ]
+    },
+    {
+      "id": "corrective_actions",
+      "name": {
+        "en": "Corrective Actions",
+        "pt": "Acoes Corretivas"
+      },
+      "required": false,
+      "order": 8,
+      "headingAnchors": [
+        "corrective action",
+        "follow up",
+        "recommendation",
+        "acao corretiva"
+      ]
+    },
+    {
+      "id": "footer_metadata",
+      "name": {
+        "en": "Footer Metadata",
+        "pt": "Rodape e Metadados"
+      },
+      "required": false,
+      "order": 9,
+      "headingAnchors": [
+        "approved by",
+        "signature",
+        "page",
+        "document id",
+        "aprovado por"
+      ]
+    }
+  ]
+}

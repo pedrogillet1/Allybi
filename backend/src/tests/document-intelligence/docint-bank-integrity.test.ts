@@ -168,6 +168,30 @@ function loadBankMap(): any {
   return JSON.parse(raw);
 }
 
+function loadDocTaxonomy(): any {
+  const taxonomyPath = path.join(
+    DATA_BANKS_ROOT,
+    "semantics",
+    "taxonomy",
+    "doc_taxonomy.any.json",
+  );
+  if (!fs.existsSync(taxonomyPath)) return null;
+  const raw = fs.readFileSync(taxonomyPath, "utf8");
+  return JSON.parse(raw);
+}
+
+const DOMAIN_ALIASES: Record<string, string> = {
+  operations: "ops",
+};
+
+function normalizeDomain(value: unknown): string {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized) return "";
+  return DOMAIN_ALIASES[normalized] ?? normalized;
+}
+
 // Pre-collect for use across tests
 const diBankFiles = collectDiBankFiles();
 const parsedBanks: Array<{ path: string; data: any }> = [];
@@ -584,9 +608,54 @@ describe("DI cross-domain parity", () => {
     if (!bankMap) return;
 
     const mapDomains = Array.isArray(bankMap.domains)
-      ? bankMap.domains.sort()
+      ? bankMap.domains.map((domain: unknown) => normalizeDomain(domain)).sort()
       : [];
     expect(mapDomains).toEqual([...DOMAINS].sort());
+  });
+
+  test("doc taxonomy domains normalize to core DI domains", () => {
+    const taxonomy = loadDocTaxonomy();
+    if (!taxonomy) return;
+
+    const clusterDomains = Object.keys(taxonomy?.clusters ?? {}).map((domain) =>
+      normalizeDomain(domain),
+    );
+    const typeDefDomains = Array.isArray(taxonomy?.typeDefinitions)
+      ? taxonomy.typeDefinitions
+          .map((entry: any) => normalizeDomain(entry?.domain))
+          .filter(Boolean)
+      : [];
+    const merged = Array.from(
+      new Set([...clusterDomains, ...typeDefDomains].filter(Boolean)),
+    ).sort();
+
+    expect(merged).toEqual([...DOMAINS].sort());
+  });
+
+  test("doc taxonomy keeps operations->ops compatibility alias", () => {
+    const taxonomy = loadDocTaxonomy();
+    if (!taxonomy) return;
+    expect(taxonomy?.config?.domainAliases?.operations).toBe("ops");
+  });
+
+  test("bank map extendedDomains are valid and do not overlap core", () => {
+    if (!bankMap) return;
+
+    const extended = Array.isArray(bankMap.extendedDomains)
+      ? bankMap.extendedDomains
+          .map((domain: unknown) => normalizeDomain(domain))
+          .filter(Boolean)
+      : [];
+    const uniqueExtended = Array.from(new Set(extended)).sort();
+
+    for (const domain of uniqueExtended) {
+      expect(DOMAINS.includes(domain as (typeof DOMAINS)[number])).toBe(false);
+      expect(
+        FULL_PARITY_DOMAINS.includes(
+          domain as (typeof FULL_PARITY_DOMAINS)[number],
+        ),
+      ).toBe(false);
+    }
   });
 
   test("bank map operators match code-expected operators", () => {

@@ -17,30 +17,44 @@ export class EditingPolicyService {
   resolvePolicy(override?: Partial<EditPolicy>): EditPolicy {
     const bank = safeEditingBank<Record<string, unknown>>("editing_policy");
     const fromBank = bank && typeof bank === "object" ? bank : {};
+    const thresholds = (fromBank as any)?.config?.thresholds || {};
+    const confirmationPolicy = (fromBank as any)?.config?.confirmationPolicy || {};
+    const legacyPolicy = (fromBank as any)?.policy || {};
+    const v2Policies = (fromBank as any)?.policies || {};
     const alwaysRequireConfirmationRaw = Array.isArray(
       fromBank.alwaysRequireConfirmation,
     )
       ? fromBank.alwaysRequireConfirmation
-      : Array.isArray((fromBank as any)?.policy?.alwaysRequireConfirmation)
-        ? (fromBank as any).policy.alwaysRequireConfirmation
+      : Array.isArray(legacyPolicy?.alwaysRequireConfirmation)
+        ? legacyPolicy.alwaysRequireConfirmation
+        : Array.isArray(v2Policies?.alwaysRequireConfirmation)
+          ? v2Policies.alwaysRequireConfirmation
+          : Array.isArray(confirmationPolicy?.alwaysConfirmOperators)
+            ? confirmationPolicy.alwaysConfirmOperators
         : [];
 
     return {
       minConfidenceForAutoApply: toNumber(
         (fromBank as any)?.minConfidenceForAutoApply ??
-          (fromBank as any)?.policy?.minConfidenceForAutoApply,
+          legacyPolicy?.minConfidenceForAutoApply ??
+          thresholds?.silentExecuteTargetConfidence ??
+          thresholds?.minTargetConfidence,
         override?.minConfidenceForAutoApply ??
           DEFAULT_EDIT_POLICY.minConfidenceForAutoApply,
       ),
       minDecisionMarginForAutoApply: toNumber(
         (fromBank as any)?.minDecisionMarginForAutoApply ??
-          (fromBank as any)?.policy?.minDecisionMarginForAutoApply,
+          legacyPolicy?.minDecisionMarginForAutoApply ??
+          thresholds?.silentExecuteDecisionMargin ??
+          thresholds?.minDecisionMargin,
         override?.minDecisionMarginForAutoApply ??
           DEFAULT_EDIT_POLICY.minDecisionMarginForAutoApply,
       ),
       minSimilarityForAutoApply: toNumber(
         (fromBank as any)?.minSimilarityForAutoApply ??
-          (fromBank as any)?.policy?.minSimilarityForAutoApply,
+          legacyPolicy?.minSimilarityForAutoApply ??
+          thresholds?.minSimilarityForStyleOnlyEdits ??
+          thresholds?.minSemanticSimilarity,
         override?.minSimilarityForAutoApply ??
           DEFAULT_EDIT_POLICY.minSimilarityForAutoApply,
       ),

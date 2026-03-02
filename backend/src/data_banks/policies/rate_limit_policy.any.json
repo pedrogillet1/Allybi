@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "id": "rate_limit_policy",
+    "version": "1.0.0",
+    "description": "HTTP rate limit policy contract by endpoint family.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true
+  },
+  "routes": {
+    "api": { "windowMs": 900000, "maxProd": 300, "maxNonProd": 500, "message": "Too many requests from this IP, please try again later." },
+    "auth": { "windowMs": 900000, "maxProd": 10, "maxNonProd": 100, "message": "Too many authentication attempts, please try again later." },
+    "admin": { "windowMs": 900000, "maxProd": 10, "maxNonProd": 20, "message": "Too many admin login attempts." },
+    "two_factor": { "windowMs": 900000, "maxProd": 3, "maxNonProd": 3, "message": "Too many 2FA attempts, please try again later." },
+    "ai": { "windowMs": 60000, "maxProd": 30, "maxNonProd": 30, "message": "Too many AI requests, please slow down." },
+    "editing_apply": { "windowMs": 60000, "maxProd": 240, "maxNonProd": 600, "message": "Too many edit apply requests, please slow down." },
+    "upload": { "windowMs": 3600000, "maxProd": 200, "maxNonProd": 200, "message": "Upload limit reached, please try again later." },
+    "presigned_url": { "windowMs": 900000, "maxProd": 2000, "maxNonProd": 2000, "message": "Upload rate limit exceeded. Please wait before uploading more files." },
+    "multipart_upload": { "windowMs": 900000, "maxProd": 500, "maxNonProd": 500, "message": "Multipart upload rate limit exceeded. Please wait before uploading more files." },
+    "download": { "windowMs": 60000, "maxProd": 60, "maxNonProd": 60, "message": "Too many downloads, please slow down." },
+    "search": { "windowMs": 60000, "maxProd": 100, "maxNonProd": 100, "message": "Too many search requests, please slow down." },
+    "pptx_preview": { "windowMs": 60000, "maxProd": 60, "maxNonProd": 60, "message": "Too many PPTX preview requests, please slow down." },
+    "suspicious": { "windowMs": 3600000, "maxProd": 12, "maxNonProd": 40, "message": "Too many suspicious requests detected; access temporarily limited." },
+    "status_polling": { "windowMs": 60000, "maxProd": 120, "maxNonProd": 180, "message": "Too many polling requests, please slow down." }
+  }
+}

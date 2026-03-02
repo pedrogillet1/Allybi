@@ -97,11 +97,47 @@ interface QueryResult {
 const REPORT_DIR = path.resolve(__dirname, "reports");
 const REPORT_FILE = path.join(REPORT_DIR, "query-test-50-explicit-results.json");
 const MAX_RESPONSE_WAIT_MS = 180_000;
+const MAX_ASSISTANT_APPEAR_MS = 12_000;
 
 interface StreamInterceptState {
   lastHttpStatus: number | null;
   lastRequestId: string | null;
   lastErrorBody: string | null;
+}
+
+async function dismissOnboardingIfPresent(page: Page): Promise<void> {
+  const selectors = [
+    page.getByRole("button", { name: /Skip introduction/i }),
+    page.getByRole("button", { name: /^Skip$/i }),
+    page.getByRole("button", { name: /^Done$/i }),
+  ];
+
+  for (let i = 0; i < 4; i++) {
+    let clicked = false;
+    for (const locator of selectors) {
+      if (await locator.isVisible({ timeout: 400 }).catch(() => false)) {
+        await locator.click().catch(() => undefined);
+        await page.waitForTimeout(250);
+        clicked = true;
+        break;
+      }
+    }
+    if (!clicked) break;
+  }
+
+  await page.keyboard.press("Escape").catch(() => undefined);
+}
+
+async function ensureChatReady(page: Page): Promise<void> {
+  await dismissOnboardingIfPresent(page);
+  const chatInput = page.locator("textarea.chat-v3-textarea");
+  if (await chatInput.isVisible({ timeout: 1200 }).catch(() => false)) return;
+
+  if (!page.url().includes("/c/")) {
+    await page.goto("/c/k4r8f5");
+  }
+  await dismissOnboardingIfPresent(page);
+  await chatInput.waitFor({ state: "visible", timeout: 15_000 });
 }
 
 function setupStreamInterceptor(page: Page): StreamInterceptState {
@@ -130,7 +166,10 @@ async function login(page: Page) {
   await page.goto("/a/r9p3q1?mode=login");
   await page.waitForTimeout(2000);
   const chatInput = page.locator("textarea.chat-v3-textarea");
-  if (await chatInput.isVisible({ timeout: 2000 }).catch(() => false)) return;
+  if (await chatInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await dismissOnboardingIfPresent(page);
+    return;
+  }
   const emailInput = page.locator('input[type="email"]');
   await emailInput.waitFor({ state: "visible", timeout: 10_000 });
   await emailInput.fill(TEST_EMAIL);
@@ -143,13 +182,12 @@ async function login(page: Page) {
     throw new Error(`Login did not redirect. Current URL: ${page.url()}`);
   }
   await page.waitForTimeout(3000);
+  await dismissOnboardingIfPresent(page);
 }
 
 async function navigateToNewChat(page: Page) {
   await page.goto("/c/k4r8f5");
-  const chatInput = page.locator("textarea.chat-v3-textarea");
-  await chatInput.waitFor({ state: "visible", timeout: 15_000 });
-  await page.waitForTimeout(1000);
+  await ensureChatReady(page);
 }
 
 async function setupDocumentAttachmentInjector(page: Page) {
@@ -180,14 +218,20 @@ async function sendQueryAndCapture(
   transport.lastErrorBody = null;
 
   try {
+    await ensureChatReady(page);
+
     const assistantMsgs = page.locator('[data-testid="msg-assistant"]');
     const beforeCount = await assistantMsgs.count();
     const chatInput = page.locator("textarea.chat-v3-textarea");
-    await chatInput.waitFor({ state: "visible", timeout: 10_000 });
     await chatInput.fill(query);
     await page.waitForTimeout(300);
-    await chatInput.press("Enter");
-    await expect(assistantMsgs).toHaveCount(beforeCount + 1, { timeout: 30_000 });
+    const sendBtn = page.locator('button[aria-label="Send"]');
+    if (await sendBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await sendBtn.click();
+    } else {
+      await chatInput.press("Enter");
+    }
+    await expect(assistantMsgs).toHaveCount(beforeCount + 1, { timeout: MAX_ASSISTANT_APPEAR_MS });
     const lastMsg = assistantMsgs.nth(beforeCount);
     await page.locator('button[aria-label="Send"]').waitFor({ state: "visible", timeout: MAX_RESPONSE_WAIT_MS });
     await page.waitForTimeout(1500);
@@ -248,7 +292,7 @@ async function sendQueryAndCapture(
     return {
       index: queryIndex + 1, query, response: "", responseLength: 0, sources: [], truncation: null, failureCode: null,
       durationMs, status: durationMs >= MAX_RESPONSE_WAIT_MS ? "timeout" : "error",
-      errorDetail: err.message || String(err),
+      errorDetail: `${err.message || String(err)} | url=${page.url()}`,
       transport: { httpStatus: transport.lastHttpStatus, requestId: transport.lastRequestId, errorBody: transport.lastErrorBody },
     };
   }

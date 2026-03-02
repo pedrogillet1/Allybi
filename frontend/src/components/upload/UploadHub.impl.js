@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -223,7 +223,8 @@ const processDroppedEntries = async (entries) => {
         progress: 0,
         error: null,
         totalSize: totalSize,
-        fileCount: normalizedFiles.length
+        fileCount: normalizedFiles.length,
+        uploadedFiles: 0
       });
     }
   }
@@ -299,12 +300,46 @@ const UploadHub = () => {
   const [expandedModalCategories, setExpandedModalCategories] = useState(new Set());
   const [allDestModalSearch, setAllDestModalSearch] = useState('');
   const embeddingTimeoutsRef = useRef({}); // Track embedding timeouts for slow processing warnings
+  const uploadItemSeqRef = useRef(0);
   const [folderBrowserModal, setFolderBrowserModal] = useState({
     isOpen: false,
-    folderIndex: null,
+    folderUploadItemId: null,
     folderName: '',
     files: []
   });
+
+  const createUploadItemId = useCallback(
+    () => `upl_${Date.now()}_${(uploadItemSeqRef.current += 1)}`,
+    [],
+  );
+
+  const normalizeUploadItem = useCallback((item) => {
+    const next = { ...(item || {}) };
+    if (!next.uploadItemId) next.uploadItemId = createUploadItemId();
+    if (!Number.isFinite(next.uploadedFiles)) next.uploadedFiles = 0;
+    if (!Number.isFinite(next.failedFiles)) next.failedFiles = 0;
+    if (!Number.isFinite(next.skippedFiles)) next.skippedFiles = 0;
+    if (next.isFolder) {
+      next.fileCount = Math.max(
+        0,
+        Number(next.fileCount || next.files?.length || 0),
+      );
+      const processed =
+        Number(next.uploadedFiles || 0) +
+        Number(next.failedFiles || 0) +
+        Number(next.skippedFiles || 0);
+      next.processedFiles = Math.min(next.fileCount, Math.max(0, processed));
+    }
+    next.lastActivityAt = Number(next.lastActivityAt || Date.now());
+    return next;
+  }, [createUploadItemId]);
+
+  const prependUploadItems = useCallback((items) => {
+    const normalized = (Array.isArray(items) ? items : [])
+      .map((item) => normalizeUploadItem(item));
+    if (normalized.length === 0) return;
+    setUploadingFiles((prev) => [...normalized, ...prev]);
+  }, [normalizeUploadItem]);
 
   // Document Scanner state (mobile only)
   const [showScanner, setShowScanner] = useState(false);
@@ -327,7 +362,8 @@ const UploadHub = () => {
             processingProgress: data.progress,
             progress: uiProgress,
             statusMessage: data.message || file.statusMessage,
-            stage: data.message || file.stage || 'Processing...'
+            stage: data.message || file.stage || 'Processing...',
+            lastActivityAt: Date.now(),
           };
         }
 
@@ -336,16 +372,21 @@ const UploadHub = () => {
           const processedCount = file.processedFiles || 0;
 
           // If this document just completed, increment processed count
-          if (data.progress === 100 || data.stage === 'completed' || data.stage === 'complete') {
-            const newProcessedCount = processedCount + 1;
-            const folderProgress = 50 + ((newProcessedCount / file.totalFiles) * 50);
-            return {
-              ...file,
-              processedFiles: newProcessedCount,
-              progress: folderProgress,
-              stage: `Processing... (${newProcessedCount}/${file.totalFiles})`
-            };
-          }
+              if (data.progress === 100 || data.stage === 'completed' || data.stage === 'complete') {
+                const newProcessedCount = processedCount + 1;
+                const folderProgress = 50 + ((newProcessedCount / file.totalFiles) * 50);
+                return {
+                  ...file,
+                  processedFiles: newProcessedCount,
+                  uploadedFiles: Math.max(
+                    Number(file.uploadedFiles || 0),
+                    Math.min(Number(file.fileCount || file.totalFiles || 0), newProcessedCount),
+                  ),
+                  progress: folderProgress,
+                  stage: `Processing... (${newProcessedCount}/${file.totalFiles})`,
+                  lastActivityAt: Date.now(),
+                };
+              }
         }
 
         return file;
@@ -439,7 +480,7 @@ const UploadHub = () => {
 
   // ✅ Poll backend for document processing status after upload completes
   // Uses a ref to track processing folders without causing effect re-runs
-  const processingFoldersRef = useRef(new Map()); // folderName -> { documentIds, totalFiles }
+  const processingFoldersRef = useRef(new Map()); // uploadItemId -> { folderName, documentIds, totalFiles }
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -469,7 +510,7 @@ const UploadHub = () => {
         return;
       }
 
-      for (const [folderName, info] of folders.entries()) {
+      for (const [uploadItemId, info] of folders.entries()) {
         const ids = Array.isArray(info.documentIds) ? info.documentIds : [];
         const totalCount = info.totalFiles || ids.length || 1;
 
@@ -487,10 +528,30 @@ const UploadHub = () => {
 
         if (allReady) {
           // All done — set 100% and dismiss
-          folders.delete(folderName);
+          folders.delete(uploadItemId);
           setUploadingFiles(prev => prev.map(f =>
-            (f.isFolder && f.folderName === folderName)
-              ? { ...f, status: 'completed', progress: 100, stage: null }
+            (f.uploadItemId === uploadItemId)
+              ? {
+                  ...f,
+                  status: 'completed',
+                  progress: 100,
+                  stage: null,
+                  uploadedFiles: Math.min(
+                    Number(f.fileCount || 0),
+                    Math.max(
+                      Number(f.uploadedFiles || 0),
+                      Number(info.uploadedFiles || 0),
+                      Number(info.totalFiles || 0),
+                    ),
+                  ),
+                  failedFiles: failedCount,
+                  skippedFiles: skippedCount,
+                  processedFiles: Math.min(
+                    Number(f.fileCount || 0),
+                    doneCount,
+                  ),
+                  lastActivityAt: Date.now(),
+                }
               : f
           ));
           invalidateCache();
@@ -502,20 +563,38 @@ const UploadHub = () => {
             const parts = [];
             if (failedCount > 0) parts.push(`${failedCount} failed`);
             if (skippedCount > 0) parts.push(`${skippedCount} had no extractable content`);
-            showError(`${issueCount} file${issueCount > 1 ? 's' : ''} in "${folderName}" could not be fully processed: ${parts.join(', ')}.`);
+            showError(`${issueCount} file${issueCount > 1 ? 's' : ''} in "${String(info.folderName || 'folder')}" could not be fully processed: ${parts.join(', ')}.`);
           }
 
           setTimeout(() => {
-            setUploadingFiles(prev => prev.filter(f => !(f.isFolder && f.folderName === folderName)));
+            setUploadingFiles(prev => prev.filter(f => f.uploadItemId !== uploadItemId));
           }, 1500);
         } else {
           // Partial — smoothly fill from upload% toward 100%
           setUploadingFiles(prev => prev.map(f => {
-            if (f.isFolder && f.folderName === folderName && f.status === 'processing') {
+            if (f.uploadItemId === uploadItemId && f.status === 'processing') {
               const base = info.uploadEndProgress || 60;
               const pct = base + ((100 - base) * (doneCount / totalCount));
               const next = Math.max(f.progress || 0, Math.min(99, Math.round(pct)));
-              return { ...f, progress: next, stage: `Processing (${doneCount}/${totalCount})...` };
+              return {
+                ...f,
+                progress: next,
+                stage: `Processing (${doneCount}/${totalCount})...`,
+                uploadedFiles: Math.min(
+                  Number(f.fileCount || 0),
+                  Math.max(
+                    Number(f.uploadedFiles || 0),
+                    Number(info.uploadedFiles || 0),
+                  ),
+                ),
+                failedFiles: failedCount,
+                skippedFiles: skippedCount,
+                processedFiles: Math.min(
+                  Number(f.fileCount || 0),
+                  doneCount,
+                ),
+                lastActivityAt: Date.now(),
+              };
             }
             return f;
           }));
@@ -772,7 +851,7 @@ const UploadHub = () => {
         allowed.push(item);
       }
       if (allowed.length === 0) return;
-      setUploadingFiles(prev => [...allowed, ...prev]);
+      prependUploadItems(allowed);
       requestAnimationFrame(() => {
         filesCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
@@ -800,7 +879,7 @@ const UploadHub = () => {
         folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
       }));
 
-      setUploadingFiles(prev => [...pendingFiles, ...prev]);
+      prependUploadItems(pendingFiles);
       requestAnimationFrame(() => {
         filesCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
@@ -808,12 +887,14 @@ const UploadHub = () => {
   };
 
   // Open folder browser modal
-  const handleOpenFolderBrowser = (folderIndex) => {
-    const folder = uploadingFiles[folderIndex];
+  const handleOpenFolderBrowser = (folderUploadItemId) => {
+    const folder = uploadingFiles.find(
+      (item) => item.uploadItemId === folderUploadItemId,
+    );
     if (folder && folder.isFolder) {
       setFolderBrowserModal({
         isOpen: true,
-        folderIndex: folderIndex,
+        folderUploadItemId: folder.uploadItemId,
         folderName: folder.folderName,
         files: folder.files
       });
@@ -824,7 +905,7 @@ const UploadHub = () => {
   const handleCloseFolderBrowser = () => {
     setFolderBrowserModal({
       isOpen: false,
-      folderIndex: null,
+      folderUploadItemId: null,
       folderName: '',
       files: []
     });
@@ -832,11 +913,15 @@ const UploadHub = () => {
 
   // Remove file from folder (called from modal)
   const handleRemoveFileFromFolder = (relativePath) => {
-    const folderIndex = folderBrowserModal.folderIndex;
-    if (folderIndex === null) return;
+    const folderUploadItemId = folderBrowserModal.folderUploadItemId;
+    if (!folderUploadItemId) return;
 
     setUploadingFiles(prev => {
       const newFiles = [...prev];
+      const folderIndex = newFiles.findIndex(
+        (item) => item.uploadItemId === folderUploadItemId,
+      );
+      if (folderIndex < 0) return prev;
       const folder = newFiles[folderIndex];
       if (folder && folder.isFolder && folder.files) {
         // Filter out the file with the matching relativePath
@@ -846,7 +931,18 @@ const UploadHub = () => {
         });
         // Update file count and total size
         folder.fileCount = folder.files.length;
+        folder.uploadedFiles = Math.min(
+          Number(folder.uploadedFiles || 0),
+          folder.fileCount,
+        );
+        folder.processedFiles = Math.min(
+          folder.fileCount,
+          Number(folder.uploadedFiles || 0) +
+            Number(folder.failedFiles || 0) +
+            Number(folder.skippedFiles || 0),
+        );
         folder.totalSize = folder.files.reduce((sum, f) => sum + (f.size || 0), 0);
+        folder.lastActivityAt = Date.now();
 
         // If no files left, remove the folder entirely
         if (folder.files.length === 0) {
@@ -867,56 +963,81 @@ const UploadHub = () => {
   const handleConfirmUpload = async () => {
     const pendingItems = uploadingFiles.filter(f => f.status === 'pending');
     if (pendingItems.length === 0) return;
-    // ✅ FIX: Filter hidden files before counting and update items
-    // Handle both File objects (drag-and-drop) and { file, relativePath } wrapped objects (button upload)
-    const filteredItems = pendingItems.map(item => {
-      if (item.isFolder) {
-        const validFiles = item.files.filter(f => {
-          const name = f.name || f.file?.name || '';
-          return !isMacHiddenFile(name);
-        });
-        return {
-          ...item,
-          files: validFiles,
-          fileCount: validFiles.length,
-          totalSize: validFiles.reduce((sum, f) => sum + (f.size || f.file?.size || 0), 0)
-        };
+
+    // ✅ FIX: Filter hidden files and keep filtered payload as source of truth
+    // Build uploadItemId-keyed mapping so async row updates stay stable.
+    const filteredById = new Map();
+    uploadingFiles.forEach((item) => {
+      if (item.status !== 'pending') return;
+      const uploadItemId = item.uploadItemId;
+      if (!uploadItemId) return;
+      if (!item.isFolder) {
+        filteredById.set(uploadItemId, normalizeUploadItem(item));
+        return;
       }
-      return item;
+      const validFiles = (item.files || []).filter(f => {
+        const name = f?.name || f?.file?.name || '';
+        return !isMacHiddenFile(name);
+      });
+      filteredById.set(uploadItemId, normalizeUploadItem({
+        ...item,
+        files: validFiles,
+        fileCount: validFiles.length,
+        uploadedFiles: Math.min(
+          Number(item.uploadedFiles || 0),
+          validFiles.length,
+        ),
+        processedFiles: Math.min(
+          validFiles.length,
+          Number(item.uploadedFiles || 0) +
+            Number(item.failedFiles || 0) +
+            Number(item.skippedFiles || 0),
+        ),
+        totalSize: validFiles.reduce((sum, f) => sum + (f.size || f.file?.size || 0), 0),
+      }));
     });
 
-    // Update state with filtered items
-    setUploadingFiles(prev => prev.map(item => {
-      const filtered = filteredItems.find(fi => fi === item || (fi.isFolder && fi.folderName === item.folderName));
-      return filtered || item;
-    }));
+    // Update state with filtered items before marking uploads as started.
+    setUploadingFiles(prev =>
+      prev.map((item) => filteredById.get(item.uploadItemId) || item)
+    );
 
-    // Count valid files only (excluding hidden files)
-    const totalFiles = filteredItems.reduce((count, item) => {
-      if (item.isFolder) {
-        return count + item.files.length;
-      }
-      return count + 1;
-    }, 0);
+    // Count valid files only (excluding hidden files).
+    const totalFiles = Array.from(filteredById.values()).reduce((count, item) => (
+      count + (item.isFolder ? (item.fileCount || 0) : 1)
+    ), 0);
 
     totalFilesToUploadRef.current = totalFiles;
     completedFilesCountRef.current = 0;
 
-    // Get current state snapshot
-    const itemsToUpload = [...uploadingFiles];
+    // Use filtered pending items (not stale pre-filter state).
+    const itemsToUpload = uploadingFiles.map((item) => filteredById.get(item.uploadItemId) || item);
 
     // Mark all pending items as uploading
-    setUploadingFiles(prev => prev.map(f =>
-      f.status === 'pending' ? { ...f, status: 'uploading' } : f
-    ));
+    setUploadingFiles(prev => prev.map((f) => {
+      if (f.status !== 'pending') return f;
+      const filtered = filteredById.get(f.uploadItemId);
+      if (filtered?.isFolder && (filtered.fileCount || 0) === 0) {
+        return {
+          ...filtered,
+          status: 'failed',
+          error: 'No valid files in folder',
+          errorDetails: 'All files were hidden/system files and were skipped.',
+          lastActivityAt: Date.now(),
+        };
+      }
+      return { ...(filtered || f), status: 'uploading', lastActivityAt: Date.now() };
+    }));
 
     // ⚡ PARALLEL UPLOAD OPTIMIZATION: Use p-limit for concurrent uploads
     // ✅ OPTIMIZED: Increased to 10 concurrent uploads for better performance
     const limit = pLimit(10);
 
     // Create upload promises for all items
-    const uploadPromises = itemsToUpload.map((item, i) => {
+    const uploadPromises = itemsToUpload.map((item) => {
       if (item.status !== 'pending') return Promise.resolve();
+      if (item.isFolder && (!item.fileCount || item.fileCount <= 0)) return Promise.resolve();
+      const itemId = item.uploadItemId;
 
       // Wrap each upload in p-limit for concurrency control
       return limit(async () => {
@@ -960,23 +1081,60 @@ const UploadHub = () => {
               // Upload phase: 0→60% based on FILE COUNT (not bytes)
               // Processing phase (polling): 60→100% based on ready doc count
               setUploadingFiles(prev => prev.map((f) => {
-                if (f.isFolder && f.folderName === item.folderName) {
+                if (f.uploadItemId === itemId) {
+                  const folderTotal =
+                    Math.max(
+                      Number(f.fileCount || 0),
+                      Number(progress.totalFiles || 0),
+                      Number(item.files?.length || 0),
+                    ) || 0;
+                  const completed = Number(progress.completedFiles || 0);
+                  const uploadedFiles = Math.min(
+                    folderTotal,
+                    Math.max(
+                      Number(f.uploadedFiles || 0),
+                      completed,
+                    ),
+                  );
                   if (progress.stage === 'complete') {
-                    return { ...f, progress: Math.max(f.progress || 0, 60), stage: 'Processing...', status: 'uploading' };
+                    return {
+                      ...f,
+                      progress: Math.max(f.progress || 0, 60),
+                      stage: 'Processing...',
+                      status: 'uploading',
+                      uploadedFiles: Math.max(uploadedFiles, folderTotal),
+                      processedFiles: Math.max(uploadedFiles, folderTotal),
+                      lastActivityAt: Date.now(),
+                    };
                   }
                   // Use file count for smooth, predictable progress
-                  const completed = progress.completedFiles || 0;
                   const total = progress.totalFiles || item.files?.length || 1;
                   if (completed > 0 && total > 0) {
                     // File-count based: each file = equal slice of 0-59%
                     const scaled = Math.min(59, Math.round((completed / total) * 60));
                     const next = Math.max(f.progress || 0, scaled);
-                    return { ...f, progress: next, stage: `Uploading (${completed}/${total})...`, status: 'uploading' };
+                    return {
+                      ...f,
+                      progress: next,
+                      stage: `Uploading (${completed}/${total})...`,
+                      status: 'uploading',
+                      uploadedFiles,
+                      processedFiles: uploadedFiles,
+                      lastActivityAt: Date.now(),
+                    };
                   }
                   // Before files complete: small stage-based progress
                   const stagePct = progress.stage === 'uploading' ? 5 : progress.stage === 'preparing' ? 3 : 2;
                   const next = Math.max(f.progress || 0, stagePct);
-                  return { ...f, progress: next, stage: progress.message || 'Preparing...', status: 'uploading' };
+                  return {
+                    ...f,
+                    progress: next,
+                    stage: progress.message || 'Preparing...',
+                    status: 'uploading',
+                    uploadedFiles,
+                    processedFiles: uploadedFiles,
+                    lastActivityAt: Date.now(),
+                  };
                 }
                 return f;
               }));
@@ -989,26 +1147,53 @@ const UploadHub = () => {
 
           if (uploadedDocIds.length > 0) {
             // Register for processing polling (ref-based, no re-render loops)
-            processingFoldersRef.current.set(item.folderName, {
+            processingFoldersRef.current.set(itemId, {
+              folderName: item.folderName,
               documentIds: uploadedDocIds,
               totalFiles: uploadedDocIds.length,
-              uploadEndProgress: 60
+              uploadEndProgress: 60,
+              uploadedFiles: uploadedDocIds.length
             });
             // Set status to processing — polling fills from 60% to 100%
             setUploadingFiles(prev => prev.map((f) =>
-              (f.isFolder && f.folderName === item.folderName)
-                ? { ...f, status: 'processing', progress: Math.max(f.progress || 0, 60), stage: 'Processing...' }
+              (f.uploadItemId === itemId)
+                ? {
+                    ...f,
+                    status: 'processing',
+                    progress: Math.max(f.progress || 0, 60),
+                    stage: 'Processing...',
+                    uploadedFiles: Math.min(
+                      Number(f.fileCount || 0),
+                      Math.max(
+                        Number(f.uploadedFiles || 0),
+                        uploadedDocIds.length,
+                      ),
+                    ),
+                    processedFiles: Math.min(
+                      Number(f.fileCount || 0),
+                      uploadedDocIds.length,
+                    ),
+                    lastActivityAt: Date.now(),
+                  }
                 : f
             ));
           } else {
             // No documents — complete immediately
             setUploadingFiles(prev => prev.map((f) =>
-              (f.isFolder && f.folderName === item.folderName)
-                ? { ...f, status: 'completed', progress: 100, stage: null }
+              (f.uploadItemId === itemId)
+                ? {
+                    ...f,
+                    status: 'completed',
+                    progress: 100,
+                    stage: null,
+                    uploadedFiles: Number(f.fileCount || 0),
+                    processedFiles: Number(f.fileCount || 0),
+                    lastActivityAt: Date.now(),
+                  }
                 : f
             ));
             setTimeout(() => {
-              setUploadingFiles(prev => prev.filter((f) => !(f.isFolder && f.folderName === item.folderName)));
+              setUploadingFiles(prev => prev.filter((f) => f.uploadItemId !== itemId));
             }, 1500);
           }
 
@@ -1051,12 +1236,13 @@ const UploadHub = () => {
           showUploadError(errorMessage, errorDetails, () => {
             // Retry handler - reset the folder status and re-queue
             setUploadingFiles(prev => prev.map((f) =>
-              (f.isFolder && f.folderName === item.folderName) ? {
+              (f.uploadItemId === itemId) ? {
                 ...f,
                 status: 'uploading',
                 error: null,
                 progress: 0,
-                stage: t('upload.preparingRetry')
+                stage: t('upload.preparingRetry'),
+                lastActivityAt: Date.now(),
               } : f
             ));
             // Note: The actual retry will happen on next processUploadQueue cycle
@@ -1064,17 +1250,20 @@ const UploadHub = () => {
 
           // Mark as failed in UI (but keep visible for retry)
           setUploadingFiles(prev => prev.map((f) =>
-            (f.isFolder && f.folderName === item.folderName) ? {
+            (f.uploadItemId === itemId) ? {
               ...f,
               status: 'failed',
               error: errorMessage,
-              errorDetails: errorDetails
+              errorDetails: errorDetails,
+              failedFiles: Number(f.fileCount || 1),
+              processedFiles: Number(f.fileCount || 1),
+              lastActivityAt: Date.now(),
             } : f
           ));
 
           // Remove failed uploads after longer delay (give user time to see error)
           setTimeout(() => {
-            setUploadingFiles(prev => prev.filter((f) => !(f.isFolder && f.folderName === item.folderName && f.status === 'failed')));
+            setUploadingFiles(prev => prev.filter((f) => !(f.uploadItemId === itemId && f.status === 'failed')));
           }, 10000);
         }
       } else {
@@ -1119,15 +1308,15 @@ const UploadHub = () => {
         const fileHash = await calculateFileHash(file);
 
         // Update to show starting
-        setUploadingFiles(prev => prev.map((f, idx) =>
-          idx === i ? { ...f, progress: 5, processingStage: 'Preparing...' } : f
+        setUploadingFiles(prev => prev.map((f) =>
+          f.uploadItemId === itemId ? { ...f, progress: 5, processingStage: 'Preparing...', lastActivityAt: Date.now() } : f
         ));
 
         // ⚡ STEP 1: Extract text from file BEFORE encryption
         let extractedText = '';
         if (encryptionPassword) {
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? { ...f, progress: 5, processingStage: 'Extracting text...' } : f
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? { ...f, progress: 5, processingStage: 'Extracting text...', lastActivityAt: Date.now() } : f
           ));
 
           try {
@@ -1144,8 +1333,8 @@ const UploadHub = () => {
         let encryptedText = null;
 
         if (encryptionPassword) {
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? { ...f, progress: 10, processingStage: 'Encrypting file...' } : f
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? { ...f, progress: 10, processingStage: 'Encrypting file...', lastActivityAt: Date.now() } : f
           ));
 
           try {
@@ -1158,11 +1347,12 @@ const UploadHub = () => {
               fileUint8Array,
               encryptionPassword,
               (operation, progress, message) => {
-                setUploadingFiles(prev => prev.map((f, idx) =>
-                  idx === i ? {
+                setUploadingFiles(prev => prev.map((f) =>
+                  f.uploadItemId === itemId ? {
                     ...f,
                     progress: 10 + (progress * 0.15),
-                    processingStage: `${message} ${Math.round(progress)}%`
+                    processingStage: `${message} ${Math.round(progress)}%`,
+                    lastActivityAt: Date.now(),
                   } : f
                 ));
               }
@@ -1195,11 +1385,12 @@ const UploadHub = () => {
               originalMimeType: file.type
             };
           } catch (encryptionError) {
-            setUploadingFiles(prev => prev.map((f, idx) =>
-              idx === i ? {
+            setUploadingFiles(prev => prev.map((f) =>
+              f.uploadItemId === itemId ? {
                 ...f,
                 status: 'failed',
-                error: 'Encryption failed: ' + encryptionError.message
+                error: 'Encryption failed: ' + encryptionError.message,
+                lastActivityAt: Date.now(),
               } : f
             ));
             return; // Exit this upload function early
@@ -1210,8 +1401,8 @@ const UploadHub = () => {
         const thumbnailBase64 = null;
 
         // Update progress
-        setUploadingFiles(prev => prev.map((f, idx) =>
-          idx === i ? { ...f, progress: 30, processingStage: 'Uploading to cloud...' } : f
+        setUploadingFiles(prev => prev.map((f) =>
+          f.uploadItemId === itemId ? { ...f, progress: 30, processingStage: 'Uploading to cloud...', lastActivityAt: Date.now() } : f
         ));
 
         // Upload via backend with multipart form data
@@ -1245,8 +1436,8 @@ const UploadHub = () => {
           onUploadProgress: (progressEvent) => {
             // Show upload progress (this is just the HTTP upload, very fast)
             const uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadingFiles(prev => prev.map((f, idx) =>
-              idx === i ? { ...f, progress: uploadProgress, processingStage: 'Uploading to cloud...' } : f
+            setUploadingFiles(prev => prev.map((f) =>
+              f.uploadItemId === itemId ? { ...f, progress: uploadProgress, processingStage: 'Uploading to cloud...', lastActivityAt: Date.now() } : f
             ));
           }
         });
@@ -1258,11 +1449,11 @@ const UploadHub = () => {
         // Guard: if backend didn't return a valid document object, bail gracefully
         if (!document || !document.id) {
           console.error('[UploadHub] Backend returned no document object:', uploadResponse.data);
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? { ...f, status: 'completed', progress: 100, processingStage: null } : f
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? { ...f, status: 'completed', progress: 100, processingStage: null, lastActivityAt: Date.now() } : f
           ));
           setTimeout(() => {
-            setUploadingFiles(prev => prev.filter((f, idx) => idx !== i));
+            setUploadingFiles(prev => prev.filter((f) => f.uploadItemId !== itemId));
           }, 1500);
           await fetchDocuments();
           return;
@@ -1274,18 +1465,19 @@ const UploadHub = () => {
           showFileExists(file.name);
 
           // Mark as completed (file exists, no further processing needed)
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? {
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? {
               ...f,
               status: 'completed',
               progress: 100,
-              processingStage: null
+              processingStage: null,
+              lastActivityAt: Date.now(),
             } : f
           ));
 
           // Remove from upload list after short delay
           setTimeout(() => {
-            setUploadingFiles(prev => prev.filter((f, idx) => idx !== i));
+            setUploadingFiles(prev => prev.filter((f) => f.uploadItemId !== itemId));
           }, 1500);
           return; // Exit early, don't process further
         }
@@ -1312,19 +1504,20 @@ const UploadHub = () => {
 
           // ⚡ SUCCESS: Mark as completed immediately after upload finishes
           // Don't reset to 0% - that causes visual bugs
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? {
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? {
               ...f,
               documentId: document.id, // Link to backend document
               status: 'completed',
               progress: 100, // Keep at 100% - upload is done
-              processingStage: null
+              processingStage: null,
+              lastActivityAt: Date.now(),
             } : f
           ));
 
           // Remove from upload list after short delay to show success
           setTimeout(() => {
-            setUploadingFiles(prev => prev.filter((f, idx) => idx !== i));
+            setUploadingFiles(prev => prev.filter((f) => f.uploadItemId !== itemId));
           }, 1500);
         } catch (postUploadError) {
           // ⚡ EDGE CASE: Rollback optimistic update if post-processing failed
@@ -1338,12 +1531,13 @@ const UploadHub = () => {
             }
           }
 
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? {
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? {
               ...f,
               status: 'failed',
               progress: f.progress,
-              error: postUploadError.message
+              error: postUploadError.message,
+              lastActivityAt: Date.now(),
             } : f
           ));
         }
@@ -1362,20 +1556,21 @@ const UploadHub = () => {
           if (isImage) {
             try {
               await unifiedUploadService.uploadSingleFile(file, targetFolderId, (progress) => {
-                setUploadingFiles(prev => prev.map((f, idx) =>
-                  idx === i ? {
+                setUploadingFiles(prev => prev.map((f) =>
+                  f.uploadItemId === itemId ? {
                     ...f,
                     progress: Math.max(f.progress || 0, Math.round(progress.percentage || 0)),
-                    processingStage: progress.message || 'Uploading...'
+                    processingStage: progress.message || 'Uploading...',
+                    lastActivityAt: Date.now(),
                   } : f
                 ));
               });
 
-              setUploadingFiles(prev => prev.map((f, idx) =>
-                idx === i ? { ...f, status: 'completed', progress: 100, processingStage: null, error: null } : f
+              setUploadingFiles(prev => prev.map((f) =>
+                f.uploadItemId === itemId ? { ...f, status: 'completed', progress: 100, processingStage: null, error: null, lastActivityAt: Date.now() } : f
               ));
               setTimeout(() => {
-                setUploadingFiles(prev => prev.filter((f, idx) => idx !== i));
+                setUploadingFiles(prev => prev.filter((f) => f.uploadItemId !== itemId));
               }, 1500);
               await fetchDocuments();
               return;
@@ -1394,12 +1589,13 @@ const UploadHub = () => {
 
           console.error('[UploadHub] Upload failed:', { status, data, message: error?.message });
 
-          setUploadingFiles(prev => prev.map((f, idx) =>
-            idx === i ? {
+          setUploadingFiles(prev => prev.map((f) =>
+            f.uploadItemId === itemId ? {
               ...f,
               status: 'failed',
               progress: f.progress,
-              error: backendMsg || error.message
+              error: backendMsg || error.message,
+              lastActivityAt: Date.now(),
             } : f
           ));
         }
@@ -1428,6 +1624,7 @@ const UploadHub = () => {
 
   const removeUploadingFile = (identifier) => {
     setUploadingFiles(prev => prev.filter(f => {
+      if (f.uploadItemId && f.uploadItemId === identifier) return false;
       if (f.isFolder) {
         return f.folderName !== identifier;
       } else {
@@ -1492,12 +1689,13 @@ const UploadHub = () => {
         folderId: destIdFolder,
         category: destNameFolder,
         fileCount: folder.files.length,
-        totalSize: totalSize
+        totalSize: totalSize,
+        uploadedFiles: 0
       });
     }
 
     if (folderEntries.length > 0) {
-      setUploadingFiles(prev => [...folderEntries, ...prev]);
+      prependUploadItems(folderEntries);
     }
   };
 
@@ -1538,7 +1736,7 @@ const UploadHub = () => {
       folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
     }));
 
-    setUploadingFiles(prev => [...pendingFiles, ...prev]);
+    prependUploadItems(pendingFiles);
 
     // Reset input so the same file can be re-selected
     event.target.value = '';
@@ -1565,7 +1763,7 @@ const UploadHub = () => {
       path: pdfFile.name
     };
 
-    setUploadingFiles(prev => [pendingFile, ...prev]);
+    prependUploadItems([pendingFile]);
 
     // Auto-scroll to the files card so user sees the scanned file
     requestAnimationFrame(() => {
@@ -2016,10 +2214,70 @@ const UploadHub = () => {
     );
   };
 
-  const pendingCount = uploadingFiles.filter(f => f.status === 'pending').length;
-  const uploadingCount = uploadingFiles.filter(f => f.status === 'uploading' || f.status === 'processing').length;
-  const completedCount = uploadingFiles.filter(f => f.status === 'completed').length;
+  const fileUnitsForQueueItem = (item) => (
+    item?.isFolder
+      ? Math.max(0, item.fileCount || item.files?.length || 0)
+      : 1
+  );
+  const pendingCount = uploadingFiles
+    .filter(f => f.status === 'pending')
+    .reduce((sum, item) => sum + fileUnitsForQueueItem(item), 0);
+  const uploadingCount = uploadingFiles
+    .filter(f => f.status === 'uploading' || f.status === 'processing')
+    .reduce((sum, item) => sum + fileUnitsForQueueItem(item), 0);
+  const completedCount = uploadingFiles
+    .filter(f => f.status === 'completed')
+    .reduce((sum, item) => sum + fileUnitsForQueueItem(item), 0);
+  const queuedFileCount = uploadingFiles.reduce(
+    (sum, item) => sum + fileUnitsForQueueItem(item),
+    0,
+  );
+  const uploadedVisibleCount = uploadingFiles.reduce((sum, item) => {
+    if (item?.isFolder) {
+      const total = fileUnitsForQueueItem(item);
+      const uploaded = Math.min(total, Math.max(0, Number(item.uploadedFiles || 0)));
+      return sum + uploaded;
+    }
+    return sum + (item.status === 'completed' ? 1 : 0);
+  }, 0);
   const hasFiles = uploadingFiles.length > 0;
+
+  useEffect(() => {
+    const timeoutMs = 120000;
+    const interval = window.setInterval(() => {
+      const now = Date.now();
+      setUploadingFiles((prev) => {
+        let changed = false;
+        const next = prev.map((item) => {
+          if (!item) return item;
+          if (item.status !== 'uploading' && item.status !== 'processing') return item;
+          const lastActivityAt = Number(item.lastActivityAt || 0);
+          if (lastActivityAt > 0 && now - lastActivityAt < timeoutMs) return item;
+          changed = true;
+          const total = fileUnitsForQueueItem(item);
+          const uploaded = Math.max(0, Number(item.uploadedFiles || 0));
+          const failed = item.isFolder
+            ? Math.max(Number(item.failedFiles || 0), Math.max(1, total - uploaded))
+            : 1;
+          const processed = item.isFolder
+            ? Math.min(total, uploaded + failed + Number(item.skippedFiles || 0))
+            : Number(item.processedFiles || 0);
+          return {
+            ...item,
+            status: 'failed',
+            error: item.error || 'Upload timed out before completion',
+            errorDetails: item.errorDetails || 'No progress update detected for 2 minutes. Retry the upload.',
+            failedFiles: failed,
+            processedFiles: processed,
+            lastActivityAt: now,
+          };
+        });
+        return changed ? next : prev;
+      });
+    }, 15000);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   // Destination selection — null means no category selected yet
   const [selectedDestination, setSelectedDestination] = useState(null);
@@ -3164,8 +3422,13 @@ const UploadHub = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: hasFiles ? 16 : 0 }}>
                   <div>
                     <h3 style={{ margin: 0, fontSize: 16, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '24px' }}>
-                      {hasFiles ? t('uploadHub.filesCount', { count: uploadingFiles.length }) : t('uploadHub.files')}
+                      {hasFiles ? t('uploadHub.filesCount', { count: queuedFileCount }) : t('uploadHub.files')}
                     </h3>
+                    {hasFiles && (
+                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px' }}>
+                        {`${uploadedVisibleCount}/${queuedFileCount} uploaded`}
+                      </p>
+                    )}
                     {subtitle && (
                       <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px' }}>
                         {subtitle}
@@ -3270,17 +3533,43 @@ const UploadHub = () => {
                   const isUploading = f.status === 'uploading' || f.status === 'processing';
                   const isPending = f.status === 'pending';
                   const progressWidth = isComplete ? 100 : (f.progress || 0);
+                  const folderTotalFiles = f.isFolder
+                    ? Math.max(0, Number(f.fileCount || f.files?.length || 0))
+                    : 0;
+                  const folderUploadedFiles = f.isFolder
+                    ? Math.min(
+                        folderTotalFiles,
+                        Math.max(
+                          0,
+                          Number(f.uploadedFiles || 0),
+                          isComplete ? folderTotalFiles : 0,
+                        ),
+                      )
+                    : 0;
+                  const folderUploadCountLabel = folderTotalFiles > 0
+                    ? `${folderUploadedFiles}/${folderTotalFiles}`
+                    : '0/0';
+                  const folderMetaText = f.isFolder
+                    ? `${folderTotalFiles} file${folderTotalFiles !== 1 ? 's' : ''} \u00B7 ${folderUploadCountLabel} uploaded \u00B7 ${formatFileSize(f.totalSize)}`
+                    : '';
 
                   let chipLabel = t('uploadHub.ready');
                   let chipColor = '#6C6B6E';
                   let chipBg = '#F5F5F5';
                   if (isError) { chipLabel = t('uploadHub.error'); chipColor = '#D92D20'; chipBg = '#FEF3F2'; }
                   else if (isComplete) { chipLabel = t('uploadHub.done'); chipColor = '#34A853'; chipBg = '#F0FDF4'; }
-                  else if (isUploading) { chipLabel = `${Math.round(progressWidth)}%`; chipColor = '#181818'; chipBg = '#F5F5F5'; }
+                  else if (isUploading) {
+                    chipLabel = f.isFolder
+                      ? folderUploadCountLabel
+                      : `${Math.round(progressWidth)}%`;
+                    chipColor = '#181818';
+                    chipBg = '#F5F5F5';
+                  }
 
+                  const rowKey = f.uploadItemId || `upload-row-${index}`;
                   return (
-                    <div key={index}
-                      onClick={() => f.isFolder && isPending && handleOpenFolderBrowser(index)}
+                    <div key={rowKey}
+                      onClick={() => f.isFolder && isPending && handleOpenFolderBrowser(f.uploadItemId)}
                       style={{
                         display: 'flex', alignItems: 'center', gap: 12,
                         height: 48, padding: '0 12px',
@@ -3320,7 +3609,7 @@ const UploadHub = () => {
                           fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: '18px',
                         }}>
                           {isError ? t('uploadHub.uploadFailed') : f.isFolder
-                            ? `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} \u00B7 ${formatFileSize(f.totalSize)}`
+                            ? folderMetaText
                             : formatFileSize(f.file?.size)}
                         </p>
                       </div>
@@ -3337,7 +3626,17 @@ const UploadHub = () => {
                         {isError && (
                           <button onClick={(e) => {
                             e.stopPropagation();
-                            setUploadingFiles(prev => prev.map((file, idx) => idx === index ? { ...file, status: 'pending', progress: 0, error: null } : file));
+                            setUploadingFiles(prev => prev.map((file) => file.uploadItemId === f.uploadItemId ? {
+                              ...file,
+                              status: 'pending',
+                              progress: 0,
+                              error: null,
+                              uploadedFiles: file.isFolder ? 0 : file.uploadedFiles,
+                              failedFiles: 0,
+                              skippedFiles: 0,
+                              processedFiles: file.isFolder ? 0 : file.processedFiles,
+                              lastActivityAt: Date.now(),
+                            } : file));
                           }}
                           style={{ padding: '2px 8px', background: 'none', border: '1px solid #D92D20', borderRadius: 9999, cursor: 'pointer', fontSize: 11, fontWeight: '600', color: '#D92D20', fontFamily: 'Plus Jakarta Sans, sans-serif', transition: 'background 150ms ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF3F2'; }}
@@ -3348,20 +3647,20 @@ const UploadHub = () => {
 
                         {isComplete && (
                           <div style={{ position: 'relative' }}>
-                            <button onClick={(e) => { e.stopPropagation(); const id = f.isFolder ? f.folderName : f.file.name; setOpenDropdownId(openDropdownId === id ? null : id); }}
+                            <button onClick={(e) => { e.stopPropagation(); const id = f.uploadItemId || (f.isFolder ? f.folderName : f.file.name); setOpenDropdownId(openDropdownId === id ? null : id); }}
                               style={{ width: 28, height: 28, background: 'transparent', borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 16, color: '#6C6B6E', transition: 'background 150ms ease' }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = '#E6E6EC'; }}
                               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
                               &#x22EF;
                             </button>
-                            {openDropdownId === (f.isFolder ? f.folderName : f.file.name) && (
+                            {openDropdownId === (f.uploadItemId || (f.isFolder ? f.folderName : f.file.name)) && (
                               <div data-dropdown style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', borderRadius: 12, border: '1px solid #E6E6EC', zIndex: 1001, minWidth: 160, padding: 8 }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                   {[
                                     { label: t('common.download'), icon: <DownloadIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: async (e) => { e.stopPropagation(); try { const response = await api.get(`/api/documents/${f.documentId}/stream?download=true`, { responseType: 'blob' }); const url = window.URL.createObjectURL(new Blob([response.data])); const link = document.createElement('a'); link.href = url; link.setAttribute('download', f.file.name); document.body.appendChild(link); link.click(); link.remove(); setOpenDropdownId(null); } catch (error) { showError(t('alerts.failedToDownloadFile')); } }},
                                     { label: t('common.rename'), icon: <RenameIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setItemToRename({ type: 'document', id: f.documentId, name: f.file.name }); setShowRenameModal(true); setOpenDropdownId(null); }},
                                     { label: t('common.move'), icon: <MoveIcon style={{ width: 16, height: 16 }} />, color: '#32302C', action: (e) => { e.stopPropagation(); setOpenDropdownId(null); setShowCategoryModal(f.documentId || (f.isFolder ? f.folderName : f.file.name)); }},
-                                    { label: t('common.delete'), icon: <DeleteIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(7149%) hue-rotate(355deg) brightness(91%) contrast(89%)' }} />, color: '#D92D20', action: (e) => { e.stopPropagation(); setItemToDelete({ type: 'uploadedFile', documentId: f.documentId, name: f.file.name, folderName: f.isFolder ? f.folderName : null, isFolder: f.isFolder }); setShowDeleteModal(true); }},
+                                    { label: t('common.delete'), icon: <DeleteIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(7149%) hue-rotate(355deg) brightness(91%) contrast(89%)' }} />, color: '#D92D20', action: (e) => { e.stopPropagation(); setItemToDelete({ type: 'uploadedFile', uploadItemId: f.uploadItemId, documentId: f.documentId, name: f.file.name, folderName: f.isFolder ? f.folderName : null, isFolder: f.isFolder }); setShowDeleteModal(true); }},
                                   ].map(item => (
                                     <button key={item.label} onClick={item.action}
                                       style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 13, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '500', color: item.color, transition: 'background 150ms ease', textAlign: 'left' }}
@@ -3377,7 +3676,7 @@ const UploadHub = () => {
                         )}
 
                         {isPending && (
-                          <button onClick={(e) => { e.stopPropagation(); removeUploadingFile(f.isFolder ? f.folderName : f.file.name); }}
+                          <button onClick={(e) => { e.stopPropagation(); removeUploadingFile(f.uploadItemId || (f.isFolder ? f.folderName : f.file.name)); }}
                             aria-label={t('uploadHub.removeFile')}
                             style={{
                               width: 44, height: 44, border: 'none', background: 'transparent',
@@ -3781,7 +4080,7 @@ const UploadHub = () => {
               } else if (itemToDeleteCopy.type === 'uploadedFile') {
                 await api.delete(`/api/documents/${itemToDeleteCopy.documentId}`);
                 setOpenDropdownId(null);
-                removeUploadingFile(itemToDeleteCopy.isFolder ? itemToDeleteCopy.folderName : itemToDeleteCopy.name);
+                removeUploadingFile(itemToDeleteCopy.uploadItemId || (itemToDeleteCopy.isFolder ? itemToDeleteCopy.folderName : itemToDeleteCopy.name));
                 setDocuments(prev => prev.filter(doc => doc.id !== itemToDeleteCopy.documentId));
                 showDeleteSuccess('file');
               }

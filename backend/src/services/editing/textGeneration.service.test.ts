@@ -34,6 +34,34 @@ function makeDocxFindReplacePlan(instruction: string) {
   } as any;
 }
 
+function makeDocxBundlePlan(input: {
+  canonicalOperator: string;
+  instruction: string;
+  metadata?: Record<string, unknown>;
+}) {
+  return {
+    operator: "EDIT_DOCX_BUNDLE",
+    canonicalOperator: input.canonicalOperator,
+    intentSource: "classified",
+    domain: "docx",
+    documentId: "doc_1",
+    targetHint: "",
+    normalizedInstruction: input.instruction,
+    constraints: {
+      preserveNumbers: false,
+      preserveEntities: false,
+      strictNoNewFacts: true,
+      tone: "neutral",
+      outputLanguage: "en",
+      maxExpansionRatio: 2,
+    },
+    metadata: input.metadata || {},
+    missingRequiredEntities: [],
+    preserveTokens: [],
+    diagnostics: { extractedEntities: [], extractedHints: [], checks: [] },
+  } as any;
+}
+
 describe("EditingTextGenerationService", () => {
   test("builds DOCX find/replace bundle patch without LLM", async () => {
     const service = new EditingTextGenerationService();
@@ -65,5 +93,53 @@ describe("EditingTextGenerationService", () => {
     expect(out.ok).toBe(false);
     if (out.ok) return;
     expect(out.error).toContain("requires explicit find/replace terms");
+  });
+
+  test("builds DOCX update TOC bundle patch without LLM", async () => {
+    const service = new EditingTextGenerationService();
+    const out = await service.generateProposedText({
+      context: makeContext(),
+      plan: makeDocxBundlePlan({
+        canonicalOperator: "DOCX_UPDATE_TOC",
+        instruction: "update the table of contents",
+      }),
+      beforeText: "",
+    });
+
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const payload = JSON.parse(out.proposedText);
+    expect(payload.patches?.[0]).toMatchObject({
+      kind: "docx_update_toc",
+    });
+  });
+
+  test("builds DOCX set-table-cell bundle patch from metadata", async () => {
+    const service = new EditingTextGenerationService();
+    const out = await service.generateProposedText({
+      context: makeContext(),
+      plan: makeDocxBundlePlan({
+        canonicalOperator: "DOCX_SET_TABLE_CELL",
+        instruction: 'set table cell to "Revenue"',
+        metadata: {
+          tableIndex: 2,
+          rowIndex: 3,
+          colIndex: 1,
+          text: "Revenue",
+        },
+      }),
+      beforeText: "",
+    });
+
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    const payload = JSON.parse(out.proposedText);
+    expect(payload.patches?.[0]).toMatchObject({
+      kind: "docx_set_table_cell",
+      tableIndex: 2,
+      rowIndex: 3,
+      colIndex: 1,
+      text: "Revenue",
+    });
   });
 });

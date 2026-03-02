@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "English abbreviations for finance domain.",
     "languages": ["en"],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -16,11 +16,14 @@
     { "abbr": "AP", "expansion": "Accounts Payable" },
     { "abbr": "AR", "expansion": "Accounts Receivable" },
     { "abbr": "BS", "expansion": "Balance Sheet" },
+    { "abbr": "BP", "expansion": "Balance Sheet (Brazilian format)" },
     { "abbr": "CAPEX", "expansion": "Capital Expenditure" },
     { "abbr": "CF", "expansion": "Cash Flow" },
     { "abbr": "COGS", "expansion": "Cost of Goods Sold" },
+    { "abbr": "CVM", "expansion": "Brazilian Securities and Exchange Commission" },
     { "abbr": "D/E", "expansion": "Debt-to-Equity Ratio" },
     { "abbr": "DCF", "expansion": "Discounted Cash Flow" },
+    { "abbr": "DRE", "expansion": "Income Statement (Brazilian format)" },
     { "abbr": "DSCR", "expansion": "Debt Service Coverage Ratio" },
     { "abbr": "EBIT", "expansion": "Earnings Before Interest and Taxes" },
     { "abbr": "EBITDA", "expansion": "Earnings Before Interest, Taxes, Depreciation, and Amortization" },

@@ -29,6 +29,40 @@ const suiteFilter = (() => {
 const failures = [];
 const warnings = [];
 
+const LEGACY_DOC_TYPE_ALIASES = {
+  education: {
+    education_diploma_certificate: "edu_diploma_certificate",
+    education_enrollment_letter: "edu_enrollment_letter",
+    education_transcript: "edu_transcript",
+  },
+  housing: {
+    housing_lease_agreement: "housing_lease_summary",
+  },
+  hr_payroll: {
+    hr_payroll_employment_contract: "hr_employment_verification_letter",
+    hr_payroll_payslip: "hr_pay_stub",
+    hr_payroll_timesheet: "hr_timesheet",
+  },
+  identity: {
+    identity_driver_license: "id_driver_license",
+    identity_national_id: "id_business_registration_certificate",
+    identity_passport: "id_passport",
+  },
+  insurance: {
+    insurance_claim_form: "ins_claim_submission",
+    insurance_policy_document: "ins_policy_document",
+    insurance_premium_notice: "ins_premium_invoice",
+  },
+  tax: {
+    tax_payment_receipt: "tax_payment_slip",
+    tax_return_business: "tax_assessment_notice",
+    tax_return_individual: "tax_individual_income_return",
+  },
+  travel: {
+    travel_hotel_receipt: "travel_hotel_booking_confirmation",
+  },
+};
+
 function fail(msg) {
   failures.push(msg);
 }
@@ -36,8 +70,8 @@ function warn(msg) {
   warnings.push(msg);
 }
 
-// ── Load taxonomy ──────────────────────────────────────────────────────
-function loadTaxonomy() {
+// ── Load doc type catalogs (core + extended) ───────────────────────────
+function loadCoreTaxonomyByDomain() {
   const taxPath = path.join(
     dataBanksRoot,
     "semantics",
@@ -46,20 +80,116 @@ function loadTaxonomy() {
   );
   if (!fs.existsSync(taxPath)) {
     fail(`Missing doc_taxonomy at ${taxPath}`);
-    return new Set();
+    return new Map();
   }
   const tax = JSON.parse(fs.readFileSync(taxPath, "utf8"));
-  const ids = new Set();
+  const byDomain = new Map();
   const clusters = tax.clusters || {};
   for (const domain of Object.keys(clusters)) {
+    const normalizedDomain = String(domain || "").trim().toLowerCase();
+    if (!normalizedDomain) continue;
+    if (!byDomain.has(normalizedDomain)) byDomain.set(normalizedDomain, new Set());
     const arr = clusters[domain];
     if (Array.isArray(arr)) {
       for (const id of arr) {
-        if (typeof id === "string") ids.add(id);
+        const normalizedId = String(id || "").trim();
+        if (normalizedId) byDomain.get(normalizedDomain).add(normalizedId);
       }
     }
   }
-  return ids;
+  return byDomain;
+}
+
+function loadExtendedCatalogByDomain() {
+  const domainsRoot = path.join(dataBanksRoot, "document_intelligence", "domains");
+  if (!fs.existsSync(domainsRoot)) {
+    warn(`Missing document_intelligence domains root at ${domainsRoot}`);
+    return new Map();
+  }
+
+  const byDomain = new Map();
+  const dirs = fs
+    .readdirSync(domainsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+
+  for (const dir of dirs) {
+    const catalogPath = path.join(
+      domainsRoot,
+      dir,
+      "doc_types",
+      "doc_type_catalog.any.json",
+    );
+    if (!fs.existsSync(catalogPath)) continue;
+
+    try {
+      const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
+      const domain =
+        String(catalog?.domain || catalog?.config?.domain || dir || "")
+          .trim()
+          .toLowerCase();
+      if (!domain) {
+        warn(`Catalog has empty domain: ${catalogPath}`);
+        continue;
+      }
+
+      if (!byDomain.has(domain)) byDomain.set(domain, new Set());
+      const docTypes = Array.isArray(catalog?.docTypes) ? catalog.docTypes : [];
+      for (const entry of docTypes) {
+        const id = String(entry?.id || "").trim();
+        if (id) byDomain.get(domain).add(id);
+      }
+    } catch (error) {
+      fail(`Invalid JSON in doc_type_catalog: ${catalogPath} — ${error.message}`);
+    }
+  }
+
+  return byDomain;
+}
+
+function mergeDocTypeCatalogs(...maps) {
+  const byDomain = new Map();
+  for (const m of maps) {
+    for (const [domain, ids] of m.entries()) {
+      const normalizedDomain = String(domain || "").trim().toLowerCase();
+      if (!normalizedDomain) continue;
+      if (!byDomain.has(normalizedDomain)) byDomain.set(normalizedDomain, new Set());
+      for (const id of ids) {
+        const normalizedId = String(id || "").trim();
+        if (normalizedId) byDomain.get(normalizedDomain).add(normalizedId);
+      }
+    }
+  }
+  return byDomain;
+}
+
+function flattenDocTypesByDomain(byDomain) {
+  const all = new Set();
+  for (const ids of byDomain.values()) {
+    for (const id of ids) all.add(id);
+  }
+  return all;
+}
+
+function loadAllowedDomains(registry) {
+  const allowed = new Set();
+  for (const suite of registry?.suites || []) {
+    for (const domain of suite?.domains || []) {
+      const normalized = String(domain || "").trim().toLowerCase();
+      if (normalized) allowed.add(normalized);
+    }
+  }
+  return allowed;
+}
+
+function resolveLegacyDocTypeAlias(domain, docTypeId) {
+  const normalizedDomain = String(domain || "").trim().toLowerCase();
+  const rawDocTypeId = String(docTypeId || "").trim();
+  if (!normalizedDomain || !rawDocTypeId) return rawDocTypeId;
+  const aliases = LEGACY_DOC_TYPE_ALIASES[normalizedDomain] || null;
+  if (!aliases) return rawDocTypeId;
+  return aliases[rawDocTypeId] || rawDocTypeId;
 }
 
 // ── Load operator families ─────────────────────────────────────────────
@@ -142,20 +272,42 @@ function loadSuiteCases(suite) {
 }
 
 // ── Validate a single case ─────────────────────────────────────────────
-function validateCase(c, suiteId, validDocTypes, validFamilies) {
+function validateCase(c, suite, validDocTypesByDomain, allDocTypes, validFamilies, allowedDomains) {
   const errs = [];
+  const suiteId = suite?.id || "<missing-suite-id>";
   const caseId = c.id || "<missing-id>";
+  const caseDomain = String(c.domain || "").trim().toLowerCase();
+  const suiteDomains = new Set(
+    Array.isArray(suite?.domains)
+      ? suite.domains.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean)
+      : [],
+  );
 
   if (!c.id || typeof c.id !== "string") errs.push("missing/invalid id");
   if (!["en", "pt"].includes(c.lang)) errs.push(`invalid lang: ${c.lang}`);
-  if (
-    !["finance", "legal", "medical", "ops", "accounting"].includes(c.domain)
-  )
+  if (!caseDomain) {
     errs.push(`invalid domain: ${c.domain}`);
+  } else {
+    if (allowedDomains.size > 0 && !allowedDomains.has(caseDomain)) {
+      errs.push(`invalid domain: ${c.domain}`);
+    }
+    if (suiteDomains.size > 0 && !suiteDomains.has(caseDomain)) {
+      errs.push(`domain not declared by suite: ${caseDomain}`);
+    }
+  }
   if (!c.docTypeId || typeof c.docTypeId !== "string")
     errs.push("missing docTypeId");
-  else if (validDocTypes.size > 0 && !validDocTypes.has(c.docTypeId))
-    errs.push(`unknown docTypeId: ${c.docTypeId}`);
+  else {
+    const canonicalDocTypeId = resolveLegacyDocTypeAlias(caseDomain, c.docTypeId);
+    const domainSet = caseDomain ? validDocTypesByDomain.get(caseDomain) : null;
+    if (domainSet && domainSet.size > 0) {
+      if (!domainSet.has(canonicalDocTypeId)) {
+        errs.push(`unknown docTypeId for domain ${caseDomain}: ${c.docTypeId}`);
+      }
+    } else if (allDocTypes.size > 0 && !allDocTypes.has(canonicalDocTypeId)) {
+      errs.push(`unknown docTypeId: ${c.docTypeId}`);
+    }
+  }
   if (!c.queryFamily || typeof c.queryFamily !== "string")
     errs.push("missing queryFamily");
   else if (validFamilies && !validFamilies.has(c.queryFamily))
@@ -183,7 +335,14 @@ if (!registry) {
   process.exit(1);
 }
 
-const validDocTypes = loadTaxonomy();
+const coreDocTypesByDomain = loadCoreTaxonomyByDomain();
+const extendedDocTypesByDomain = loadExtendedCatalogByDomain();
+const validDocTypesByDomain = mergeDocTypeCatalogs(
+  coreDocTypesByDomain,
+  extendedDocTypesByDomain,
+);
+const validDocTypes = flattenDocTypesByDomain(validDocTypesByDomain);
+const allowedDomains = loadAllowedDomains(registry);
 const validFamilies = loadQueryFamilies();
 
 const suites = (registry.suites || []).filter(
@@ -204,7 +363,14 @@ const summary = [];
 for (const suite of suites) {
   const cases = loadSuiteCases(suite);
   const validCases = cases.filter((c) =>
-    validateCase(c, suite.id, validDocTypes, validFamilies),
+    validateCase(
+      c,
+      suite,
+      validDocTypesByDomain,
+      validDocTypes,
+      validFamilies,
+      allowedDomains,
+    ),
   );
 
   // Count metrics
@@ -314,6 +480,9 @@ console.log(
     String(totalCases).padStart(6) +
     String(totalEn).padStart(5) +
     String(totalPt).padStart(5),
+);
+console.log(
+  `[docint-eval] catalogs: domains=${validDocTypesByDomain.size}, docTypes=${validDocTypes.size}, coreDomains=${coreDocTypesByDomain.size}, extendedDomains=${extendedDocTypesByDomain.size}`,
 );
 
 if (warnings.length > 0) {

@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "finance_kpi_ontology",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Finance KPI ontology with formula definitions, bilingual synonyms, interpretation boundaries, and guardrail rules.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "finance"
+    "domain": "finance",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "finance",
   "definitions": [
@@ -3366,6 +3381,21 @@
           "en": "I’m missing one or more inputs for ADR. Which source table should I use?",
           "pt": "Falta um ou mais insumos para ADR. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3407,6 +3437,21 @@
           "en": "I’m missing one or more inputs for ARPU. Which source table should I use?",
           "pt": "Falta um ou mais insumos para ARPU. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3448,6 +3493,21 @@
           "en": "I’m missing one or more inputs for Backlog Coverage. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Backlog Coverage. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3489,6 +3549,21 @@
           "en": "I’m missing one or more inputs for Burn Rate. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Burn Rate. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3530,6 +3605,21 @@
           "en": "I’m missing one or more inputs for CAC. Which source table should I use?",
           "pt": "Falta um ou mais insumos para CAC. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3571,6 +3661,21 @@
           "en": "I’m missing one or more inputs for Cap Rate. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Cap Rate. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3612,6 +3717,21 @@
           "en": "I’m missing one or more inputs for Capital Expenditure. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Capital Expenditure. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3653,6 +3773,21 @@
           "en": "I’m missing one or more inputs for Capex Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Capex Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3694,6 +3829,21 @@
           "en": "I’m missing one or more inputs for Cash Conversion Cycle. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Cash Conversion Cycle. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3735,6 +3885,21 @@
           "en": "I’m missing one or more inputs for Cash Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Cash Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3776,6 +3941,21 @@
           "en": "I’m missing one or more inputs for Churn Rate. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Churn Rate. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3818,6 +3998,21 @@
           "en": "I’m missing one or more inputs for COGS Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para COGS Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3859,6 +4054,21 @@
           "en": "I’m missing one or more inputs for Current Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Current Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3900,6 +4110,21 @@
           "en": "I’m missing one or more inputs for Debt Service Coverage Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Debt Service Coverage Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3941,6 +4166,21 @@
           "en": "I’m missing one or more inputs for Debt to Equity. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Debt to Equity. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -3982,6 +4222,21 @@
           "en": "I’m missing one or more inputs for Days Inventory Outstanding. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Days Inventory Outstanding. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4023,6 +4278,21 @@
           "en": "I’m missing one or more inputs for Days Payables Outstanding. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Days Payables Outstanding. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4064,6 +4334,21 @@
           "en": "I’m missing one or more inputs for Days Sales Outstanding. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Days Sales Outstanding. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4105,6 +4390,21 @@
           "en": "I’m missing one or more inputs for EBIT. Which source table should I use?",
           "pt": "Falta um ou mais insumos para EBIT. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4146,6 +4446,21 @@
           "en": "I’m missing one or more inputs for EBITDA. Which source table should I use?",
           "pt": "Falta um ou mais insumos para EBITDA. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4188,6 +4503,21 @@
           "en": "I’m missing one or more inputs for EBITDA Margin. Which source table should I use?",
           "pt": "Falta um ou mais insumos para EBITDA Margin. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4229,6 +4559,21 @@
           "en": "I’m missing one or more inputs for Free Cash Flow. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Free Cash Flow. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4270,6 +4615,21 @@
           "en": "I’m missing one or more inputs for Gross Margin. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Gross Margin. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4311,6 +4671,21 @@
           "en": "I’m missing one or more inputs for Gross Profit. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Gross Profit. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4352,6 +4727,21 @@
           "en": "I’m missing one or more inputs for Interest Coverage. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Interest Coverage. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4393,6 +4783,21 @@
           "en": "I’m missing one or more inputs for LTV. Which source table should I use?",
           "pt": "Falta um ou mais insumos para LTV. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4434,6 +4839,21 @@
           "en": "I’m missing one or more inputs for LTV/CAC Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para LTV/CAC Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4475,6 +4895,21 @@
           "en": "I’m missing one or more inputs for MoM Growth. Which source table should I use?",
           "pt": "Falta um ou mais insumos para MoM Growth. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4516,6 +4951,21 @@
           "en": "I’m missing one or more inputs for Net Debt to EBITDA. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Net Debt to EBITDA. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4559,6 +5009,21 @@
           "en": "I’m missing one or more inputs for Net Income. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Net Income. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4600,6 +5065,21 @@
           "en": "I’m missing one or more inputs for Net Margin. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Net Margin. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4643,6 +5123,21 @@
           "en": "I’m missing one or more inputs for Net Revenue. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Net Revenue. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4684,6 +5179,21 @@
           "en": "I’m missing one or more inputs for NOI. Which source table should I use?",
           "pt": "Falta um ou mais insumos para NOI. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4725,6 +5235,21 @@
           "en": "I’m missing one or more inputs for Occupancy Rate. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Occupancy Rate. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4766,6 +5291,21 @@
           "en": "I’m missing one or more inputs for Operating Cash Flow. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Operating Cash Flow. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4807,6 +5347,21 @@
           "en": "I’m missing one or more inputs for Operating Income. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Operating Income. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4848,6 +5403,21 @@
           "en": "I’m missing one or more inputs for Operating Margin. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Operating Margin. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4890,6 +5460,21 @@
           "en": "I’m missing one or more inputs for OPEX Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para OPEX Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4931,6 +5516,21 @@
           "en": "I’m missing one or more inputs for QoQ Growth. Which source table should I use?",
           "pt": "Falta um ou mais insumos para QoQ Growth. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -4972,6 +5572,21 @@
           "en": "I’m missing one or more inputs for Quick Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Quick Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5015,6 +5630,21 @@
           "en": "I’m missing one or more inputs for Revenue. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Revenue. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5056,6 +5686,21 @@
           "en": "I’m missing one or more inputs for RevPAR. Which source table should I use?",
           "pt": "Falta um ou mais insumos para RevPAR. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5097,6 +5742,21 @@
           "en": "I’m missing one or more inputs for R&D Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para R&D Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5138,6 +5798,21 @@
           "en": "I’m missing one or more inputs for ROA. Which source table should I use?",
           "pt": "Falta um ou mais insumos para ROA. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5179,6 +5854,21 @@
           "en": "I’m missing one or more inputs for ROE. Which source table should I use?",
           "pt": "Falta um ou mais insumos para ROE. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5220,6 +5910,21 @@
           "en": "I’m missing one or more inputs for ROI. Which source table should I use?",
           "pt": "Falta um ou mais insumos para ROI. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5261,6 +5966,21 @@
           "en": "I’m missing one or more inputs for ROIC. Which source table should I use?",
           "pt": "Falta um ou mais insumos para ROIC. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5302,6 +6022,21 @@
           "en": "I’m missing one or more inputs for Runway (Months). Which source table should I use?",
           "pt": "Falta um ou mais insumos para Runway (Months). Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5344,6 +6079,21 @@
           "en": "I’m missing one or more inputs for SG&A Ratio. Which source table should I use?",
           "pt": "Falta um ou mais insumos para SG&A Ratio. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5385,6 +6135,21 @@
           "en": "I’m missing one or more inputs for Actual vs Budget Variance. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Actual vs Budget Variance. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5426,6 +6191,21 @@
           "en": "I’m missing one or more inputs for Actual vs Budget Variance %. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Actual vs Budget Variance %. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5467,6 +6247,21 @@
           "en": "I’m missing one or more inputs for Working Capital. Which source table should I use?",
           "pt": "Falta um ou mais insumos para Working Capital. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5510,6 +6305,21 @@
           "en": "I’m missing one or more inputs for YoY Growth. Which source table should I use?",
           "pt": "Falta um ou mais insumos para YoY Growth. Qual tabela de origem devo usar?"
         }
+      },
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:formula_components_present",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5553,6 +6363,21 @@
           "en": "Which scenario pair should I compare (Actual vs Budget, Actual vs Forecast, or Budget vs Forecast)?",
           "pt": "Qual par de cenários devo comparar (Real vs Orçamento, Real vs Previsão ou Orçamento vs Previsão)?"
         }
+      },
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:actual_budget_forecast_scope",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5594,6 +6419,21 @@
           "en": "Should I align periods using fiscal calendar or calendar year?",
           "pt": "Devo alinhar os períodos usando ano fiscal ou ano calendário?"
         }
+      },
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:calendar_fiscal_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5637,6 +6477,21 @@
           "en": "Which accounting policy should I follow for classifying interest/dividend cash flows?",
           "pt": "Qual política contábil devo seguir para classificar fluxos de juros/dividendos?"
         }
+      },
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:cash_flow_classification_guard",
+          "scope:global",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "core",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -5680,6 +6535,21 @@
           "en": "Should I convert all monetary values to a single currency before calculating?",
           "pt": "Devo converter todos os valores monetários para uma única moeda antes de calcular?"
         }
+      },
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:currency_match",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5723,6 +6593,21 @@
           "en": "The denominator is zero or missing. Should I return N/A or use an alternate denominator?",
           "pt": "O denominador está zero ou ausente. Devo retornar N/A ou usar um denominador alternativo?"
         }
+      },
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:denominator_non_zero",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5764,6 +6649,21 @@
           "en": "I detected duplicate lines. Should I deduplicate by account + period + entity?",
           "pt": "Detectei linhas duplicadas. Devo deduplicar por conta + período + entidade?"
         }
+      },
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:duplicate_line_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5805,6 +6705,21 @@
           "en": "Do you want standard EBITDA only, or adjusted EBITDA with explicit add-backs?",
           "pt": "Você quer apenas EBITDA padrão ou EBITDA ajustado com add-backs explícitos?"
         }
+      },
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:ebitda_adjusted_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5848,6 +6763,21 @@
           "en": "Should I present EBITDA, NOI, and RevPAR in separate blocks by business context?",
           "pt": "Devo apresentar EBITDA, NOI e RevPAR em blocos separados por contexto de negócio?"
         }
+      },
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:ebitda_noi_revpar_priority",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5891,6 +6821,21 @@
           "en": "Should I calculate for standalone entity or consolidated group?",
           "pt": "Devo calcular para entidade individual ou grupo consolidado?"
         }
+      },
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:entity_scope_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5932,6 +6877,21 @@
           "en": "I can compute RevPAR directly, but should I also include ADR and Occupancy decomposition?",
           "pt": "Posso calcular RevPAR diretamente, mas devo incluir também a decomposição por ADR e Ocupação?"
         }
+      },
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:hospitality_revpar_dependency",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -5975,6 +6935,21 @@
           "en": "I could not find evidence for one input. Which document section should I use?",
           "pt": "Não encontrei evidência para um insumo. Qual seção do documento devo usar?"
         }
+      },
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:missing_evidence_guard",
+          "scope:global",
+          "policy:ask_clarification"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6014,6 +6989,21 @@
           "en": "Should I include lease liabilities and exclude restricted cash in net debt?",
           "pt": "Devo incluir passivos de arrendamento e excluir caixa restrito na dívida líquida?"
         }
+      },
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:net_debt_component_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6057,6 +7047,21 @@
           "en": "Which comparison window should I use (YoY, QoQ, or MoM)?",
           "pt": "Qual janela de comparação devo usar (ano contra ano, trimestre contra trimestre ou mês contra mês)?"
         }
+      },
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:period_comparability",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6100,6 +7105,21 @@
           "en": "Do you want me to normalize all values to the same period granularity first?",
           "pt": "Quer que eu normalize todos os valores para a mesma granularidade de período primeiro?"
         }
+      },
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:period_granularity_match",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6141,6 +7161,21 @@
           "en": "Should NOI exclude financing, taxes, depreciation, and capex (market standard)?",
           "pt": "O NOI deve excluir financiamento, impostos, depreciação e capex (padrão de mercado)?"
         }
+      },
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:real_estate_noi_boundary",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6182,6 +7217,21 @@
           "en": "Should I use recognized revenue only, excluding deferred/unbilled adjustments?",
           "pt": "Devo usar apenas receita reconhecida, excluindo ajustes de diferidas/a faturar?"
         }
+      },
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:revenue_recognition_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6225,6 +7275,21 @@
           "en": "Should I treat expenses as positive values and unfavorable variance as negative?",
           "pt": "Devo tratar despesas como valores positivos e variação desfavorável como negativa?"
         }
+      },
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:sign_convention_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6266,6 +7331,21 @@
           "en": "Should I compute TTM using the latest 12 months ending at which date?",
           "pt": "Devo calcular TTM usando os últimos 12 meses terminando em qual data?"
         }
+      },
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:ttm_window_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6309,6 +7389,21 @@
           "en": "Should I normalize all figures to the same scale before calculating?",
           "pt": "Devo normalizar todos os valores para a mesma escala antes de calcular?"
         }
+      },
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:unit_consistency_guard",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6352,6 +7447,21 @@
           "en": "Should I label positive variance as favorable for revenue and unfavorable for expenses?",
           "pt": "Devo rotular variação positiva como favorável para receita e desfavorável para despesa?"
         }
+      },
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:variance_label_consistency",
+          "scope:global",
+          "policy:first_match"
+        ],
+        "reviewTier": "core",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6395,6 +7505,21 @@
           "en": "The companies have different capital structures. Should I normalize leverage before comparing WACC?",
           "pt": "As empresas possuem estruturas de capital diferentes. Devo normalizar a alavancagem antes de comparar o WACC?"
         }
+      },
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+evaluate+validate",
+          "check:capital_structure_comparability",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6436,6 +7561,21 @@
           "en": "Should debt service include only financial debt, or also operating lease obligations?",
           "pt": "O serviço da dívida deve incluir apenas dívida financeira ou também obrigações de arrendamento operacional?"
         }
+      },
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+validate",
+          "check:obligation_classification",
+          "scope:specific",
+          "policy:highest_confidence"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
       }
     },
     {
@@ -6478,6 +7618,21 @@
           "en": "Earnings may include non-recurring items. Should I use adjusted or reported earnings for P/E?",
           "pt": "Os lucros podem incluir itens não recorrentes. Devo usar lucro ajustado ou reportado para o P/L?"
         }
+      },
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:earnings_normalization",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6520,6 +7675,21 @@
           "en": "Is EBITDA calculated pre-IFRS 16 or post-IFRS 16? Lease treatment materially affects the multiple.",
           "pt": "O EBITDA é calculado antes ou depois do IFRS 16? O tratamento de arrendamentos afeta materialmente o múltiplo."
         }
+      },
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:ifrs16_treatment",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6564,6 +7734,21 @@
           "en": "Which ESG rating methodology was used (MSCI, Sustainalytics, S&P Global, or other)?",
           "pt": "Qual metodologia de classificação ESG foi utilizada (MSCI, Sustainalytics, S&P Global ou outra)?"
         }
+      },
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:compare+evaluate+validate",
+          "check:methodology_disclosure",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6608,6 +7793,21 @@
           "en": "Should I break down insurance ratios by line of business, or use the consolidated figure?",
           "pt": "Devo detalhar os índices de seguros por ramo de negócio ou utilizar o número consolidado?"
         }
+      },
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:line_of_business_segmentation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6652,6 +7852,21 @@
           "en": "Which Basel framework version applies to these capital ratios (Basel II, III, or III.1)?",
           "pt": "Qual versão do acordo de Basileia se aplica a esses índices de capital (Basileia II, III ou III.1)?"
         }
+      },
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+validate",
+          "check:regulatory_framework_version",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6694,6 +7909,21 @@
           "en": "What is the appraisal date for the property value used in the LTV calculation?",
           "pt": "Qual é a data da avaliação do imóvel utilizada no cálculo do LTV?"
         }
+      },
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+evaluate+validate",
+          "check:appraisal_date_requirement",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6736,6 +7966,21 @@
           "en": "What denominator should I use for carbon intensity (revenue, units, headcount, or square meters)?",
           "pt": "Qual denominador devo usar para a intensidade de carbono (receita, unidades, número de funcionários ou metros quadrados)?"
         }
+      },
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+compare+evaluate",
+          "check:denominator_disclosure",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     },
     {
@@ -6779,6 +8024,21 @@
           "en": "Should I separate the effective tax rate into current and deferred components?",
           "pt": "Devo separar a alíquota efetiva de imposto em componentes corrente e diferido?"
         }
+      },
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:unknown",
+          "ops:calculate+evaluate+validate",
+          "check:current_deferred_separation",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
       }
     }
   ]

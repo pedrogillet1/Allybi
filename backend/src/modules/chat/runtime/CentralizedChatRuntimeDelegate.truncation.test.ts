@@ -188,6 +188,138 @@ describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
   });
 });
 
+describe("CentralizedChatRuntimeDelegate fallback signal resolution", () => {
+  function createDelegateForFallbackTests() {
+    return Object.create(CentralizedChatRuntimeDelegate.prototype) as any;
+  }
+
+  test("suppresses low_confidence fallback prompt when evidence exists", () => {
+    const delegate = createDelegateForFallbackTests();
+    delegate.fallbackDecisionPolicy = {
+      resolve: () => ({
+        reasonCode: "low_confidence",
+        selectedBankId: "fallback_processing",
+        selectedRuleId: "fp_low_confidence",
+        severity: "medium",
+        fallbackType: null,
+        routerAction: "regen_with_stricter_model",
+        routerTelemetryReason: "low_confidence",
+      }),
+    };
+
+    const signal = (delegate as any).resolveFallbackSignal(
+      { userId: "u1", message: "What does this mean?" },
+      { evidence: [{ docId: "doc-1" }] },
+    );
+
+    expect(signal.reasonCode).toBeUndefined();
+    expect(signal.telemetryReasonCode).toBe("low_confidence");
+    expect(signal.policyMeta?.reasonCode).toBe("low_confidence");
+    expect(signal.policyMeta?.suppressedForPrompt).toBe(true);
+    expect(signal.policyMeta?.suppressionReason).toBe(
+      "low_confidence_with_evidence",
+    );
+    expect(signal.policyMeta?.userFacingReasonCode).toBeNull();
+  });
+
+  test("keeps low_confidence fallback prompt when there is no evidence", () => {
+    const delegate = createDelegateForFallbackTests();
+    delegate.fallbackDecisionPolicy = {
+      resolve: () => ({
+        reasonCode: "low_confidence",
+        selectedBankId: "fallback_processing",
+        selectedRuleId: "fp_low_confidence",
+        severity: "medium",
+        fallbackType: null,
+        routerAction: "regen_with_stricter_model",
+        routerTelemetryReason: "low_confidence",
+      }),
+    };
+
+    const signal = (delegate as any).resolveFallbackSignal(
+      { userId: "u1", message: "Need an answer" },
+      { evidence: [] },
+    );
+
+    expect(signal.reasonCode).toBe("low_confidence");
+    expect(signal.telemetryReasonCode).toBe("low_confidence");
+    expect(signal.policyMeta?.suppressedForPrompt).toBe(false);
+    expect(signal.policyMeta?.userFacingReasonCode).toBe("low_confidence");
+  });
+
+  test("does not suppress non-low-confidence fallback reasons", () => {
+    const delegate = createDelegateForFallbackTests();
+    delegate.fallbackDecisionPolicy = {
+      resolve: () => ({
+        reasonCode: "scope_hard_constraints_empty",
+        selectedBankId: "fallback_scope_empty",
+        selectedRuleId: "scope_empty",
+        severity: "high",
+        fallbackType: "scoped_not_found",
+        routerAction: "fallback",
+        routerTelemetryReason: "scope_hard_constraints_empty",
+      }),
+    };
+
+    const signal = (delegate as any).resolveFallbackSignal(
+      { userId: "u1", message: "Find this in my doc" },
+      { evidence: [{ docId: "doc-1" }] },
+    );
+
+    expect(signal.reasonCode).toBe("scope_hard_constraints_empty");
+    expect(signal.policyMeta?.suppressedForPrompt).toBe(false);
+    expect(signal.policyMeta?.userFacingReasonCode).toBe(
+      "scope_hard_constraints_empty",
+    );
+  });
+
+  test("keeps unknown fallback reasons telemetry-only", () => {
+    const delegate = createDelegateForFallbackTests();
+    delegate.fallbackDecisionPolicy = {
+      resolve: () => ({
+        reasonCode: "unknown_reason",
+        selectedBankId: "fallback_processing",
+        selectedRuleId: "unknown",
+        severity: "medium",
+        fallbackType: null,
+        routerAction: "ask_one_question",
+        routerTelemetryReason: "UNKNOWN",
+      }),
+    };
+
+    const signal = (delegate as any).resolveFallbackSignal(
+      { userId: "u1", message: "Need help" },
+      { evidence: [] },
+    );
+
+    expect(signal.reasonCode).toBeUndefined();
+    expect(signal.telemetryReasonCode).toBe("unknown_reason");
+    expect(signal.policyMeta?.suppressedForPrompt).toBe(true);
+    expect(signal.policyMeta?.suppressionReason).toBe("non_user_facing_reason");
+  });
+
+  test("buildRuntimeMeta carries telemetry fallback separately from user-facing reason", () => {
+    const delegate = createDelegateForFallbackTests();
+    const meta = (delegate as any).buildRuntimeMeta(
+      { preferredLanguage: "en", meta: {} },
+      { evidence: [{ docId: "doc-1" }] },
+      "doc_grounded_single",
+      null,
+      {
+        reasonCode: undefined,
+        telemetryReasonCode: "low_confidence",
+        policyMeta: { reasonCode: "low_confidence", routerAction: "regen" },
+      },
+    );
+
+    expect(meta.fallbackReasonCode).toBeUndefined();
+    expect(meta.fallbackTelemetry).toEqual({
+      reasonCode: "low_confidence",
+      policy: { reasonCode: "low_confidence", routerAction: "regen" },
+    });
+  });
+});
+
 describe("CentralizedChatRuntimeDelegate source invariants", () => {
   test("returns missing_provenance when doc-grounded answer has zero filtered sources", () => {
     const failure = resolveSourceInvariantFailureCode({
@@ -244,8 +376,7 @@ describe("CentralizedChatRuntimeDelegate language contract", () => {
 
   test("adjusts mixed portuguese output when preferred language is english", () => {
     const result = enforceLanguageContract({
-      text:
-        "The monthly amount was billed correctly for the selected period, and the detailed breakdown confirms each charge. Obrigado pelo envio do documento e pela confirmacao dos valores na tabela.",
+      text: "The monthly amount was billed correctly for the selected period, and the detailed breakdown confirms each charge. Obrigado pelo envio do documento e pela confirmacao dos valores na tabela.",
       preferredLanguage: "en",
     });
     expect(result.adjusted).toBe(true);
@@ -254,8 +385,7 @@ describe("CentralizedChatRuntimeDelegate language contract", () => {
 
   test("does not adjust mostly english output with a short portuguese phrase", () => {
     const result = enforceLanguageContract({
-      text:
-        "The invoice is complete, includes all charges, and the totals reconcile with the statement. Obrigado.",
+      text: "The invoice is complete, includes all charges, and the totals reconcile with the statement. Obrigado.",
       preferredLanguage: "en",
     });
     expect(result.adjusted).toBe(false);

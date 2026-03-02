@@ -52,15 +52,15 @@ describe("ContractNormalizer", () => {
     expect(normalized.failureCode).toBe("MISSING_EVIDENCE");
   });
 
-  test("downgrades to partial when provenance is missing for doc-grounded output", () => {
+  test("keeps success when evidence is present even if provenance metadata is missing", () => {
     const normalizer = new ContractNormalizer();
     const normalized = normalizer.normalize(
       mkResult({
         provenance: undefined,
       }),
     );
-    expect(normalized.status).toBe("partial");
-    expect(normalized.failureCode).toBe("missing_provenance");
+    expect(normalized.status).toBe("success");
+    expect(normalized.failureCode).toBeNull();
   });
 
   test("downgrades success to partial when truncation occurred", () => {
@@ -111,5 +111,20 @@ describe("ContractNormalizer", () => {
     );
     expect(normalized.status).toBe("partial");
     expect(normalized.failureCode).toBe("quality_gate_blocked");
+  });
+
+  test("keeps success when fallback telemetry exists but user-facing fallback reason is absent", () => {
+    const normalizer = new ContractNormalizer();
+    const normalized = normalizer.normalize(
+      mkResult({
+        status: "success",
+        fallbackReasonCode: undefined,
+        assistantTelemetry: {
+          fallbackTelemetry: { reasonCode: "low_confidence" },
+        },
+      } as ChatResult),
+    );
+    expect(normalized.status).toBe("success");
+    expect(normalized.failureCode).toBeNull();
   });
 });

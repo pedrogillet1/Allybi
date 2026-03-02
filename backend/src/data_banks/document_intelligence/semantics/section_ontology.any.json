@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "di_section_ontology",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "owner": "document_intelligence",
     "languages": [
       "en",
@@ -18,7 +18,7 @@
     "tests": [
       "SSOT_SECTION_001"
     ],
-    "lastUpdated": "2026-02-27",
+    "lastUpdated": "2026-03-01",
     "description": "di_section_ontology (document_intelligence) configuration bank."
   },
   "config": {
@@ -34,7 +34,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Brief summary of document content and key findings",
       "purposePt": "Breve resumo do conteúdo do documento e principais conclusões"
@@ -47,7 +47,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "purpose": "List of tasks, owners, and deadlines arising from the document",
       "purposePt": "Lista de tarefas, responsáveis e prazos decorrentes do documento"
@@ -61,7 +61,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Supplementary material referenced in the main body",
       "purposePt": "Material suplementar referenciado no corpo principal"
@@ -75,7 +75,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Sign-off records from authorized reviewers or decision-makers",
       "purposePt": "Registros de aprovação de revisores ou tomadores de decisão autorizados"
@@ -99,7 +99,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "purpose": "Stated assumptions underlying the analysis or projections",
       "purposePt": "Premissas declaradas que fundamentam a análise ou projeções"
@@ -113,7 +113,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "External documents or files attached to the main document",
       "purposePt": "Documentos ou arquivos externos anexados ao documento principal"
@@ -126,7 +126,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "purpose": "Chronological record of actions taken on the document or process",
       "purposePt": "Registro cronológico das ações realizadas no documento ou processo"
@@ -140,7 +140,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Formal authorization granting permission or authority to proceed",
       "purposePt": "Autorização formal concedendo permissão ou autoridade para prosseguir"
@@ -152,7 +152,7 @@
       "category": "financial",
       "domains": [
         "finance",
-        "operations"
+        "ops"
       ],
       "purpose": "High-level overview of budgeted vs. actual figures",
       "purposePt": "Visão geral de alto nível dos valores orçados versus realizados"
@@ -166,7 +166,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Formal attestations of compliance with standards or regulations",
       "purposePt": "Atestados formais de conformidade com normas ou regulamentos"
@@ -180,7 +180,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Assessment of adherence to regulatory or policy requirements",
       "purposePt": "Avaliação da aderência aos requisitos regulatórios ou de políticas"
@@ -206,7 +206,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Standards or benchmarks used to evaluate or assess",
       "purposePt": "Padrões ou referências utilizados para avaliar ou aferir"
@@ -220,7 +220,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Structured tabular data supporting the analysis",
       "purposePt": "Dados tabulares estruturados que suportam a análise"
@@ -243,7 +243,7 @@
       "labelPt": "Dependências",
       "category": "operational",
       "domains": [
-        "operations",
+        "ops",
         "finance"
       ],
       "purpose": "External factors or prerequisites that the plan relies upon",
@@ -258,7 +258,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "In-depth examination of the subject matter",
       "purposePt": "Exame aprofundado do assunto em questão"
@@ -285,7 +285,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Interpretation and contextualization of results or findings",
       "purposePt": "Interpretação e contextualização dos resultados ou achados"
@@ -310,7 +310,7 @@
       "domains": [
         "finance",
         "legal",
-        "operations"
+        "ops"
       ],
       "purpose": "Recipients or stakeholders who receive copies of the document",
       "purposePt": "Destinatários ou partes interessadas que recebem cópias do documento"
@@ -324,7 +324,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Identifying information such as title, author, date, and version",
       "purposePt": "Informações de identificação como título, autor, data e versão"
@@ -338,7 +338,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "High-level overview of document content for decision-makers",
       "purposePt": "Visão geral de alto nível do conteúdo do documento para tomadores de decisão"
@@ -386,7 +386,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Key observations or discoveries from the analysis",
       "purposePt": "Principais observações ou descobertas da análise"
@@ -400,7 +400,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Alphabetical list of terms and their definitions",
       "purposePt": "Lista alfabética de termos e suas definições"
@@ -426,7 +426,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Document header containing logos, titles, and reference numbers",
       "purposePt": "Cabeçalho do documento contendo logotipos, títulos e números de referência"
@@ -463,7 +463,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Background context and objectives of the document",
       "purposePt": "Contexto e objetivos do documento"
@@ -477,7 +477,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Constraints or boundaries that affect the scope or reliability of the analysis",
       "purposePt": "Restrições ou limites que afetam o escopo ou a confiabilidade da análise"
@@ -489,7 +489,7 @@
       "category": "detail",
       "domains": [
         "finance",
-        "operations"
+        "ops"
       ],
       "purpose": "Individual entries in an itemized list such as invoices or budgets",
       "purposePt": "Entradas individuais em uma lista detalhada como faturas ou orçamentos"
@@ -514,7 +514,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Description of approaches, methods, and techniques used in the analysis",
       "purposePt": "Descrição das abordagens, métodos e técnicas utilizados na análise"
@@ -525,7 +525,7 @@
       "labelPt": "Marcos",
       "category": "operational",
       "domains": [
-        "operations",
+        "ops",
         "finance"
       ],
       "purpose": "Key dates or achievements marking progress toward objectives",
@@ -573,7 +573,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Step-by-step instructions or processes to be followed",
       "purposePt": "Instruções ou processos passo a passo a serem seguidos"
@@ -596,7 +596,7 @@
       "category": "methodology",
       "domains": [
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Standardized procedures or guidelines for specific situations",
       "purposePt": "Procedimentos ou diretrizes padronizados para situações específicas"
@@ -621,7 +621,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Suggested courses of action based on the analysis or findings",
       "purposePt": "Cursos de ação sugeridos com base na análise ou nos achados"
@@ -635,7 +635,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Warning indicators that require immediate attention or investigation",
       "purposePt": "Indicadores de alerta que requerem atenção ou investigação imediata"
@@ -649,7 +649,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Citations of applicable laws, regulations, or standards",
       "purposePt": "Citações de leis, regulamentos ou normas aplicáveis"
@@ -672,7 +672,7 @@
       "labelPt": "Recursos",
       "category": "operational",
       "domains": [
-        "operations",
+        "ops",
         "finance"
       ],
       "purpose": "Personnel, budget, or materials allocated to the initiative",
@@ -687,7 +687,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Outcomes or outputs produced by the analysis or process",
       "purposePt": "Resultados ou produtos gerados pela análise ou processo"
@@ -701,7 +701,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Comments and feedback from reviewers during the approval process",
       "purposePt": "Comentários e feedback dos revisores durante o processo de aprovação"
@@ -715,7 +715,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Log of document changes including dates, authors, and descriptions",
       "purposePt": "Registro de alterações do documento incluindo datas, autores e descrições"
@@ -729,7 +729,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Evaluation of potential risks, their likelihood, and impact",
       "purposePt": "Avaliação de riscos potenciais, sua probabilidade e impacto"
@@ -756,7 +756,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Boundaries and extent of the document's coverage or analysis",
       "purposePt": "Limites e extensão da cobertura ou análise do documento"
@@ -770,7 +770,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Formal signature blocks for authorized parties",
       "purposePt": "Blocos de assinatura formais para partes autorizadas"
@@ -784,7 +784,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Additional documents that corroborate or supplement the main content",
       "purposePt": "Documentos adicionais que corroboram ou complementam o conteúdo principal"
@@ -798,7 +798,7 @@
         "finance",
         "legal",
         "medical",
-        "operations"
+        "ops"
       ],
       "purpose": "Structured listing of document sections and their page numbers",
       "purposePt": "Listagem estruturada das seções do documento e seus números de página"
@@ -821,7 +821,7 @@
       "labelPt": "Cronograma",
       "category": "operational",
       "domains": [
-        "operations",
+        "ops",
         "finance",
         "legal"
       ],

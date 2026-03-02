@@ -153,8 +153,8 @@ export class SlackEventsController {
   private verifySlackSignature(req: Request): boolean {
     const signingSecret = process.env.SLACK_SIGNING_SECRET;
     if (!asString(signingSecret)) {
-      // Fail closed in production if not configured.
-      return process.env.NODE_ENV !== "production";
+      // Always fail closed when signature verification key is missing.
+      return false;
     }
 
     const timestamp = asString(req.headers["x-slack-request-timestamp"]);

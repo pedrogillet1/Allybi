@@ -16,5 +16,19 @@
     "CONNECTOR_READ_LIST": { "allowedInViewerMode": false, "requiresExplicitActivation": true },
     "CONNECTOR_DRAFT": { "allowedInViewerMode": false, "requiresExplicitActivation": true },
     "CONNECTOR_SEND_CONFIRM": { "allowedInViewerMode": false, "requiresExplicitActivation": true, "requiresSendClick": true }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "ACP_T_0001_send_requires_click",
+        "input": { "action": "CONNECTOR_SEND_CONFIRM" },
+        "expect": { "requiresSendClick": true, "allowedInViewerMode": false }
+      },
+      {
+        "id": "ACP_T_0002_read_blocked_in_viewer",
+        "input": { "action": "CONNECTOR_READ_LIST" },
+        "expect": { "allowedInViewerMode": false }
+      }
+    ]
   }
 }

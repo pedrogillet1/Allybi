@@ -10,6 +10,7 @@ interface ParsedDocumentXml {
   document: XmlNode;
   body: XmlNode;
   paragraphs: XmlNode[];
+  tables: XmlNode[];
   parsedRoot: XmlNode;
 }
 
@@ -798,13 +799,162 @@ async function parseDocumentXml(xml: string): Promise<ParsedDocumentXml> {
   const paragraphs = asArray(
     bodyNode["w:p"] as XmlNode | XmlNode[] | undefined,
   );
+  const tables = asArray(bodyNode["w:tbl"] as XmlNode | XmlNode[] | undefined);
 
   return {
     document: documentNode,
     body: bodyNode,
     paragraphs,
+    tables,
     parsedRoot,
   };
+}
+
+function toSafePositiveInt(
+  value: unknown,
+  fallback: number,
+  bounds?: { min?: number; max?: number },
+): number {
+  const min = Number.isFinite(Number(bounds?.min)) ? Number(bounds!.min) : 1;
+  const max = Number.isFinite(Number(bounds?.max)) ? Number(bounds!.max) : 50;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  const floored = Math.floor(n);
+  return Math.min(max, Math.max(min, floored));
+}
+
+function toZeroBasedIndex(value: unknown, fallbackOneBased = 1): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return Math.max(0, fallbackOneBased - 1);
+  if (n <= 0) return 0;
+  return Math.max(0, Math.floor(n) - 1);
+}
+
+function resolveTableIndex(value: unknown, tableCount: number): number {
+  if (tableCount <= 0) {
+    throw new Error("No tables found in document.");
+  }
+  const idx = toZeroBasedIndex(value, 1);
+  if (idx < 0 || idx >= tableCount) {
+    throw new Error(
+      `tableIndex out of range: ${idx + 1} (tables=${tableCount})`,
+    );
+  }
+  return idx;
+}
+
+function resolveRowIndex(value: unknown, rowCount: number): number {
+  if (rowCount <= 0) {
+    throw new Error("Selected table has no rows.");
+  }
+  const idx = toZeroBasedIndex(value, 1);
+  if (idx < 0 || idx >= rowCount) {
+    throw new Error(`rowIndex out of range: ${idx + 1} (rows=${rowCount})`);
+  }
+  return idx;
+}
+
+function resolveColIndex(value: unknown, colCount: number): number {
+  if (colCount <= 0) {
+    throw new Error("Selected row has no cells.");
+  }
+  const idx = toZeroBasedIndex(value, 1);
+  if (idx < 0 || idx >= colCount) {
+    throw new Error(`colIndex out of range: ${idx + 1} (cols=${colCount})`);
+  }
+  return idx;
+}
+
+function ensureTableRows(table: XmlNode): XmlNode[] {
+  const rows = asArray(table["w:tr"] as XmlNode | XmlNode[] | undefined);
+  table["w:tr"] = rows;
+  return rows;
+}
+
+function ensureRowCells(row: XmlNode): XmlNode[] {
+  const cells = asArray(row["w:tc"] as XmlNode | XmlNode[] | undefined);
+  row["w:tc"] = cells;
+  return cells;
+}
+
+function buildTableCell(text: string): XmlNode {
+  return {
+    "w:tcPr": [
+      {
+        "w:tcW": [{ $: { "w:w": "2400", "w:type": "dxa" } }],
+      },
+    ],
+    "w:p": [
+      {
+        "w:r": [buildReplacementRun(text, undefined)],
+      },
+    ],
+  };
+}
+
+function buildTableRow(colCount: number, cellTexts?: string[]): XmlNode {
+  const cells: XmlNode[] = [];
+  for (let i = 0; i < colCount; i += 1) {
+    const text = String(cellTexts?.[i] || "");
+    cells.push(buildTableCell(text));
+  }
+  return { "w:tc": cells };
+}
+
+function buildDocxTable(
+  rowCount: number,
+  colCount: number,
+  headerRow: boolean,
+): XmlNode {
+  const gridCols = Array.from({ length: colCount }, () => ({
+    $: { "w:w": "2400" },
+  }));
+  const rows: XmlNode[] = [];
+  for (let r = 0; r < rowCount; r += 1) {
+    const seedTexts =
+      headerRow && r === 0
+        ? Array.from({ length: colCount }, (_v, i) => `Header ${i + 1}`)
+        : undefined;
+    rows.push(buildTableRow(colCount, seedTexts));
+  }
+  return {
+    "w:tblPr": [
+      {
+        "w:tblW": [{ $: { "w:w": "0", "w:type": "auto" } }],
+        "w:tblLook": [
+          {
+            $: {
+              "w:val": "04A0",
+              "w:firstRow": headerRow ? "1" : "0",
+              "w:lastRow": "0",
+              "w:firstColumn": "1",
+              "w:lastColumn": "0",
+              "w:noHBand": "0",
+              "w:noVBand": "1",
+            },
+          },
+        ],
+      },
+    ],
+    "w:tblGrid": [{ "w:gridCol": gridCols }],
+    "w:tr": rows,
+  };
+}
+
+function setTableCellText(cell: XmlNode, text: string): void {
+  const paragraphs = asArray(cell["w:p"] as XmlNode | XmlNode[] | undefined);
+  const firstParagraph = paragraphs[0] || {};
+  const runs = asArray(
+    firstParagraph["w:r"] as XmlNode | XmlNode[] | undefined,
+  );
+  const firstRun = runs[0];
+  const firstRunProps = firstRun
+    ? asArray(firstRun["w:rPr"] as XmlNode | XmlNode[] | undefined)[0]
+    : undefined;
+  firstParagraph["w:r"] = [buildReplacementRun(String(text || ""), firstRunProps)];
+  if (firstParagraph["w:hyperlink"]) delete firstParagraph["w:hyperlink"];
+  if (firstParagraph["w:ins"]) delete firstParagraph["w:ins"];
+  cell["w:p"] = [firstParagraph];
 }
 
 function findParagraphXmlIndex(
@@ -2032,6 +2182,165 @@ export class DocxEditorService {
       }
     }
 
+    return this.rebuildZip(zip, parsed);
+  }
+
+  /**
+   * Create a new table in the document body.
+   *
+   * The current XML parser groups body children by tag, so table insertion is
+   * currently append-only to preserve deterministic behavior.
+   */
+  async createTable(
+    buffer: Buffer,
+    opts?: {
+      rows?: number;
+      cols?: number;
+      headerRow?: boolean;
+      paragraphId?: string;
+    },
+  ): Promise<Buffer> {
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
+
+    const documentXml = documentEntry.getData().toString("utf8");
+    const parsed = await parseDocumentXml(documentXml);
+
+    const rows = toSafePositiveInt(opts?.rows, 3, { min: 1, max: 50 });
+    const cols = toSafePositiveInt(opts?.cols, 3, { min: 1, max: 20 });
+    const headerRow = opts?.headerRow !== false;
+
+    const table = buildDocxTable(rows, cols, headerRow);
+    const tables = asArray(parsed.body["w:tbl"] as XmlNode | XmlNode[] | undefined);
+    tables.push(table);
+    parsed.body["w:tbl"] = tables;
+    parsed.tables = tables;
+
+    return this.rebuildZip(zip, parsed);
+  }
+
+  /**
+   * Add a row to an existing table.
+   */
+  async addTableRow(
+    buffer: Buffer,
+    opts: {
+      tableIndex?: number;
+      rowIndex?: number;
+      position?: string;
+      cellTexts?: string[];
+    },
+  ): Promise<Buffer> {
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
+
+    const documentXml = documentEntry.getData().toString("utf8");
+    const parsed = await parseDocumentXml(documentXml);
+    const tables = asArray(parsed.body["w:tbl"] as XmlNode | XmlNode[] | undefined);
+    if (!tables.length) throw new Error("No tables found in document.");
+
+    const tableIdx = resolveTableIndex(opts.tableIndex, tables.length);
+    const table = tables[tableIdx]!;
+    const rows = ensureTableRows(table);
+    const firstRowCells = rows[0] ? ensureRowCells(rows[0]!) : [];
+    const colCount = Math.max(
+      1,
+      firstRowCells.length || toSafePositiveInt(opts.cellTexts?.length, 1, { min: 1, max: 20 }),
+    );
+    const newRow = buildTableRow(colCount, opts.cellTexts);
+
+    const pos = String(opts.position || "").trim().toLowerCase();
+    let insertAt = rows.length;
+    if (opts.rowIndex != null) {
+      const pivot = resolveRowIndex(opts.rowIndex, rows.length);
+      const before = /^(?:before|top|start|inicio|in[ií]cio)$/.test(pos);
+      insertAt = before ? pivot : pivot + 1;
+    } else if (/^(?:top|start|inicio|in[ií]cio)$/.test(pos)) {
+      insertAt = 0;
+    } else if (/^(?:before)$/.test(pos)) {
+      insertAt = 0;
+    } else if (/^(?:after|end|bottom|fim)$/.test(pos)) {
+      insertAt = rows.length;
+    }
+
+    insertAt = Math.max(0, Math.min(rows.length, insertAt));
+    rows.splice(insertAt, 0, newRow);
+
+    parsed.body["w:tbl"] = tables;
+    parsed.tables = tables;
+    return this.rebuildZip(zip, parsed);
+  }
+
+  /**
+   * Delete a row from an existing table.
+   */
+  async deleteTableRow(
+    buffer: Buffer,
+    opts: { tableIndex?: number; rowIndex?: number },
+  ): Promise<Buffer> {
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
+
+    const documentXml = documentEntry.getData().toString("utf8");
+    const parsed = await parseDocumentXml(documentXml);
+    const tables = asArray(parsed.body["w:tbl"] as XmlNode | XmlNode[] | undefined);
+    if (!tables.length) throw new Error("No tables found in document.");
+
+    const tableIdx = resolveTableIndex(opts.tableIndex, tables.length);
+    const table = tables[tableIdx]!;
+    const rows = ensureTableRows(table);
+    const rowIdx = resolveRowIndex(opts.rowIndex, rows.length);
+    rows.splice(rowIdx, 1);
+
+    if (rows.length === 0) {
+      tables.splice(tableIdx, 1);
+    }
+
+    parsed.body["w:tbl"] = tables;
+    parsed.tables = tables;
+    return this.rebuildZip(zip, parsed);
+  }
+
+  /**
+   * Set text in a table cell.
+   */
+  async setTableCell(
+    buffer: Buffer,
+    opts: {
+      tableIndex?: number;
+      rowIndex?: number;
+      colIndex?: number;
+      text: string;
+    },
+  ): Promise<Buffer> {
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry("word/document.xml");
+    if (!documentEntry)
+      throw new Error("Invalid DOCX: missing word/document.xml");
+
+    const documentXml = documentEntry.getData().toString("utf8");
+    const parsed = await parseDocumentXml(documentXml);
+    const tables = asArray(parsed.body["w:tbl"] as XmlNode | XmlNode[] | undefined);
+    if (!tables.length) throw new Error("No tables found in document.");
+
+    const tableIdx = resolveTableIndex(opts.tableIndex, tables.length);
+    const table = tables[tableIdx]!;
+    const rows = ensureTableRows(table);
+    const rowIdx = resolveRowIndex(opts.rowIndex, rows.length);
+    const row = rows[rowIdx]!;
+    const cells = ensureRowCells(row);
+    const colIdx = resolveColIndex(opts.colIndex, cells.length);
+    const cell = cells[colIdx]!;
+    setTableCellText(cell, String(opts.text || ""));
+
+    parsed.body["w:tbl"] = tables;
+    parsed.tables = tables;
     return this.rebuildZip(zip, parsed);
   }
 

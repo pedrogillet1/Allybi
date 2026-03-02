@@ -71,7 +71,14 @@ function canSkipBeforeTextForPlan(plan: EditPlan): boolean {
   const canonical = String(plan.canonicalOperator || "")
     .trim()
     .toUpperCase();
-  return canonical === "DOCX_FIND_REPLACE";
+  return (
+    canonical === "DOCX_FIND_REPLACE" ||
+    canonical === "DOCX_UPDATE_TOC" ||
+    canonical === "DOCX_CREATE_TABLE" ||
+    canonical === "DOCX_ADD_TABLE_ROW" ||
+    canonical === "DOCX_DELETE_TABLE_ROW" ||
+    canonical === "DOCX_SET_TABLE_CELL"
+  );
 }
 
 function syntheticTarget(label: string): ResolvedTarget {

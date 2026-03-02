@@ -81,17 +81,11 @@
         "CANDIDATES (ranked):",
         "{{candidates}}",
         "",
-        "OUTPUT FORMAT (KODA_DISAMBIGUATION_V1):",
-        "[KODA_DISAMBIGUATION]",
-        "question: <one question, max 2 sentences>",
-        "options:",
-        "- <Option 1 label>",
-        "- <Option 2 label>",
-        "- <Option 3 label (optional)>",
-        "- <Option 4 label (optional)>",
-        "- <Option 5 label (optional)>",
-        "notes: <optional short note, max 8 words, only if needed>",
-        "[/KODA_DISAMBIGUATION]"
+        "OUTPUT FORMAT:",
+        "- Plain user-facing markdown only.",
+        "- Line 1: the single disambiguation question.",
+        "- Then 2–5 options as numbered lines (1. / 2. / 3.).",
+        "- Do not include tags, wrappers, JSON, or code fences."
       ]
     },
     "pt": {
@@ -125,17 +119,11 @@
         "CANDIDATOS (ordenados):",
         "{{candidates}}",
         "",
-        "OUTPUT FORMAT (KODA_DISAMBIGUATION_V1):",
-        "[KODA_DISAMBIGUATION]",
-        "question: <uma pergunta, máx. 2 frases>",
-        "options:",
-        "- <Opção 1>",
-        "- <Opção 2>",
-        "- <Opção 3 (opcional)>",
-        "- <Opção 4 (opcional)>",
-        "- <Opção 5 (opcional)>",
-        "notes: <nota curta opcional, máx. 8 palavras>",
-        "[/KODA_DISAMBIGUATION]"
+        "FORMATO DE SAÍDA:",
+        "- Apenas markdown para o usuário.",
+        "- Linha 1: a única pergunta de desambiguação.",
+        "- Depois, 2–5 opções em linhas numeradas (1. / 2. / 3.).",
+        "- Não use tags, wrappers, JSON ou blocos de código."
       ]
     },
     "es": {
@@ -169,17 +157,11 @@
         "CANDIDATOS (ordenados):",
         "{{candidates}}",
         "",
-        "OUTPUT FORMAT (KODA_DISAMBIGUATION_V1):",
-        "[KODA_DISAMBIGUATION]",
-        "question: <una pregunta, máx. 2 frases>",
-        "options:",
-        "- <Opción 1>",
-        "- <Opción 2>",
-        "- <Opción 3 (opcional)>",
-        "- <Opción 4 (opcional)>",
-        "- <Opción 5 (opcional)>",
-        "notes: <nota corta opcional, máx. 8 palabras>",
-        "[/KODA_DISAMBIGUATION]"
+        "FORMATO DE SALIDA:",
+        "- Solo markdown para el usuario.",
+        "- Línea 1: la única pregunta de desambiguación.",
+        "- Luego 2–5 opciones en líneas numeradas (1. / 2. / 3.).",
+        "- No uses etiquetas, wrappers, JSON ni bloques de código."
       ]
     }
   },

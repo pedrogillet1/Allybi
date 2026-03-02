@@ -178,6 +178,26 @@
     {
       "abbr": "VIG",
       "expansion": "Vigencia"
+    },
+    {
+      "abbr": "HMO",
+      "expansion": "Organizacao de Manutencao de Saude"
+    },
+    {
+      "abbr": "PBM",
+      "expansion": "Gerenciador de Beneficios Farmaceuticos"
+    },
+    {
+      "abbr": "UIE",
+      "expansion": "Unidade de Investigacao Especial"
+    },
+    {
+      "abbr": "ILP",
+      "expansion": "Incapacidade de Longa Permanencia"
+    },
+    {
+      "abbr": "GU",
+      "expansion": "Gestao de Utilizacao"
     }
   ]
 }

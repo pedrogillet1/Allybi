@@ -1,0 +1,153 @@
+{
+  "_meta": {
+    "id": "di_ops_extraction_ops_quality_report",
+    "version": "1.0.0",
+    "description": "Extraction hints for quality report documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "ops",
+    "docType": "ops_quality_report"
+  },
+  "hints": [
+    {
+      "id": "hint_01_docType",
+      "entity": "docType",
+      "anchors": [
+        "quality report",
+        "inspection report",
+        "QC report",
+        "ops_quality_report"
+      ],
+      "location": "header",
+      "extractionMethod": "classification_rule"
+    },
+    {
+      "id": "hint_02_reportNumber",
+      "entity": "reportNumber",
+      "anchors": [
+        "report no",
+        "inspection no",
+        "numero relatorio"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_03_inspectionDate",
+      "entity": "inspectionDate",
+      "anchors": [
+        "inspection date",
+        "audit date",
+        "data da inspecao"
+      ],
+      "location": "header",
+      "extractionMethod": "date_parse"
+    },
+    {
+      "id": "hint_04_inspectionType",
+      "entity": "inspectionType",
+      "anchors": [
+        "inspection type",
+        "audit type",
+        "tipo de inspecao"
+      ],
+      "location": "header",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_05_overallResult",
+      "entity": "overallResult",
+      "anchors": [
+        "result",
+        "verdict",
+        "outcome",
+        "resultado"
+      ],
+      "location": "summary",
+      "extractionMethod": "enum_match"
+    },
+    {
+      "id": "hint_06_productName",
+      "entity": "productName",
+      "anchors": [
+        "product",
+        "item",
+        "material",
+        "produto"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_07_batchNumber",
+      "entity": "batchNumber",
+      "anchors": [
+        "batch",
+        "lot",
+        "lote"
+      ],
+      "location": "header",
+      "extractionMethod": "regex_capture"
+    },
+    {
+      "id": "hint_08_inspectorName",
+      "entity": "inspectorName",
+      "anchors": [
+        "inspector",
+        "auditor",
+        "inspetor"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_09_sampleSize",
+      "entity": "sampleSize",
+      "anchors": [
+        "sample size",
+        "units inspected",
+        "tamanho da amostra"
+      ],
+      "location": "test_results",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_10_defectsFound",
+      "entity": "defectsFound",
+      "anchors": [
+        "defects found",
+        "non-conformances",
+        "defeitos encontrados"
+      ],
+      "location": "test_results",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_11_defectRate",
+      "entity": "defectRate",
+      "anchors": [
+        "defect rate",
+        "rejection rate",
+        "taxa de defeito"
+      ],
+      "location": "test_results",
+      "extractionMethod": "amount_parse"
+    },
+    {
+      "id": "hint_12_disposition",
+      "entity": "disposition",
+      "anchors": [
+        "disposition",
+        "decision",
+        "disposicao"
+      ],
+      "location": "summary",
+      "extractionMethod": "enum_match"
+    }
+  ]
+}

@@ -42,6 +42,7 @@ import MessageActions from "../messages/MessageActions";
 import useStageLabel from "../messages/useStageLabel";
 import FollowUpChips from "../followups/FollowUpChips";
 import StreamingWelcomeMessage from "../streaming/StreamingWelcomeMessage";
+import KeyboardShortcutsModal from "../../shared/KeyboardShortcutsModal";
 import kodaIconBlack from "../../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "../ChromaKeyVideo";
@@ -291,6 +292,7 @@ function pickRotatingViewerPrompts(params) {
 const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
 const cacheTsKeyFor = (conversationId) => `${cacheKeyFor(conversationId)}_timestamp`;
 const DRAFT_KEY = (conversationId) => `koda_draft_${conversationId || "new"}`;
+const PLACEHOLDER_CHAT_TITLES = new Set(["", "new chat", "untitled"]);
 
 // localStorage persistent cache keys
 const lsCacheKeyFor = (conversationId) => `koda_chat_persist_${conversationId}`;
@@ -331,6 +333,35 @@ function uid(prefix = "m") {
 
 function clamp(n, a, b) {
   return Math.max(a, Math.min(b, n));
+}
+
+function normalizeConversationTitleKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isPlaceholderConversationTitle(value) {
+  return PLACEHOLDER_CHAT_TITLES.has(normalizeConversationTitleKey(value));
+}
+
+function deriveConversationTitleFromPrompt(message, opts = {}) {
+  const maxWords = clamp(Number(opts.maxWords) || 10, 3, 16);
+  const maxChars = clamp(Number(opts.maxChars) || 80, 24, 120);
+  const cleaned = String(message || "")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s"'`“”‘’\-–—:;,.!?()[\]{}]+/, "")
+    .trim();
+  if (!cleaned) return null;
+
+  const words = cleaned.split(" ").filter(Boolean);
+  if (!words.length) return null;
+
+  let title = words.slice(0, maxWords).join(" ").trim();
+  title = title.replace(/[\s"'`“”‘’\-–—:;,.!?()[\]{}]+$/, "").trim();
+  if (!title) return null;
+  if (title.length > maxChars) {
+    title = title.slice(0, maxChars).replace(/\s+\S*$/, "").trim();
+  }
+  return title || null;
 }
 
 function normalizeWhitespace(s) {
@@ -464,11 +495,11 @@ function shouldRenderFollowupsForMessage(message) {
     .trim()
     .toUpperCase();
   const answerMode = String(message?.answerMode || "").trim();
-  const hasSources =
-    Array.isArray(message?.sources) && message.sources.length > 0;
   const isDocumentAnswer =
     answerClass === "DOCUMENT" || isDocumentGroundedMode(answerMode);
-  return isDocumentAnswer && hasSources;
+  const hasFollowupPayload =
+    Array.isArray(message?.followups) && message.followups.length > 0;
+  return isDocumentAnswer && hasFollowupPayload;
 }
 
 function normalizeFollowupChips(chips, max = 3) {
@@ -508,6 +539,12 @@ function deriveRenderableFollowups(message, fallbackChips = []) {
       ? message.followups
       : fallbackChips;
   return normalizeFollowupChips(raw);
+}
+
+function followupOfferHeader(lang) {
+  const l = normalizeEditLang(lang);
+  if (l === "pt") return "Sugestões de próximas perguntas:";
+  return "Suggested follow-up questions:";
 }
 
 function shouldSuppressPlainFileMatchAnswer({ isViewerVariant, userPrompt, sources, answerText }) {
@@ -2059,6 +2096,7 @@ export default function ChatInterface({
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false);
 
   // Close info modal on Esc
   useEffect(() => {
@@ -2562,6 +2600,42 @@ export default function ChatInterface({
       );
     }
   }, []);
+
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const key = String(e.key || "");
+      const lower = key.toLowerCase();
+      const isMod = Boolean(e.metaKey || e.ctrlKey);
+      const tag = String(e.target?.tagName || "").toLowerCase();
+      const isEditable =
+        tag === "input" ||
+        tag === "textarea" ||
+        tag === "select" ||
+        Boolean(e.target?.isContentEditable);
+
+      if (isMod && !e.altKey && lower === "k") {
+        e.preventDefault();
+        setShowInfoModal(false);
+        setShowShortcutsModal(false);
+        try { inputRef.current?.focus(); } catch {}
+        return;
+      }
+
+      if (isMod && !e.altKey && (key === "/" || key === "?" || e.code === "Slash")) {
+        e.preventDefault();
+        setShowShortcutsModal(true);
+        return;
+      }
+
+      if (key === "Escape" && isStreaming && !showInfoModal && !showShortcutsModal && !isEditable) {
+        e.preventDefault();
+        stopStreaming(true);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [isStreaming, showInfoModal, showShortcutsModal, stopStreaming]);
 
   // IMPORTANT:
   // Do not auto-cancel generation when the user navigates away from the chat screen.
@@ -3073,6 +3147,19 @@ export default function ChatInterface({
       return;
     }
 
+    if (!isViewerVariant && isEphemeral && !isRegenerate && onConversationUpdate) {
+      const seedTitle = conversationCreateTitle || "New Chat";
+      if (isPlaceholderConversationTitle(seedTitle)) {
+        const optimisticTitle = deriveConversationTitleFromPrompt(messageText, {
+          maxWords: 10,
+          maxChars: 80,
+        });
+        if (optimisticTitle) {
+          onConversationUpdate({ id: realConversationId, title: optimisticTitle });
+        }
+      }
+    }
+
     const token = getCompatAccessToken();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -3256,6 +3343,8 @@ export default function ChatInterface({
     }
 
     try {
+      let sawDoneFrame = false;
+      let sawTerminalFrame = false;
       for await (const raw of streamSSE(response)) {
         if (!activeAssistantIdRef.current) break;
 
@@ -3273,6 +3362,7 @@ export default function ChatInterface({
         if (!mountedRef.current) {
           if (type === "done") continue;
           if (type === "final" || type === "error") {
+            sawTerminalFrame = true;
             abortRef.current = null;
             if (rafRef.current) {
               try { cancelAnimationFrame(rafRef.current); } catch {}
@@ -3363,10 +3453,12 @@ export default function ChatInterface({
         if (type === "done") {
           // The backend always sends a trailing "done" frame after "final".
           // Never finalize on "done" or we risk losing attachments if something odd happens.
+          sawDoneFrame = true;
           continue;
         }
 
         if (type === "final") {
+          sawTerminalFrame = true;
           const msg = evt.message || evt.payload || evt;
 
           // Promote the placeholder id to the real DB id so that conversation
@@ -3532,6 +3624,7 @@ export default function ChatInterface({
         }
 
         if (type === "error") {
+          sawTerminalFrame = true;
           setStreamError(String(evt.message || "Request failed"));
           setMessages((prev) =>
             prev.map((m) =>
@@ -3563,6 +3656,58 @@ export default function ChatInterface({
 
           break;
         }
+      }
+
+      // Safety net: if the stream closes without a terminal frame, finalize from
+      // buffered text so the UI never remains in perpetual "loading".
+      if (!sawTerminalFrame) {
+        abortRef.current = null;
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+
+        if (!mountedRef.current || activeAssistantIdRef.current !== assistantId) {
+          return;
+        }
+
+        const buffered = streamBufRef.current;
+        streamBufRef.current = "";
+        const fallbackError = "Stream ended before final response.";
+
+        setMessages((prev) =>
+          prev.map((m) => {
+            if (m.id !== assistantId) return m;
+            const merged = normalizeWhitespace((m.content || "") + buffered);
+            const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
+            const hasRenderableContent = Boolean(cleaned);
+            const doneLike = sawDoneFrame || hasRenderableContent;
+            return {
+              ...m,
+              content: cleaned,
+              status: doneLike ? "done" : "error",
+              ...(doneLike
+                ? {
+                    worklog: nextWorklogFromEvent(m.worklog, {
+                      eventType: "RUN_COMPLETE",
+                    }),
+                  }
+                : {
+                    error: fallbackError,
+                    worklog: nextWorklogFromEvent(m.worklog, {
+                      eventType: "RUN_ERROR",
+                      summary: fallbackError,
+                    }),
+                  }),
+            };
+          }),
+        );
+
+        if (!sawDoneFrame) {
+          setStreamError(fallbackError);
+        }
+
+        setIsStreaming(false);
       }
     } catch (e) {
       if (controller.signal.aborted) {
@@ -3596,6 +3741,8 @@ export default function ChatInterface({
     activeConnectors,
     fetchDocuments,
     fetchFolders,
+    conversationCreateTitle,
+    isEphemeral,
     isViewerVariant,
     messages,
     onConversationUpdate,
@@ -4107,7 +4254,7 @@ export default function ChatInterface({
       return (
         // Email drafts should align to the avatar "baseline" like regular assistant text
         // (no extra top gap).
-        <div style={{ marginTop: 0 }}>
+        <div style={{ marginTop: -6 }}>
           <EmailDraftActionCard
             message={m}
             confirmationToken={confirmation?.confirmationId || null}
@@ -4194,7 +4341,22 @@ export default function ChatInterface({
     );
   };
 
-  const renderAssistantAttachments = (m) => {
+  const isConnectorCardAttachment = (attachment) => {
+    const type = String(attachment?.type || "").trim();
+    return (
+      type === "connector_email_ref" ||
+      type === "connector_email" ||
+      type === "connector_slack_message" ||
+      type === "connector_prompt"
+    );
+  };
+
+  const renderAssistantAttachments = (m, opts = {}) => {
+    const onlyConnectorCards = opts?.onlyConnectorCards === true;
+    const excludeConnectorCards = opts?.excludeConnectorCards === true;
+    const marginTopOverride =
+      typeof opts?.marginTop === "number" ? opts.marginTop : null;
+
     const a = Array.isArray(m.attachments) ? m.attachments : [];
     if (!a.length) return null;
 
@@ -4223,11 +4385,25 @@ export default function ChatInterface({
     // Avoid double-render: action confirmations have a dedicated UI below.
     // Hide edit_session cards when the diff is already shown inline in the worklog card.
     const hasInlineEditDiff = String(m.worklog?.mode || "") === "editing" && getEditSessionFromAttachments(a);
-    const filtered = filteredForDeck.filter((x) => x && x.type !== "action_confirmation" && !(hasInlineEditDiff && x.type === "edit_session"));
+    let filtered = filteredForDeck.filter(
+      (x) =>
+        x &&
+        x.type !== "action_confirmation" &&
+        x.type !== "email_draft_snapshot" &&
+        !(hasInlineEditDiff && x.type === "edit_session"),
+    );
+    if (onlyConnectorCards) {
+      filtered = filtered.filter((x) => isConnectorCardAttachment(x));
+    } else if (excludeConnectorCards) {
+      filtered = filtered.filter((x) => !isConnectorCardAttachment(x));
+    }
     if (!filtered.length) return null;
 
+    const hasConnectorCards = filtered.some((x) => isConnectorCardAttachment(x));
+    const marginTop = marginTopOverride != null ? marginTopOverride : (hasConnectorCards ? 0 : 10);
+
     return (
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop }}>
         <AttachmentsRenderer
           attachments={filtered}
           variant="inline"
@@ -5305,6 +5481,12 @@ export default function ChatInterface({
                                 <>
                                   {(() => {
                                     const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+                                    const leadWithConnectorCards = attachments.some((x) => isConnectorCardAttachment(x));
+                                    if (!leadWithConnectorCards) return null;
+                                    return renderAssistantAttachments(m, { onlyConnectorCards: true, marginTop: 16 });
+                                  })()}
+                                  {(() => {
+                                    const attachments = Array.isArray(m.attachments) ? m.attachments : [];
                                     const confirm = attachments.find((a) => a && a.type === 'action_confirmation');
                                     const emailSnapshot = attachments.find((a) => a && a.type === 'email_draft_snapshot');
                                     const isEmailSendCard = Boolean(confirm?.operator === 'EMAIL_SEND' || emailSnapshot);
@@ -5383,7 +5565,12 @@ export default function ChatInterface({
                                       />
                                     );
                                   })()}
-                                  {renderAssistantAttachments(m)}
+                                  {(() => {
+                                    const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+                                    const leadWithConnectorCards = attachments.some((x) => isConnectorCardAttachment(x));
+                                    if (!leadWithConnectorCards) return renderAssistantAttachments(m);
+                                    return renderAssistantAttachments(m, { excludeConnectorCards: true });
+                                  })()}
                                   {m.listing && m.listing.length > 0 && renderFileListing(m)}
                                 </>
                               );
@@ -5452,10 +5639,14 @@ export default function ChatInterface({
                               {(() => {
                                 const renderableFollowups = deriveRenderableFollowups(m);
                                 if (!renderableFollowups.length) return null;
+                                const followupHeader = followupOfferHeader(
+                                  m?.language || streamingLang || answerLang,
+                                );
                                 return (
                                   <div className="koda-followup-chips" style={{ marginTop: 4 }}>
                                     <FollowUpChips
                                       chips={renderableFollowups}
+                                      header={followupHeader}
                                       onSelect={(chip) => {
                                         const q = typeof chip === "string" ? chip : chip?.query || chip?.label || "";
                                         if (!q) return;
@@ -6237,6 +6428,17 @@ export default function ChatInterface({
               </a>
               {' '}
               <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); setShowShortcutsModal(true); }}
+                style={{ color: '#9CA3AF', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6C6B6E'; e.currentTarget.style.textDecoration = 'underline'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#9CA3AF'; e.currentTarget.style.textDecoration = 'none'; }}
+                title="Keyboard shortcuts (Ctrl/Cmd+/)"
+              >
+                Shortcuts
+              </a>
+              {' '}
+              <a
                 href="https://www.getkoda.io/terms.html"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -6342,6 +6544,11 @@ export default function ChatInterface({
           </div>
         </div>
       )}
+
+      <KeyboardShortcutsModal
+        isOpen={showShortcutsModal}
+        onClose={() => setShowShortcutsModal(false)}
+      />
 
       {/* Preview modal */}
       <DocumentPreviewModal

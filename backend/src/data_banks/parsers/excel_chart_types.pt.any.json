@@ -44,6 +44,9 @@
     "sunburst": "sunburst",
     "gráfico de dispersão": "scatter",
     "aranha": "radar",
-    "gráfico combinado": "combo"
+    "gráfico combinado": "combo",
+    "gráfico de barras empilhadas": "stacked_bar",
+    "gráfico de colunas empilhadas": "stacked_column",
+    "combinação": "combo"
   }
 }

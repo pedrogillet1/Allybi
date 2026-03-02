@@ -11,6 +11,9 @@ type ProductHelpBank = {
   topics?: Array<{
     id?: string;
     priority?: number;
+    aliases?: string[];
+    operatorHints?: string[];
+    triggers?: Record<string, string[]>;
     when?: {
       answerModes?: string[];
       fallbackReasonCodes?: string[];
@@ -19,6 +22,11 @@ type ProductHelpBank = {
       queryAny?: string[];
     };
     snippets?: Record<string, string> | string;
+  }>;
+  topicSnippets?: Array<{
+    topic?: string;
+    snippet?: Record<string, string> | string;
+    operators?: string[];
   }>;
 };
 
@@ -126,7 +134,9 @@ function normalizeList(values: unknown): string[] {
   if (!Array.isArray(values)) return [];
   return values
     .map((value) => normalizeCode(value))
-    .filter((value, idx, arr) => value.length > 0 && arr.indexOf(value) === idx);
+    .filter(
+      (value, idx, arr) => value.length > 0 && arr.indexOf(value) === idx,
+    );
 }
 
 function asSnippetMap(input: unknown): Record<string, string> {
@@ -160,29 +170,181 @@ function chooseSnippet(
   );
 }
 
-function buildRulesFromBank(bank: ProductHelpBank | null): ProductHelpTopicRule[] {
+function buildRulesFromBank(
+  bank: ProductHelpBank | null,
+): ProductHelpTopicRule[] {
   if (!bank?.config?.enabled) return [];
   const source = Array.isArray(bank.topics) ? bank.topics : [];
   const out: ProductHelpTopicRule[] = [];
 
   for (const topic of source) {
-    const id = String(topic?.id || "").trim();
+    const id = normalizeCode(topic?.id);
     if (!id) continue;
 
     const snippets = asSnippetMap(topic?.snippets);
     if (!Object.keys(snippets).length) continue;
 
+    const queryAny = [
+      ...normalizeList(topic?.when?.queryAny),
+      ...normalizeList(topic?.aliases),
+      ...normalizeList(topic?.triggers?.any),
+      ...normalizeList(topic?.triggers?.en),
+      ...normalizeList(topic?.triggers?.pt),
+      ...normalizeList(topic?.triggers?.es),
+    ].filter(
+      (value, idx, arr) => value.length > 0 && arr.indexOf(value) === idx,
+    );
+
+    const operators = [
+      ...normalizeList(topic?.when?.operators),
+      ...normalizeList(topic?.operatorHints),
+    ].filter(
+      (value, idx, arr) => value.length > 0 && arr.indexOf(value) === idx,
+    );
+
+    const fallbackReasonCodes = normalizeList(topic?.when?.fallbackReasonCodes);
+    if (!fallbackReasonCodes.length && id === "limitations_memory_scope") {
+      fallbackReasonCodes.push(
+        "scope_hard_constraints_empty",
+        "no_docs_indexed",
+        "no_relevant_chunks_in_scoped_docs",
+      );
+    }
+
+    const answerModes = normalizeList(topic?.when?.answerModes);
+    if (
+      !answerModes.length &&
+      (id === "docx_editing" || id === "xlsx_editing")
+    ) {
+      answerModes.push("help_steps");
+    }
+    if (!answerModes.length && id === "limitations_memory_scope") {
+      answerModes.push("general_answer", "help_steps");
+    }
+
+    const intentFamilies = normalizeList(topic?.when?.intentFamilies);
+    if (!intentFamilies.length && id === "limitations_memory_scope") {
+      intentFamilies.push("documents", "help");
+    }
+    if (!queryAny.length) queryAny.push(...topicKeywords(id));
+
     out.push({
       id,
-      priority: Number.isFinite(Number(topic?.priority))
-        ? Number(topic?.priority)
-        : 50,
+      priority:
+        Number.isFinite(Number(topic?.priority)) && Number(topic?.priority) > 0
+          ? Number(topic?.priority)
+          : topicPriority(id),
       when: {
-        answerModes: normalizeList(topic?.when?.answerModes),
-        fallbackReasonCodes: normalizeList(topic?.when?.fallbackReasonCodes),
-        operators: normalizeList(topic?.when?.operators),
-        intentFamilies: normalizeList(topic?.when?.intentFamilies),
-        queryAny: normalizeList(topic?.when?.queryAny),
+        answerModes,
+        fallbackReasonCodes,
+        operators,
+        intentFamilies,
+        queryAny,
+      },
+      snippets,
+    });
+  }
+
+  return out;
+}
+
+function topicKeywords(topicId: string): string[] {
+  const normalized = normalizeCode(topicId);
+  if (!normalized) return [];
+  if (normalized.includes("limitations_memory_scope")) {
+    return [
+      "scope",
+      "document",
+      "not found",
+      "missing",
+      "escopo",
+      "arquivo",
+      "nao",
+      "alcance",
+      "archivo",
+      "no",
+    ];
+  }
+  if (normalized.includes("docx_editing")) {
+    return [
+      "docx",
+      "paragraph",
+      "section",
+      "format",
+      "paragrafo",
+      "secao",
+      "edicao",
+      "parrafo",
+      "seccion",
+      "edicion",
+    ];
+  }
+  if (normalized.includes("xlsx_editing")) {
+    return [
+      "xlsx",
+      "sheet",
+      "cell",
+      "formula",
+      "aba",
+      "celula",
+      "planilha",
+      "hoja",
+      "celda",
+      "tabla",
+    ];
+  }
+  return normalized
+    .split(/[^a-z0-9]+/g)
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function topicPriority(topicId: string): number {
+  const normalized = normalizeCode(topicId);
+  if (normalized === "limitations_memory_scope") return 120;
+  if (normalized === "capabilities_overview") return 60;
+  if (normalized === "docx_editing") return 90;
+  if (normalized === "xlsx_editing") return 85;
+  return 70;
+}
+
+function buildRulesFromTopicSnippets(
+  bank: ProductHelpBank | null,
+): ProductHelpTopicRule[] {
+  if (!bank?.config?.enabled) return [];
+  const source = Array.isArray(bank.topicSnippets) ? bank.topicSnippets : [];
+  const out: ProductHelpTopicRule[] = [];
+
+  for (const entry of source) {
+    const id = normalizeCode(entry?.topic);
+    if (!id) continue;
+    const snippets = asSnippetMap(entry?.snippet);
+    if (!Object.keys(snippets).length) continue;
+
+    const fallbackReasonCodes =
+      id === "limitations_memory_scope"
+        ? [
+            "scope_hard_constraints_empty",
+            "no_docs_indexed",
+            "no_relevant_chunks_in_scoped_docs",
+          ]
+        : [];
+    const answerModes =
+      id === "limitations_memory_scope"
+        ? ["general_answer", "help_steps"]
+        : ["help_steps"];
+    const intentFamilies =
+      id === "limitations_memory_scope" ? ["documents", "help"] : ["help"];
+
+    out.push({
+      id,
+      priority: topicPriority(id),
+      when: {
+        answerModes,
+        fallbackReasonCodes,
+        operators: normalizeList(entry?.operators),
+        intentFamilies,
+        queryAny: topicKeywords(id),
       },
       snippets,
     });
@@ -249,10 +411,11 @@ export class ProductHelpService {
       params.language || bank?.config?.defaultLanguage || "en",
     );
 
-    const allRules = [
+    const bankRules = [
       ...buildRulesFromBank(bank),
-      ...FALLBACK_TOPIC_RULES,
+      ...buildRulesFromTopicSnippets(bank),
     ];
+    const allRules = bankRules.length > 0 ? bankRules : FALLBACK_TOPIC_RULES;
 
     if (explicitTopic) {
       const explicit = allRules.find((rule) => rule.id === explicitTopic);

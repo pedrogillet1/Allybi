@@ -1,7 +1,7 @@
 {
   "_meta": {
     "id": "operator_contracts",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Canonical contracts for all operators Koda can execute. Defines what each operator means, what inputs it expects, what it is allowed to output, what evidence it requires, and which UX mode it should prefer (e.g., nav_pills for open/where/discover). Non-coding: Koda never outputs JSON to users.",
     "languages": [
       "any",
@@ -9,7 +9,7 @@
       "pt",
       "es"
     ],
-    "lastUpdated": "2026-01-26"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
@@ -195,6 +195,17 @@
           "ask_for_section",
           "offer_doc_selection"
         ]
+      },
+      "examples": {
+        "en": [
+          "Please summarize from the active document."
+        ],
+        "pt": [
+          "Por favor, execute summarize no documento ativo."
+        ],
+        "es": [
+          "Por favor, ejecuta summarize en el documento activo."
+        ]
       }
     },
     {
@@ -256,6 +267,17 @@
           "ask_for_section",
           "offer_broaden_scope"
         ]
+      },
+      "examples": {
+        "en": [
+          "Please extract from the active document."
+        ],
+        "pt": [
+          "Por favor, execute extract no documento ativo."
+        ],
+        "es": [
+          "Por favor, ejecuta extract en el documento activo."
+        ]
       }
     },
     {
@@ -295,6 +317,17 @@
         "recommendedNext": [
           "ask_for_section",
           "ask_for_keyword_or_phrase"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Please quote from the active document."
+        ],
+        "pt": [
+          "Por favor, execute quote no documento ativo."
+        ],
+        "es": [
+          "Por favor, ejecuta quote en el documento activo."
         ]
       }
     },
@@ -336,6 +369,17 @@
           "offer_doc_selection",
           "ask_for_versions"
         ]
+      },
+      "examples": {
+        "en": [
+          "Please compare from the active document."
+        ],
+        "pt": [
+          "Por favor, execute compare no documento ativo."
+        ],
+        "es": [
+          "Por favor, ejecuta compare en el documento activo."
+        ]
       }
     },
     {
@@ -374,6 +418,17 @@
       "numericPolicy": {
         "mustCiteInputsFromEvidence": true,
         "ifInputsMissing": "ask_one_clarification"
+      },
+      "examples": {
+        "en": [
+          "Please compute from the active document."
+        ],
+        "pt": [
+          "Por favor, execute compute no documento ativo."
+        ],
+        "es": [
+          "Por favor, ejecuta compute en el documento activo."
+        ]
       }
     },
     {
@@ -409,6 +464,17 @@
           "maxSentencesPerBullet": 2
         },
         "preferBreadcrumbs": true
+      },
+      "examples": {
+        "en": [
+          "Please locate content from the active document."
+        ],
+        "pt": [
+          "Por favor, execute locate content no documento ativo."
+        ],
+        "es": [
+          "Por favor, ejecuta locate content en el documento activo."
+        ]
       }
     },
     {
@@ -438,6 +504,17 @@
       "uxRules": {
         "noInlineFileNamesInBody": true,
         "useSeeAllIfMoreThan": 10
+      },
+      "examples": {
+        "en": [
+          "Please run list for my files."
+        ],
+        "pt": [
+          "Por favor, execute list nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta list en mis archivos."
+        ]
       }
     },
     {
@@ -464,6 +541,17 @@
           "fileInventoryIntent",
           "fileTypeHintOrKeyword"
         ]
+      },
+      "examples": {
+        "en": [
+          "Please run filter for my files."
+        ],
+        "pt": [
+          "Por favor, execute filter nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta filter en mis archivos."
+        ]
       }
     },
     {
@@ -484,6 +572,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run sort for my files."
+        ],
+        "pt": [
+          "Por favor, execute sort nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta sort en mis archivos."
+        ]
       }
     },
     {
@@ -504,6 +603,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run group for my files."
+        ],
+        "pt": [
+          "Por favor, execute group nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta group en mis archivos."
+        ]
       }
     },
     {
@@ -541,6 +651,17 @@
           "maxChars": 90
         },
         "noInlineSourcesLabel": true
+      },
+      "examples": {
+        "en": [
+          "Please run open for my files."
+        ],
+        "pt": [
+          "Por favor, execute open nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta open en mis archivos."
+        ]
       }
     },
     {
@@ -571,6 +692,17 @@
         "expects": [
           "explicitDocRefOrFilenameHint"
         ]
+      },
+      "examples": {
+        "en": [
+          "Please run locate file for my files."
+        ],
+        "pt": [
+          "Por favor, execute locate file nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta locate file en mis archivos."
+        ]
       }
     },
     {
@@ -591,6 +723,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run count files for my files."
+        ],
+        "pt": [
+          "Por favor, execute count files nos meus arquivos."
+        ],
+        "es": [
+          "Por favor, ejecuta count files en mis archivos."
+        ]
       }
     },
     {
@@ -612,6 +755,17 @@
           "required": true,
           "maxDocs": 1
         }
+      },
+      "examples": {
+        "en": [
+          "Run count pages."
+        ],
+        "pt": [
+          "Execute count pages."
+        ],
+        "es": [
+          "Ejecuta count pages."
+        ]
       }
     },
     {
@@ -633,6 +787,17 @@
           "required": true,
           "maxDocs": 1
         }
+      },
+      "examples": {
+        "en": [
+          "Run count slides."
+        ],
+        "pt": [
+          "Execute count slides."
+        ],
+        "es": [
+          "Ejecuta count slides."
+        ]
       }
     },
     {
@@ -654,6 +819,17 @@
           "required": true,
           "maxDocs": 1
         }
+      },
+      "examples": {
+        "en": [
+          "Run count sheets."
+        ],
+        "pt": [
+          "Execute count sheets."
+        ],
+        "es": [
+          "Ejecuta count sheets."
+        ]
       }
     },
     {
@@ -682,6 +858,17 @@
         "paragraphs": {
           "maxSentencesPerParagraph": 2
         }
+      },
+      "examples": {
+        "en": [
+          "Show me capabilities."
+        ],
+        "pt": [
+          "Mostre capabilities."
+        ],
+        "es": [
+          "Muéstrame capabilities."
+        ]
       }
     },
     {
@@ -704,6 +891,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Show me how to."
+        ],
+        "pt": [
+          "Mostre how to."
+        ],
+        "es": [
+          "Muéstrame how to."
+        ]
       }
     },
     {
@@ -724,6 +922,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run edit paragraph on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute edit paragraph no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta edit paragraph en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -744,6 +953,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run edit span on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute edit span no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta edit span en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -764,6 +984,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run add paragraph on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute add paragraph no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta add paragraph en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -784,6 +1015,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run edit docx bundle on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute edit docx bundle no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta edit docx bundle en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -804,6 +1046,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run edit cell on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute edit cell no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta edit cell en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -824,6 +1077,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run edit range on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute edit range no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta edit range en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -844,6 +1108,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run add sheet on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute add sheet no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta add sheet en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -864,6 +1139,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run rename sheet on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute rename sheet no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta rename sheet en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -884,6 +1170,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run delete sheet on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute delete sheet no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta delete sheet en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -904,6 +1201,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run create chart on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute create chart no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta create chart en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -924,6 +1232,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run compute on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute compute no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta compute en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -944,6 +1263,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run compute bundle on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute compute bundle no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta compute bundle en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -964,6 +1294,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run add slide on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute add slide no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta add slide en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -984,6 +1325,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run rewrite slide text on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute rewrite slide text no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta rewrite slide text en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -1004,6 +1356,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run replace slide image on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute replace slide image no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta replace slide image en el contenido seleccionado."
+        ]
       }
     },
     {
@@ -1024,6 +1387,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run connect start on my connector setup."
+        ],
+        "pt": [
+          "Por favor, execute connect start na minha integração."
+        ],
+        "es": [
+          "Por favor, ejecuta connect start en mi integración."
+        ]
       }
     },
     {
@@ -1044,6 +1418,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run connector sync on my connector setup."
+        ],
+        "pt": [
+          "Por favor, execute connector sync na minha integração."
+        ],
+        "es": [
+          "Por favor, ejecuta connector sync en mi integración."
+        ]
       }
     },
     {
@@ -1065,6 +1450,17 @@
         "sources": {
           "required": true
         }
+      },
+      "examples": {
+        "en": [
+          "Please run connector search on my connector setup."
+        ],
+        "pt": [
+          "Por favor, execute connector search na minha integração."
+        ],
+        "es": [
+          "Por favor, ejecuta connector search en mi integración."
+        ]
       }
     },
     {
@@ -1085,6 +1481,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run connector status on my connector setup."
+        ],
+        "pt": [
+          "Por favor, execute connector status na minha integração."
+        ],
+        "es": [
+          "Por favor, ejecuta connector status en mi integración."
+        ]
       }
     },
     {
@@ -1105,6 +1512,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run connector disconnect on my connector setup."
+        ],
+        "pt": [
+          "Por favor, execute connector disconnect na minha integração."
+        ],
+        "es": [
+          "Por favor, ejecuta connector disconnect en mi integración."
+        ]
       }
     },
     {
@@ -1125,6 +1543,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run email latest for my latest email."
+        ],
+        "pt": [
+          "Por favor, execute email latest no meu email mais recente."
+        ],
+        "es": [
+          "Por favor, ejecuta email latest en mi correo más reciente."
+        ]
       }
     },
     {
@@ -1146,6 +1575,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run email explain latest for my latest email."
+        ],
+        "pt": [
+          "Por favor, execute email explain latest no meu email mais recente."
+        ],
+        "es": [
+          "Por favor, ejecuta email explain latest en mi correo más reciente."
+        ]
       }
     },
     {
@@ -1167,6 +1607,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run email summarize previous for my latest email."
+        ],
+        "pt": [
+          "Por favor, execute email summarize previous no meu email mais recente."
+        ],
+        "es": [
+          "Por favor, ejecuta email summarize previous en mi correo más reciente."
+        ]
       }
     },
     {
@@ -1187,6 +1638,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run email draft for my latest email."
+        ],
+        "pt": [
+          "Por favor, execute email draft no meu email mais recente."
+        ],
+        "es": [
+          "Por favor, ejecuta email draft en mi correo más reciente."
+        ]
       }
     },
     {
@@ -1207,6 +1669,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Please run email send for my latest email."
+        ],
+        "pt": [
+          "Por favor, execute email send no meu email mais recente."
+        ],
+        "es": [
+          "Por favor, ejecuta email send en mi correo más reciente."
+        ]
       }
     },
     {
@@ -1229,6 +1702,17 @@
           "required": true,
           "maxDocs": 3
         }
+      },
+      "examples": {
+        "en": [
+          "Please run email doc fusion for my latest email."
+        ],
+        "pt": [
+          "Por favor, execute email doc fusion no meu email mais recente."
+        ],
+        "es": [
+          "Por favor, ejecuta email doc fusion en mi correo más reciente."
+        ]
       }
     },
     {
@@ -1254,6 +1738,17 @@
         "expects": [
           "conversationMicrocopy"
         ]
+      },
+      "examples": {
+        "en": [
+          "greeting."
+        ],
+        "pt": [
+          "greeting."
+        ],
+        "es": [
+          "greeting."
+        ]
       }
     },
     {
@@ -1274,6 +1769,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "thanks."
+        ],
+        "pt": [
+          "thanks."
+        ],
+        "es": [
+          "thanks."
+        ]
       }
     },
     {
@@ -1294,6 +1800,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "goodbye."
+        ],
+        "pt": [
+          "goodbye."
+        ],
+        "es": [
+          "goodbye."
+        ]
       }
     },
     {
@@ -1314,6 +1831,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "ack."
+        ],
+        "pt": [
+          "ack."
+        ],
+        "es": [
+          "ack."
+        ]
       }
     },
     {
@@ -1334,6 +1862,17 @@
         "sources": {
           "required": false
         }
+      },
+      "examples": {
+        "en": [
+          "Run error."
+        ],
+        "pt": [
+          "Execute error."
+        ],
+        "es": [
+          "Ejecuta error."
+        ]
       }
     },
     {
@@ -1386,6 +1925,9 @@
         "pt": [
           "Edite este parágrafo selecionado para ficar mais conciso.",
           "Transforme os bullets selecionados em um parágrafo."
+        ],
+        "es": [
+          "Por favor, ejecuta edit.plan en el contenido seleccionado."
         ]
       }
     },
@@ -1439,6 +1981,9 @@
         "pt": [
           "Aplicar essas alterações.",
           "Confirmar e aplicar as edições."
+        ],
+        "es": [
+          "Por favor, ejecuta edit.apply en el contenido seleccionado."
         ]
       }
     },
@@ -1490,6 +2035,162 @@
         "pt": [
           "Desfazer a última edição.",
           "Reverter a última alteração aplicada."
+        ],
+        "es": [
+          "Por favor, ejecuta edit.undo en el contenido seleccionado."
+        ]
+      }
+    },
+    {
+      "id": "PY_COMPUTE",
+      "family": "editing",
+      "description": "Python-backed compute operation for advanced dataframe/statistical transformations.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": false,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": [
+          "paragraph",
+          "bullets"
+        ],
+        "sources": {
+          "required": false
+        }
+      },
+      "signals": {
+        "expects": [
+          "activeDocRefOrExplicit"
+        ]
+      },
+      "uxRules": {
+        "body": {
+          "maxSentences": 2,
+          "maxChars": 220
+        },
+        "noTables": true
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifNoEvidence": "engine_unsupported",
+        "recommendedNext": [
+          "ask_for_scope"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Please run py compute on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute py compute no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta py compute en el contenido seleccionado."
+        ]
+      }
+    },
+    {
+      "id": "PY_CHART",
+      "family": "editing",
+      "description": "Python-backed chart generation operation for non-native charting workloads.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": false,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": [
+          "paragraph",
+          "bullets"
+        ],
+        "sources": {
+          "required": false
+        }
+      },
+      "signals": {
+        "expects": [
+          "activeDocRefOrExplicit"
+        ]
+      },
+      "uxRules": {
+        "body": {
+          "maxSentences": 2,
+          "maxChars": 220
+        },
+        "noTables": true
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifNoEvidence": "engine_unsupported",
+        "recommendedNext": [
+          "ask_for_scope"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Please run py chart on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute py chart no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta py chart en el contenido seleccionado."
+        ]
+      }
+    },
+    {
+      "id": "PY_WRITEBACK",
+      "family": "editing",
+      "description": "Python-backed writeback operation that persists computed results to workbook ranges.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": false,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": [
+          "paragraph",
+          "bullets"
+        ],
+        "sources": {
+          "required": false
+        }
+      },
+      "signals": {
+        "expects": [
+          "activeDocRefOrExplicit"
+        ]
+      },
+      "uxRules": {
+        "body": {
+          "maxSentences": 2,
+          "maxChars": 220
+        },
+        "noTables": true
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifNoEvidence": "engine_unsupported",
+        "recommendedNext": [
+          "ask_for_scope"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Please run py writeback on the selected content."
+        ],
+        "pt": [
+          "Por favor, execute py writeback no conteúdo selecionado."
+        ],
+        "es": [
+          "Por favor, ejecuta py writeback en el contenido seleccionado."
         ]
       }
     }

@@ -1,16 +1,31 @@
 {
   "_meta": {
     "id": "medical_safety_boundaries",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Medical safety boundary policy controlling caution language and escalation guidance.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "medical"
+    "domain": "medical",
+    "ruleContract": {
+      "version": "1.0.0",
+      "requireRuleId": true,
+      "requirePrecedence": true,
+      "requireResolutionPolicy": true,
+      "requireConflictsWithArray": true,
+      "defaultResolutionPolicy": "first_match"
+    },
+    "curationProfile": {
+      "version": "2.0.0",
+      "strategy": "semantic_signal_weighting",
+      "precedenceModel": "weighted_priority_rank",
+      "conflictModel": "token_antonym_detection+scope_overlap",
+      "disambiguationModel": "ask_on_ambiguity_or_missing_critical_inputs"
+    }
   },
   "domain": "medical",
   "definitions": [
@@ -1919,7 +1934,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 45,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_002_refer_cardiology_hf_pattern",
@@ -1944,7 +1973,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 46,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_003_refer_neurology_stroke_pattern",
@@ -1969,7 +2012,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 47,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_004_refer_neurosurgery_mass_effect",
@@ -1994,7 +2051,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 48,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_005_refer_pulmonology_chronic_hypoxemia",
@@ -2019,7 +2090,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 49,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_006_refer_hematology_cytopenia",
@@ -2044,7 +2129,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 50,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_007_refer_hematology_coagulopathy",
@@ -2069,7 +2168,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 51,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_008_refer_nephrology_ckd_progression",
@@ -2094,7 +2207,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 52,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_009_refer_hepatology_liver_injury",
@@ -2119,7 +2246,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 53,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_010_refer_gastroenterology_pancreatic_pattern",
@@ -2144,7 +2285,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 54,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_011_refer_endocrinology_thyroid_complex",
@@ -2169,7 +2324,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 55,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_012_refer_endocrinology_diabetes_instability",
@@ -2194,7 +2363,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 56,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_013_refer_infectious_disease_persistent_infection",
@@ -2219,7 +2402,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 57,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_014_refer_rheumatology_autoimmune_marker_pattern",
@@ -2244,7 +2441,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 58,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_015_refer_oncology_mass_or_marker",
@@ -2269,7 +2480,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 59,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_016_refer_obgyn_pregnancy_complication",
@@ -2294,7 +2519,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 60,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_017_refer_urology_psa_elevation",
@@ -2319,7 +2558,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 61,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_018_refer_psychiatry_risk_pattern",
@@ -2344,7 +2597,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 62,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_019_refer_dermatology_severe_reaction",
@@ -2369,7 +2636,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 63,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_020_refer_orthopedics_fracture_complexity",
@@ -2394,7 +2675,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 64,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_021_refer_vascular_dvt_signs",
@@ -2419,7 +2714,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 65,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_022_refer_surgery_acute_abdomen",
@@ -2444,7 +2753,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 66,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_023_refer_pain_specialist_chronic_uncontrolled",
@@ -2469,7 +2792,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 67,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_024_refer_rehab_functional_decline",
@@ -2494,7 +2831,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 68,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_025_refer_nutrition_malnutrition_risk",
@@ -2519,7 +2870,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 69,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_026_refer_allergy_immunology_recurrent_reaction",
@@ -2544,7 +2909,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 70,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_027_refer_ent_airway_findings",
@@ -2569,7 +2948,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 71,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_028_refer_ophthalmology_visual_redflags",
@@ -2594,7 +2987,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 72,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_029_refer_dentistry_oral_infection_pattern",
@@ -2619,7 +3026,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 73,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_030_refer_genetics_family_pattern",
@@ -2644,7 +3065,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 74,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_031_refer_pediatrics_growth_concern",
@@ -2669,7 +3104,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 75,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_032_refer_geriatrics_frailty_pattern",
@@ -2694,7 +3143,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 76,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_033_refer_palliative_care_advanced_disease",
@@ -2719,7 +3182,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 77,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_034_refer_anesthesiology_preop_risk",
@@ -2744,7 +3221,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 78,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_035_refer_pharmacy_polypharmacy",
@@ -2769,7 +3260,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 79,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_036_refer_social_work_safety_barrier",
@@ -2794,7 +3299,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 80,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_037_refer_wound_care_nonhealing",
@@ -2819,7 +3338,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 81,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_038_refer_sleep_medicine_apnea_pattern",
@@ -2844,7 +3377,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 82,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_039_refer_transplant_team_graft_concern",
@@ -2869,7 +3416,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 83,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_clinician_referral_trigger_040_refer_emergency_medicine_immediate_review",
@@ -2894,7 +3455,21 @@
           "noteEn": "This support does not replace physician diagnosis.",
           "notePt": "Este suporte não substitui diagnóstico médico."
         }
-      ]
+      ],
+      "precedence": 84,
+      "conflictsWith": [],
+      "resolutionPolicy": "highest_confidence",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:clinician_referral_trigger",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "model_ranked"
+      }
     },
     {
       "id": "rule_escalation_condition_001_chest_pain_with_troponin_rise",
@@ -2919,7 +3494,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 1,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_002_new_neurologic_deficit",
@@ -2944,7 +3533,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 2,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_003_severe_hypoxemia",
@@ -2969,7 +3572,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 3,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_004_hemodynamic_instability",
@@ -2994,7 +3611,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 4,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_005_active_major_bleeding",
@@ -3019,7 +3650,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 5,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_006_sepsis_pattern",
@@ -3044,7 +3689,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 6,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_007_anaphylaxis_signs",
@@ -3069,7 +3728,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 7,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_008_suicidal_ideation",
@@ -3094,7 +3767,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 8,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_009_acute_confusion",
@@ -3119,7 +3806,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 9,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_010_severe_hyponatremia",
@@ -3144,7 +3845,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 10,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_011_severe_hyperkalemia",
@@ -3169,7 +3884,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 11,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_012_severe_hypokalemia",
@@ -3194,7 +3923,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 12,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_013_critical_anemia",
@@ -3219,7 +3962,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 13,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_014_thrombocytopenia_severe",
@@ -3244,7 +4001,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 14,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_015_worsening_renal_failure",
@@ -3269,7 +4040,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 15,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_016_dka_pattern",
@@ -3294,7 +4079,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 16,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_017_possible_pe",
@@ -3319,7 +4118,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 17,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_018_possible_acs",
@@ -3344,7 +4157,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 18,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_019_intracranial_bleed_imaging",
@@ -3369,7 +4196,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 19,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_020_aortic_dissection_suspected",
@@ -3394,7 +4235,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 20,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_021_pregnancy_with_bleeding",
@@ -3419,7 +4274,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 21,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_022_febrile_neutropenia",
@@ -3444,7 +4313,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 22,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_023_high_inr_bleeding",
@@ -3469,7 +4352,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 23,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_024_new_arrhythmia_instability",
@@ -3494,7 +4391,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 24,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_025_acute_pancreatitis_pattern",
@@ -3519,7 +4430,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 25,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_026_biliary_sepsis_pattern",
@@ -3544,7 +4469,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 26,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_027_severe_dehydration",
@@ -3569,7 +4508,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 27,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_028_post_op_deterioration",
@@ -3594,7 +4547,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 28,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_029_critical_lactate_rise",
@@ -3619,7 +4586,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 29,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_030_airway_obstruction_imaging",
@@ -3644,7 +4625,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 30,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_031_pulmonary_edema_signs",
@@ -3669,7 +4664,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 31,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_032_spinal_cord_compression_signs",
@@ -3694,7 +4703,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 32,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_033_severe_headache_redflags",
@@ -3719,7 +4742,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 33,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_034_persistent_fever_unknown_source",
@@ -3744,7 +4781,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 34,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_035_worsening_abdominal_pain_guarding",
@@ -3769,7 +4820,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 35,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_036_high_risk_medication_toxicity",
@@ -3794,7 +4859,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 36,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_037_severe_allergic_rash_systemic",
@@ -3819,7 +4898,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 37,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_038_postpartum_redflag",
@@ -3844,7 +4937,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 38,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_039_pediatric_lethargy_pattern",
@@ -3869,7 +4976,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 39,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_040_geriatric_delirium_pattern",
@@ -3894,7 +5015,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 40,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_041_severe_hypoglycemia",
@@ -3919,7 +5054,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 41,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_042_new_jaundice_with_instability",
@@ -3944,7 +5093,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 42,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_043_critical_hypercalcemia",
@@ -3969,7 +5132,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 43,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_escalation_condition_044_critical_hypocalcemia",
@@ -3994,7 +5171,21 @@
           "action": "require_clinician_referral_note",
           "required": true
         }
-      ]
+      ],
+      "precedence": 44,
+      "conflictsWith": [],
+      "resolutionPolicy": "ask_clarification",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:critical",
+          "ruleType:escalation_condition",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_001",
@@ -4020,7 +5211,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 85,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_002",
@@ -4046,7 +5251,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 86,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_003",
@@ -4072,7 +5291,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 87,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_004",
@@ -4098,7 +5331,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 88,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_005",
@@ -4124,7 +5371,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 89,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_006",
@@ -4150,7 +5411,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 90,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_007",
@@ -4176,7 +5451,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 91,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_008",
@@ -4202,7 +5491,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 92,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_009",
@@ -4228,7 +5531,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 93,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_010",
@@ -4254,7 +5571,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 94,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_011",
@@ -4280,7 +5611,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 95,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_012",
@@ -4306,7 +5651,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 96,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_013",
@@ -4332,7 +5691,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 97,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_014",
@@ -4358,7 +5731,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 98,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_015",
@@ -4384,7 +5771,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 99,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_016",
@@ -4410,7 +5811,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 100,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_017",
@@ -4436,7 +5851,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 101,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_018",
@@ -4462,7 +5891,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 102,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_019",
@@ -4488,7 +5931,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 103,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_020",
@@ -4514,7 +5971,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 104,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_021",
@@ -4540,7 +6011,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 105,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_022",
@@ -4566,7 +6051,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 106,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_023",
@@ -4592,7 +6091,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 107,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_024",
@@ -4618,7 +6131,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 108,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_025",
@@ -4644,7 +6171,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 109,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_026",
@@ -4670,7 +6211,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 110,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_027",
@@ -4696,7 +6251,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 111,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_028",
@@ -4722,7 +6291,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 112,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_029",
@@ -4748,7 +6331,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 113,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_030",
@@ -4774,7 +6371,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 114,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_031",
@@ -4800,7 +6411,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 115,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_032",
@@ -4826,7 +6451,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 116,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_033",
@@ -4852,7 +6491,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 117,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_034",
@@ -4878,7 +6531,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 118,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_035",
@@ -4904,7 +6571,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 119,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_036",
@@ -4930,7 +6611,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 120,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_037",
@@ -4956,7 +6651,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 121,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_038",
@@ -4982,7 +6691,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 122,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_039",
@@ -5008,7 +6731,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 123,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_040",
@@ -5034,7 +6771,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 124,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_041",
@@ -5060,7 +6811,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 125,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_042",
@@ -5086,7 +6851,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 126,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_043",
@@ -5112,7 +6891,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 127,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_044",
@@ -5138,7 +6931,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 128,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_045",
@@ -5164,7 +6971,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 129,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_046",
@@ -5190,7 +7011,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 130,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_047",
@@ -5216,7 +7051,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 131,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_048",
@@ -5242,7 +7091,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 132,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_049",
@@ -5268,7 +7131,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 133,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_050",
@@ -5294,7 +7171,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 134,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_051",
@@ -5320,7 +7211,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 135,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_052",
@@ -5346,7 +7251,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 136,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_053",
@@ -5372,7 +7291,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 137,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_054",
@@ -5398,7 +7331,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 138,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_055",
@@ -5424,7 +7371,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 139,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_056",
@@ -5450,7 +7411,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 140,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_057",
@@ -5476,7 +7451,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 141,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_058",
@@ -5502,7 +7491,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 142,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_059",
@@ -5528,7 +7531,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 143,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_060",
@@ -5554,7 +7571,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 144,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     },
     {
       "id": "rule_prohibited_diagnostic_language_061",
@@ -5580,7 +7611,21 @@
           "noteEn": "Seek urgent care for severe or rapidly worsening symptoms.",
           "notePt": "Procure atendimento urgente para sintomas graves ou que pioram rapidamente."
         }
-      ]
+      ],
+      "precedence": 145,
+      "conflictsWith": [],
+      "resolutionPolicy": "first_match",
+      "curation": {
+        "profile": "semantic_signal_weighting",
+        "priorityDrivers": [
+          "severity:high",
+          "ruleType:prohibited_diagnostic_language",
+          "scope:specific",
+          "policy:first_match"
+        ],
+        "reviewTier": "specific",
+        "confidence": "rule_strict"
+      }
     }
   ]
 }

@@ -1,16 +1,29 @@
 {
   "_meta": {
     "id": "table_header_ontology_billing",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "Table header ontology for billing documents with multilingual synonym coverage.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-01"
   },
   "config": {
     "enabled": true,
-    "domain": "billing"
+    "domain": "billing",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
   },
   "domain": "billing",
   "headers": [
@@ -33,7 +46,11 @@
         "account_code",
         "account_number",
         "account_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_amount",
+      "curationReason": "weighted:account_amount:domain_general"
     },
     {
       "canonical": "account_code",
@@ -52,7 +69,11 @@
         "account_count",
         "account_quantity",
         "account_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_code",
+      "curationReason": "weighted:account_code:domain_general"
     },
     {
       "canonical": "account_count",
@@ -71,7 +92,11 @@
         "account_date",
         "account_rate",
         "account_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_count",
+      "curationReason": "weighted:account_count:domain_general"
     },
     {
       "canonical": "account_date",
@@ -90,7 +115,11 @@
         "account_end_date",
         "account_start_date",
         "adjustment_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_date",
+      "curationReason": "weighted:account_date:domain_general"
     },
     {
       "canonical": "account_end_date",
@@ -109,7 +138,11 @@
         "account_id",
         "account_status",
         "adjustment_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_end_date",
+      "curationReason": "weighted:account_end_date:domain_general"
     },
     {
       "canonical": "account_id",
@@ -128,7 +161,11 @@
         "account_name",
         "account_subtotal",
         "adjustment_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_id",
+      "curationReason": "weighted:account_id:domain_general"
     },
     {
       "canonical": "account_name",
@@ -147,7 +184,11 @@
         "account_number",
         "account_total",
         "adjustment_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_name",
+      "curationReason": "weighted:account_name:domain_general"
     },
     {
       "canonical": "account_number",
@@ -167,7 +208,11 @@
         "account_quantity",
         "account_type",
         "adjustment_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_number",
+      "curationReason": "weighted:account_number:domain_general"
     },
     {
       "canonical": "account_quantity",
@@ -187,7 +232,11 @@
         "account_rate",
         "account_unit",
         "adjustment_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_quantity",
+      "curationReason": "weighted:account_quantity:domain_general"
     },
     {
       "canonical": "account_rate",
@@ -206,7 +255,11 @@
         "account_start_date",
         "adjustment_amount",
         "adjustment_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_rate",
+      "curationReason": "weighted:account_rate:domain_general"
     },
     {
       "canonical": "account_start_date",
@@ -225,7 +278,11 @@
         "account_status",
         "adjustment_code",
         "adjustment_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_start_date",
+      "curationReason": "weighted:account_start_date:domain_general"
     },
     {
       "canonical": "account_status",
@@ -244,7 +301,11 @@
         "account_subtotal",
         "adjustment_count",
         "adjustment_quantity"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_status",
+      "curationReason": "weighted:account_status:domain_general"
     },
     {
       "canonical": "account_subtotal",
@@ -263,7 +324,11 @@
         "account_total",
         "adjustment_date",
         "adjustment_rate"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_subtotal",
+      "curationReason": "weighted:account_subtotal:domain_general"
     },
     {
       "canonical": "account_total",
@@ -282,7 +347,11 @@
         "account_type",
         "adjustment_end_date",
         "adjustment_start_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_total",
+      "curationReason": "weighted:account_total:domain_general"
     },
     {
       "canonical": "account_type",
@@ -301,7 +370,11 @@
         "account_unit",
         "adjustment_id",
         "adjustment_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_type",
+      "curationReason": "weighted:account_type:domain_general"
     },
     {
       "canonical": "account_unit",
@@ -320,7 +393,11 @@
         "adjustment_amount",
         "adjustment_name",
         "adjustment_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_account_unit",
+      "curationReason": "weighted:account_unit:domain_general"
     },
     {
       "canonical": "adjustment_amount",
@@ -341,7 +418,11 @@
         "adjustment_code",
         "adjustment_number",
         "adjustment_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_amount",
+      "curationReason": "weighted:adjustment_amount:domain_general"
     },
     {
       "canonical": "adjustment_code",
@@ -360,7 +441,11 @@
         "adjustment_count",
         "adjustment_quantity",
         "adjustment_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_code",
+      "curationReason": "weighted:adjustment_code:domain_general"
     },
     {
       "canonical": "adjustment_count",
@@ -377,7 +462,11 @@
         "adjustment_date",
         "adjustment_rate",
         "adjustment_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_count",
+      "curationReason": "weighted:adjustment_count:domain_general"
     },
     {
       "canonical": "adjustment_date",
@@ -396,7 +485,11 @@
         "adjustment_end_date",
         "adjustment_start_date",
         "amount_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_date",
+      "curationReason": "weighted:adjustment_date:domain_general"
     },
     {
       "canonical": "adjustment_end_date",
@@ -415,7 +508,11 @@
         "adjustment_id",
         "adjustment_status",
         "amount_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_end_date",
+      "curationReason": "weighted:adjustment_end_date:domain_general"
     },
     {
       "canonical": "adjustment_id",
@@ -432,7 +529,11 @@
         "adjustment_name",
         "adjustment_subtotal",
         "amount_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_id",
+      "curationReason": "weighted:adjustment_id:domain_general"
     },
     {
       "canonical": "adjustment_name",
@@ -451,7 +552,11 @@
         "adjustment_number",
         "adjustment_total",
         "amount_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_name",
+      "curationReason": "weighted:adjustment_name:domain_general"
     },
     {
       "canonical": "adjustment_number",
@@ -471,7 +576,11 @@
         "adjustment_quantity",
         "adjustment_type",
         "amount_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_number",
+      "curationReason": "weighted:adjustment_number:domain_general"
     },
     {
       "canonical": "adjustment_quantity",
@@ -491,7 +600,11 @@
         "adjustment_rate",
         "adjustment_unit",
         "amount_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_quantity",
+      "curationReason": "weighted:adjustment_quantity:domain_general"
     },
     {
       "canonical": "adjustment_rate",
@@ -510,7 +623,11 @@
         "adjustment_start_date",
         "amount_amount",
         "amount_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_rate",
+      "curationReason": "weighted:adjustment_rate:domain_general"
     },
     {
       "canonical": "adjustment_start_date",
@@ -529,7 +646,11 @@
         "adjustment_status",
         "amount_code",
         "amount_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_start_date",
+      "curationReason": "weighted:adjustment_start_date:domain_general"
     },
     {
       "canonical": "adjustment_status",
@@ -546,7 +667,11 @@
         "adjustment_subtotal",
         "amount_count",
         "amount_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_status",
+      "curationReason": "weighted:adjustment_status:domain_general"
     },
     {
       "canonical": "adjustment_subtotal",
@@ -563,7 +688,11 @@
         "adjustment_total",
         "amount_date",
         "amount_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_subtotal",
+      "curationReason": "weighted:adjustment_subtotal:domain_general"
     },
     {
       "canonical": "adjustment_total",
@@ -580,7 +709,11 @@
         "adjustment_type",
         "amount_end_date",
         "amount_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_total",
+      "curationReason": "weighted:adjustment_total:domain_general"
     },
     {
       "canonical": "adjustment_type",
@@ -599,7 +732,11 @@
         "adjustment_unit",
         "amount_id",
         "amount_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_type",
+      "curationReason": "weighted:adjustment_type:domain_general"
     },
     {
       "canonical": "adjustment_unit",
@@ -618,7 +755,11 @@
         "amount_amount",
         "amount_name",
         "amount_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_adjustment_unit",
+      "curationReason": "weighted:adjustment_unit:domain_general"
     },
     {
       "canonical": "amount_amount",
@@ -639,7 +780,11 @@
         "amount_code",
         "amount_number",
         "amount_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_amount",
+      "curationReason": "weighted:amount_amount:domain_general"
     },
     {
       "canonical": "amount_code",
@@ -660,7 +805,11 @@
         "amount_count",
         "amount_quantity",
         "amount_type"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_code",
+      "curationReason": "weighted:amount_code:domain_general"
     },
     {
       "canonical": "amount_count",
@@ -681,7 +830,11 @@
         "amount_date",
         "amount_rate",
         "amount_unit"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_count",
+      "curationReason": "weighted:amount_count:domain_general"
     },
     {
       "canonical": "amount_date",
@@ -702,7 +855,11 @@
         "amount_end_date",
         "amount_start_date",
         "arrears_amount"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_date",
+      "curationReason": "weighted:amount_date:domain_general"
     },
     {
       "canonical": "amount_end_date",
@@ -723,7 +880,11 @@
         "amount_id",
         "amount_status",
         "arrears_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_end_date",
+      "curationReason": "weighted:amount_end_date:domain_general"
     },
     {
       "canonical": "amount_id",
@@ -744,7 +905,11 @@
         "amount_name",
         "amount_subtotal",
         "arrears_count"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_id",
+      "curationReason": "weighted:amount_id:domain_general"
     },
     {
       "canonical": "amount_name",
@@ -765,7 +930,11 @@
         "amount_number",
         "amount_total",
         "arrears_date"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_name",
+      "curationReason": "weighted:amount_name:domain_general"
     },
     {
       "canonical": "amount_number",
@@ -787,7 +956,11 @@
         "amount_quantity",
         "amount_type",
         "arrears_end_date"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_number",
+      "curationReason": "weighted:amount_number:domain_general"
     },
     {
       "canonical": "amount_quantity",
@@ -809,7 +982,11 @@
         "amount_rate",
         "amount_unit",
         "arrears_id"
-      ]
+      ],
+      "priority": 767,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_quantity",
+      "curationReason": "weighted:amount_quantity:domain_general"
     },
     {
       "canonical": "amount_rate",
@@ -830,7 +1007,11 @@
         "amount_start_date",
         "arrears_amount",
         "arrears_name"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_rate",
+      "curationReason": "weighted:amount_rate:domain_general"
     },
     {
       "canonical": "amount_start_date",
@@ -851,7 +1032,11 @@
         "amount_status",
         "arrears_code",
         "arrears_number"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_start_date",
+      "curationReason": "weighted:amount_start_date:domain_general"
     },
     {
       "canonical": "amount_status",
@@ -872,7 +1057,11 @@
         "amount_subtotal",
         "arrears_count",
         "arrears_quantity"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_status",
+      "curationReason": "weighted:amount_status:domain_general"
     },
     {
       "canonical": "amount_subtotal",
@@ -893,7 +1082,11 @@
         "amount_total",
         "arrears_date",
         "arrears_rate"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_subtotal",
+      "curationReason": "weighted:amount_subtotal:domain_general"
     },
     {
       "canonical": "amount_total",
@@ -914,7 +1107,11 @@
         "amount_type",
         "arrears_end_date",
         "arrears_start_date"
-      ]
+      ],
+      "priority": 1111,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_total",
+      "curationReason": "weighted:amount_total:domain_general"
     },
     {
       "canonical": "amount_type",
@@ -935,7 +1132,11 @@
         "amount_unit",
         "arrears_id",
         "arrears_status"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_type",
+      "curationReason": "weighted:amount_type:domain_general"
     },
     {
       "canonical": "amount_unit",
@@ -956,7 +1157,11 @@
         "arrears_amount",
         "arrears_name",
         "arrears_subtotal"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_amount_unit",
+      "curationReason": "weighted:amount_unit:domain_general"
     },
     {
       "canonical": "arrears_amount",
@@ -977,7 +1182,11 @@
         "arrears_code",
         "arrears_number",
         "arrears_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_amount",
+      "curationReason": "weighted:arrears_amount:domain_general"
     },
     {
       "canonical": "arrears_code",
@@ -996,7 +1205,11 @@
         "arrears_count",
         "arrears_quantity",
         "arrears_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_code",
+      "curationReason": "weighted:arrears_code:domain_general"
     },
     {
       "canonical": "arrears_count",
@@ -1013,7 +1226,11 @@
         "arrears_date",
         "arrears_rate",
         "arrears_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_count",
+      "curationReason": "weighted:arrears_count:domain_general"
     },
     {
       "canonical": "arrears_date",
@@ -1032,7 +1249,11 @@
         "arrears_end_date",
         "arrears_start_date",
         "autopay_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_date",
+      "curationReason": "weighted:arrears_date:domain_general"
     },
     {
       "canonical": "arrears_end_date",
@@ -1051,7 +1272,11 @@
         "arrears_id",
         "arrears_status",
         "autopay_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_end_date",
+      "curationReason": "weighted:arrears_end_date:domain_general"
     },
     {
       "canonical": "arrears_id",
@@ -1068,7 +1293,11 @@
         "arrears_name",
         "arrears_subtotal",
         "autopay_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_id",
+      "curationReason": "weighted:arrears_id:domain_general"
     },
     {
       "canonical": "arrears_name",
@@ -1087,7 +1316,11 @@
         "arrears_number",
         "arrears_total",
         "autopay_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_name",
+      "curationReason": "weighted:arrears_name:domain_general"
     },
     {
       "canonical": "arrears_number",
@@ -1107,7 +1340,11 @@
         "arrears_quantity",
         "arrears_type",
         "autopay_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_number",
+      "curationReason": "weighted:arrears_number:domain_general"
     },
     {
       "canonical": "arrears_quantity",
@@ -1127,7 +1364,11 @@
         "arrears_rate",
         "arrears_unit",
         "autopay_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_quantity",
+      "curationReason": "weighted:arrears_quantity:domain_general"
     },
     {
       "canonical": "arrears_rate",
@@ -1146,7 +1387,11 @@
         "arrears_start_date",
         "autopay_amount",
         "autopay_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_rate",
+      "curationReason": "weighted:arrears_rate:domain_general"
     },
     {
       "canonical": "arrears_start_date",
@@ -1165,7 +1410,11 @@
         "arrears_status",
         "autopay_code",
         "autopay_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_start_date",
+      "curationReason": "weighted:arrears_start_date:domain_general"
     },
     {
       "canonical": "arrears_status",
@@ -1182,7 +1431,11 @@
         "arrears_subtotal",
         "autopay_count",
         "autopay_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_status",
+      "curationReason": "weighted:arrears_status:domain_general"
     },
     {
       "canonical": "arrears_subtotal",
@@ -1199,7 +1452,11 @@
         "arrears_total",
         "autopay_date",
         "autopay_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_subtotal",
+      "curationReason": "weighted:arrears_subtotal:domain_general"
     },
     {
       "canonical": "arrears_total",
@@ -1216,7 +1473,11 @@
         "arrears_type",
         "autopay_end_date",
         "autopay_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_total",
+      "curationReason": "weighted:arrears_total:domain_general"
     },
     {
       "canonical": "arrears_type",
@@ -1235,7 +1496,11 @@
         "arrears_unit",
         "autopay_id",
         "autopay_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_type",
+      "curationReason": "weighted:arrears_type:domain_general"
     },
     {
       "canonical": "arrears_unit",
@@ -1254,7 +1519,11 @@
         "autopay_amount",
         "autopay_name",
         "autopay_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_arrears_unit",
+      "curationReason": "weighted:arrears_unit:domain_general"
     },
     {
       "canonical": "autopay_amount",
@@ -1275,7 +1544,11 @@
         "autopay_code",
         "autopay_number",
         "autopay_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_amount",
+      "curationReason": "weighted:autopay_amount:domain_general"
     },
     {
       "canonical": "autopay_code",
@@ -1294,7 +1567,11 @@
         "autopay_count",
         "autopay_quantity",
         "autopay_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_code",
+      "curationReason": "weighted:autopay_code:domain_general"
     },
     {
       "canonical": "autopay_count",
@@ -1311,7 +1588,11 @@
         "autopay_date",
         "autopay_rate",
         "autopay_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_count",
+      "curationReason": "weighted:autopay_count:domain_general"
     },
     {
       "canonical": "autopay_date",
@@ -1330,7 +1611,11 @@
         "autopay_end_date",
         "autopay_start_date",
         "balance_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_date",
+      "curationReason": "weighted:autopay_date:domain_general"
     },
     {
       "canonical": "autopay_end_date",
@@ -1349,7 +1634,11 @@
         "autopay_id",
         "autopay_status",
         "balance_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_end_date",
+      "curationReason": "weighted:autopay_end_date:domain_general"
     },
     {
       "canonical": "autopay_id",
@@ -1366,7 +1655,11 @@
         "autopay_name",
         "autopay_subtotal",
         "balance_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_id",
+      "curationReason": "weighted:autopay_id:domain_general"
     },
     {
       "canonical": "autopay_name",
@@ -1385,7 +1678,11 @@
         "autopay_number",
         "autopay_total",
         "balance_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_name",
+      "curationReason": "weighted:autopay_name:domain_general"
     },
     {
       "canonical": "autopay_number",
@@ -1405,7 +1702,11 @@
         "autopay_quantity",
         "autopay_type",
         "balance_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_number",
+      "curationReason": "weighted:autopay_number:domain_general"
     },
     {
       "canonical": "autopay_quantity",
@@ -1425,7 +1726,11 @@
         "autopay_rate",
         "autopay_unit",
         "balance_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_quantity",
+      "curationReason": "weighted:autopay_quantity:domain_general"
     },
     {
       "canonical": "autopay_rate",
@@ -1444,7 +1749,11 @@
         "autopay_start_date",
         "balance_amount",
         "balance_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_rate",
+      "curationReason": "weighted:autopay_rate:domain_general"
     },
     {
       "canonical": "autopay_start_date",
@@ -1463,7 +1772,11 @@
         "autopay_status",
         "balance_code",
         "balance_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_start_date",
+      "curationReason": "weighted:autopay_start_date:domain_general"
     },
     {
       "canonical": "autopay_status",
@@ -1480,7 +1793,11 @@
         "autopay_subtotal",
         "balance_count",
         "balance_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_status",
+      "curationReason": "weighted:autopay_status:domain_general"
     },
     {
       "canonical": "autopay_subtotal",
@@ -1497,7 +1814,11 @@
         "autopay_total",
         "balance_date",
         "balance_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_subtotal",
+      "curationReason": "weighted:autopay_subtotal:domain_general"
     },
     {
       "canonical": "autopay_total",
@@ -1514,7 +1835,11 @@
         "autopay_type",
         "balance_end_date",
         "balance_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_total",
+      "curationReason": "weighted:autopay_total:domain_general"
     },
     {
       "canonical": "autopay_type",
@@ -1533,7 +1858,11 @@
         "autopay_unit",
         "balance_id",
         "balance_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_type",
+      "curationReason": "weighted:autopay_type:domain_general"
     },
     {
       "canonical": "autopay_unit",
@@ -1552,7 +1881,11 @@
         "balance_amount",
         "balance_name",
         "balance_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_autopay_unit",
+      "curationReason": "weighted:autopay_unit:domain_general"
     },
     {
       "canonical": "balance_amount",
@@ -1573,7 +1906,11 @@
         "balance_code",
         "balance_number",
         "balance_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_amount",
+      "curationReason": "weighted:balance_amount:domain_general"
     },
     {
       "canonical": "balance_code",
@@ -1592,7 +1929,11 @@
         "balance_count",
         "balance_quantity",
         "balance_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_code",
+      "curationReason": "weighted:balance_code:domain_general"
     },
     {
       "canonical": "balance_count",
@@ -1611,7 +1952,11 @@
         "balance_date",
         "balance_rate",
         "balance_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_count",
+      "curationReason": "weighted:balance_count:domain_general"
     },
     {
       "canonical": "balance_date",
@@ -1630,7 +1975,11 @@
         "balance_end_date",
         "balance_start_date",
         "barcode_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_date",
+      "curationReason": "weighted:balance_date:domain_general"
     },
     {
       "canonical": "balance_end_date",
@@ -1649,7 +1998,11 @@
         "balance_id",
         "balance_status",
         "barcode_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_end_date",
+      "curationReason": "weighted:balance_end_date:domain_general"
     },
     {
       "canonical": "balance_id",
@@ -1668,7 +2021,11 @@
         "balance_name",
         "balance_subtotal",
         "barcode_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_id",
+      "curationReason": "weighted:balance_id:domain_general"
     },
     {
       "canonical": "balance_name",
@@ -1687,7 +2044,11 @@
         "balance_number",
         "balance_total",
         "barcode_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_name",
+      "curationReason": "weighted:balance_name:domain_general"
     },
     {
       "canonical": "balance_number",
@@ -1707,7 +2068,11 @@
         "balance_quantity",
         "balance_type",
         "barcode_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_number",
+      "curationReason": "weighted:balance_number:domain_general"
     },
     {
       "canonical": "balance_quantity",
@@ -1727,7 +2092,11 @@
         "balance_rate",
         "balance_unit",
         "barcode_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_quantity",
+      "curationReason": "weighted:balance_quantity:domain_general"
     },
     {
       "canonical": "balance_rate",
@@ -1746,7 +2115,11 @@
         "balance_start_date",
         "barcode_amount",
         "barcode_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_rate",
+      "curationReason": "weighted:balance_rate:domain_general"
     },
     {
       "canonical": "balance_start_date",
@@ -1765,7 +2138,11 @@
         "balance_status",
         "barcode_code",
         "barcode_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_start_date",
+      "curationReason": "weighted:balance_start_date:domain_general"
     },
     {
       "canonical": "balance_status",
@@ -1784,7 +2161,11 @@
         "balance_subtotal",
         "barcode_count",
         "barcode_quantity"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_status",
+      "curationReason": "weighted:balance_status:domain_general"
     },
     {
       "canonical": "balance_subtotal",
@@ -1803,7 +2184,11 @@
         "balance_total",
         "barcode_date",
         "barcode_rate"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_subtotal",
+      "curationReason": "weighted:balance_subtotal:domain_general"
     },
     {
       "canonical": "balance_total",
@@ -1822,7 +2207,11 @@
         "balance_type",
         "barcode_end_date",
         "barcode_start_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_total",
+      "curationReason": "weighted:balance_total:domain_general"
     },
     {
       "canonical": "balance_type",
@@ -1841,7 +2230,11 @@
         "balance_unit",
         "barcode_id",
         "barcode_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_type",
+      "curationReason": "weighted:balance_type:domain_general"
     },
     {
       "canonical": "balance_unit",
@@ -1860,7 +2253,11 @@
         "barcode_amount",
         "barcode_name",
         "barcode_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_balance_unit",
+      "curationReason": "weighted:balance_unit:domain_general"
     },
     {
       "canonical": "barcode_amount",
@@ -1881,7 +2278,11 @@
         "barcode_code",
         "barcode_number",
         "barcode_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_amount",
+      "curationReason": "weighted:barcode_amount:domain_general"
     },
     {
       "canonical": "barcode_code",
@@ -1900,7 +2301,11 @@
         "barcode_count",
         "barcode_quantity",
         "barcode_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_code",
+      "curationReason": "weighted:barcode_code:domain_general"
     },
     {
       "canonical": "barcode_count",
@@ -1917,7 +2322,11 @@
         "barcode_date",
         "barcode_rate",
         "barcode_unit"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_count",
+      "curationReason": "weighted:barcode_count:domain_general"
     },
     {
       "canonical": "barcode_date",
@@ -1936,7 +2345,11 @@
         "barcode_end_date",
         "barcode_start_date",
         "base_charge_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_date",
+      "curationReason": "weighted:barcode_date:domain_general"
     },
     {
       "canonical": "barcode_end_date",
@@ -1955,7 +2368,11 @@
         "barcode_id",
         "barcode_status",
         "base_charge_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_end_date",
+      "curationReason": "weighted:barcode_end_date:domain_general"
     },
     {
       "canonical": "barcode_id",
@@ -1972,7 +2389,11 @@
         "barcode_name",
         "barcode_subtotal",
         "base_charge_count"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_id",
+      "curationReason": "weighted:barcode_id:domain_general"
     },
     {
       "canonical": "barcode_name",
@@ -1991,7 +2412,11 @@
         "barcode_number",
         "barcode_total",
         "base_charge_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_name",
+      "curationReason": "weighted:barcode_name:domain_general"
     },
     {
       "canonical": "barcode_number",
@@ -2011,7 +2436,11 @@
         "barcode_quantity",
         "barcode_type",
         "base_charge_end_date"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_number",
+      "curationReason": "weighted:barcode_number:domain_general"
     },
     {
       "canonical": "barcode_quantity",
@@ -2031,7 +2460,11 @@
         "barcode_rate",
         "barcode_unit",
         "base_charge_id"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_quantity",
+      "curationReason": "weighted:barcode_quantity:domain_general"
     },
     {
       "canonical": "barcode_rate",
@@ -2050,7 +2483,11 @@
         "barcode_start_date",
         "base_charge_amount",
         "base_charge_name"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_rate",
+      "curationReason": "weighted:barcode_rate:domain_general"
     },
     {
       "canonical": "barcode_start_date",
@@ -2069,7 +2506,11 @@
         "barcode_status",
         "base_charge_code",
         "base_charge_number"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_start_date",
+      "curationReason": "weighted:barcode_start_date:domain_general"
     },
     {
       "canonical": "barcode_status",
@@ -2086,7 +2527,11 @@
         "barcode_subtotal",
         "base_charge_count",
         "base_charge_quantity"
-      ]
+      ],
+      "priority": 557,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_status",
+      "curationReason": "weighted:barcode_status:domain_general"
     },
     {
       "canonical": "barcode_subtotal",
@@ -2103,7 +2548,11 @@
         "barcode_total",
         "base_charge_date",
         "base_charge_rate"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_subtotal",
+      "curationReason": "weighted:barcode_subtotal:domain_general"
     },
     {
       "canonical": "barcode_total",
@@ -2120,7 +2569,11 @@
         "barcode_type",
         "base_charge_end_date",
         "base_charge_start_date"
-      ]
+      ],
+      "priority": 907,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_total",
+      "curationReason": "weighted:barcode_total:domain_general"
     },
     {
       "canonical": "barcode_type",
@@ -2139,7 +2592,11 @@
         "barcode_unit",
         "base_charge_id",
         "base_charge_status"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_type",
+      "curationReason": "weighted:barcode_type:domain_general"
     },
     {
       "canonical": "barcode_unit",
@@ -2158,7 +2615,11 @@
         "base_charge_amount",
         "base_charge_name",
         "base_charge_subtotal"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_barcode_unit",
+      "curationReason": "weighted:barcode_unit:domain_general"
     },
     {
       "canonical": "base_charge_amount",
@@ -2179,7 +2640,11 @@
         "base_charge_code",
         "base_charge_number",
         "base_charge_total"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_amount",
+      "curationReason": "weighted:base_charge_amount:domain_general"
     },
     {
       "canonical": "base_charge_code",
@@ -2198,7 +2663,11 @@
         "base_charge_count",
         "base_charge_quantity",
         "base_charge_type"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_code",
+      "curationReason": "weighted:base_charge_code:domain_general"
     },
     {
       "canonical": "base_charge_count",
@@ -2217,7 +2686,11 @@
         "base_charge_date",
         "base_charge_rate",
         "base_charge_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_count",
+      "curationReason": "weighted:base_charge_count:domain_general"
     },
     {
       "canonical": "base_charge_date",
@@ -2236,7 +2709,11 @@
         "base_charge_end_date",
         "base_charge_start_date",
         "bill_amount"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_date",
+      "curationReason": "weighted:base_charge_date:domain_general"
     },
     {
       "canonical": "base_charge_end_date",
@@ -2255,7 +2732,11 @@
         "base_charge_id",
         "base_charge_status",
         "bill_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_end_date",
+      "curationReason": "weighted:base_charge_end_date:domain_general"
     },
     {
       "canonical": "base_charge_id",
@@ -2274,7 +2755,11 @@
         "base_charge_name",
         "base_charge_subtotal",
         "bill_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_id",
+      "curationReason": "weighted:base_charge_id:domain_general"
     },
     {
       "canonical": "base_charge_name",
@@ -2293,7 +2778,11 @@
         "base_charge_number",
         "base_charge_total",
         "bill_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_name",
+      "curationReason": "weighted:base_charge_name:domain_general"
     },
     {
       "canonical": "base_charge_number",
@@ -2313,7 +2802,11 @@
         "account_amount",
         "base_charge_quantity",
         "base_charge_type"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_number",
+      "curationReason": "weighted:base_charge_number:domain_general"
     },
     {
       "canonical": "base_charge_quantity",
@@ -2333,7 +2826,11 @@
         "account_code",
         "base_charge_rate",
         "base_charge_unit"
-      ]
+      ],
+      "priority": 575,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_quantity",
+      "curationReason": "weighted:base_charge_quantity:domain_general"
     },
     {
       "canonical": "base_charge_rate",
@@ -2352,7 +2849,11 @@
         "account_count",
         "base_charge_start_date",
         "bill_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_rate",
+      "curationReason": "weighted:base_charge_rate:domain_general"
     },
     {
       "canonical": "base_charge_start_date",
@@ -2371,7 +2872,11 @@
         "account_date",
         "base_charge_status",
         "bill_code"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_start_date",
+      "curationReason": "weighted:base_charge_start_date:domain_general"
     },
     {
       "canonical": "base_charge_status",
@@ -2390,7 +2895,11 @@
         "account_end_date",
         "base_charge_subtotal",
         "bill_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_status",
+      "curationReason": "weighted:base_charge_status:domain_general"
     },
     {
       "canonical": "base_charge_subtotal",
@@ -2409,7 +2918,11 @@
         "account_id",
         "base_charge_total",
         "bill_date"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_subtotal",
+      "curationReason": "weighted:base_charge_subtotal:domain_general"
     },
     {
       "canonical": "base_charge_total",
@@ -2428,7 +2941,11 @@
         "account_amount",
         "account_name",
         "base_charge_type"
-      ]
+      ],
+      "priority": 919,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_total",
+      "curationReason": "weighted:base_charge_total:domain_general"
     },
     {
       "canonical": "base_charge_type",
@@ -2447,7 +2964,11 @@
         "account_code",
         "account_number",
         "base_charge_unit"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_type",
+      "curationReason": "weighted:base_charge_type:domain_general"
     },
     {
       "canonical": "base_charge_unit",
@@ -2466,7 +2987,11 @@
         "account_count",
         "account_quantity",
         "bill_amount"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_base_charge_unit",
+      "curationReason": "weighted:base_charge_unit:domain_general"
     },
     {
       "canonical": "bill_amount",
@@ -2487,7 +3012,11 @@
         "account_date",
         "account_rate",
         "bill_code"
-      ]
+      ],
+      "priority": 761,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_bill_amount",
+      "curationReason": "weighted:bill_amount:domain_general"
     },
     {
       "canonical": "bill_code",
@@ -2506,7 +3035,11 @@
         "account_end_date",
         "account_start_date",
         "bill_count"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_bill_code",
+      "curationReason": "weighted:bill_code:domain_general"
     },
     {
       "canonical": "bill_count",
@@ -2525,7 +3058,11 @@
         "account_id",
         "account_status",
         "bill_date"
-      ]
+      ],
+      "priority": 569,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_bill_count",
+      "curationReason": "weighted:bill_count:domain_general"
     },
     {
       "canonical": "bill_date",
@@ -2544,7 +3081,11 @@
         "account_amount",
         "account_name",
         "account_subtotal"
-      ]
+      ],
+      "priority": 749,
+      "scope": "table_header:billing",
+      "disambiguationRuleId": "headers_disambiguation_general_bill_date",
+      "curationReason": "weighted:bill_date:domain_general"
     }
   ]
 }

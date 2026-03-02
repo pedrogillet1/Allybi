@@ -41,7 +41,9 @@ function resolveMinCoverage(answerMode?: AnswerMode): number {
 }
 
 function isStrictProvenanceV2Enabled(): boolean {
-  const raw = String(process.env.STRICT_PROVENANCE_V2 || "").trim().toLowerCase();
+  const raw = String(process.env.STRICT_PROVENANCE_V2 || "")
+    .trim()
+    .toLowerCase();
   if (!raw) return true;
   return !["0", "false", "off", "no"].includes(raw);
 }
@@ -93,7 +95,14 @@ export function validateChatProvenance(params: {
   }
 
   if (!isStrictProvenanceV2Enabled()) {
-    if (provenance.coverageScore < (params.answerMode === "doc_grounded_multi" ? 0.2 : params.answerMode === "doc_grounded_quote" ? 0.15 : 0.1)) {
+    if (
+      provenance.coverageScore <
+      (params.answerMode === "doc_grounded_multi"
+        ? 0.2
+        : params.answerMode === "doc_grounded_quote"
+          ? 0.15
+          : 0.1)
+    ) {
       return {
         ok: false,
         failureCode: "insufficient_provenance_coverage",
