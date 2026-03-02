@@ -669,7 +669,7 @@
     "copied": "Copied to clipboard"
   },
   "category": {
-    "uploadDocument": "Upload a Document",
+    "uploadDocument": "Upload",
     "createFolder": "Create a Folder"
   },
   "common": {
@@ -1862,8 +1862,8 @@
       "files": "Files",
       "menu": {
         "edit": "Edit",
-        "uploadTo": "Upload to",
-        "moveTo": "Move to",
+        "uploadTo": "Upload",
+        "moveTo": "Move",
         "download": "Download",
         "delete": "Delete"
       }

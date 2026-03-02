@@ -636,7 +636,7 @@
     "copied": "Copiado al portapapeles"
   },
   "category": {
-    "uploadDocument": "Subir un Documento",
+    "uploadDocument": "Subir",
     "createFolder": "Crear una Carpeta"
   },
   "common": {
@@ -1856,8 +1856,8 @@
       "files": "Archivos",
       "menu": {
         "edit": "Editar",
-        "uploadTo": "Subir a",
-        "moveTo": "Mover a",
+        "uploadTo": "Subir",
+        "moveTo": "Mover",
         "download": "Descargar",
         "delete": "Eliminar"
       }

@@ -2090,12 +2090,8 @@ const UploadHub = () => {
           ) : (
             <span style={{ width: 16, flexShrink: 0 }} />
           )}
-          {/* Icon: CategoryIcon for root, folder icon for nested */}
-          {isRoot ? (
-            <CategoryIcon emoji={folder.emoji} size={iconSize} />
-          ) : (
-            <img src={folderIcon} alt="" aria-hidden="true" style={{ width: iconSize, height: iconSize, flexShrink: 0, filter: 'brightness(0) invert(0.35)' }} />
-          )}
+          {/* Icon: CategoryIcon for both root and nested */}
+          <CategoryIcon emoji={folder.emoji} size={iconSize} />
           <span style={{
             fontSize: fSize, fontWeight: '500', color: '#32302C',
             fontFamily: 'Plus Jakarta Sans, sans-serif', flex: 1,

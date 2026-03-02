@@ -435,7 +435,7 @@ const DocumentViewer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { documents: contextDocuments, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder } = useDocuments();
+  const { documents: contextDocuments, folders: contextFolders, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder } = useDocuments();
 
   // Parse ?page=X query param for jump-to-page support
   const searchParams = new URLSearchParams(location.search);
@@ -4915,20 +4915,18 @@ const DocumentViewer = () => {
           <button
             onClick={() => navigate(-1)}
             style={{
-              width: isMobile ? 36 : 42,
-              height: isMobile ? 36 : 42,
+              width: isMobile ? 36 : 40,
+              height: isMobile ? 36 : 40,
               background: 'white',
-              color: '#181818',
-              borderRadius: 100,
-              outline: '1px #E6E6EC solid',
-              outlineOffset: '-1px',
+              borderRadius: '50%',
+              border: '1px solid #E6E6EC',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              border: 'none',
               transition: 'all 0.2s ease',
-              flexShrink: 0
+              flexShrink: 0,
+              padding: 0
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#F5F5F5';
@@ -4937,7 +4935,7 @@ const DocumentViewer = () => {
               e.currentTarget.style.background = 'white';
             }}
           >
-            <ArrowLeftIcon style={{ width: 18, height: 18, color: '#181818' }} />
+            <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
           </button>
 
           <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 4 : 8, display: 'inline-flex', minWidth: 0, overflow: 'hidden' }}>
@@ -4961,22 +4959,27 @@ const DocumentViewer = () => {
                         <InlineNavPill
                           label={category.name}
                           icon={<img src={folderIcon} alt="" style={{ width: 20, height: 20 }} />}
-                          style={{ height: 32 }}
+                          onClick={() => navigate(buildRoute.folder(category.id))}
+                          style={{ height: 32, cursor: 'pointer' }}
                         />
                       </React.Fragment>
                     ) : null;
                   })()}
                   {/* Folder path (if exists) */}
-                  {document.folderPath && document.folderPath.split('/').filter(Boolean).map((folder, index) => (
+                  {document.folderPath && document.folderPath.split('/').filter(Boolean).map((folderName, index) => {
+                    const matchedFolder = contextFolders.find(f => f.name === folderName);
+                    return (
                     <React.Fragment key={index}>
                       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       <InlineNavPill
-                        label={folder}
+                        label={folderName}
                         icon={<img src={folderIcon} alt="" style={{ width: 20, height: 20 }} />}
-                        style={{ height: 32 }}
+                        onClick={matchedFolder ? () => navigate(buildRoute.folder(matchedFolder.id)) : undefined}
+                        style={{ height: 32, cursor: matchedFolder ? 'pointer' : 'default' }}
                       />
                     </React.Fragment>
-                  ))}
+                    );
+                  })}
                   {/* File name */}
                       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   <InlineNavPill

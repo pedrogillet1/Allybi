@@ -29,6 +29,7 @@ import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
+import { ReactComponent as VectorIcon } from '../../assets/Vector.svg';
 import logoSvg from '../../assets/logo.svg';
 import api from '../../services/api';
 import pdfIcon from '../../assets/pdf-icon.png';
@@ -117,6 +118,7 @@ const DocumentsPage = () => {
   const [categoryMenuPosition, setCategoryMenuPosition] = useState({ top: 0, left: 0 });
   const [editingCategory, setEditingCategory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showNewDropdown, setShowNewDropdown] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadCategoryId, setUploadCategoryId] = useState(null);
   const [showAskKoda, setShowAskKoda] = useState(true);
@@ -135,6 +137,7 @@ const DocumentsPage = () => {
   // Refs to track current state for event listener (avoids stale closures)
   const openDropdownIdRef = useRef(openDropdownId);
   const categoryMenuOpenRef = useRef(categoryMenuOpen);
+  const showNewDropdownRef = useRef(showNewDropdown);
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -145,6 +148,10 @@ const DocumentsPage = () => {
     categoryMenuOpenRef.current = categoryMenuOpen;
   }, [categoryMenuOpen]);
 
+  useEffect(() => {
+    showNewDropdownRef.current = showNewDropdown;
+  }, [showNewDropdown]);
+
   // Close dropdown when clicking outside - attached ONCE on mount
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -154,6 +161,9 @@ const DocumentsPage = () => {
       }
       if (categoryMenuOpenRef.current && !event.target.closest('[data-category-menu]')) {
         setCategoryMenuOpen(null);
+      }
+      if (showNewDropdownRef.current && !event.target.closest('[data-new-dropdown]')) {
+        setShowNewDropdown(false);
       }
     };
 
@@ -521,9 +531,9 @@ const DocumentsPage = () => {
               style={{
                 width: isMobile ? 36 : 40,
                 height: isMobile ? 36 : 40,
-                background: '#F3F4F6',
-                borderRadius: 8,
-                border: '1px solid #E5E7EB',
+                background: 'white',
+                borderRadius: '50%',
+                border: '1px solid #E6E6EC',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -533,8 +543,8 @@ const DocumentsPage = () => {
                 padding: 0,
                 marginLeft: isMobile ? 0 : -28
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#E5E7EB'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = '#F3F4F6'; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}
             >
               <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
             </button>
@@ -648,7 +658,8 @@ const DocumentsPage = () => {
                     display: 'flex',
                     alignItems: 'center',
                     transition: 'transform 0.15s ease',
-                    cursor: 'text'
+                    cursor: 'text',
+                    zIndex: 1000
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
@@ -794,9 +805,79 @@ const DocumentsPage = () => {
                   </div>
                 </button>
 
-                <div onClick={() => setShowUniversalUploadModal(true)} style={{height: 44, paddingLeft: 20, paddingRight: 20, background: '#181818', borderRadius: 9999, border: 'none', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexShrink: 0, transition: 'background 120ms ease, transform 160ms cubic-bezier(0.2,0.8,0.2,1)', color: 'white'}} onMouseEnter={(e) => { e.currentTarget.style.background = '#0F0F0F'; e.currentTarget.style.transform = 'translateY(-1px)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = '#181818'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-                  <UploadIcon style={{width: 18, height: 18, filter: 'brightness(0) invert(1)'}} />
-                  <span style={{fontSize: 14, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, lineHeight: '20px'}}>Upload</span>
+                <div style={{ position: 'relative' }} data-new-dropdown>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowNewDropdown(!showNewDropdown); }}
+                    style={{
+                      paddingLeft: 18,
+                      paddingRight: 18,
+                      paddingTop: 10,
+                      paddingBottom: 10,
+                      background: '#F5F5F5',
+                      boxShadow: '0px 0px 8px 1px rgba(0, 0, 0, 0.02)',
+                      overflow: 'hidden',
+                      borderRadius: 100,
+                      outline: '1px #E6E6EC solid',
+                      outlineOffset: '-1px',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 6,
+                      display: 'inline-flex',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <VectorIcon style={{ width: 15, height: 14 }} />
+                    <div style={{color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('common.new')}</div>
+                  </button>
+
+                  {showNewDropdown && (
+                    <div style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      right: 0,
+                      background: 'white',
+                      boxShadow: '0 4px 16px rgba(24,24,24,0.12), 0 1px 4px rgba(24,24,24,0.06)',
+                      borderRadius: 12,
+                      border: '1px solid #E6E6EC',
+                      zIndex: 100,
+                      padding: 6,
+                      whiteSpace: 'nowrap'
+                    }}>
+                        {[
+                          { label: t('category.uploadDocument'), icon: UploadIcon, action: () => { setShowUniversalUploadModal(true); setShowNewDropdown(false); }, color: '#32302C' },
+                          { label: t('category.createFolder'), icon: AddIcon, action: () => { setIsModalOpen(true); setShowNewDropdown(false); }, color: '#32302C' },
+                          { label: t('documents.delete'), icon: TrashCanIcon, action: () => { setShowDeleteModal(true); setShowNewDropdown(false); }, color: '#D92D20' },
+                        ].map(item => (
+                          <button
+                            key={item.label}
+                            onClick={(e) => { e.stopPropagation(); item.action(); }}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              background: 'transparent',
+                              border: 'none',
+                              borderRadius: 8,
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              fontSize: 14,
+                              fontWeight: 500,
+                              fontFamily: 'Plus Jakarta Sans, sans-serif',
+                              color: item.color,
+                              transition: 'background 120ms ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = item.color === '#D92D20' ? '#FEE2E2' : '#F5F5F5'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                          >
+                            <item.icon style={{ width: 18, height: 18, flexShrink: 0, filter: item.color === '#D92D20' ? 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(7149%) hue-rotate(355deg) brightness(91%) contrast(89%)' : 'brightness(0) invert(0.2)' }} />
+                            {item.label}
+                          </button>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -808,8 +889,7 @@ const DocumentsPage = () => {
         <div className="documents-content scrollable-content" style={{flex: 1, padding: isMobile ? spacing.xl : 48, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 48, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: spacing.xl, WebkitOverflowScrolling: 'touch'}}>
           {/* Smart Categories */}
           <div style={{display: 'flex', flexDirection: 'column', gap: spacing.md}}>
-            {/* Mobile: section header with + New */}
-            {isMobile && (
+            {/* Section header with + New */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -817,9 +897,9 @@ const DocumentsPage = () => {
               }}>
                 <div style={{
                   color: '#32302C',
-                  fontSize: 16,
+                  fontSize: isMobile ? 16 : 18,
                   fontFamily: 'Plus Jakarta Sans, sans-serif',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   lineHeight: '26px',
                 }}>
                   {t('documents.smartCategories')}
@@ -848,31 +928,7 @@ const DocumentsPage = () => {
                   {t('home.categories.new')}
                 </div>
               </div>
-            )}
             <div style={{display: isMobile ? 'flex' : 'grid', flexDirection: isMobile ? 'column' : undefined, gridTemplateColumns: isMobile ? undefined : 'repeat(4, 1fr)', gap: spacing.md}}>
-              {/* Desktop only: New Folder card */}
-              {!isMobile && (
-              <div onClick={() => setIsModalOpen(true)} style={{
-                padding: `${spacing.lg}px`,
-                background: colors.white,
-                borderRadius: radius.xl,
-                border: `2px solid ${colors.gray[300]}`,
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: spacing.sm,
-                cursor: 'pointer',
-                minHeight: 72,
-                height: 72,
-                boxSizing: 'border-box',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-              }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-                <div style={{width: 40, height: 40, background: colors.gray[100], borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                  <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
-                </div>
-                <span style={{color: colors.gray[900], fontSize: typography.sizes.sm, fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold, lineHeight: '19.60px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0}}>{t('documents.newFolder')}</span>
-              </div>
-              )}
               {categories.map((category, index) => {
                 const folderSelected = isSelectMode && isFolderSelected(category.id);
                 return (
@@ -993,7 +1049,7 @@ const DocumentsPage = () => {
                           setCategoryMenuOpen(null);
                         } else {
                           const buttonRect = e.currentTarget.getBoundingClientRect();
-                          const dropdownHeight = 160;
+                          const dropdownHeight = 240;
                           const dropdownWidth = 160;
                           const spaceBelow = window.innerHeight - buttonRect.bottom;
                           const openUpward = spaceBelow < dropdownHeight && buttonRect.top > dropdownHeight;
@@ -1099,7 +1155,77 @@ const DocumentsPage = () => {
                           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                         >
                           <UploadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
-                          {t('nav.upload')}
+                          {t('home.categories.menu.uploadTo')}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDocumentForCategory(null);
+                            setSelectedCategoryId(null);
+                            setShowCategoryModal(true);
+                            setCategoryMenuOpen(null);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            padding: '10px 14px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderBottom: '1px solid #F5F5F5',
+                            cursor: 'pointer',
+                            fontSize: 14,
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontWeight: '500',
+                            color: '#32302C',
+                            transition: 'background 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                        >
+                          <AddIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
+                          {t('home.categories.menu.moveTo')}
+                        </button>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setCategoryMenuOpen(null);
+                            try {
+                              const response = await api.get(`/api/folders/${category.id}/download`, { responseType: 'blob' });
+                              const url = window.URL.createObjectURL(response.data);
+                              const link = document.createElement('a');
+                              link.href = url;
+                              link.download = `${category.name}.zip`;
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                              window.URL.revokeObjectURL(url);
+                            } catch (error) {
+                              console.error('Download failed:', error);
+                            }
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            padding: '10px 14px',
+                            background: 'transparent',
+                            border: 'none',
+                            borderBottom: '1px solid #F5F5F5',
+                            cursor: 'pointer',
+                            fontSize: 14,
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontWeight: '500',
+                            color: '#32302C',
+                            transition: 'background 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                        >
+                          <DownloadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
+                          {t('home.categories.menu.download')}
                         </button>
                         <button
                           onClick={(e) => {
@@ -1159,8 +1285,8 @@ const DocumentsPage = () => {
             </div>
 
             {(() => {
-              // Show ALL documents (regardless of folder) in the All Documents section
-              const rootDocuments = contextDocuments;
+              // Show only documents NOT in any folder/category
+              const rootDocuments = contextDocuments.filter(d => !d.folderId);
               const combinedItems = [
                 ...rootDocuments.map(d => ({ ...d, isDocument: true }))
               ];

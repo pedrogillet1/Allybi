@@ -646,7 +646,7 @@
     "copied": "Copiado para a área de transferência"
   },
   "category": {
-    "uploadDocument": "Enviar um Documento",
+    "uploadDocument": "Enviar",
     "createFolder": "Criar uma Pasta"
   },
   "common": {
@@ -1829,8 +1829,8 @@
       "files": "Arquivos",
       "menu": {
         "edit": "Editar",
-        "uploadTo": "Enviar para",
-        "moveTo": "Mover para",
+        "uploadTo": "Enviar",
+        "moveTo": "Mover",
         "download": "Baixar",
         "delete": "Excluir"
       }

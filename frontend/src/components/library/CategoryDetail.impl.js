@@ -1363,9 +1363,9 @@ const CategoryDetail = () => {
                     style={{
                       width: 40,
                       height: 40,
-                      background: '#F3F4F6',
-                      border: '1px solid #E5E7EB',
-                      borderRadius: 8,
+                      background: 'white',
+                      border: '1px solid #E6E6EC',
+                      borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1374,15 +1374,13 @@ const CategoryDetail = () => {
                       padding: 0
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#E5E7EB';
+                      e.currentTarget.style.background = '#F5F5F5';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#F3F4F6';
+                      e.currentTarget.style.background = 'white';
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12.5 15L7.5 10L12.5 5" stroke="#111827" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
                   </button>
                 )}
                 <h1 style={{
@@ -1630,7 +1628,8 @@ const CategoryDetail = () => {
                     style={{ display: 'none' }}
                   />
 
-                  {/* New Dropdown Button */}
+                  {/* New Dropdown Button - hidden on "Your Files" / recently-added */}
+                  {categoryName !== 'recently-added' && categoryName !== 'your-files' && (
                   <div style={{ position: 'relative' }} data-new-dropdown>
                     <button
                   onClick={(e) => {
@@ -1868,6 +1867,7 @@ const CategoryDetail = () => {
                   </div>
                 )}
               </div>
+              )}
               </>
             )}
             </div>

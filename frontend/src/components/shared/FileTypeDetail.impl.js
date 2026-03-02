@@ -29,6 +29,7 @@ import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
+import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
 
 const FileTypeDetail = () => {
   const { t } = useTranslation();
@@ -504,8 +505,8 @@ const FileTypeDetail = () => {
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {!isMobile && (
-                  <button onClick={() => navigate(-1)} style={{ width: 40, height: 40, background: '#F3F4F6', border: '1px solid #E5E7EB', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', padding: 0 }} onMouseEnter={(e) => e.currentTarget.style.background = '#E5E7EB'} onMouseLeave={(e) => e.currentTarget.style.background = '#F3F4F6'}>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 15L7.5 10L12.5 5" stroke="#111827" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <button onClick={() => navigate(-1)} style={{ width: 40, height: 40, background: 'white', border: '1px solid #E6E6EC', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', padding: 0 }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
+                    <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
                   </button>
                 )}
                 {config.icon && <img src={config.icon} alt={fileType} style={{ width: isMobile ? 24 : 32, height: isMobile ? 24 : 32, objectFit: 'contain' }} />}
@@ -529,9 +530,9 @@ const FileTypeDetail = () => {
                   </>
                 ) : (
                   <>
-                    <div style={{ paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'white', borderRadius: 100, border: '1px #E5E7EB solid', display: 'flex', alignItems: 'center', gap: 8, width: 280 }}>
+                    <div style={{ paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', borderRadius: 100, border: '1px #E6E6EC solid', display: 'flex', alignItems: 'center', gap: 8, width: 280 }}>
                       <SearchIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
-                      <input type="text" placeholder={t('common.searchFilesPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ border: 'none', outline: 'none', background: 'transparent', color: '#111827', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', flex: 1, width: '100%' }} />
+                      <input type="text" placeholder={t('common.searchFilesPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ border: 'none', outline: 'none', background: 'transparent', color: '#32302C', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', flex: 1, width: '100%' }} />
                     </div>
                     <button onClick={toggleSelectMode} style={{ height: 42, paddingLeft: 18, paddingRight: 18, background: 'white', borderRadius: 100, border: '1px solid #E6E6EC', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans', fontWeight: '600', fontSize: 15, color: '#111827', whiteSpace: 'nowrap' }}>{t('common.select')}</button>
                   </>
