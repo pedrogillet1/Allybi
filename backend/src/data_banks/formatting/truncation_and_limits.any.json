@@ -35,45 +35,45 @@
   "profileBudgets": {
     "_comment": "Character and element budgets by profile. Used by answer composer.",
     "micro": {
-      "maxChars": 120,
+      "maxChars": 260,
       "maxParagraphs": 1,
       "maxSentences": 1,
-      "maxBullets": 0,
+      "maxBullets": 4,
       "maxTableRows": 0
     },
     "brief": {
-      "maxChars": 300,
+      "maxChars": 520,
       "maxParagraphs": 2,
       "maxSentences": 3,
-      "maxBullets": 3,
+      "maxBullets": 5,
       "maxTableRows": 5
     },
     "concise": {
-      "maxChars": 600,
+      "maxChars": 850,
       "maxParagraphs": 3,
       "maxSentences": 6,
-      "maxBullets": 5,
+      "maxBullets": 7,
       "maxTableRows": 10
     },
     "standard": {
-      "maxChars": 2400,
-      "maxParagraphs": 7,
+      "maxChars": 4000,
+      "maxParagraphs": 6,
       "maxSentences": 20,
-      "maxBullets": 7,
+      "maxBullets": 10,
       "maxTableRows": 15
     },
     "detailed": {
-      "maxChars": 4000,
-      "maxParagraphs": 10,
+      "maxChars": 6000,
+      "maxParagraphs": 8,
       "maxSentences": 30,
-      "maxBullets": 10,
+      "maxBullets": 12,
       "maxTableRows": 20
     },
     "deep": {
-      "maxChars": 6000,
-      "maxParagraphs": 12,
+      "maxChars": 8000,
+      "maxParagraphs": 10,
       "maxSentences": 40,
-      "maxBullets": 12,
+      "maxBullets": 14,
       "maxTableRows": 25
     }
   },
@@ -260,9 +260,9 @@
         "expect": { "outputCharsMax": 90 }
       },
       {
-        "id": "TRUNC_002_profile_standard_1200",
+        "id": "TRUNC_002_profile_standard_4000",
         "context": { "profile": "standard" },
-        "expect": { "maxChars": 2400, "maxBullets": 7 }
+        "expect": { "maxChars": 4000, "maxBullets": 10 }
       },
       {
         "id": "TRUNC_003_table_row_limit",
