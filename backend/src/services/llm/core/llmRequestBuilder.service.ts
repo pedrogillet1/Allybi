@@ -1,5 +1,4 @@
 // src/services/llm/core/llmRequestBuilder.service.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createHash } from "crypto";
 
 /**
@@ -42,11 +41,12 @@ import type {
 import { BRAND_NAME } from "../../../config/brand";
 import { resolveOutputTokenBudget } from "../../core/enforcement/tokenBudget.service";
 import { ReasoningPolicyService } from "../../core/policy/reasoningPolicy.service";
+import { getOptionalBank } from "../../core/banks/bankLoader.service";
 
 export type LangCode = "any" | "en" | "pt" | "es";
 
 export interface BankLoader {
-  getBank<T = any>(bankId: string): T;
+  getBank<T = unknown>(bankId: string): T;
 }
 
 /**
@@ -61,7 +61,7 @@ export interface PromptRegistryService {
       | "disambiguation"
       | "fallback"
       | "tool",
-    ctx: any,
+    ctx: Record<string, unknown>,
   ): {
     id?: string;
     messages: Array<{ role: "system" | "developer" | "user"; content: string }>;
@@ -185,10 +185,257 @@ export interface BuildRequestInput {
   memoryPack?: MemoryPackLike | null;
 
   // Optional: tool request context (file actions)
-  toolContext?: { toolName: string; toolArgs?: any } | null;
+  toolContext?: { toolName: string; toolArgs?: Record<string, unknown> } | null;
 
   // Optional overrides
   options?: Partial<LlmGenerationOptions>;
+}
+
+type BuilderPayloadStats = {
+  memoryCharsIncluded: number;
+  evidenceCharsIncluded: number;
+  evidenceItemsIncluded: number;
+  disambiguationOptionsIncluded: number;
+  toolContextCharsIncluded: number;
+  answerDepthCharsIncluded: number;
+  languageConstraintCharsIncluded: number;
+  userSectionCharsIncluded: number;
+  totalUserPayloadChars: number;
+  estimatedUserPayloadTokens: number;
+};
+
+type EvidenceRenderResult = {
+  text: string;
+  charsIncluded: number;
+  itemsIncluded: number;
+};
+
+type BuilderEvidenceCaps = {
+  maxItems: number;
+  maxSnippetChars: number;
+  maxSectionChars: number;
+};
+
+type BuilderPayloadCaps = {
+  memoryCharsDefault: number;
+  memoryCharsDocGrounded: number;
+  userSectionCharsMax: number;
+  toolContextCharsMax: number;
+  totalUserPayloadCharsMax: number;
+};
+
+type BuilderRuntimePolicy = {
+  docGroundedMinOutputTokensByMode: Record<string, number>;
+  styleClampModes: string[];
+  payloadCaps: BuilderPayloadCaps;
+  evidenceCapsByMode: Record<string, BuilderEvidenceCaps>;
+};
+
+const DEFAULT_BUILDER_POLICY: BuilderRuntimePolicy = {
+  docGroundedMinOutputTokensByMode: {
+    doc_grounded_single: 900,
+    doc_grounded_multi: 900,
+    doc_grounded_quote: 700,
+    doc_grounded_table: 1000,
+  },
+  styleClampModes: ["rank_disambiguate", "scoped_not_found", "refusal"],
+  payloadCaps: {
+    memoryCharsDefault: 4800,
+    memoryCharsDocGrounded: 6800,
+    userSectionCharsMax: 4200,
+    toolContextCharsMax: 1400,
+    totalUserPayloadCharsMax: 18000,
+  },
+  evidenceCapsByMode: {
+    doc_grounded_single: {
+      maxItems: 6,
+      maxSnippetChars: 220,
+      maxSectionChars: 2600,
+    },
+    doc_grounded_multi: {
+      maxItems: 10,
+      maxSnippetChars: 280,
+      maxSectionChars: 3800,
+    },
+    doc_grounded_quote: {
+      maxItems: 6,
+      maxSnippetChars: 240,
+      maxSectionChars: 2600,
+    },
+    doc_grounded_table: {
+      maxItems: 8,
+      maxSnippetChars: 260,
+      maxSectionChars: 3200,
+    },
+  },
+};
+
+let builderPolicyCache: BuilderRuntimePolicy | null | undefined;
+
+function asPositiveInt(
+  value: unknown,
+  fallback: number,
+  min = 1,
+  max = 100000,
+): number {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.floor(n)));
+}
+
+function toNormalizedModeKey(value: unknown): string {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function normalizeStyleClampModes(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [...DEFAULT_BUILDER_POLICY.styleClampModes];
+  const normalized = raw
+    .map((entry) => toNormalizedModeKey(entry))
+    .filter((entry) => entry.length > 0);
+  return normalized.length > 0
+    ? Array.from(new Set(normalized))
+    : [...DEFAULT_BUILDER_POLICY.styleClampModes];
+}
+
+function normalizeDocFloors(raw: unknown): Record<string, number> {
+  const out: Record<string, number> = {
+    ...DEFAULT_BUILDER_POLICY.docGroundedMinOutputTokensByMode,
+  };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  for (const [mode, value] of Object.entries(raw as Record<string, unknown>)) {
+    const key = toNormalizedModeKey(mode);
+    if (!key) continue;
+    out[key] = asPositiveInt(value, out[key] ?? 1600, 128, 16000);
+  }
+  return out;
+}
+
+function normalizePayloadCaps(raw: unknown): BuilderPayloadCaps {
+  const defaults = DEFAULT_BUILDER_POLICY.payloadCaps;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { ...defaults };
+  const src = raw as Record<string, unknown>;
+  return {
+    memoryCharsDefault: asPositiveInt(
+      src.memoryCharsDefault,
+      defaults.memoryCharsDefault,
+      256,
+      60000,
+    ),
+    memoryCharsDocGrounded: asPositiveInt(
+      src.memoryCharsDocGrounded,
+      defaults.memoryCharsDocGrounded,
+      256,
+      60000,
+    ),
+    userSectionCharsMax: asPositiveInt(
+      src.userSectionCharsMax,
+      defaults.userSectionCharsMax,
+      128,
+      20000,
+    ),
+    toolContextCharsMax: asPositiveInt(
+      src.toolContextCharsMax,
+      defaults.toolContextCharsMax,
+      64,
+      20000,
+    ),
+    totalUserPayloadCharsMax: asPositiveInt(
+      src.totalUserPayloadCharsMax,
+      defaults.totalUserPayloadCharsMax,
+      512,
+      100000,
+    ),
+  };
+}
+
+function normalizeEvidenceCapEntry(
+  raw: unknown,
+  fallback: BuilderEvidenceCaps,
+): BuilderEvidenceCaps {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { ...fallback };
+  const src = raw as Record<string, unknown>;
+  return {
+    maxItems: asPositiveInt(src.maxItems, fallback.maxItems, 1, 50),
+    maxSnippetChars: asPositiveInt(
+      src.maxSnippetChars,
+      fallback.maxSnippetChars,
+      40,
+      5000,
+    ),
+    maxSectionChars: asPositiveInt(
+      src.maxSectionChars,
+      fallback.maxSectionChars,
+      200,
+      100000,
+    ),
+  };
+}
+
+function normalizeEvidenceCapsByMode(
+  raw: unknown,
+): Record<string, BuilderEvidenceCaps> {
+  const out: Record<string, BuilderEvidenceCaps> = Object.fromEntries(
+    Object.entries(DEFAULT_BUILDER_POLICY.evidenceCapsByMode).map(([mode, caps]) => [
+      mode,
+      { ...caps },
+    ]),
+  );
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
+  for (const [mode, entry] of Object.entries(raw as Record<string, unknown>)) {
+    const key = toNormalizedModeKey(mode);
+    if (!key) continue;
+    const fallback = out[key] || {
+      maxItems: 8,
+      maxSnippetChars: 260,
+      maxSectionChars: 3400,
+    };
+    out[key] = normalizeEvidenceCapEntry(entry, fallback);
+  }
+  return out;
+}
+
+function readBuilderPolicyFromBank(): BuilderRuntimePolicy {
+  const bank = getOptionalBank<Record<string, unknown>>("llm_builder_policy");
+  if (!bank || typeof bank !== "object") {
+    return {
+      ...DEFAULT_BUILDER_POLICY,
+      payloadCaps: { ...DEFAULT_BUILDER_POLICY.payloadCaps },
+      evidenceCapsByMode: normalizeEvidenceCapsByMode(null),
+      docGroundedMinOutputTokensByMode: {
+        ...DEFAULT_BUILDER_POLICY.docGroundedMinOutputTokensByMode,
+      },
+      styleClampModes: [...DEFAULT_BUILDER_POLICY.styleClampModes],
+    };
+  }
+
+  const source =
+    bank.config && typeof bank.config === "object"
+      ? (bank.config as Record<string, unknown>)
+      : (bank as Record<string, unknown>);
+  return {
+    docGroundedMinOutputTokensByMode: normalizeDocFloors(
+      source.docGroundedMinOutputTokensByMode,
+    ),
+    styleClampModes: normalizeStyleClampModes(source.styleClampModes),
+    payloadCaps: normalizePayloadCaps(source.payloadCaps),
+    evidenceCapsByMode: normalizeEvidenceCapsByMode(source.evidenceCapsByMode),
+  };
+}
+
+function getBuilderRuntimePolicy(): BuilderRuntimePolicy {
+  if (builderPolicyCache !== undefined && builderPolicyCache !== null) {
+    return builderPolicyCache;
+  }
+  const policy = readBuilderPolicyFromBank();
+  builderPolicyCache = policy;
+  return policy;
+}
+
+function estimateTokensFromChars(chars: number): number {
+  if (!Number.isFinite(chars) || chars <= 0) return 0;
+  return Math.max(1, Math.ceil(chars / 4));
 }
 
 export class LlmRequestBuilderService {
@@ -238,9 +485,15 @@ export class LlmRequestBuilderService {
       messages.push({ role: m.role, content: m.content });
     }
 
+    const builderPolicy = getBuilderRuntimePolicy();
+    const userPayload = this.buildUserPayload(
+      input,
+      disambiguationSignal,
+      builderPolicy,
+    );
     messages.push({
       role: "user",
-      content: this.buildUserPayload(input, disambiguationSignal),
+      content: userPayload.content,
     });
 
     const answerMode = input.signals.answerMode;
@@ -274,32 +527,54 @@ export class LlmRequestBuilderService {
     };
 
     const styleMaxCharsRaw = Number(input.signals.styleMaxChars);
-    const styleClampModes = new Set([
-      "nav_pills",
-      "rank_disambiguate",
-      "scoped_not_found",
-      "refusal",
-    ]);
+    const styleClampModes = new Set(builderPolicy.styleClampModes);
     if (
       Number.isFinite(styleMaxCharsRaw) &&
       styleMaxCharsRaw > 0 &&
       (userRequestedShort || styleClampModes.has(normalizedAnswerMode))
     ) {
-      const styleTokenCap = Math.max(64, Math.ceil(styleMaxCharsRaw / 4.5));
+      // PT/ES diacritics → fewer chars per token; use language-aware ratio
+      const cpt = (input.outputLanguage === "pt" || input.outputLanguage === "es") ? 3.5 : 4.0;
+      const styleTokenCap = Math.max(256, Math.ceil(styleMaxCharsRaw / cpt));
       options.maxOutputTokens = Math.min(
         options.maxOutputTokens ?? styleTokenCap,
         styleTokenCap,
       );
     }
 
-    if (normalizedAnswerMode.startsWith("doc_grounded") && !userRequestedShort) {
-      options.maxOutputTokens = Math.max(options.maxOutputTokens ?? 0, 1600);
+    const docGroundedFloor =
+      !userRequestedShort && normalizedAnswerMode.startsWith("doc_grounded")
+        ? builderPolicy.docGroundedMinOutputTokensByMode[normalizedAnswerMode]
+          ?? 1600
+        : null;
+    if (docGroundedFloor != null) {
+      options.maxOutputTokens = Math.max(
+        options.maxOutputTokens ?? docGroundedFloor,
+        docGroundedFloor,
+      );
+    }
+    // Latency guardrail: keep draft turns snappy, but do not aggressively cap
+    // final doc-grounded answers where completeness matters most.
+    const docGroundedLatencyCaps: Record<string, number> = {
+      doc_grounded_table: 900,
+      doc_grounded_multi: 850,
+      doc_grounded_single: 800,
+      doc_grounded_quote: 550,
+    };
+    const applyDocGroundedLatencyCap =
+      input.route.stage !== "final" || userRequestedShort;
+    const docGroundedLatencyCap = docGroundedLatencyCaps[normalizedAnswerMode];
+    if (applyDocGroundedLatencyCap && docGroundedLatencyCap) {
+      options.maxOutputTokens = Math.min(
+        options.maxOutputTokens ?? docGroundedLatencyCap,
+        docGroundedLatencyCap,
+      );
     }
 
     // Special case: nav_pills should be short and fast
     if (answerMode === "nav_pills") {
       options.temperature = 0.2;
-      options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 300, 220);
+      options.maxOutputTokens = Math.min(options.maxOutputTokens ?? 260, 260);
     }
 
     // Special case: disambiguation must be short
@@ -317,13 +592,28 @@ export class LlmRequestBuilderService {
       );
     }
 
+    const promptCharCount = messages.reduce(
+      (sum, msg) => sum + String(msg.content || "").length,
+      0,
+    );
+    const finalMaxOutputTokens = Number(options.maxOutputTokens ?? 0);
+    const resolvedTokenPolicy = {
+      answerMode: normalizedAnswerMode,
+      source: "tokenBudget+builder",
+      baseBudgetMaxOutputTokens: outputBudget.maxOutputTokens,
+      styleCapApplied:
+        Number.isFinite(styleMaxCharsRaw) &&
+        styleMaxCharsRaw > 0 &&
+        (userRequestedShort || styleClampModes.has(normalizedAnswerMode)),
+      docGroundedFloorApplied: docGroundedFloor != null,
+      docGroundedFloor,
+      finalMaxOutputTokens,
+    };
+
     return {
       route: input.route,
       messages,
       options,
-      correlationId: input.route?.constraints?.maxLatencyMs
-        ? undefined
-        : undefined,
       cacheKeyHint: this.cacheKeyHint(input, promptType),
       kodaMeta: {
         promptType,
@@ -335,6 +625,12 @@ export class LlmRequestBuilderService {
           ? [input.signals.fallback.reasonCode]
           : [],
         outputBudget,
+        resolvedTokenPolicy,
+        payloadStats: {
+          ...userPayload.stats,
+          promptCharCount,
+          estimatedPromptTokens: estimateTokensFromChars(promptCharCount),
+        },
         provenanceSchemaVersion: "v1",
         evidenceMap: this.buildEvidenceMapMetadata(input.evidencePack),
       },
@@ -454,6 +750,9 @@ export class LlmRequestBuilderService {
     return {
       env: input.env,
       outputLanguage: input.outputLanguage,
+      maxQuestions,
+      maxOptions: disambiguationSignal?.maxOptions ?? 4,
+      disallowJsonOutput: input.signals.disallowJsonOutput !== false,
 
       answerMode: input.signals.answerMode,
       intentFamily: input.signals.intentFamily,
@@ -564,12 +863,38 @@ export class LlmRequestBuilderService {
   private buildUserPayload(
     input: BuildRequestInput,
     disambiguationSignal: DisambiguationPayload | null,
-  ): string {
+    policy: BuilderRuntimePolicy,
+  ): { content: string; stats: BuilderPayloadStats } {
     const parts: string[] = [];
+    const stats: BuilderPayloadStats = {
+      memoryCharsIncluded: 0,
+      evidenceCharsIncluded: 0,
+      evidenceItemsIncluded: 0,
+      disambiguationOptionsIncluded: 0,
+      toolContextCharsIncluded: 0,
+      answerDepthCharsIncluded: 0,
+      languageConstraintCharsIncluded: 0,
+      userSectionCharsIncluded: 0,
+      totalUserPayloadChars: 0,
+      estimatedUserPayloadTokens: 0,
+    };
+
+    const answerMode = String(input.signals.answerMode || "")
+      .trim()
+      .toLowerCase();
+    const memoryCharCap = answerMode.startsWith("doc_grounded")
+      ? policy.payloadCaps.memoryCharsDocGrounded
+      : policy.payloadCaps.memoryCharsDefault;
 
     // Memory context (bounded, already packed)
     if (input.memoryPack?.contextText) {
-      parts.push(input.memoryPack.contextText.trim());
+      const memoryBlock = String(input.memoryPack.contextText || "")
+        .trim()
+        .slice(0, memoryCharCap);
+      if (memoryBlock) {
+        parts.push(memoryBlock);
+        stats.memoryCharsIncluded = memoryBlock.length;
+      }
     }
 
     // Evidence context: compact “Evidence” section (do not dump everything)
@@ -578,12 +903,15 @@ export class LlmRequestBuilderService {
       Array.isArray(input.evidencePack.evidence) &&
       input.evidencePack.evidence.length
     ) {
-      parts.push(
-        this.renderEvidenceForPrompt(input.evidencePack, {
-          isExtractionQuery: input.signals.isExtractionQuery,
-          answerMode: input.signals.answerMode,
-        }),
-      );
+      const evidenceBlock = this.renderEvidenceForPrompt(input.evidencePack, {
+        isExtractionQuery: input.signals.isExtractionQuery,
+        answerMode: input.signals.answerMode,
+      }, policy);
+      if (evidenceBlock.text) {
+        parts.push(evidenceBlock.text);
+        stats.evidenceCharsIncluded = evidenceBlock.charsIncluded;
+        stats.evidenceItemsIncluded = evidenceBlock.itemsIncluded;
+      }
     }
 
     // Disambiguation options (if active) — keep minimal; prompt handles rendering policy
@@ -592,51 +920,108 @@ export class LlmRequestBuilderService {
         0,
         disambiguationSignal.maxOptions,
       );
-      parts.push(
-        ["### Options", ...opts.map((o, i) => `- (${i + 1}) ${o.label}`)].join(
-          "\n",
-        ),
-      );
+      const optionsBlock = [
+        "### Options",
+        ...opts.map((o, i) => `- (${i + 1}) ${o.label}`),
+      ].join("\n");
+      parts.push(optionsBlock);
+      stats.disambiguationOptionsIncluded = opts.length;
     }
 
     // Tool context (file actions)
     if (input.toolContext) {
-      parts.push(
-        [
-          "### Tool Context",
-          `toolName: ${input.toolContext.toolName}`,
-          input.toolContext.toolArgs
-            ? `toolArgs: ${JSON.stringify(input.toolContext.toolArgs)}`
-            : "",
-        ]
-          .filter(Boolean)
-          .join("\n"),
-      );
+      const toolContextText = [
+        "### Tool Context",
+        `toolName: ${input.toolContext.toolName}`,
+        input.toolContext.toolArgs
+          ? `toolArgs: ${JSON.stringify(input.toolContext.toolArgs)}`
+          : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+        .slice(0, policy.payloadCaps.toolContextCharsMax);
+      parts.push(toolContextText);
+      stats.toolContextCharsIncluded = toolContextText.length;
+    }
+
+    // Answer depth guidance for doc-grounded modes — override the system-level
+    // style hints with mode-specific guidance while staying compatible with
+    // global table/body constraints from prompt banks.
+    const am = input.signals.answerMode ?? "";
+    if (am.startsWith("doc_grounded")) {
+      const isTable = am === "doc_grounded_table";
+      const answerDepthBlock =
+        isTable
+          ? `### Answer Depth\nProvide a compact, evidence-grounded table that answers the user's exact request. Prefer key rows first; if the full result is long, summarize the remainder clearly. After the table, add a brief interpretation (1-2 sentences).`
+          : `### Answer Depth\nProvide a complete answer to the specific question using relevant evidence. Include key facts, numbers, and short structured bullets when helpful. Keep the response focused and avoid generic overviews.`;
+      parts.push(answerDepthBlock);
+      stats.answerDepthCharsIncluded = answerDepthBlock.length;
+    }
+
+    // Language constraint: ensure the LLM responds in the correct language
+    const lang = input.outputLanguage;
+    if (lang && lang !== "any") {
+      const langLabel =
+        lang === "en" ? "English" : lang === "pt" ? "Portuguese" : lang === "es" ? "Spanish" : lang;
+      const languageConstraintBlock = `### Language Constraint\nYou MUST respond entirely in ${langLabel}. This is a binding requirement, not a suggestion.`;
+      parts.push(languageConstraintBlock);
+      stats.languageConstraintCharsIncluded = languageConstraintBlock.length;
     }
 
     // Finally the user message
-    parts.push(`### User\n${input.userText.trim()}`);
+    const userSection = `### User\n${input.userText.trim()}`.slice(
+      0,
+      policy.payloadCaps.userSectionCharsMax,
+    );
+    parts.push(userSection);
+    stats.userSectionCharsIncluded = userSection.length;
 
-    return parts.join("\n\n").trim();
+    const content = parts
+      .join("\n\n")
+      .trim()
+      .slice(0, policy.payloadCaps.totalUserPayloadCharsMax);
+    stats.totalUserPayloadChars = content.length;
+    stats.estimatedUserPayloadTokens = estimateTokensFromChars(content.length);
+    return { content, stats };
   }
 
   private renderEvidenceForPrompt(
     pack: EvidencePackLike,
     opts?: { isExtractionQuery?: boolean; answerMode?: string },
-  ): string {
-    // Dynamic evidence budget: extraction + multi-doc queries get more items + longer snippets
-    const isMultiDoc = opts?.answerMode === "doc_grounded_multi";
-    const wideContext = isMultiDoc || opts?.isExtractionQuery;
-    const maxItems = wideContext ? 16 : 8;
-    const maxSnippetChars = wideContext ? 520 : 260;
+    policy?: BuilderRuntimePolicy,
+  ): EvidenceRenderResult {
+    const activePolicy = policy || getBuilderRuntimePolicy();
+    const answerMode = String(opts?.answerMode || "")
+      .trim()
+      .toLowerCase();
+    const modeLimits = activePolicy.evidenceCapsByMode[answerMode] || {
+      maxItems: 8,
+      maxSnippetChars: 260,
+      maxSectionChars: 3400,
+    };
+    const extractionBoost = opts?.isExtractionQuery
+      ? { maxItems: 12, maxSnippetChars: 420, maxSectionChars: 5200 }
+      : null;
+    const maxItems = extractionBoost
+      ? Math.max(modeLimits.maxItems, extractionBoost.maxItems)
+      : modeLimits.maxItems;
+    const maxSnippetChars = extractionBoost
+      ? Math.max(modeLimits.maxSnippetChars, extractionBoost.maxSnippetChars)
+      : modeLimits.maxSnippetChars;
+    const maxSectionChars = extractionBoost
+      ? Math.max(modeLimits.maxSectionChars, extractionBoost.maxSectionChars)
+      : modeLimits.maxSectionChars;
 
     const top = pack.evidence.slice(0, maxItems);
 
     const lines: string[] = [];
-    const header = isMultiDoc
+    const header =
+      answerMode === "doc_grounded_multi"
       ? "### Evidence (use only this — synthesize information from all relevant documents below)"
       : "### Evidence (use only this — answer the specific question, not a generic overview)";
     lines.push(header);
+    let sectionChars = header.length;
+    let itemsIncluded = 0;
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const loc =
@@ -660,12 +1045,21 @@ export class LlmRequestBuilderService {
           ? snippet.slice(0, maxSnippetChars - 1) + "…"
           : snippet;
 
-      lines.push(
-        `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`,
-      );
+      const line = `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`;
+      if (sectionChars + line.length + 1 > maxSectionChars) {
+        break;
+      }
+      lines.push(line);
+      sectionChars += line.length + 1;
+      itemsIncluded += 1;
     }
 
-    return lines.join("\n");
+    const text = lines.join("\n");
+    return {
+      text,
+      charsIncluded: text.length,
+      itemsIncluded,
+    };
   }
 
   private buildEvidenceMapMetadata(
