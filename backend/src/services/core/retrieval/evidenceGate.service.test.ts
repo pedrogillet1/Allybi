@@ -84,4 +84,39 @@ describe("EvidenceGateService", () => {
     expect(result.evidenceStrength).toBe("none");
     expect(result.suggestedAction).toBe("apologize");
   });
+
+  test("returns none/apologize when chunks exist but topic overlap is negligible", () => {
+    const service = new EvidenceGateService();
+    const result = service.checkEvidence(
+      "what are the financial projections for Q3",
+      [
+        { text: "Employee handbook section 4.2 covers dress code policies.", metadata: {} },
+        { text: "Please submit PTO requests two weeks in advance.", metadata: {} },
+      ],
+      "en",
+    );
+    expect(result.evidenceStrength).toBe("none");
+    expect(result.suggestedAction).toBe("apologize");
+  });
+
+  test("returns weak (not none) when overlap is between 0.10 and 0.20", () => {
+    const service = new EvidenceGateService();
+    const result = service.checkEvidence(
+      "summarize the report findings",
+      [{ text: "The report header shows the company logo and title page.", metadata: {} }],
+      "en",
+    );
+    expect(result.evidenceStrength).toBe("weak");
+  });
+
+  test("returns weak when overlap is low but rich content exists", () => {
+    const service = new EvidenceGateService();
+    const longText = Array(260).fill("word").join(" ");
+    const result = service.checkEvidence(
+      "what are the financial projections",
+      [{ text: longText, metadata: {} }],
+      "en",
+    );
+    expect(["weak", "moderate", "strong"]).toContain(result.evidenceStrength);
+  });
 });

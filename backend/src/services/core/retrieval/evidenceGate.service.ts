@@ -219,6 +219,7 @@ export class EvidenceGateService {
       foundEvidence,
       chunks.length,
       topicOverlap,
+      isNarrativeRisk,
     );
 
     const result = this.determineAction(
@@ -423,6 +424,7 @@ export class EvidenceGateService {
     found: string[],
     chunkCount: number,
     topicOverlap: number,
+    isNarrativeRisk = false,
   ): "strong" | "moderate" | "weak" | "none" {
     // No chunks at all → no evidence
     if (chunkCount === 0) return "none";
@@ -439,7 +441,12 @@ export class EvidenceGateService {
       if (topicOverlap >= 0.6 && hasRichContent) return "strong";
       if (topicOverlap >= 0.4 && hasRichContent) return "moderate";
       if (topicOverlap >= 0.2) return "weak";
-      // Low topic overlap but chunks exist — hedge instead of blocking
+      // Negligible overlap (<0.10) with no rich content → chunks are irrelevant.
+      // Return "none" so the LLM apologizes instead of hedging on unrelated evidence.
+      // Exception: narrative-risk queries (e.g. "visão geral") are deliberately vague —
+      // low keyword overlap is expected, so we hedge instead of refusing.
+      if (topicOverlap < 0.10 && !hasRichContent && !isNarrativeRisk) return "none";
+      // Low overlap (0.10..0.20) or narrative-risk: hedge.
       return "weak";
     }
 
