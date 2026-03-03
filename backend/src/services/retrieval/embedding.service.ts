@@ -109,7 +109,7 @@ export class EmbeddingsService {
     this.openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
 
     this.cfg = {
-      model: process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small",
+      model: process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-large",
       dimensions: Number(process.env.OPENAI_EMBEDDING_DIMENSIONS || 1536),
 
       // Keep conservative defaults; raise via env if you want
