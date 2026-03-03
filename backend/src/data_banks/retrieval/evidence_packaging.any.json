@@ -178,7 +178,7 @@
           {
             "path": "metrics.chunkRelevance",
             "op": "lt",
-            "value": 0.55
+            "value": 0.20
           }
         ]
       },

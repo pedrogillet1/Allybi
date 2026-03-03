@@ -22,6 +22,7 @@
         "hardBlockThreshold": 0.85,
         "softPenaltyThreshold": 0.35,
         "minChunkRelevance": 0.55,
+        "minRelevanceScore": 0.55,
         "minDocRelevance": 0.5,
         "maxCrossDocWhenSingleDocIntent": 1
       },
