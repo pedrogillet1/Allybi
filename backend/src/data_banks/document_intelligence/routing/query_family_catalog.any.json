@@ -1,0 +1,337 @@
+{
+  "_meta": {
+    "id": "query_family_catalog",
+    "version": "2.1.0",
+    "description": "Query-family catalog and machine-actionable family routing rules for document-intelligence queries.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultFamily": "document_retrieval",
+    "fallbackFamily": "document_retrieval",
+    "maxFamiliesPerQuery": 3,
+    "useContextSignals": true
+  },
+  "families": [
+    {
+      "id": "family_document_identity",
+      "name": "document_identity",
+      "canonicalIntents": [
+        "identify_doc_type",
+        "resolve_doc_alias",
+        "resolve_doc_type"
+      ],
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday",
+        "all"
+      ],
+      "docTypeHints": [
+        "invoice",
+        "receipt",
+        "bank_statement",
+        "tax_return",
+        "lab_result",
+        "contract",
+        "agreement",
+        "statement",
+        "report",
+        "pay_stub"
+      ],
+      "signals": {
+        "required": [
+          "document",
+          "doc",
+          "arquivo",
+          "file"
+        ],
+        "disambiguators": [
+          "receipt",
+          "invoice",
+          "contract",
+          "statement",
+          "lab",
+          "report",
+          "spreadsheet"
+        ]
+      },
+      "aliases": {
+        "en": [
+          "what kind of doc",
+          "document type",
+          "which type",
+          "identify doc"
+        ],
+        "pt": [
+          "que tipo de documento",
+          "qual tipo de documento",
+          "arquivo",
+          "identifique documento"
+        ]
+      }
+    },
+    {
+      "id": "family_document_lookup",
+      "name": "document_retrieval",
+      "canonicalIntents": [
+        "find_doc",
+        "locate_doc",
+        "list_docs",
+        "where_is"
+      ],
+      "domains": [
+        "all"
+      ],
+      "docTypeHints": [
+        "any"
+      ],
+      "signals": {
+        "required": [
+          "file",
+          "document",
+          "onde",
+          "find",
+          "search"
+        ],
+        "disambiguators": [
+          "contains",
+          "mentions",
+          "talks about",
+          "mostra",
+          "list"
+        ]
+      }
+    },
+    {
+      "id": "family_content_extraction",
+      "name": "content_extraction",
+      "canonicalIntents": [
+        "extract",
+        "summarize",
+        "locate_content",
+        "quote"
+      ],
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "docTypeHints": [
+        "invoice",
+        "spreadsheet",
+        "contract",
+        "report",
+        "lab_report",
+        "statement"
+      ],
+      "signals": {
+        "required": [
+          "extract",
+          "sumarizar",
+          "resumo",
+          "quote",
+          "dizer"
+        ],
+        "disambiguators": [
+          "table",
+          "section",
+          "line",
+          "valor",
+          "montante",
+          "linha",
+          "seção"
+        ]
+      }
+    },
+    {
+      "id": "family_compute",
+      "name": "numeric_compute",
+      "canonicalIntents": [
+        "calculate",
+        "compare_numbers",
+        "variance",
+        "derive_delta"
+      ],
+      "domains": [
+        "finance",
+        "accounting",
+        "medical",
+        "everyday"
+      ],
+      "docTypeHints": [
+        "spreadsheet",
+        "invoice",
+        "statement",
+        "financial_report",
+        "receipt"
+      ],
+      "signals": {
+        "required": [
+          "total",
+          "%",
+          "sum",
+          "difference",
+          "quanto",
+          "média",
+          "media",
+          "ratio",
+          "valor"
+        ],
+        "disambiguators": [
+          "reconcile",
+          "variance",
+          "formula",
+          "bucket"
+        ]
+      }
+    },
+    {
+      "id": "family_compare",
+      "name": "cross_document_compare",
+      "canonicalIntents": [
+        "compare",
+        "versus",
+        "side_by_side",
+        "delta",
+        "trend"
+      ],
+      "domains": [
+        "finance",
+        "legal",
+        "medical",
+        "accounting",
+        "everyday"
+      ],
+      "docTypeHints": [
+        "any"
+      ],
+      "signals": {
+        "required": [
+          "compare",
+          "versus",
+          "against",
+          "between",
+          "difference",
+          "delta"
+        ],
+        "disambiguators": [
+          "multiple",
+          "all",
+          "every",
+          "across",
+          "across all",
+          "lado a lado"
+        ]
+      }
+    },
+    {
+      "id": "family_clarification",
+      "name": "clarification_request",
+      "canonicalIntents": [
+        "ask_for_clarification",
+        "missing_scope",
+        "disambiguate"
+      ],
+      "domains": [
+        "all"
+      ],
+      "docTypeHints": [
+        "any"
+      ],
+      "signals": {
+        "required": [
+          "which",
+          "clarify",
+          "unsure",
+          "what",
+          "qual"
+        ],
+        "disambiguators": [
+          "multiple",
+          "between",
+          "ambiguous",
+          "nao",
+          "precisa"
+        ]
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "QFC_001_high_confidence_identity",
+      "trigger": "query mentions explicit doc reference and document class clues",
+      "check": "context.explicitDocRef == true AND context.domainSignal.confidence > 0.65",
+      "failureAction": "ROUTE_TO_FAMILY_IDENTITY",
+      "severity": "high",
+      "targetFamily": "document_identity"
+    },
+    {
+      "id": "QFC_002_compute_pattern_routing",
+      "trigger": "query contains numeric operators or formula-like text",
+      "check": "query.hasNumericExpression == true OR query.textMatches('(calc|calculate|compute|ratio|total|sum|difference|average|%|percent|media|quanto)')",
+      "failureAction": "ROUTE_TO_FAMILY_COMPUTE",
+      "severity": "high",
+      "targetFamily": "numeric_compute"
+    },
+    {
+      "id": "QFC_003_compare_requires_two_docs_signal",
+      "trigger": "compare operator is present",
+      "check": "query.intent == 'compare' OR query.textMatches('\\b(versus|vs|vs\\.|vs\\\b|compare|against)\\b')",
+      "failureAction": "ROUTE_TO_FAMILY_COMPARE",
+      "severity": "high",
+      "targetFamily": "cross_document_compare"
+    },
+    {
+      "id": "QFC_004_lookup_when_no_scope_and_weak_type",
+      "trigger": "query has weak domain clues and broad retrieval terms",
+      "check": "context.domain == null AND context.explicitDocRef == null AND query.textMatches('\\b(find|list|locate|where is|encontre|listar|qual doc)\\b')",
+      "failureAction": "ROUTE_TO_FAMILY_LOOKUP",
+      "severity": "medium",
+      "targetFamily": "document_retrieval"
+    },
+    {
+      "id": "QFC_005_extract_or_quote_signal",
+      "trigger": "query asks for extraction, summary, or quote",
+      "check": "query.intent IN ['extract','summarize','locate_content','quote'] OR query.textMatches('(extract|sumar|resuma|quote|citar|resumo|what does it say)')",
+      "failureAction": "ROUTE_TO_FAMILY_EXTRACT",
+      "severity": "medium",
+      "targetFamily": "content_extraction"
+    },
+    {
+      "id": "QFC_006_everyday_fallback",
+      "trigger": "query has pronouns and lacks domain anchor",
+      "check": "context.domain == null AND query.ambiguitySignal > 0.45 AND context.explicitDocRef == false",
+      "failureAction": "ROUTE_TO_FAMILY_CLARIFICATION",
+      "severity": "medium",
+      "targetFamily": "clarification_request"
+    },
+    {
+      "id": "QFC_007_ambiguous_domain_requires_disambiguation",
+      "trigger": "multiple candidate families above confidence threshold",
+      "check": "context.familyCandidates.count >= 2 AND context.familyTopGap < 0.12",
+      "failureAction": "EMIT_TOP2_FAMILIES_FOR_CONFIRMATION",
+      "severity": "warning"
+    }
+  ],
+  "templates": [
+    {
+      "id": "QUERY_FAMILY_CATALOG_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in query_family_catalog.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

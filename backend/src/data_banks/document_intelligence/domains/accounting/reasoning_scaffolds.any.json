@@ -1,10 +1,10 @@
 {
   "_meta": {
-    "id": "di_accounting_reasoning_scaffolds",
-    "version": "1.0.0",
-    "description": "Reasoning scaffolds for accounting domain — structured thinking patterns for bookkeeping and audit analysis.",
+    "id": "di_accounting_reasoning_scaffolds_v2",
+    "version": "2.0.0",
+    "description": "Reasoning templates for accounting analysis including tie-out, control evaluation, and period-specific checks.",
     "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,81 +13,133 @@
   "domain": "accounting",
   "scaffolds": [
     {
-      "id": "acct_scaffold_001_reconciliation",
-      "name": "Bank Reconciliation Analysis",
+      "id": "acct_scaffold_001_trial_balance_tieout",
+      "name": "Trial Balance to Ledger Tie-Out",
+      "operators": ["validate", "compare", "extract"],
+      "steps": [
+        "Extract total debit and credit from the trial balance table section.",
+        "Check whether the same period ledger pages present control account totals.",
+        "For selected key accounts, fetch ledger opening and closing balance columns.",
+        "Recompute movement and confirm arithmetic to trial balance total movements.",
+        "Flag any variance by account with absolute/percent threshold.",
+        "Document source sections and tie-out status for each account.",
+        "Conclude whether TB is balanced and tieout is complete."
+      ]
+    },
+    {
+      "id": "acct_scaffold_002_bank_reconciliation",
+      "name": "Bank Reconciliation Tie-Out",
       "operators": ["validate", "compare"],
       "steps": [
-        "Identify the book balance (per GL) and the bank balance (per statement) with their dates",
-        "List all outstanding checks (issued but not yet cleared)",
-        "List all deposits in transit (recorded but not yet credited by bank)",
-        "Identify bank charges, interest, or errors not yet recorded in books",
-        "Compute adjusted book balance and adjusted bank balance",
-        "Verify the two adjusted balances agree; flag any remaining difference"
+        "Capture bank statement ending balance and reporting date.",
+        "Capture GL/cash account book balance and reporting date from heading/table context.",
+        "List deposit in transit and outstanding checks from reconciliation table.",
+        "Add/subtract reconciling bank charges, interest, fees, and errors.",
+        "Compute adjusted balances and compare equality; if mismatch, isolate residual.",
+        "Identify missing dates/sources for each reconciling item.",
+        "Classify status: clean, needs document, or unresolved."
       ]
     },
     {
-      "id": "acct_scaffold_002_trial_balance_review",
-      "name": "Trial Balance Review",
-      "operators": ["validate", "extract"],
-      "steps": [
-        "Verify total debits equal total credits",
-        "Identify unusual balances (credit balances in normally-debit accounts, or vice versa)",
-        "Flag accounts with zero balance that are expected to have activity",
-        "Check for large round-number entries that may indicate estimates or adjustments",
-        "Cross-reference key accounts (cash, AR, AP) against subsidiary ledgers",
-        "Note any suspense or clearing accounts with remaining balances"
-      ]
-    },
-    {
-      "id": "acct_scaffold_003_journal_entry_validation",
-      "name": "Journal Entry Validation",
+      "id": "acct_scaffold_003_journal_integrity",
+      "name": "Journal Entry Integrity Check",
       "operators": ["validate", "evaluate"],
       "steps": [
-        "Verify the entry balances (total debits = total credits)",
-        "Check that account codes are valid per chart of accounts",
-        "Verify the posting date falls within the correct period",
-        "Assess whether the entry has proper approval/authorization",
-        "Evaluate the business rationale for the entry",
-        "Flag if the entry is a reversal, adjustment, or standard recurring entry"
+        "Validate that each JE has both debit and credit side in supported conventions.",
+        "Check JE date is within period and cutoff (no future/post-period entries).",
+        "Verify account numbers are valid per COA context.",
+        "Verify authorization fields exist for manual or adjusting entries.",
+        "Compute net effect by account and evaluate unusual spikes.",
+        "Assess whether transaction is recurring, recurring reversal, or adjustment.",
+        "Link JE to source documents when table provides voucher/invoice references."
       ]
     },
     {
-      "id": "acct_scaffold_004_aging_analysis",
-      "name": "Aging Schedule Analysis",
-      "operators": ["monitor", "evaluate"],
+      "id": "acct_scaffold_004_subledger_tieout",
+      "name": "Subledger Tie-Out",
+      "operators": ["compare", "validate"],
       "steps": [
-        "Extract total balances by aging bucket (current, 1-30, 31-60, 61-90, 90+)",
-        "Calculate the percentage of balance in each bucket",
-        "Identify the top concentrations (largest individual balances in 90+ bucket)",
-        "Compare current aging to prior period aging for trend",
-        "Assess adequacy of allowance/provision based on aging mix",
-        "Flag any customer/vendor with sudden jump to delinquent status"
+        "Summarize AR or AP subledger totals by control account.",
+        "Identify key control account in GL for same period.",
+        "Compare movement and ending balances from both sources.",
+        "If mismatch, list missing, duplicate, or stale detail lines.",
+        "Check aging totals are equal to subledger total in corresponding report.",
+        "Output tie-out result and remediation actions."
       ]
     },
     {
-      "id": "acct_scaffold_005_controls_evaluation",
-      "name": "Internal Controls Evaluation",
+      "id": "acct_scaffold_005_accrual_cash_compare",
+      "name": "Competência x Caixa",
+      "operators": ["compare", "evaluate", "monitor"],
+      "steps": [
+        "Identify accrual-based and cash-based totals with clear heading/footnote cues.",
+        "Map revenue/expense recognition basis by source section.",
+        "Quantify periodic differences and classify temporary differences.",
+        "Link differences to reconciling or timing items table lines.",
+        "Summarize impact by account and period.",
+        "Flag major basis mismatches."
+      ]
+    },
+    {
+      "id": "acct_scaffold_006_control_risk",
+      "name": "Control Design Evaluation",
       "operators": ["evaluate", "validate"],
       "steps": [
-        "Identify the control objective (e.g., 'all disbursements are properly authorized')",
-        "Describe the control activity as documented",
-        "Assess whether the control is preventive or detective",
-        "Evaluate the evidence of control operation (signatures, system logs, reconciliations)",
-        "Identify any gaps or deficiencies in the control design",
-        "Rate the control as effective, partially effective, or ineffective"
+        "Extract control objective and walkthrough from narrative/workpaper table.",
+        "Assess control owner, frequency, and key controls evidence.",
+        "Check for compensating controls and preventive/detective mix.",
+        "Evaluate design and operational effectiveness with sample coverage.",
+        "Attach issue list with severity and impact.",
+        "Summarize residual risk and testing gaps."
       ]
     },
     {
-      "id": "acct_scaffold_006_account_analysis",
-      "name": "GL Account Activity Analysis",
-      "operators": ["extract", "calculate", "compare"],
+      "id": "acct_scaffold_007_fixed_asset_recon",
+      "name": "Fixed Asset Rollforward Validation",
+      "operators": ["calculate", "validate", "compare"],
       "steps": [
-        "Extract the opening balance for the period",
-        "List significant transactions (journal entries) affecting the account",
-        "Compute the running balance after each significant posting",
-        "Verify the closing balance matches the ending balance on the trial balance",
-        "Identify any unusual or large entries that warrant further investigation",
-        "Summarize net activity (total debits, total credits, net change)"
+        "Extract opening carrying amounts and movement columns.",
+        "Apply additions, disposals, transfers, depreciation for period.",
+        "Recompute closing amount and compare to book control account.",
+        "Cross-check depreciation method/rate by asset class.",
+        "Report any rollforward break and trace to source rows."
+      ]
+    },
+    {
+      "id": "acct_scaffold_008_aging_workflow",
+      "name": "Aging and Provision Workflow",
+      "operators": ["extract", "monitor", "evaluate"],
+      "steps": [
+        "Collect aging buckets and total for same report date.",
+        "Identify top balances in each delinquency bucket.",
+        "Cross-check prior period aging if available for trend analysis.",
+        "Compute expected allowance coverage and highlight variances.",
+        "Validate bucket totals reconcile to subledger total.",
+        "Conclude concentration and aging deterioration risks."
+      ]
+    },
+    {
+      "id": "acct_scaffold_009_pbc_completeness",
+      "name": "PBC and Request Completion Check",
+      "operators": ["evaluate", "validate", "summarize"],
+      "steps": [
+        "Classify PBC items by document type and required evidence field.",
+        "Check if each request has status, owner, receipt date and location.",
+        "Mark missing responses and classify as high-risk blockers.",
+        "Summarize completion heatmap by cycle."
+      ]
+    },
+    {
+      "id": "acct_scaffold_010_debit_credit_sign",
+      "name": "Debit/Credit Sign Convention",
+      "operators": ["validate", "extract", "compare"],
+      "steps": [
+        "Determine convention from column headings or explicit sign legend.",
+        "Verify DR/CR usage consistency across tables.",
+        "Compute one sample where DR/CR signs differ and reconcile manually.",
+        "Record whether convention is column-based or single signed amount.",
+        "Apply chosen convention to all derived computations.",
+        "Flag conflicting conventions before reporting numbers."
       ]
     }
   ]

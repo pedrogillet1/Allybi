@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -1513,5 +1519,47 @@
         "allowInferenceWhenLabeled": true
       }
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "ACC_DEC_001_compare_docs_required",
+      "trigger": "accounting compare request without second document",
+      "check": "context.domain=='accounting' && context.intent=='compare' && context.explicitDocs.count < 2",
+      "failureAction": "ASK_FOR_SECOND_DOC"
+    },
+    {
+      "id": "ACC_DEC_002_reconciliation_gap_required",
+      "trigger": "accounting query about reconciliation but gap not validated",
+      "check": "context.domain=='accounting' && context.queryNeedsReconciliation == true && context.reconciliationEvidenceMissing == true",
+      "failureAction": "ASK_FOR_RECONCILIATION_SUPPORT"
+    },
+    {
+      "id": "ACC_DEC_003_closed_period_gate",
+      "trigger": "accounting answer mixes open and closed periods",
+      "check": "context.domain=='accounting' && context.periodMismatch == true",
+      "failureAction": "ASK_FOR_PERIOD_MATCH"
+    },
+    {
+      "id": "ACC_DEC_004_currency_guard",
+      "trigger": "accounting numeric response with implicit currency conversion",
+      "check": "context.domain=='accounting' && output.currencyConverted == true && context.currencyConversionRequested == false",
+      "failureAction": "PRESERVE_SOURCE_CURRENCY"
+    },
+    {
+      "id": "ACC_DEC_005_evidence_threshold",
+      "trigger": "accounting recommendation with weak evidence only",
+      "check": "context.domain=='accounting' && output.confidence < 0.78",
+      "failureAction": "REJECT_LOW_CONFIDENCE_RECOMMENDATION"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ACC_DEC_SMOKE_001"
+      }
+    ]
+  }
 }

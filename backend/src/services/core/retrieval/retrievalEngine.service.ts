@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 // retrievalEngine.service.ts
 
 /**
@@ -19,7 +21,6 @@
  * indexes (embedding + lexical) to match your storage.
  */
 
-import crypto from "crypto";
 import { logger } from "../../../utils/logger";
 import {
   resolveDocScopeLockFromSignals,
@@ -45,6 +46,14 @@ import {
   type DocumentIntelligenceDomain,
 } from "../banks/documentIntelligenceBanks.service";
 import type { RetrievalPlan } from "./retrievalPlanParser.service";
+import { BankRuntimeCache } from "../cache/bankRuntimeCache.service";
+import {
+  clamp01,
+  isProductionEnv,
+  safeNumber,
+  sha256,
+  stableLocationKey,
+} from "./retrievalEngine.utils";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 type AnswerMode =
@@ -63,6 +72,19 @@ type AnswerMode =
 
 type CandidateType = "text" | "table" | "image";
 type CandidateSource = "semantic" | "lexical" | "structural";
+
+const queryRewriteCache = new BankRuntimeCache<{
+  variants: QueryVariant[];
+  ruleIds: string[];
+}>({
+  maxEntries: Number(process.env.BANK_REWRITE_CACHE_MAX || 1000),
+  ttlMs: Number(process.env.BANK_REWRITE_CACHE_TTL_MS || 5 * 60 * 1000),
+});
+
+const retrievalResultCache = new BankRuntimeCache<EvidencePack>({
+  maxEntries: Number(process.env.BANK_RETRIEVAL_CACHE_MAX || 800),
+  ttlMs: Number(process.env.BANK_RETRIEVAL_CACHE_TTL_MS || 5 * 60 * 1000),
+});
 
 export interface RetrievalRequest {
   query: string;
@@ -107,10 +129,13 @@ export interface RetrievalRequest {
 
     // Optional domain hint for document-intelligence retrieval banks.
     domainHint?: string | null;
+    queryFamily?: string | null;
     languageHint?: string | null;
     explicitDocTypes?: string[] | null;
     explicitDocIds?: string[] | null;
     explicitDocDomains?: string[] | null;
+    requiredBankIds?: string[] | null;
+    selectedBankVersionMap?: Record<string, string> | null;
 
     // Discovery mode can ignore doc lock for corpus search
     corpusSearchAllowed?: boolean;
@@ -471,40 +496,6 @@ export interface QueryNormalizer {
 /**
  * Utility: stable hash for dedupe keys.
  */
-function sha256(input: string): string {
-  return crypto.createHash("sha256").update(input, "utf8").digest("hex");
-}
-
-function clamp01(x: number): number {
-  if (Number.isNaN(x)) return 0;
-  return Math.max(0, Math.min(1, x));
-}
-
-function safeNumber(x: unknown, fallback = 0): number {
-  const n = Number(x);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function stableLocationKey(
-  docId: string,
-  loc: ChunkLocation,
-  fallbackId: string,
-): string {
-  const parts = [
-    `d:${docId}`,
-    loc.page != null ? `p:${loc.page}` : "",
-    loc.sheet ? `s:${loc.sheet}` : "",
-    loc.slide != null ? `sl:${loc.slide}` : "",
-    loc.sectionKey ? `sec:${loc.sectionKey}` : "",
-  ].filter(Boolean);
-  const base = parts.join("|");
-  return base.length ? base : `d:${docId}|c:${fallbackId}`;
-}
-
-function isProduction(env: EnvName): boolean {
-  return env === "production";
-}
-
 /**
  * Main Service
  */
@@ -543,16 +534,16 @@ export class RetrievalEngineService {
     }
 
     // 1) Load banks (single source of truth)
-    const semanticCfg = this.getRequiredBank<Record<string, unknown>>("semantic_search_config");
-    const rankerCfg = this.getRequiredBank<Record<string, unknown>>("retrieval_ranker_config");
+    const semanticCfg = this.getRequiredBank<any>("semantic_search_config");
+    const rankerCfg = this.getRequiredBank<any>("retrieval_ranker_config");
     const boostsKeyword = this.safeGetBank<Record<string, unknown>>("keyword_boost_rules");
     const boostsTitle = this.safeGetBank<Record<string, unknown>>("doc_title_boost_rules");
     const boostsType = this.safeGetBank<Record<string, unknown>>("doc_type_boost_rules");
     const boostsRecency = this.safeGetBank<Record<string, unknown>>("recency_boost_rules");
     const routingPriority = this.safeGetBank<Record<string, unknown>>("routing_priority");
-    const diversification = this.getRequiredBank<Record<string, unknown>>("diversification_rules");
-    const negatives = this.getRequiredBank<Record<string, unknown>>("retrieval_negatives");
-    const packaging = this.getRequiredBank<Record<string, unknown>>("evidence_packaging");
+    const diversification = this.getRequiredBank<any>("diversification_rules");
+    const negatives = this.getRequiredBank<any>("retrieval_negatives");
+    const packaging = this.getRequiredBank<any>("evidence_packaging");
     const crossDocGrounding =
       this.documentIntelligenceBanks.getCrossDocGroundingPolicy();
 
@@ -612,7 +603,7 @@ export class RetrievalEngineService {
     const ruleCtx: RuleMatchContext = {
       query: queryOriginal,
       normalizedQuery: queryNormalized,
-      intent: signals.intentFamily ?? null,
+      intent: signals.queryFamily ?? signals.intentFamily ?? null,
       operator: signals.operator ?? null,
       domain: domain || null,
       docLock: this.isDocLockActive(signals),
@@ -675,15 +666,66 @@ export class RetrievalEngineService {
       candidateDocIds: crossDocDecision.allowedCandidateDocIds,
     };
 
-    const domainBoostBank = domain
-      ? this.documentIntelligenceBanks.getRetrievalBoostRules(domain)
-      : null;
-    const domainRewriteBank = domain
-      ? this.documentIntelligenceBanks.getQueryRewriteRules(domain)
-      : null;
-    const sectionPriorityBank = domain
-      ? this.documentIntelligenceBanks.getSectionPriorityRules(domain)
-      : null;
+    const retrievalCacheEnabled =
+      process.env.BANK_MULTI_LEVEL_CACHE_ENABLED === "true";
+    const retrievalCacheModelVersion =
+      process.env.RETRIEVAL_MODEL_VERSION ||
+      process.env.OPENAI_MODEL ||
+      process.env.LLM_MODEL_ID ||
+      "unknown";
+    let retrievalCacheKey: string | null = null;
+    if (retrievalCacheEnabled) {
+      retrievalCacheKey = this.buildRetrievalCacheKey({
+        queryNormalized,
+        scopeDocIds: scope.candidateDocIds,
+        domain,
+        resolvedDocTypes,
+        resolvedDocDomains,
+        signals,
+        retrievalPlan: req.retrievalPlan || null,
+        overrides: req.overrides || null,
+        env: req.env,
+        modelVersion: retrievalCacheModelVersion,
+      });
+      const cachedPack = retrievalResultCache.get(retrievalCacheKey);
+      if (cachedPack) {
+        const clonedCached = this.cloneEvidencePack(cachedPack);
+        if (clonedCached.debug) {
+          const reasons = Array.isArray(clonedCached.debug.reasonCodes)
+            ? clonedCached.debug.reasonCodes
+            : [];
+          if (!reasons.includes("retrieval_cache_hit")) {
+            reasons.push("retrieval_cache_hit");
+          }
+          clonedCached.debug.reasonCodes = reasons;
+        }
+        return clonedCached;
+      }
+    }
+
+    const requiredBankSet =
+      Array.isArray(signals.requiredBankIds) &&
+      signals.requiredBankIds.length > 0
+        ? new Set(
+            signals.requiredBankIds
+              .map((id) => String(id || "").trim())
+              .filter(Boolean),
+          )
+        : null;
+    const includeBank = (bankId: string): boolean =>
+      !requiredBankSet || requiredBankSet.has(bankId);
+    const domainBoostBank =
+      domain && includeBank(`boost_rules_${domain}`)
+        ? this.documentIntelligenceBanks.getRetrievalBoostRules(domain)
+        : null;
+    const domainRewriteBank =
+      domain && includeBank(`query_rewrites_${domain}`)
+        ? this.documentIntelligenceBanks.getQueryRewriteRules(domain)
+        : null;
+    const sectionPriorityBank =
+      domain && includeBank(`section_priority_${domain}`)
+        ? this.documentIntelligenceBanks.getSectionPriorityRules(domain)
+        : null;
     const boostRules = Array.isArray(domainBoostBank?.rules)
       ? (domainBoostBank.rules as BoostRule[])
       : [];
@@ -739,17 +781,51 @@ export class RetrievalEngineService {
     const rewriteRules = Array.isArray(domainRewriteBank?.rules)
       ? (domainRewriteBank.rules as RewriteRule[])
       : [];
-    const domainRewriteVariants = applyQueryRewrites(
-      {
-        ...ruleCtx,
-        contextText: queryNormalized,
-        maxQueryVariants: safeNumber(
-          domainRewriteBank?.config?.maxRewriteTerms,
-          12,
+    const rewriteCacheEnabled =
+      process.env.BANK_MULTI_LEVEL_CACHE_ENABLED === "true";
+    const rewriteCacheKeyBase = crypto
+      .createHash("sha256")
+      .update(
+        JSON.stringify({
+          queryNormalized,
+          domain: domain || "unknown",
+          intentFamily: signals.queryFamily ?? signals.intentFamily ?? "any",
+          locale: this.resolveLanguageHint(signals),
+          rewriteRuleCount: rewriteRules.length,
+          bankVersion: signals.selectedBankVersionMap || null,
+        }),
+        "utf8",
+      )
+      .digest("hex");
+    const rewriteCacheKey = `rewrite:${rewriteCacheKeyBase}`;
+    const cachedRewrite = rewriteCacheEnabled
+      ? queryRewriteCache.get(rewriteCacheKey)
+      : null;
+    const domainRewriteVariants = cachedRewrite
+      ? cachedRewrite.variants
+      : applyQueryRewrites(
+          {
+            ...ruleCtx,
+            contextText: queryNormalized,
+            maxQueryVariants: safeNumber(
+              domainRewriteBank?.config?.maxRewriteTerms,
+              12,
+            ),
+          },
+          rewriteRules,
+        );
+    if (!cachedRewrite && rewriteCacheEnabled) {
+      queryRewriteCache.set(rewriteCacheKey, {
+        variants: domainRewriteVariants,
+        ruleIds: Array.from(
+          new Set(
+            domainRewriteVariants
+              .map((variant) => String(variant.sourceRuleId || "").trim())
+              .filter(Boolean),
+          ),
         ),
-      },
-      rewriteRules,
-    );
+      });
+    }
     const rewriteVariantCounts = new Map<string, number>();
     for (const variant of domainRewriteVariants) {
       const ruleId = String(variant.sourceRuleId || "").trim();
@@ -975,8 +1051,12 @@ export class RetrievalEngineService {
       }
     }
 
-    if (isProduction(req.env)) {
+    if (isProductionEnv(req.env)) {
       delete pack.debug;
+    }
+
+    if (retrievalCacheEnabled && retrievalCacheKey) {
+      retrievalResultCache.set(retrievalCacheKey, this.cloneEvidencePack(pack));
     }
 
     return pack;
@@ -3585,6 +3665,81 @@ export class RetrievalEngineService {
     };
   }
 
+  private buildRetrievalCacheKey(params: {
+    queryNormalized: string;
+    scopeDocIds: string[];
+    domain: DocumentIntelligenceDomain | null;
+    resolvedDocTypes: string[];
+    resolvedDocDomains: string[];
+    signals: RetrievalRequest["signals"];
+    retrievalPlan: Partial<RetrievalPlan> | null;
+    overrides: Partial<RetrievalOverrides> | null;
+    env: EnvName;
+    modelVersion: string;
+  }): string {
+    const payload = {
+      query: String(params.queryNormalized || "").trim(),
+      scopeDocIds: Array.from(
+        new Set(
+          (params.scopeDocIds || [])
+            .map((docId) => String(docId || "").trim())
+            .filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b)),
+      domain: params.domain || null,
+      resolvedDocTypes: Array.from(
+        new Set(
+          (params.resolvedDocTypes || [])
+            .map((value) => String(value || "").trim())
+            .filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b)),
+      resolvedDocDomains: Array.from(
+        new Set(
+          (params.resolvedDocDomains || [])
+            .map((value) => String(value || "").trim())
+            .filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b)),
+      signalShape: {
+        intentFamily: params.signals.intentFamily || null,
+        queryFamily: params.signals.queryFamily || null,
+        operator: params.signals.operator || null,
+        answerMode: params.signals.answerMode || null,
+        explicitDocLock: Boolean(params.signals.explicitDocLock),
+        explicitDocRef: Boolean(params.signals.explicitDocRef),
+        singleDocIntent: Boolean(params.signals.singleDocIntent),
+        allowExpansion: Boolean(params.signals.allowExpansion),
+        tableExpected: Boolean(params.signals.tableExpected),
+        userAskedForTable: Boolean(params.signals.userAskedForTable),
+        userAskedForQuote: Boolean(params.signals.userAskedForQuote),
+        languageHint: params.signals.languageHint || null,
+        requiredBankIds: Array.from(
+          new Set(
+            (params.signals.requiredBankIds || [])
+              .map((value) => String(value || "").trim())
+              .filter(Boolean),
+          ),
+        ).sort((a, b) => a.localeCompare(b)),
+        selectedBankVersionMap: params.signals.selectedBankVersionMap || null,
+      },
+      retrievalPlan: params.retrievalPlan || null,
+      overrides: params.overrides || null,
+      env: params.env,
+      modelVersion: String(params.modelVersion || "unknown"),
+      retrievalCacheVersion: "v1",
+    };
+
+    return `retrieval:${crypto
+      .createHash("sha256")
+      .update(JSON.stringify(payload), "utf8")
+      .digest("hex")}`;
+  }
+
+  private cloneEvidencePack(pack: EvidencePack): EvidencePack {
+    return JSON.parse(JSON.stringify(pack)) as EvidencePack;
+  }
+
   private emptyPack(
     req: RetrievalRequest,
     dbg: { reasonCodes: string[]; note?: string },
@@ -3615,7 +3770,7 @@ export class RetrievalEngineService {
       },
       evidence: [],
       telemetry,
-      debug: isProduction(req.env)
+      debug: isProductionEnv(req.env)
         ? undefined
         : { phases: [], reasonCodes: dbg.reasonCodes },
     };

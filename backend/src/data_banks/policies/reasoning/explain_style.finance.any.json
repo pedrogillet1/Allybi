@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -720,5 +726,47 @@
       "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
       "template": "Audiencia=auditor; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "FIN_EXPL_001_clear_unit_context",
+      "trigger": "finance explanation drops units",
+      "check": "context.domain=='finance' && output.containsNumericValues == true && output.unitCoverage < 1",
+      "failureAction": "APPEND_UNIT_CONTEXT"
+    },
+    {
+      "id": "FIN_EXPL_002_require_uncertainty",
+      "trigger": "finance response has high confidence without uncertainty",
+      "check": "context.domain=='finance' && output.confidence > 0.9 && output.uncertaintyState == 'none'",
+      "failureAction": "INSERT_UNCERTAINTY_LINE"
+    },
+    {
+      "id": "FIN_EXPL_003_compare_disclosure",
+      "trigger": "finance compare explanation lacks source distribution",
+      "check": "context.domain=='finance' && context.intent=='compare' && output.sourcesPerDoc < 2",
+      "failureAction": "REQUIRE_CROSS_DOC_BREAKDOWN"
+    },
+    {
+      "id": "FIN_EXPL_004_billing_terminology_gate",
+      "trigger": "finance explanation uses ambiguous billing term",
+      "check": "context.domain=='finance' && output.ambiguousTerms.includes('margin') == true && context.queryLanguage == 'consumer'",
+      "failureAction": "ADD_TERM_GLOSARY"
+    },
+    {
+      "id": "FIN_EXPL_005_period_context_guard",
+      "trigger": "finance explanation has no period context text",
+      "check": "context.domain=='finance' && context.queryNeedsTimeScope == true && output.periodContextMissing == true",
+      "failureAction": "REQUEST_PERIOD"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FIN_EXPL_SMOKE_001"
+      }
+    ]
+  }
 }

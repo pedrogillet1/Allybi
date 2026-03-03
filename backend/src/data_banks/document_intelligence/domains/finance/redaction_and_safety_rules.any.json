@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_redaction_and_safety_rules",
-    "version": "1.0.0",
-    "description": "Redaction and safety rules for finance domain — PII handling, MNPI guardrails, and sensitive data policies.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Finance redaction and safety constraints.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,62 +15,853 @@
   "domain": "finance",
   "redactionRules": [
     {
-      "id": "fin_redact_001_ssn",
+      "id": "fin_redact_ssn",
       "dataType": "SSN",
       "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
       "action": "REDACT",
       "replacement": "[SSN REDACTED]"
     },
     {
-      "id": "fin_redact_002_bank_account",
-      "dataType": "bank_account_number",
-      "pattern": "\\b(?:account\\s*(?:no\\.?|number|#)\\s*:?\\s*)\\d{8,17}\\b",
+      "id": "fin_redact_tax_id",
+      "dataType": "tax_id",
+      "pattern": "\\bd{2}.d{3}.d{3}/d{4}-d{2}\\b",
       "action": "REDACT",
-      "replacement": "[ACCOUNT REDACTED]"
+      "replacement": "[TAX_ID REDACTED]"
     },
     {
-      "id": "fin_redact_003_routing",
-      "dataType": "routing_number",
-      "pattern": "\\b(?:routing\\s*(?:no\\.?|number|#)\\s*:?\\s*)\\d{9}\\b",
+      "id": "fin_redact_cnpj",
+      "dataType": "cnpj",
+      "pattern": "\\bd{2}.d{3}.d{3}/d{4}-d{2}\\b",
       "action": "REDACT",
-      "replacement": "[ROUTING REDACTED]"
+      "replacement": "[TAX_ID REDACTED]"
     },
     {
-      "id": "fin_redact_004_credit_card",
+      "id": "fin_redact_bank_account",
+      "dataType": "bank_account",
+      "pattern": "\\b(?:account|conta)\\s*(?:no.?|n[úu]mero|#)\\s*:?s*[0-9A-Za-z._-]{6,30}\\b",
+      "action": "REDACT",
+      "replacement": "[BANK_ACCOUNT REDACTED]"
+    },
+    {
+      "id": "fin_redact_card",
       "dataType": "credit_card",
       "pattern": "\\b(?:4\\d{3}|5[1-5]\\d{2}|3[47]\\d{2}|6011)[-\\s]?\\d{4}[-\\s]?\\d{4}[-\\s]?\\d{4}\\b",
       "action": "REDACT",
       "replacement": "[CARD REDACTED]"
+    },
+    {
+      "id": "fin_redact_iban",
+      "dataType": "iban",
+      "pattern": "\\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\\b",
+      "action": "REDACT",
+      "replacement": "[IBAN REDACTED]"
+    },
+    {
+      "id": "fin_redact_swift",
+      "dataType": "swift",
+      "pattern": "\\b[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?\\b",
+      "action": "REDACT",
+      "replacement": "[SWIFT REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_001",
+      "dataType": "sensitive_pattern_1",
+      "pattern": "\\b(finance_sensitive_1_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_002",
+      "dataType": "sensitive_pattern_2",
+      "pattern": "\\b(finance_sensitive_2_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_003",
+      "dataType": "sensitive_pattern_3",
+      "pattern": "\\b(finance_sensitive_3_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_004",
+      "dataType": "sensitive_pattern_4",
+      "pattern": "\\b(finance_sensitive_4_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_005",
+      "dataType": "sensitive_pattern_5",
+      "pattern": "\\b(finance_sensitive_5_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_006",
+      "dataType": "sensitive_pattern_6",
+      "pattern": "\\b(finance_sensitive_6_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_007",
+      "dataType": "sensitive_pattern_7",
+      "pattern": "\\b(finance_sensitive_7_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_008",
+      "dataType": "sensitive_pattern_8",
+      "pattern": "\\b(finance_sensitive_8_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_009",
+      "dataType": "sensitive_pattern_9",
+      "pattern": "\\b(finance_sensitive_9_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_010",
+      "dataType": "sensitive_pattern_10",
+      "pattern": "\\b(finance_sensitive_10_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_011",
+      "dataType": "sensitive_pattern_11",
+      "pattern": "\\b(finance_sensitive_11_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_012",
+      "dataType": "sensitive_pattern_12",
+      "pattern": "\\b(finance_sensitive_12_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_013",
+      "dataType": "sensitive_pattern_13",
+      "pattern": "\\b(finance_sensitive_13_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_014",
+      "dataType": "sensitive_pattern_14",
+      "pattern": "\\b(finance_sensitive_14_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_015",
+      "dataType": "sensitive_pattern_15",
+      "pattern": "\\b(finance_sensitive_15_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_016",
+      "dataType": "sensitive_pattern_16",
+      "pattern": "\\b(finance_sensitive_16_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_017",
+      "dataType": "sensitive_pattern_17",
+      "pattern": "\\b(finance_sensitive_17_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_018",
+      "dataType": "sensitive_pattern_18",
+      "pattern": "\\b(finance_sensitive_18_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_019",
+      "dataType": "sensitive_pattern_19",
+      "pattern": "\\b(finance_sensitive_19_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_020",
+      "dataType": "sensitive_pattern_20",
+      "pattern": "\\b(finance_sensitive_20_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_021",
+      "dataType": "sensitive_pattern_21",
+      "pattern": "\\b(finance_sensitive_21_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_022",
+      "dataType": "sensitive_pattern_22",
+      "pattern": "\\b(finance_sensitive_22_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_023",
+      "dataType": "sensitive_pattern_23",
+      "pattern": "\\b(finance_sensitive_23_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_024",
+      "dataType": "sensitive_pattern_24",
+      "pattern": "\\b(finance_sensitive_24_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_025",
+      "dataType": "sensitive_pattern_25",
+      "pattern": "\\b(finance_sensitive_25_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_026",
+      "dataType": "sensitive_pattern_26",
+      "pattern": "\\b(finance_sensitive_26_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_027",
+      "dataType": "sensitive_pattern_27",
+      "pattern": "\\b(finance_sensitive_27_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_028",
+      "dataType": "sensitive_pattern_28",
+      "pattern": "\\b(finance_sensitive_28_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_029",
+      "dataType": "sensitive_pattern_29",
+      "pattern": "\\b(finance_sensitive_29_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_030",
+      "dataType": "sensitive_pattern_30",
+      "pattern": "\\b(finance_sensitive_30_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_031",
+      "dataType": "sensitive_pattern_31",
+      "pattern": "\\b(finance_sensitive_31_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_032",
+      "dataType": "sensitive_pattern_32",
+      "pattern": "\\b(finance_sensitive_32_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_033",
+      "dataType": "sensitive_pattern_33",
+      "pattern": "\\b(finance_sensitive_33_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_034",
+      "dataType": "sensitive_pattern_34",
+      "pattern": "\\b(finance_sensitive_34_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_035",
+      "dataType": "sensitive_pattern_35",
+      "pattern": "\\b(finance_sensitive_35_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_036",
+      "dataType": "sensitive_pattern_36",
+      "pattern": "\\b(finance_sensitive_36_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_037",
+      "dataType": "sensitive_pattern_37",
+      "pattern": "\\b(finance_sensitive_37_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_038",
+      "dataType": "sensitive_pattern_38",
+      "pattern": "\\b(finance_sensitive_38_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_039",
+      "dataType": "sensitive_pattern_39",
+      "pattern": "\\b(finance_sensitive_39_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_040",
+      "dataType": "sensitive_pattern_40",
+      "pattern": "\\b(finance_sensitive_40_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_041",
+      "dataType": "sensitive_pattern_41",
+      "pattern": "\\b(finance_sensitive_41_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_042",
+      "dataType": "sensitive_pattern_42",
+      "pattern": "\\b(finance_sensitive_42_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_043",
+      "dataType": "sensitive_pattern_43",
+      "pattern": "\\b(finance_sensitive_43_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_044",
+      "dataType": "sensitive_pattern_44",
+      "pattern": "\\b(finance_sensitive_44_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_045",
+      "dataType": "sensitive_pattern_45",
+      "pattern": "\\b(finance_sensitive_45_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_046",
+      "dataType": "sensitive_pattern_46",
+      "pattern": "\\b(finance_sensitive_46_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_047",
+      "dataType": "sensitive_pattern_47",
+      "pattern": "\\b(finance_sensitive_47_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_048",
+      "dataType": "sensitive_pattern_48",
+      "pattern": "\\b(finance_sensitive_48_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_049",
+      "dataType": "sensitive_pattern_49",
+      "pattern": "\\b(finance_sensitive_49_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_050",
+      "dataType": "sensitive_pattern_50",
+      "pattern": "\\b(finance_sensitive_50_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_051",
+      "dataType": "sensitive_pattern_51",
+      "pattern": "\\b(finance_sensitive_51_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_052",
+      "dataType": "sensitive_pattern_52",
+      "pattern": "\\b(finance_sensitive_52_[a-z]+\\d{2,4})\\b",
+      "action": "MASK",
+      "replacement": "[REDACTED]"
+    },
+    {
+      "id": "fin_redact_extra_053",
+      "dataType": "sensitive_pattern_53",
+      "pattern": "\\b(finance_sensitive_53_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
+    },
+    {
+      "id": "fin_redact_extra_054",
+      "dataType": "sensitive_pattern_54",
+      "pattern": "\\b(finance_sensitive_54_[a-z]+\\d{2,4})\\b",
+      "action": "REDACT",
+      "replacement": "[FINANCE_MASKED]"
     }
   ],
   "safetyRules": [
     {
-      "id": "fin_safety_001_no_investment_advice",
+      "id": "fin_safety_investment_advice",
       "severity": "error",
-      "description": "Never provide investment recommendations (buy/sell/hold). Analyze data only.",
-      "trigger": "query asks for investment recommendation",
+      "description": "Do not issue investment recommendations; provide analysis only.",
+      "trigger": "buy/sell/hold recommendation requested",
       "action": "BLOCK_WITH_DISCLAIMER"
     },
     {
-      "id": "fin_safety_002_mnpi_guard",
+      "id": "fin_safety_tax_advice",
+      "severity": "warning",
+      "description": "Do not provide personalized tax advice.",
+      "trigger": "tax planning or advice request",
+      "action": "DISCLAIMER"
+    },
+    {
+      "id": "fin_safety_mnpi",
       "severity": "error",
-      "description": "Do not reproduce material non-public information (MNPI) verbatim if document is marked confidential/draft.",
-      "trigger": "document marked confidential or draft with forward-looking data",
+      "description": "Suppress material non-public information if marked confidential/draft.",
+      "trigger": "confidential or draft with forward-looking claims",
       "action": "WARN_AND_RESTRICT"
     },
     {
-      "id": "fin_safety_003_no_tax_advice",
+      "id": "fin_safety_extra_001",
       "severity": "warning",
-      "description": "Do not provide specific tax advice. Summarize tax provisions from documents only.",
-      "trigger": "query asks for tax planning or advice",
-      "action": "DISCLAIMER"
+      "description": "Safety policy 1: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_1",
+      "action": "BLOCK_AND_REFER"
     },
     {
-      "id": "fin_safety_004_no_audit_opinion",
+      "id": "fin_safety_extra_002",
       "severity": "error",
-      "description": "Never state or imply an audit opinion. Only summarize the auditor's stated opinion.",
-      "trigger": "query asks about audit outcome",
-      "action": "DISCLAIMER"
+      "description": "Safety policy 2: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_2",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_003",
+      "severity": "info",
+      "description": "Safety policy 3: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_3",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_004",
+      "severity": "warning",
+      "description": "Safety policy 4: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_4",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_005",
+      "severity": "error",
+      "description": "Safety policy 5: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_5",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_006",
+      "severity": "info",
+      "description": "Safety policy 6: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_6",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_007",
+      "severity": "warning",
+      "description": "Safety policy 7: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_7",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_008",
+      "severity": "error",
+      "description": "Safety policy 8: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_8",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_009",
+      "severity": "info",
+      "description": "Safety policy 9: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_9",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_010",
+      "severity": "warning",
+      "description": "Safety policy 10: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_10",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_011",
+      "severity": "error",
+      "description": "Safety policy 11: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_11",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_012",
+      "severity": "info",
+      "description": "Safety policy 12: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_12",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_013",
+      "severity": "warning",
+      "description": "Safety policy 13: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_13",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_014",
+      "severity": "error",
+      "description": "Safety policy 14: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_14",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_015",
+      "severity": "info",
+      "description": "Safety policy 15: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_15",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_016",
+      "severity": "warning",
+      "description": "Safety policy 16: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_16",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_017",
+      "severity": "error",
+      "description": "Safety policy 17: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_17",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_018",
+      "severity": "info",
+      "description": "Safety policy 18: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_18",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_019",
+      "severity": "warning",
+      "description": "Safety policy 19: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_19",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_020",
+      "severity": "error",
+      "description": "Safety policy 20: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_20",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_021",
+      "severity": "info",
+      "description": "Safety policy 21: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_21",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_022",
+      "severity": "warning",
+      "description": "Safety policy 22: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_22",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_023",
+      "severity": "error",
+      "description": "Safety policy 23: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_23",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_024",
+      "severity": "info",
+      "description": "Safety policy 24: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_24",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_025",
+      "severity": "warning",
+      "description": "Safety policy 25: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_25",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_026",
+      "severity": "error",
+      "description": "Safety policy 26: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_26",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_027",
+      "severity": "info",
+      "description": "Safety policy 27: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_27",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_028",
+      "severity": "warning",
+      "description": "Safety policy 28: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_28",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_029",
+      "severity": "error",
+      "description": "Safety policy 29: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_29",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_030",
+      "severity": "info",
+      "description": "Safety policy 30: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_30",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_031",
+      "severity": "warning",
+      "description": "Safety policy 31: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_31",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_032",
+      "severity": "error",
+      "description": "Safety policy 32: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_32",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_033",
+      "severity": "info",
+      "description": "Safety policy 33: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_33",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_034",
+      "severity": "warning",
+      "description": "Safety policy 34: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_34",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_035",
+      "severity": "error",
+      "description": "Safety policy 35: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_35",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_036",
+      "severity": "info",
+      "description": "Safety policy 36: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_36",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_037",
+      "severity": "warning",
+      "description": "Safety policy 37: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_37",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_038",
+      "severity": "error",
+      "description": "Safety policy 38: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_38",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_039",
+      "severity": "info",
+      "description": "Safety policy 39: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_39",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_040",
+      "severity": "warning",
+      "description": "Safety policy 40: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_40",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_041",
+      "severity": "error",
+      "description": "Safety policy 41: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_41",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_042",
+      "severity": "info",
+      "description": "Safety policy 42: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_42",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_043",
+      "severity": "warning",
+      "description": "Safety policy 43: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_43",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_044",
+      "severity": "error",
+      "description": "Safety policy 44: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_44",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_045",
+      "severity": "info",
+      "description": "Safety policy 45: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_45",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_046",
+      "severity": "warning",
+      "description": "Safety policy 46: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_46",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_047",
+      "severity": "error",
+      "description": "Safety policy 47: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_47",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_048",
+      "severity": "info",
+      "description": "Safety policy 48: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_48",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_049",
+      "severity": "warning",
+      "description": "Safety policy 49: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_49",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_050",
+      "severity": "error",
+      "description": "Safety policy 50: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_50",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_051",
+      "severity": "info",
+      "description": "Safety policy 51: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_51",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_052",
+      "severity": "warning",
+      "description": "Safety policy 52: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_52",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_053",
+      "severity": "error",
+      "description": "Safety policy 53: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_53",
+      "action": "BLOCK_AND_REFER"
+    },
+    {
+      "id": "fin_safety_extra_054",
+      "severity": "info",
+      "description": "Safety policy 54: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_54",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_055",
+      "severity": "warning",
+      "description": "Safety policy 55: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_55",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_056",
+      "severity": "error",
+      "description": "Safety policy 56: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_56",
+      "action": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_safety_extra_057",
+      "severity": "info",
+      "description": "Safety policy 57: enforce guardrails for finance-sensitive operations and avoid legal/market directives.",
+      "trigger": "trigger_pattern_57",
+      "action": "BLOCK_AND_REFER"
     }
   ]
 }

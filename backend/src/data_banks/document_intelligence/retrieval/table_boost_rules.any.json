@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "id": "table_boost_rules",
+    "version": "1.0.0",
+    "description": "Table-specific retrieval boosts to favor structured evidence when tabular cues are present.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requireEvidenceTypeForTabularBoost": true,
+    "maxTableBoost": 0.24,
+    "maxColumnTypeWeight": 0.18
+  },
+  "rules": [
+    {
+      "id": "TAB_001_table_signal_prefix",
+      "trigger": "Query asks for row/column/sort/filter operations",
+      "check": "query.tabularSignals.count > 0",
+      "failureAction": "BOOST_TABLE_CANDIDATES",
+      "severity": "high",
+      "boost": 0.14,
+      "appliesTo": "table_chunks"
+    },
+    {
+      "id": "TAB_002_numeric_column_match",
+      "trigger": "Query mentions totals/amounts/percentages and table has numeric columns",
+      "check": "query.hasNumericIntent == true AND candidate.hasNumericColumns == true",
+      "failureAction": "BOOST_TABLE_CANDIDATES",
+      "severity": "high",
+      "boost": 0.12,
+      "appliesTo": "table_chunks"
+    },
+    {
+      "id": "TAB_003_header_exact_unit_match",
+      "trigger": "Table headers include the exact unit requested",
+      "check": "query.unitHint != null AND candidate.headers.contains(query.unitHint)",
+      "failureAction": "BOOST_UNIT_CONTEXT_MATCH",
+      "severity": "high",
+      "boost": 0.1,
+      "appliesTo": "table_chunks"
+    },
+    {
+      "id": "TAB_004_revenue_table_priority_finance",
+      "trigger": "Finance query asks for revenue, expense, or variance in table form",
+      "check": "query.domain == 'finance' AND query.sectionHints.AnyOf(['revenue','expense','variance'])",
+      "failureAction": "BOOST_TABLE_CANDIDATES",
+      "severity": "medium",
+      "boost": 0.09,
+      "appliesTo": "table_chunks"
+    },
+    {
+      "id": "TAB_005_penalize_ocr_noise_tables",
+      "trigger": "OCR extracted table has high header entropy and many ambiguous cells",
+      "check": "candidate.tableQuality.ocrConfidence < 0.62 OR candidate.tableQuality.emptyRate > 0.35",
+      "failureAction": "DOWNRANK_TABLE_CHUNKS",
+      "severity": "warning",
+      "penalty": 0.07,
+      "appliesTo": "table_chunks"
+    }
+  ],
+  "templates": [
+    {
+      "id": "TABLE_BOOST_RULES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in table_boost_rules.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

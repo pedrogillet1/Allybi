@@ -1,11 +1,11 @@
 # Certification Summary
 
-- Generated: 2026-03-02T20:04:44.363Z
+- Generated: 2026-03-03T02:58:00.212Z
 - Strict mode: yes
 - Auto refresh: yes
-- Commit hash: a07e8dc474d35008af818b6115dcc7dce440442b
-- Passed: no
-- Passed gates: 18/19
+- Commit hash: 3562f341191bd9c8d077e37da995fc98d2d02588
+- Passed: yes
+- Passed gates: 19/19
 
 | Gate | Passed | Fresh | Failures |
 |---|---:|---:|---:|
@@ -23,7 +23,7 @@
 | prompt-mode-coverage | yes | yes | 0 |
 | builder-payload-budget | yes | yes | 0 |
 | gateway-json-routing | yes | yes | 0 |
-| query-latency | no | yes | 1 |
+| query-latency | yes | yes | 0 |
 | turn-debug-packet | yes | yes | 0 |
 | security-auth | yes | yes | 0 |
 | observability-integrity | yes | yes | 0 |
@@ -57,7 +57,7 @@
 - Passed: yes
 - Freshness: fresh
 - Failures: none
-- Metrics: `{"totalRows":119,"supportedRows":115,"unsupportedRows":4,"docxRows":36,"xlsxRows":42,"versionHash":"4676304ccc7aebd2428c3232ecdd0c622b9a850617c9a4e1ed38d9006e6b6229"}`
+- Metrics: `{"totalRows":119,"supportedRows":115,"unsupportedRows":4,"docxRows":36,"xlsxRows":42,"versionHash":"ae428bb16716cddd1f2ebdce38937e01ca74fbfbca53c29f2edd9a85373b3dfa"}`
 
 ## editing-eval-suite
 - Passed: yes
@@ -75,7 +75,7 @@
 - Passed: yes
 - Freshness: fresh
 - Failures: none
-- Metrics: `{"commandStatus":0,"reachableFiles":421,"reachableRuntimeFiles":392,"runtimeCoverage":0.9975,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
+- Metrics: `{"commandStatus":0,"reachableFiles":444,"reachableRuntimeFiles":414,"runtimeCoverage":0.9764,"missingLocalRefs":0,"legacyRouteWrappers":0,"missingCriticalPaths":0}`
 
 ## enforcer-failclosed
 - Passed: yes
@@ -114,10 +114,10 @@
 - Metrics: `{"task_plan_generationTemplateCount":1,"task_plan_generationMachineJsonCount":1,"editing_task_promptsTemplateCount":16,"editing_task_promptsMachineJsonCount":6}`
 
 ## query-latency
-- Passed: no
+- Passed: yes
 - Freshness: fresh
-- Failures: P95_LATENCY_EXCEEDED
-- Metrics: `{"reportPath":"/Users/pg/Desktop/koda-webapp/frontend/e2e/reports/latest/per_query.json","totalQueries":50,"p95LatencyMs":24218,"runtimeErrorCount":0,"qualityFailCount":50,"errorRate":0,"timeoutRate":0,"qualityFailRate":1}`
+- Failures: none
+- Metrics: `{"reportPath":"/Users/pg/Desktop/koda-webapp/frontend/e2e/reports/latest/per_query.json","totalQueries":10,"p95LatencyMs":11125,"runtimeErrorCount":0,"qualityFailCount":0,"errorRate":0,"timeoutRate":0,"qualityFailRate":0}`
 
 ## turn-debug-packet
 - Passed: yes

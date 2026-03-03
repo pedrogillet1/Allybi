@@ -11,6 +11,8 @@ import {
 export interface RuntimeWiringIntegrityResult {
   ok: boolean;
   missingBanks: string[];
+  missingRuntimePolicyConsumers: string[];
+  runtimePolicyEnvGaps: string[];
   missingOperatorContracts: string[];
   missingOperatorOutputShapes: string[];
   missingEditingCatalogOperators: string[];
@@ -87,6 +89,50 @@ export const RUNTIME_REQUIRED_BANKS = [
   "rate_limit_policy",
   "refusal_policy",
 ] as const;
+
+export const RUNTIME_REQUIRED_POLICIES = [
+  "clarification_policy",
+  "compliance_policy",
+  "logging_policy",
+  "rate_limit_policy",
+  "refusal_policy",
+  "fallback_policy",
+  "editing_policy",
+  "editing_agent_policy",
+  "viewer_locked_chat_policy",
+  "memory_policy",
+  "orchestrator_certification",
+  "llm_builder_policy",
+  "assumption_policy",
+  "access_control_policy",
+  "incident_response_policy",
+  "data_retention_deletion_policy",
+  "secrets_rotation_policy",
+  "model_release_policy",
+  "policy_exceptions_policy",
+] as const;
+
+const RUNTIME_POLICY_CONSUMER_MARKERS: Record<string, string[]> = {
+  clarification_policy: ["ClarificationPolicyService"],
+  compliance_policy: ["CompliancePolicyService"],
+  logging_policy: ["LoggingPolicyService"],
+  rate_limit_policy: ["rate_limit_policy"],
+  refusal_policy: ["RefusalPolicyService"],
+  fallback_policy: ["FallbackDecisionPolicyService"],
+  editing_policy: ["EditingPolicyService"],
+  editing_agent_policy: ["editing_agent_policy"],
+  viewer_locked_chat_policy: ["ViewerLockedChatPolicyService"],
+  memory_policy: ["memory_policy"],
+  orchestrator_certification: ["orchestrator_certification"],
+  llm_builder_policy: ["llm_builder_policy"],
+  assumption_policy: ["assumption_policy"],
+  access_control_policy: ["GovernanceRuntimePolicyService"],
+  incident_response_policy: ["GovernanceRuntimePolicyService"],
+  data_retention_deletion_policy: ["GovernanceRuntimePolicyService"],
+  secrets_rotation_policy: ["GovernanceRuntimePolicyService"],
+  model_release_policy: ["GovernanceRuntimePolicyService"],
+  policy_exceptions_policy: ["GovernanceRuntimePolicyService"],
+};
 
 function collectRenderPolicyHookBankIds(bank: Record<string, unknown> | null): string[] {
   const config = bank?.config as Record<string, unknown> | undefined;
@@ -585,24 +631,26 @@ function collectMemoryPolicyHookEngineMissing(): string[] {
     ),
   ];
   const failures: string[] = [];
+  const existingCandidates: string[] = [];
   for (const filePath of candidatePaths) {
     if (!fs.existsSync(filePath)) {
-      failures.push(filePath);
       continue;
     }
+    existingCandidates.push(filePath);
     try {
       const src = fs.readFileSync(filePath, "utf8");
       if (
         !/integrationHooks/.test(src) ||
         !/memory_policy integration hook banks missing/.test(src)
       ) {
-        failures.push(filePath);
+        continue;
       }
+      return [];
     } catch {
-      failures.push(filePath);
+      continue;
     }
   }
-  return failures;
+  return existingCandidates.length > 0 ? existingCandidates : candidatePaths;
 }
 
 function collectDormantIntentConfigUsage(): string[] {
@@ -724,6 +772,132 @@ function collectProductHelpRuntimeUsageMissing(): string[] {
   return failures;
 }
 
+function listRuntimeSourceFiles(): string[] {
+  const roots = [
+    path.join(process.cwd(), "backend", "src"),
+    path.join(process.cwd(), "src"),
+  ];
+  const out: string[] = [];
+  const stack = roots.filter((root) => fs.existsSync(root));
+  while (stack.length > 0) {
+    const current = stack.pop() as string;
+    let entries: fs.Dirent[] = [];
+    try {
+      entries = fs.readdirSync(current, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const abs = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(abs);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      if (!/\.(ts|tsx|js|mjs|cjs)$/.test(entry.name)) continue;
+      if (/\.test\./.test(entry.name) || /\.spec\./.test(entry.name)) continue;
+      const normalized = abs.replace(/\\/g, "/");
+      if (normalized.includes("/data_banks/")) continue;
+      if (normalized.includes("/services/core/policy/")) continue;
+      out.push(abs);
+    }
+  }
+  return out;
+}
+
+function collectMissingRuntimePolicyConsumers(): string[] {
+  const files = listRuntimeSourceFiles();
+  if (files.length < 1) return [];
+  const content = new Map<string, string>();
+  for (const filePath of files) {
+    try {
+      content.set(filePath, fs.readFileSync(filePath, "utf8"));
+    } catch {
+      // Ignore unreadable files; they are non-deterministic in this static check.
+    }
+  }
+
+  const missing: string[] = [];
+  for (const policyId of RUNTIME_REQUIRED_POLICIES) {
+    const markers = RUNTIME_POLICY_CONSUMER_MARKERS[policyId] || [policyId];
+    let found = false;
+    for (const src of content.values()) {
+      if (markers.some((marker) => src.includes(marker))) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) missing.push(policyId);
+  }
+  return missing.sort((a, b) => a.localeCompare(b));
+}
+
+function resolveRegistryPath(): string | null {
+  const candidates = [
+    path.join(
+      process.cwd(),
+      "backend",
+      "src",
+      "data_banks",
+      "manifest",
+      "bank_registry.any.json",
+    ),
+    path.join(
+      process.cwd(),
+      "src",
+      "data_banks",
+      "manifest",
+      "bank_registry.any.json",
+    ),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return null;
+}
+
+function collectRuntimePolicyEnvGaps(): string[] {
+  const registryPath = resolveRegistryPath();
+  if (!registryPath) return [];
+  try {
+    const raw = fs.readFileSync(registryPath, "utf8");
+    const parsed = JSON.parse(raw) as {
+      banks?: Array<{
+        id?: string;
+        requiredByEnv?: Record<string, boolean>;
+      }>;
+    };
+    const byId = new Map<string, Record<string, boolean>>();
+    const banks = Array.isArray(parsed?.banks) ? parsed.banks : [];
+    for (const entry of banks) {
+      const id = asTrimmedString(entry?.id);
+      if (!id) continue;
+      const envMap =
+        entry?.requiredByEnv && typeof entry.requiredByEnv === "object"
+          ? entry.requiredByEnv
+          : {};
+      byId.set(id, envMap);
+    }
+    const gaps: string[] = [];
+    for (const policyId of RUNTIME_REQUIRED_POLICIES) {
+      const envMap = byId.get(policyId);
+      if (!envMap) {
+        gaps.push(`${policyId}:missing_registry_entry`);
+        continue;
+      }
+      if (envMap.production !== true) {
+        gaps.push(`${policyId}:requiredByEnv.production!=true`);
+      }
+      if (envMap.staging !== true) {
+        gaps.push(`${policyId}:requiredByEnv.staging!=true`);
+      }
+    }
+    return gaps.sort((a, b) => a.localeCompare(b));
+  } catch {
+    return [];
+  }
+}
+
 export class RuntimeWiringIntegrityService {
   validate(): RuntimeWiringIntegrityResult {
     const renderPolicy = getOptionalBank<Record<string, unknown>>("render_policy");
@@ -732,6 +906,8 @@ export class RuntimeWiringIntegrityService {
       new Set<string>([...RUNTIME_REQUIRED_BANKS, ...hookRequiredBanks]),
     );
     const missingBanks = requiredBanks.filter((id) => !getOptionalBank(id));
+    const missingRuntimePolicyConsumers = collectMissingRuntimePolicyConsumers();
+    const runtimePolicyEnvGaps = collectRuntimePolicyEnvGaps();
 
     const intentConfig = getOptionalBank<Record<string, unknown>>("intent_config");
     const operatorFamilies = getOptionalBank<Record<string, unknown>>("operator_families");
@@ -833,6 +1009,8 @@ export class RuntimeWiringIntegrityService {
     return {
       ok:
         missingBanks.length === 0 &&
+        missingRuntimePolicyConsumers.length === 0 &&
+        runtimePolicyEnvGaps.length === 0 &&
         missingOperatorContracts.length === 0 &&
         missingOperatorOutputShapes.length === 0 &&
         missingEditingCatalogOperators.length === 0 &&
@@ -854,6 +1032,8 @@ export class RuntimeWiringIntegrityService {
         answerModeContractDrift.length === 0 &&
         productHelpRuntimeUsageMissing.length === 0,
       missingBanks,
+      missingRuntimePolicyConsumers,
+      runtimePolicyEnvGaps,
       missingOperatorContracts,
       missingOperatorOutputShapes,
       missingEditingCatalogOperators,

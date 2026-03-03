@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { PolicyRuntimeEngine } from "./policyRuntimeEngine.service";
+import { extractPolicyRules, PolicyRuntimeEngine } from "./policyRuntimeEngine.service";
 
 describe("PolicyRuntimeEngine", () => {
   test("returns highest-priority matching rule", () => {
@@ -60,5 +60,53 @@ describe("PolicyRuntimeEngine", () => {
     expect(match?.ruleId).toBe("rule_any");
     expect(match?.then.action).toBe("redact");
   });
-});
 
+  test("loads rules from nested policies.rules and supports defaultAction", () => {
+    const engine = new PolicyRuntimeEngine();
+    const noMatch = engine.firstMatch({
+      runtime: { signals: { blocked: false } },
+      policyBank: {
+        config: {
+          defaultAction: "allow",
+        },
+        policies: {
+          rules: [
+            {
+              ruleId: "needs_block",
+              priority: 10,
+              when: { path: "signals.blocked", op: "eq", value: true },
+              then: { action: "block" },
+            },
+          ],
+        },
+      },
+    });
+
+    expect(noMatch?.ruleId).toBe("__default__");
+    expect(noMatch?.then.action).toBe("allow");
+  });
+
+  test("treats when.any=true as an always-match fallback", () => {
+    const engine = new PolicyRuntimeEngine();
+    const match = engine.firstMatch({
+      runtime: {},
+      rules: [
+        {
+          id: "fallback",
+          when: { any: true as any },
+          then: { action: "use_default_agent" },
+        },
+      ],
+    });
+    expect(match?.ruleId).toBe("fallback");
+    expect(match?.then.action).toBe("use_default_agent");
+  });
+
+  test("extractPolicyRules merges top-level and nested rules", () => {
+    const rules = extractPolicyRules({
+      rules: [{ id: "one" }],
+      policies: { rules: [{ ruleId: "two" }] },
+    });
+    expect(rules).toHaveLength(2);
+  });
+});

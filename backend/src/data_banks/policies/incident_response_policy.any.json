@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "id": "incident_response_policy",
+    "version": "1.0.0",
+    "description": "Runtime incident response policy for escalation, containment, and communication SLAs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "platform-reliability",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Initial runtime incident response policy bank"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": false,
+    "defaultAction": "monitor"
+  },
+  "rules": [
+    {
+      "id": "IRP_1000_p0_security",
+      "priority": 1000,
+      "when": {
+        "all": [
+          {
+            "path": "signals.category",
+            "op": "eq",
+            "value": "security"
+          },
+          {
+            "path": "signals.severity",
+            "op": "eq",
+            "value": "critical"
+          }
+        ]
+      },
+      "then": {
+        "action": "page_immediately",
+        "target": "security_oncall",
+        "slaMinutes": 5,
+        "containment": "enable_protective_mode"
+      },
+      "reasonCode": "incident_p0_security",
+      "terminal": true
+    },
+    {
+      "id": "IRP_900_p1_runtime",
+      "priority": 900,
+      "when": {
+        "all": [
+          {
+            "path": "signals.category",
+            "op": "eq",
+            "value": "runtime"
+          },
+          {
+            "path": "signals.severity",
+            "op": "eq",
+            "value": "high"
+          }
+        ]
+      },
+      "then": {
+        "action": "page_primary",
+        "target": "platform_oncall",
+        "slaMinutes": 15,
+        "containment": "degrade_non_critical_features"
+      },
+      "reasonCode": "incident_p1_runtime",
+      "terminal": true
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "IRP_T_001",
+        "runtime": {
+          "signals": {
+            "category": "security",
+            "severity": "critical"
+          }
+        },
+        "expect": {
+          "action": "page_immediately"
+        }
+      }
+    ]
+  }
+}

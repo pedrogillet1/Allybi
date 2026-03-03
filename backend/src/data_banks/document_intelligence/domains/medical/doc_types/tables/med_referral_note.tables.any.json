@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "medical_med_referral_note_tables",
-    "version": "1.0.0",
-    "description": "Expected table patterns for Referral Note.",
+    "version": "2.0.0",
+    "description": "Expected table signatures for referral notes.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,1323 +15,273 @@
   },
   "tables": [
     {
-      "id": "med_referral_note_table_01",
+      "id": "med_referral_note_provider_table",
       "name": {
-        "en": "Referral Note Table Shape 1",
-        "pt": "Referral Note Tabela 1"
+        "en": "Provider Contact Table",
+        "pt": "Tabela de Contato de Profissionais"
       },
-      "section": "abstract",
+      "section": "referring_provider",
       "expectedColumns": [
-        "clause",
-        "obligation",
-        "owner",
-        "deadline"
+        "provider_name",
+        "provider_role",
+        "phone",
+        "facility",
+        "contact_note"
       ],
       "keyRows": [
-        "address",
-        "country"
+        "provider_name",
+        "provider_role"
       ],
       "headerSynonyms": {
-        "clause": [
-          "clause",
-          "clause",
-          "clause_value"
+        "provider_name": [
+          "provider",
+          "name",
+          "medico"
         ],
-        "obligation": [
-          "obligation",
-          "obligation",
-          "obligation_value"
-        ],
-        "owner": [
-          "owner",
-          "owner",
-          "owner_value"
-        ],
-        "deadline": [
-          "deadline",
-          "deadline",
-          "deadline_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "aud",
-          "appliesToColumns": [
-            "clause"
-          ]
-        },
-        {
-          "unitId": "chf",
-          "appliesToColumns": [
-            "clause"
-          ]
-        },
-        {
-          "unitId": "gallon",
-          "appliesToColumns": [
-            "clause"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_02",
-      "name": {
-        "en": "Referral Note Table Shape 2",
-        "pt": "Referral Note Tabela 2"
-      },
-      "section": "appendix",
-      "expectedColumns": [
-        "section",
-        "subsection",
-        "summary",
-        "risk_level"
-      ],
-      "keyRows": [
-        "case_number",
-        "diagnosis_code"
-      ],
-      "headerSynonyms": {
-        "section": [
-          "section",
-          "section",
-          "section_value"
-        ],
-        "subsection": [
-          "subsection",
-          "subsection",
-          "subsection_value"
-        ],
-        "summary": [
-          "summary",
-          "summary",
-          "summary_value"
-        ],
-        "risk_level": [
-          "risk_level",
-          "risk level",
-          "risk_level_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "basis_point",
-          "appliesToColumns": [
-            "subsection"
-          ]
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "subsection"
-          ]
-        },
-        {
-          "unitId": "gbp",
-          "appliesToColumns": [
-            "subsection"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_03",
-      "name": {
-        "en": "Referral Note Table Shape 3",
-        "pt": "Referral Note Tabela 3"
-      },
-      "section": "approvals",
-      "expectedColumns": [
-        "term",
-        "definition",
-        "source_section",
-        "notes"
-      ],
-      "keyRows": [
-        "city",
-        "document_number"
-      ],
-      "headerSynonyms": {
-        "term": [
-          "term",
-          "term",
-          "term_value"
-        ],
-        "definition": [
-          "definition",
-          "definition",
-          "definition_value"
-        ],
-        "source_section": [
-          "source_section",
-          "source section",
-          "source_section_value"
-        ],
-        "notes": [
-          "notes",
-          "notes",
-          "notes_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "billion",
-          "appliesToColumns": [
-            "source_section"
-          ]
-        },
-        {
-          "unitId": "dozen",
-          "appliesToColumns": [
-            "source_section"
-          ]
-        },
-        {
-          "unitId": "gram",
-          "appliesToColumns": [
-            "source_section"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_04",
-      "name": {
-        "en": "Referral Note Table Shape 4",
-        "pt": "Referral Note Tabela 4"
-      },
-      "section": "assessment_plan",
-      "expectedColumns": [
-        "party",
-        "role",
-        "jurisdiction",
-        "effective_date"
-      ],
-      "keyRows": [
-        "country",
-        "dosage"
-      ],
-      "headerSynonyms": {
-        "party": [
-          "party",
-          "party",
-          "party_value"
-        ],
-        "role": [
+        "provider_role": [
           "role",
-          "role",
-          "role_value"
-        ],
-        "jurisdiction": [
-          "jurisdiction",
-          "jurisdiction",
-          "jurisdiction_value"
-        ],
-        "effective_date": [
-          "effective_date",
-          "effective date",
-          "effective_date_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "brl",
-          "appliesToColumns": [
-            "effective_date"
-          ]
-        },
-        {
-          "unitId": "eur",
-          "appliesToColumns": [
-            "effective_date"
-          ]
-        },
-        {
-          "unitId": "hour",
-          "appliesToColumns": [
-            "effective_date"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_05",
-      "name": {
-        "en": "Referral Note Table Shape 5",
-        "pt": "Referral Note Tabela 5"
-      },
-      "section": "attachments",
-      "expectedColumns": [
-        "line_item",
-        "amount",
-        "currency",
-        "period"
-      ],
-      "keyRows": [
-        "diagnosis_code",
-        "effective_date"
-      ],
-      "headerSynonyms": {
-        "line_item": [
-          "line_item",
-          "line item",
-          "line_item_value"
-        ],
-        "amount": [
-          "amount",
-          "amount",
-          "amount_value"
-        ],
-        "currency": [
-          "currency",
-          "currency",
-          "currency_value"
-        ],
-        "period": [
-          "period",
-          "period",
-          "period_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "cad",
-          "appliesToColumns": [
-            "line_item"
-          ]
-        },
-        {
-          "unitId": "fahrenheit",
-          "appliesToColumns": [
-            "line_item"
-          ]
-        },
-        {
-          "unitId": "inch",
-          "appliesToColumns": [
-            "line_item"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_06",
-      "name": {
-        "en": "Referral Note Table Shape 6",
-        "pt": "Referral Note Tabela 6"
-      },
-      "section": "authorization",
-      "expectedColumns": [
-        "metric",
-        "value",
-        "unit",
-        "reference_range"
-      ],
-      "keyRows": [
-        "document_number",
-        "expiration_date"
-      ],
-      "headerSynonyms": {
-        "metric": [
-          "metric",
-          "metric",
-          "metric_value"
-        ],
-        "value": [
-          "value",
-          "value",
-          "value_value"
-        ],
-        "unit": [
-          "unit",
-          "unit",
-          "unit_value"
-        ],
-        "reference_range": [
-          "reference_range",
-          "reference range",
-          "reference_range_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "celsius",
-          "appliesToColumns": [
-            "value"
-          ]
-        },
-        {
-          "unitId": "fluid_ounce",
-          "appliesToColumns": [
-            "value"
-          ]
-        },
-        {
-          "unitId": "jpy",
-          "appliesToColumns": [
-            "value"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_07",
-      "name": {
-        "en": "Referral Note Table Shape 7",
-        "pt": "Referral Note Tabela 7"
-      },
-      "section": "certifications",
-      "expectedColumns": [
-        "finding",
-        "severity",
-        "recommendation",
-        "owner"
-      ],
-      "keyRows": [
-        "dosage",
-        "lab_value"
-      ],
-      "headerSynonyms": {
-        "finding": [
-          "finding",
-          "finding",
-          "finding_value"
-        ],
-        "severity": [
-          "severity",
-          "severity",
-          "severity_value"
-        ],
-        "recommendation": [
-          "recommendation",
-          "recommendation",
-          "recommendation_value"
-        ],
-        "owner": [
-          "owner",
-          "owner",
-          "owner_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "centimeter",
-          "appliesToColumns": [
-            "recommendation"
-          ]
-        },
-        {
-          "unitId": "gallon",
-          "appliesToColumns": [
-            "recommendation"
-          ]
-        },
-        {
-          "unitId": "kelvin",
-          "appliesToColumns": [
-            "recommendation"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_08",
-      "name": {
-        "en": "Referral Note Table Shape 8",
-        "pt": "Referral Note Tabela 8"
-      },
-      "section": "compliance_section",
-      "expectedColumns": [
-        "event",
-        "date",
-        "status",
-        "evidence"
-      ],
-      "keyRows": [
-        "effective_date",
-        "medication_name"
-      ],
-      "headerSynonyms": {
-        "event": [
-          "event",
-          "event",
-          "event_value"
-        ],
-        "date": [
-          "date",
-          "date",
-          "date_value"
-        ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
-        ],
-        "evidence": [
-          "evidence",
-          "evidence",
-          "evidence_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "chf",
-          "appliesToColumns": [
-            "evidence"
-          ]
-        },
-        {
-          "unitId": "gbp",
-          "appliesToColumns": [
-            "evidence"
-          ]
-        },
-        {
-          "unitId": "kilogram",
-          "appliesToColumns": [
-            "evidence"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_09",
-      "name": {
-        "en": "Referral Note Table Shape 9",
-        "pt": "Referral Note Tabela 9"
-      },
-      "section": "criteria",
-      "expectedColumns": [
-        "control",
-        "test",
-        "result",
-        "owner"
-      ],
-      "keyRows": [
-        "expiration_date",
-        "period_reference"
-      ],
-      "headerSynonyms": {
-        "control": [
-          "control",
-          "control",
-          "control_value"
-        ],
-        "test": [
-          "test",
-          "test",
-          "test_value"
-        ],
-        "result": [
-          "result",
-          "result",
-          "result_value"
-        ],
-        "owner": [
-          "owner",
-          "owner",
-          "owner_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "control"
-          ]
-        },
-        {
-          "unitId": "gram",
-          "appliesToColumns": [
-            "control"
-          ]
-        },
-        {
-          "unitId": "liter",
-          "appliesToColumns": [
-            "control"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_10",
-      "name": {
-        "en": "Referral Note Table Shape 10",
-        "pt": "Referral Note Tabela 10"
-      },
-      "section": "data_tables",
-      "expectedColumns": [
-        "question",
-        "answer",
-        "citation",
-        "confidence"
-      ],
-      "keyRows": [
-        "lab_value",
-        "person_name"
-      ],
-      "headerSynonyms": {
-        "question": [
-          "question",
-          "question",
-          "question_value"
-        ],
-        "answer": [
-          "answer",
-          "answer",
-          "answer_value"
-        ],
-        "citation": [
-          "citation",
-          "citation",
-          "citation_value"
-        ],
-        "confidence": [
-          "confidence",
-          "confidence",
-          "confidence_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "dozen",
-          "appliesToColumns": [
-            "answer"
-          ]
-        },
-        {
-          "unitId": "hour",
-          "appliesToColumns": [
-            "answer"
-          ]
-        },
-        {
-          "unitId": "meter",
-          "appliesToColumns": [
-            "answer"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_11",
-      "name": {
-        "en": "Referral Note Table Shape 11",
-        "pt": "Referral Note Tabela 11"
-      },
-      "section": "detailed_analysis",
-      "expectedColumns": [
-        "document",
-        "version",
-        "change",
-        "approved_by"
-      ],
-      "keyRows": [
-        "medication_name",
-        "person_role"
-      ],
-      "headerSynonyms": {
-        "document": [
-          "document",
-          "document",
-          "document_value"
-        ],
-        "version": [
-          "version",
-          "version",
-          "version_value"
-        ],
-        "change": [
-          "change",
-          "change",
-          "change_value"
-        ],
-        "approved_by": [
-          "approved_by",
-          "approved by",
-          "approved_by_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "eur",
-          "appliesToColumns": [
-            "change"
-          ]
-        },
-        {
-          "unitId": "inch",
-          "appliesToColumns": [
-            "change"
-          ]
-        },
-        {
-          "unitId": "milligram",
-          "appliesToColumns": [
-            "change"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_12",
-      "name": {
-        "en": "Referral Note Table Shape 12",
-        "pt": "Referral Note Tabela 12"
-      },
-      "section": "disclaimers",
-      "expectedColumns": [
-        "service",
-        "sla",
-        "measurement",
-        "breach_flag"
-      ],
-      "keyRows": [
-        "period_reference",
-        "person_title"
-      ],
-      "headerSynonyms": {
-        "service": [
-          "service",
-          "service",
-          "service_value"
-        ],
-        "sla": [
-          "sla",
-          "sla",
-          "sla_value"
-        ],
-        "measurement": [
-          "measurement",
-          "measurement",
-          "measurement_value"
-        ],
-        "breach_flag": [
-          "breach_flag",
-          "breach flag",
-          "breach_flag_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "fahrenheit",
-          "appliesToColumns": [
-            "breach_flag"
-          ]
-        },
-        {
-          "unitId": "jpy",
-          "appliesToColumns": [
-            "breach_flag"
-          ]
-        },
-        {
-          "unitId": "milliliter",
-          "appliesToColumns": [
-            "breach_flag"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_13",
-      "name": {
-        "en": "Referral Note Table Shape 13",
-        "pt": "Referral Note Tabela 13"
-      },
-      "section": "discussion",
-      "expectedColumns": [
-        "procedure",
-        "code",
-        "description",
-        "notes"
-      ],
-      "keyRows": [
-        "person_name",
-        "procedure_code"
-      ],
-      "headerSynonyms": {
-        "procedure": [
-          "procedure",
-          "procedure",
-          "procedure_value"
-        ],
-        "code": [
-          "code",
-          "code",
-          "code_value"
-        ],
-        "description": [
-          "description",
-          "description",
-          "description_value"
-        ],
-        "notes": [
-          "notes",
-          "notes",
-          "notes_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "fluid_ounce",
-          "appliesToColumns": [
-            "procedure"
-          ]
-        },
-        {
-          "unitId": "kelvin",
-          "appliesToColumns": [
-            "procedure"
-          ]
-        },
-        {
-          "unitId": "millimeter",
-          "appliesToColumns": [
-            "procedure"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_14",
-      "name": {
-        "en": "Referral Note Table Shape 14",
-        "pt": "Referral Note Tabela 14"
-      },
-      "section": "document_metadata",
-      "expectedColumns": [
-        "medication",
-        "dose",
-        "route",
-        "frequency"
-      ],
-      "keyRows": [
-        "person_role",
-        "registration_number"
-      ],
-      "headerSynonyms": {
-        "medication": [
-          "medication",
-          "medication",
-          "medication_value"
-        ],
-        "dose": [
-          "dose",
-          "dose",
-          "dose_value"
-        ],
-        "route": [
-          "route",
-          "route",
-          "route_value"
-        ],
-        "frequency": [
-          "frequency",
-          "frequency",
-          "frequency_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "gallon",
-          "appliesToColumns": [
-            "dose"
-          ]
-        },
-        {
-          "unitId": "kilogram",
-          "appliesToColumns": [
-            "dose"
-          ]
-        },
-        {
-          "unitId": "million",
-          "appliesToColumns": [
-            "dose"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_15",
-      "name": {
-        "en": "Referral Note Table Shape 15",
-        "pt": "Referral Note Tabela 15"
-      },
-      "section": "executive_summary",
-      "expectedColumns": [
-        "test",
-        "result",
-        "unit",
-        "flag"
-      ],
-      "keyRows": [
-        "person_title",
-        "regulatory_body"
-      ],
-      "headerSynonyms": {
-        "test": [
-          "test",
-          "test",
-          "test_value"
-        ],
-        "result": [
-          "result",
-          "result",
-          "result_value"
-        ],
-        "unit": [
-          "unit",
-          "unit",
-          "unit_value"
-        ],
-        "flag": [
-          "flag",
-          "flag",
-          "flag_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "gbp",
-          "appliesToColumns": [
-            "unit"
-          ]
-        },
-        {
-          "unitId": "liter",
-          "appliesToColumns": [
-            "unit"
-          ]
-        },
-        {
-          "unitId": "minute",
-          "appliesToColumns": [
-            "unit"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_16",
-      "name": {
-        "en": "Referral Note Table Shape 16",
-        "pt": "Referral Note Tabela 16"
-      },
-      "section": "findings",
-      "expectedColumns": [
-        "problem",
-        "assessment",
-        "plan",
-        "follow_up"
-      ],
-      "keyRows": [
-        "procedure_code",
-        "report_date"
-      ],
-      "headerSynonyms": {
-        "problem": [
-          "problem",
-          "problem",
-          "problem_value"
-        ],
-        "assessment": [
-          "assessment",
-          "assessment",
-          "assessment_value"
-        ],
-        "plan": [
-          "plan",
-          "plan",
-          "plan_value"
-        ],
-        "follow_up": [
-          "follow_up",
-          "follow up",
-          "follow_up_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "gram",
-          "appliesToColumns": [
-            "follow_up"
-          ]
-        },
-        {
-          "unitId": "meter",
-          "appliesToColumns": [
-            "follow_up"
-          ]
-        },
-        {
-          "unitId": "month",
-          "appliesToColumns": [
-            "follow_up"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_17",
-      "name": {
-        "en": "Referral Note Table Shape 17",
-        "pt": "Referral Note Tabela 17"
-      },
-      "section": "glossary",
-      "expectedColumns": [
-        "invoice",
-        "amount",
-        "due_date",
-        "status"
-      ],
-      "keyRows": [
-        "registration_number",
-        "state_province"
-      ],
-      "headerSynonyms": {
-        "invoice": [
-          "invoice",
-          "invoice",
-          "invoice_value"
-        ],
-        "amount": [
-          "amount",
-          "amount",
-          "amount_value"
-        ],
-        "due_date": [
-          "due_date",
-          "due date",
-          "due_date_value"
-        ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "hour",
-          "appliesToColumns": [
-            "invoice"
-          ]
-        },
-        {
-          "unitId": "milligram",
-          "appliesToColumns": [
-            "invoice"
-          ]
-        },
-        {
-          "unitId": "percent",
-          "appliesToColumns": [
-            "invoice"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_18",
-      "name": {
-        "en": "Referral Note Table Shape 18",
-        "pt": "Referral Note Tabela 18"
-      },
-      "section": "header",
-      "expectedColumns": [
-        "milestone",
-        "owner",
-        "target_date",
-        "completion"
-      ],
-      "keyRows": [
-        "regulatory_body",
-        "address"
-      ],
-      "headerSynonyms": {
-        "milestone": [
-          "milestone",
-          "milestone",
-          "milestone_value"
-        ],
-        "owner": [
-          "owner",
-          "owner",
-          "owner_value"
-        ],
-        "target_date": [
-          "target_date",
-          "target date",
-          "target_date_value"
-        ],
-        "completion": [
-          "completion",
-          "completion",
-          "completion_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "inch",
-          "appliesToColumns": [
-            "owner"
-          ]
-        },
-        {
-          "unitId": "milliliter",
-          "appliesToColumns": [
-            "owner"
-          ]
-        },
-        {
-          "unitId": "percentage_point",
-          "appliesToColumns": [
-            "owner"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_19",
-      "name": {
-        "en": "Referral Note Table Shape 19",
-        "pt": "Referral Note Tabela 19"
-      },
-      "section": "history_present_illness",
-      "expectedColumns": [
-        "exception",
-        "reason",
-        "impact",
-        "mitigation"
-      ],
-      "keyRows": [
-        "report_date",
-        "case_number"
-      ],
-      "headerSynonyms": {
-        "exception": [
-          "exception",
-          "exception",
-          "exception_value"
-        ],
-        "reason": [
-          "reason",
-          "reason",
-          "reason_value"
-        ],
-        "impact": [
-          "impact",
-          "impact",
-          "impact_value"
-        ],
-        "mitigation": [
-          "mitigation",
-          "mitigation",
-          "mitigation_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "jpy",
-          "appliesToColumns": [
-            "impact"
-          ]
-        },
-        {
-          "unitId": "millimeter",
-          "appliesToColumns": [
-            "impact"
-          ]
-        },
-        {
-          "unitId": "pound",
-          "appliesToColumns": [
-            "impact"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_20",
-      "name": {
-        "en": "Referral Note Table Shape 20",
-        "pt": "Referral Note Tabela 20"
-      },
-      "section": "introduction",
-      "expectedColumns": [
-        "citation",
-        "quote",
-        "location",
-        "commentary"
-      ],
-      "keyRows": [
-        "state_province",
-        "city"
-      ],
-      "headerSynonyms": {
-        "citation": [
-          "citation",
-          "citation",
-          "citation_value"
-        ],
-        "quote": [
-          "quote",
-          "quote",
-          "quote_value"
-        ],
-        "location": [
-          "location",
-          "location",
-          "location_value"
-        ],
-        "commentary": [
-          "commentary",
-          "commentary",
-          "commentary_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "kelvin",
-          "appliesToColumns": [
-            "commentary"
-          ]
-        },
-        {
-          "unitId": "million",
-          "appliesToColumns": [
-            "commentary"
-          ]
-        },
-        {
-          "unitId": "second",
-          "appliesToColumns": [
-            "commentary"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "med_referral_note_table_21",
-      "name": {
-        "en": "Referral Note Table Shape 21",
-        "pt": "Referral Note Tabela 21"
-      },
-      "section": "limitations",
-      "expectedColumns": [
-        "contact",
-        "organization",
-        "email",
-        "phone"
-      ],
-      "keyRows": [
-        "address",
-        "country"
-      ],
-      "headerSynonyms": {
-        "contact": [
-          "contact",
-          "contact",
-          "contact_value"
-        ],
-        "organization": [
-          "organization",
-          "organization",
-          "organization_value"
-        ],
-        "email": [
-          "email",
-          "email",
-          "email_value"
+          "role type"
         ],
         "phone": [
           "phone",
-          "phone",
-          "phone_value"
+          "telefone"
+        ],
+        "facility": [
+          "facility",
+          "service",
+          "site"
+        ],
+        "contact_note": [
+          "note",
+          "comments"
         ]
       },
       "unitsRules": [
         {
-          "unitId": "kilogram",
+          "unitId": "unitless",
           "appliesToColumns": [
-            "contact"
-          ]
-        },
-        {
-          "unitId": "minute",
-          "appliesToColumns": [
-            "contact"
-          ]
-        },
-        {
-          "unitId": "thousand",
-          "appliesToColumns": [
-            "contact"
+            "provider_name",
+            "provider_role",
+            "facility",
+            "contact_note",
+            "phone"
           ]
         }
+      ],
+      "extractionNotes": [
+        "Use referral and receiving provider blocks as fallback if table is omitted."
       ]
     },
     {
-      "id": "med_referral_note_table_22",
+      "id": "med_referral_note_reason_table",
       "name": {
-        "en": "Referral Note Table Shape 22",
-        "pt": "Referral Note Tabela 22"
+        "en": "Clinical Reason Table",
+        "pt": "Tabela de Motivo Clinico"
       },
-      "section": "medications",
+      "section": "reason_for_referral",
       "expectedColumns": [
-        "policy",
-        "requirement",
-        "evidence",
-        "gap"
+        "clinical_question",
+        "reason",
+        "urgency",
+        "supporting_dx",
+        "goal"
       ],
       "keyRows": [
-        "case_number",
-        "diagnosis_code"
+        "clinical_question",
+        "reason"
       ],
       "headerSynonyms": {
-        "policy": [
-          "policy",
-          "policy",
-          "policy_value"
+        "clinical_question": [
+          "clinical question",
+          "question",
+          "dq"
         ],
-        "requirement": [
-          "requirement",
-          "requirement",
-          "requirement_value"
+        "reason": [
+          "reason",
+          "motivo"
         ],
-        "evidence": [
-          "evidence",
-          "evidence",
-          "evidence_value"
+        "urgency": [
+          "urgency",
+          "priority",
+          "prioridade"
         ],
-        "gap": [
-          "gap",
-          "gap",
-          "gap_value"
+        "supporting_dx": [
+          "diagnosis",
+          "dx",
+          "support"
+        ],
+        "goal": [
+          "goal",
+          "objective"
         ]
       },
       "unitsRules": [
         {
-          "unitId": "liter",
-          "appliesToColumns": [
-            "requirement"
-          ]
+          "unitId": "unitless",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "When urgent referral lacks this table, read heading + first paragraph."
+      ]
+    },
+    {
+      "id": "med_referral_note_service_table",
+      "name": {
+        "en": "Requested Service and Appointment Table",
+        "pt": "Tabela de Servico Solicitado"
+      },
+      "section": "requested_service",
+      "expectedColumns": [
+        "service_type",
+        "clinic",
+        "preferred_location",
+        "estimated_date",
+        "notes"
+      ],
+      "keyRows": [
+        "service_type",
+        "clinic"
+      ],
+      "headerSynonyms": {
+        "service_type": [
+          "service",
+          "requested service",
+          "specialty"
+        ],
+        "clinic": [
+          "clinic",
+          "specialty center"
+        ],
+        "preferred_location": [
+          "location",
+          "site"
+        ],
+        "estimated_date": [
+          "date",
+          "target date"
+        ],
+        "notes": [
+          "notes",
+          "comment"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
         },
         {
-          "unitId": "month",
+          "unitId": "day",
           "appliesToColumns": [
-            "requirement"
-          ]
-        },
-        {
-          "unitId": "unit",
-          "appliesToColumns": [
-            "requirement"
+            "estimated_date"
           ]
         }
+      ],
+      "extractionNotes": [
+        "Link requested service rows with urgency section."
+      ]
+    },
+    {
+      "id": "med_referral_note_med_history_table",
+      "name": {
+        "en": "Clinical Background Table",
+        "pt": "Tabela de Historico Clinico"
+      },
+      "section": "clinical_summary",
+      "expectedColumns": [
+        "history_item",
+        "status",
+        "date",
+        "comment",
+        "source"
+      ],
+      "keyRows": [
+        "history_item",
+        "status"
+      ],
+      "headerSynonyms": {
+        "history_item": [
+          "history item",
+          "condition",
+          "history"
+        ],
+        "status": [
+          "status",
+          "current status"
+        ],
+        "date": [
+          "date",
+          "diagnosed",
+          "from"
+        ],
+        "comment": [
+          "comment",
+          "commentary"
+        ],
+        "source": [
+          "source",
+          "source doc"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "Preserve chronology if table contains previous admissions and procedures."
+      ]
+    },
+    {
+      "id": "med_referral_note_authorization_table",
+      "name": {
+        "en": "Authorization and Attachments",
+        "pt": "Tabela de Autorizacao e Anexos"
+      },
+      "section": "insurance_authorization",
+      "expectedColumns": [
+        "authorization_id",
+        "status",
+        "policy_number",
+        "expiry",
+        "required_docs"
+      ],
+      "keyRows": [
+        "authorization_id",
+        "status"
+      ],
+      "headerSynonyms": {
+        "authorization_id": [
+          "authorization id",
+          "authorization"
+        ],
+        "status": [
+          "status",
+          "state"
+        ],
+        "policy_number": [
+          "policy",
+          "policy number"
+        ],
+        "expiry": [
+          "expiry",
+          "valid until"
+        ],
+        "required_docs": [
+          "documents",
+          "attachments"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "Treat this as operational metadata and separate from clinical findings."
       ]
     }
   ]

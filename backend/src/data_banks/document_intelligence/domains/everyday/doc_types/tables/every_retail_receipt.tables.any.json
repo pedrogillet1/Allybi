@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_retail_receipt",
+    "version": "1.0.0",
+    "description": "Tables expected in every_retail_receipt.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_retail_receipt"
+  },
+  "tableHeaderSynonyms": {
+    "item": ["item", "produto", "desc", "description"],
+    "quantity": ["qtd", "quantity", "quantidade"],
+    "price": ["price", "unit price", "preco", "unit"],
+    "amount": ["amount", "total", "valor", "valor total"],
+    "discount": ["discount", "desconto"],
+    "tax": ["tax", "taxes", "impostos"]
+  },
+  "tables": [
+    {
+      "id": "retail_receipt_items_table",
+      "canonicalName": {
+        "en": "Purchased Items",
+        "pt": "Tabela de Itens"
+      },
+      "section": "transaction_lines",
+      "signaturePatterns": ["\\bitem\\b", "\\bproduto\\b", "\\bdescricao\\b"],
+      "requiredHeaders": ["item", "quantity", "unit_price", "amount", "item_code"],
+      "headerAliases": [["item", "descricao"], ["quantity", "qtd"], ["unit_price", "preco"], ["amount", "total"], ["item_code", "codigo"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["retail_receipt_fn_01"]
+    },
+    {
+      "id": "retail_receipt_discount_tax_table",
+      "canonicalName": {
+        "en": "Discounts and Taxes",
+        "pt": "Tabela de Descontos e Impostos"
+      },
+      "section": "discounts_taxes",
+      "signaturePatterns": ["\\bdiscount\\b", "\\btax\\b", "\\bdesconto\\b", "\\bimposto\\b"],
+      "requiredHeaders": ["type", "base", "rate", "amount", "currency"],
+      "headerAliases": [["type", "tipo"], ["base", "base de calculo"], ["rate", "aliquota"], ["amount", "valor"], ["currency", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["percent", "units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["retail_receipt_fn_02"]
+    },
+    {
+      "id": "retail_receipt_totals_table",
+      "canonicalName": {
+        "en": "Totals",
+        "pt": "Tabela de Totais"
+      },
+      "section": "totals_block",
+      "signaturePatterns": ["\\btotal\\b", "\\bsubtotal\\b", "\\bvalor total\\b"],
+      "requiredHeaders": ["label", "amount", "currency"],
+      "headerAliases": [["label", "descricao"], ["amount", "valor"], ["currency", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["retail_receipt_fn_03"]
+    },
+    {
+      "id": "retail_receipt_payment_table",
+      "canonicalName": {
+        "en": "Payment",
+        "pt": "Tabela de Pagamento"
+      },
+      "section": "payment_info",
+      "signaturePatterns": ["\\bpayment\\b", "\\bcard\\b", "\\bcash\\b", "\\bpix\\b", "\\bforma de pagamento\\b"],
+      "requiredHeaders": ["method", "reference", "amount", "auth"],
+      "headerAliases": [["method", "forma"], ["reference", "referencia"], ["amount", "valor"], ["auth", "autorizacao"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["retail_receipt_fn_04"]
+    }
+  ]
+}

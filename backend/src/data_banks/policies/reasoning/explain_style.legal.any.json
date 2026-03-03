@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -720,5 +726,47 @@
       "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
       "template": "Audiencia=auditor; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "LEG_EXPL_001_disclosure_first",
+      "trigger": "legal explanation missing source disclosure",
+      "check": "context.domain=='legal' && output.sourceDisclosure == false",
+      "failureAction": "INSERT_DISCLOSURE"
+    },
+    {
+      "id": "LEG_EXPL_002_risk_section_required",
+      "trigger": "legal explanation about obligations without risk section",
+      "check": "context.domain=='legal' && context.queryCategory == 'obligation' && output.riskSectionPresent == false",
+      "failureAction": "INSERT_LEGAL_RISK_SECTION"
+    },
+    {
+      "id": "LEG_EXPL_003_no_diagnostic_conclusion",
+      "trigger": "legal explanation gives unsupported clause intent",
+      "check": "context.domain=='legal' && output.containsClauseOpinion == true && output.supportingClauseCount == 0",
+      "failureAction": "REQUEST_SUPPORTING_SECTION"
+    },
+    {
+      "id": "LEG_EXPL_004_citation_density",
+      "trigger": "legal response is long and weakly cited",
+      "check": "context.domain=='legal' && output.citationCount < 2 && output.length > 320",
+      "failureAction": "INCREASE_CITATION_DENSITY"
+    },
+    {
+      "id": "LEG_EXPL_005_jurisdiction_guard",
+      "trigger": "legal recommendation without jurisdiction mention",
+      "check": "context.domain=='legal' && context.jurisdictionExpected == true && context.jurisdictionMentioned == false",
+      "failureAction": "ASK_FOR_JURISDICTION"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "LEG_EXPL_SMOKE_001"
+      }
+    ]
+  }
 }

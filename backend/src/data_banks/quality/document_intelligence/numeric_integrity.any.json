@@ -18,7 +18,10 @@
       "check": "output.currencyValues.any(v => v.digitCount < source.matchingValue.digitCount)",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: R$ 1.234.567,89 → Output: R$ 1.234", "Source: $45,000.00 → Output: $45"]
+      "examples": [
+        "Source: R$ 1.234.567,89 → Output: R$ 1.234",
+        "Source: $45,000.00 → Output: $45"
+      ]
     },
     {
       "id": "NUM_002_currency_symbol_mismatch",
@@ -26,7 +29,10 @@
       "check": "output.currencySymbol != source.currencySymbol",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: R$ 500 → Output: $ 500", "Source: € 1.000 → Output: £ 1,000"]
+      "examples": [
+        "Source: R$ 500 → Output: $ 500",
+        "Source: € 1.000 → Output: £ 1,000"
+      ]
     },
     {
       "id": "NUM_003_decimal_separator_swap",
@@ -34,7 +40,10 @@
       "check": "output.numberFormat.separatorConvention != source.numberFormat.separatorConvention",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 1.234,56 → Output: 1,234.56", "Source: 1,234.56 → Output: 1.234,56"]
+      "examples": [
+        "Source: 1.234,56 → Output: 1,234.56",
+        "Source: 1,234.56 → Output: 1.234,56"
+      ]
     },
     {
       "id": "NUM_004_percentage_missing_symbol",
@@ -42,7 +51,10 @@
       "check": "output.percentValues.any(v => v.symbolPresent == false) AND source.percentSymbolPresent == true",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 15.3% → Output: 15.3", "Source: taxa de 8,5% → Output: taxa de 8,5"]
+      "examples": [
+        "Source: 15.3% → Output: 15.3",
+        "Source: taxa de 8,5% → Output: taxa de 8,5"
+      ]
     },
     {
       "id": "NUM_005_percentage_decimal_drift",
@@ -50,7 +62,10 @@
       "check": "output.percentValue == source.percentValue * 100 OR output.percentValue == source.percentValue / 100",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 0.153 (ratio) → Output: 0.153%", "Source: 15.3% → Output: 0.153%"]
+      "examples": [
+        "Source: 0.153 (ratio) → Output: 0.153%",
+        "Source: 15.3% → Output: 0.153%"
+      ]
     },
     {
       "id": "NUM_006_unit_stripping",
@@ -58,7 +73,10 @@
       "check": "source.unitPresent == true AND output.unitPresent == false",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 500 kg → Output: 500", "Source: 12 months → Output: 12"]
+      "examples": [
+        "Source: 500 kg → Output: 500",
+        "Source: 12 months → Output: 12"
+      ]
     },
     {
       "id": "NUM_007_unit_conversion_unsolicited",
@@ -66,7 +84,10 @@
       "check": "output.unit != source.unit AND context.conversionRequested == false",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 10 km → Output: 6.2 miles", "Source: 100°F → Output: 37.8°C"]
+      "examples": [
+        "Source: 10 km → Output: 6.2 miles",
+        "Source: 100°F → Output: 37.8°C"
+      ]
     },
     {
       "id": "NUM_008_rounding_without_disclosure",
@@ -74,7 +95,10 @@
       "check": "output.numericValue != source.numericValue AND output.approximationMarker == false AND abs(output.numericValue - source.numericValue) > 0",
       "failureAction": "FALLBACK_WEAK_EVIDENCE",
       "severity": "warning",
-      "examples": ["Source: $4,982,341 → Output: $5 million (no 'approximately')", "Source: 73.4% → Output: 73%"]
+      "examples": [
+        "Source: $4,982,341 → Output: $5 million (no 'approximately')",
+        "Source: 73.4% → Output: 73%"
+      ]
     },
     {
       "id": "NUM_009_date_format_corruption",
@@ -82,7 +106,10 @@
       "check": "output.dateValue.day != source.dateValue.day OR output.dateValue.month != source.dateValue.month",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 03/12/2025 (Mar 12) → Output: 12/03/2025 (Dec 3)", "Source: 15/01/2026 → Output: 01/15/2026"]
+      "examples": [
+        "Source: 03/12/2025 (Mar 12) → Output: 12/03/2025 (Dec 3)",
+        "Source: 15/01/2026 → Output: 01/15/2026"
+      ]
     },
     {
       "id": "NUM_010_negative_sign_dropped",
@@ -90,7 +117,10 @@
       "check": "source.numericValue < 0 AND output.numericValue > 0 AND abs(source.numericValue) == output.numericValue",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: -$12,500 → Output: $12,500", "Source: (345.00) → Output: 345.00"]
+      "examples": [
+        "Source: -$12,500 → Output: $12,500",
+        "Source: (345.00) → Output: 345.00"
+      ]
     },
     {
       "id": "NUM_011_parenthetical_negative_misread",
@@ -98,7 +128,10 @@
       "check": "source.parentheticalNegative == true AND output.signPositive == true",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: (1,200) → Output: 1,200 (should be -1,200)", "Source: (R$ 50,00) → Output: R$ 50,00"]
+      "examples": [
+        "Source: (1,200) → Output: 1,200 (should be -1,200)",
+        "Source: (R$ 50,00) → Output: R$ 50,00"
+      ]
     },
     {
       "id": "NUM_012_period_mismatch",
@@ -106,7 +139,10 @@
       "check": "output.periodLabel != source.periodLabel AND source.periodLabel != null",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: Q3 2025 revenue → Output: attributed to Q4 2025", "Source: Jan figure → Output: labeled as Feb"]
+      "examples": [
+        "Source: Q3 2025 revenue → Output: attributed to Q4 2025",
+        "Source: Jan figure → Output: labeled as Feb"
+      ]
     },
     {
       "id": "NUM_013_phantom_digit_insertion",
@@ -114,7 +150,10 @@
       "check": "output.rawDigitCount > source.rawDigitCount AND context.calculationRequested == false",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 1,234 → Output: 12,340", "Source: R$ 89,50 → Output: R$ 895,00"]
+      "examples": [
+        "Source: 1,234 → Output: 12,340",
+        "Source: R$ 89,50 → Output: R$ 895,00"
+      ]
     },
     {
       "id": "NUM_014_digit_transposition",
@@ -122,7 +161,10 @@
       "check": "output.digitSequence != source.digitSequence AND output.digitSet == source.digitSet",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 1,523 → Output: 1,532", "Source: 87.4% → Output: 84.7%"]
+      "examples": [
+        "Source: 1,523 → Output: 1,532",
+        "Source: 87.4% → Output: 84.7%"
+      ]
     },
     {
       "id": "NUM_015_table_row_column_swap",
@@ -130,7 +172,10 @@
       "check": "output.tableRef.row != source.tableRef.row OR output.tableRef.column != source.tableRef.column",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Cited Q2 column but took Q1 value.", "Reported COGS row value as Revenue."]
+      "examples": [
+        "Cited Q2 column but took Q1 value.",
+        "Reported COGS row value as Revenue."
+      ]
     },
     {
       "id": "NUM_016_sum_disagrees_with_parts",
@@ -138,7 +183,10 @@
       "check": "output.statedTotal != sum(output.statedParts) AND context.arithmeticCheck == true",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["'10 + 20 + 30 = 70' (should be 60).", "'Parts sum to 100 but total shows 95'."]
+      "examples": [
+        "'10 + 20 + 30 = 70' (should be 60).",
+        "'Parts sum to 100 but total shows 95'."
+      ]
     },
     {
       "id": "NUM_017_mixed_scale_values",
@@ -146,7 +194,10 @@
       "check": "output.scaleLabels.distinct.count > 1 AND output.scaleLabelExplicit == false",
       "failureAction": "FALLBACK_WEAK_EVIDENCE",
       "severity": "warning",
-      "examples": ["Revenue: $5M, Costs: $3,200,000 (mixed notation).", "One value in thousands, another in units."]
+      "examples": [
+        "Revenue: $5M, Costs: $3,200,000 (mixed notation).",
+        "One value in thousands, another in units."
+      ]
     },
     {
       "id": "NUM_018_zero_vs_null_confusion",
@@ -154,7 +205,10 @@
       "check": "(source.value == null AND output.value == 0) OR (source.value == 0 AND output.value == null)",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: N/A → Output: 0", "Source: 0 → Output: 'not available'"]
+      "examples": [
+        "Source: N/A → Output: 0",
+        "Source: 0 → Output: 'not available'"
+      ]
     },
     {
       "id": "NUM_019_scientific_notation_mangled",
@@ -162,7 +216,10 @@
       "check": "source.scientificNotation == true AND output.scientificNotation.exponent != source.scientificNotation.exponent",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 3.2e6 → Output: 3.2e5", "Source: 1.5 × 10^9 → Output: 1.5 × 10^6"]
+      "examples": [
+        "Source: 3.2e6 → Output: 3.2e5",
+        "Source: 1.5 × 10^9 → Output: 1.5 × 10^6"
+      ]
     },
     {
       "id": "NUM_020_fraction_decimal_mismatch",
@@ -170,7 +227,10 @@
       "check": "source.isFraction == true AND output.decimalEquivalent != source.fractionValue",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 3/4 → Output: 0.34 (should be 0.75)", "Source: 1/3 → Output: 0.30"]
+      "examples": [
+        "Source: 3/4 → Output: 0.34 (should be 0.75)",
+        "Source: 1/3 → Output: 0.30"
+      ]
     },
     {
       "id": "NUM_021_trailing_zeros_significance",
@@ -178,7 +238,10 @@
       "check": "source.trailingZeros > 0 AND output.trailingZeros < source.trailingZeros AND context.precisionSignificant == true",
       "failureAction": "FALLBACK_WEAK_EVIDENCE",
       "severity": "warning",
-      "examples": ["Source: 5.00% → Output: 5%", "Source: R$ 100,00 → Output: R$ 100"]
+      "examples": [
+        "Source: 5.00% → Output: 5%",
+        "Source: R$ 100,00 → Output: R$ 100"
+      ]
     },
     {
       "id": "NUM_022_index_base_mismatch",
@@ -186,7 +249,10 @@
       "check": "source.indexBase != output.indexBase",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: index 142 (base 100) → Output: 1.42", "Source: 0.85 → Output: 85 (assumed base 100)"]
+      "examples": [
+        "Source: index 142 (base 100) → Output: 1.42",
+        "Source: 0.85 → Output: 85 (assumed base 100)"
+      ]
     },
     {
       "id": "NUM_023_time_unit_confusion",
@@ -194,7 +260,10 @@
       "check": "output.timeUnit != source.timeUnit AND context.timeConversionRequested == false",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 18 months → Output: 18 years", "Source: 30-day period → Output: 30 weeks"]
+      "examples": [
+        "Source: 18 months → Output: 18 years",
+        "Source: 30-day period → Output: 30 weeks"
+      ]
     },
     {
       "id": "NUM_024_rate_vs_absolute_confusion",
@@ -202,7 +271,10 @@
       "check": "(source.isRate == true AND output.isRate == false) OR (source.isRate == false AND output.isRate == true)",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 5% per annum → Output: 5 per annum", "Source: R$ 500/month → Output: R$ 500"]
+      "examples": [
+        "Source: 5% per annum → Output: 5 per annum",
+        "Source: R$ 500/month → Output: R$ 500"
+      ]
     },
     {
       "id": "NUM_025_cumulative_vs_incremental",
@@ -210,7 +282,10 @@
       "check": "source.valueSemantic == 'cumulative' AND output.valueSemantic == 'incremental' OR vice versa",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: YTD total $1.2M → Output: monthly $1.2M", "Source: incremental 50 → Output: cumulative 50"]
+      "examples": [
+        "Source: YTD total $1.2M → Output: monthly $1.2M",
+        "Source: incremental 50 → Output: cumulative 50"
+      ]
     },
     {
       "id": "NUM_026_magnitude_order_error",
@@ -218,7 +293,10 @@
       "check": "abs(log10(output.numericValue / source.numericValue)) >= 1 AND context.calculationRequested == false",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: $50,000 → Output: $500,000", "Source: 3.5% → Output: 35%"]
+      "examples": [
+        "Source: $50,000 → Output: $500,000",
+        "Source: 3.5% → Output: 35%"
+      ]
     },
     {
       "id": "NUM_027_currency_conversion_unsolicited",
@@ -226,7 +304,10 @@
       "check": "output.currency != source.currency AND context.currencyConversionRequested == false",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: R$ 50.000 → Output: $10,000 (converted)", "Source: €500 → Output: $550"]
+      "examples": [
+        "Source: R$ 50.000 → Output: $10,000 (converted)",
+        "Source: €500 → Output: $550"
+      ]
     },
     {
       "id": "NUM_028_interpolated_value_unlabeled",
@@ -234,7 +315,10 @@
       "check": "output.isInterpolated == true AND output.interpolationMarker == false",
       "failureAction": "FALLBACK_WEAK_EVIDENCE",
       "severity": "warning",
-      "examples": ["Gap-filled missing month with average, not labeled.", "Projected value presented as actual."]
+      "examples": [
+        "Gap-filled missing month with average, not labeled.",
+        "Projected value presented as actual."
+      ]
     },
     {
       "id": "NUM_029_percentage_point_vs_percent",
@@ -242,7 +326,10 @@
       "check": "source.isPercentagePoint == true AND output.treatedAsPercentChange == true",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: increased by 3pp → Output: increased by 3%", "Source: 5 percentage points → Output: 5% change"]
+      "examples": [
+        "Source: increased by 3pp → Output: increased by 3%",
+        "Source: 5 percentage points → Output: 5% change"
+      ]
     },
     {
       "id": "NUM_030_fiscal_calendar_year_mix",
@@ -250,7 +337,10 @@
       "check": "source.yearType == 'fiscal' AND output.yearType == 'calendar' OR vice versa",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: FY2025 (ends Jun) → Output: 2025 (implies Dec)", "Source: CY2024 data → Output: labeled FY2024"]
+      "examples": [
+        "Source: FY2025 (ends Jun) → Output: 2025 (implies Dec)",
+        "Source: CY2024 data → Output: labeled FY2024"
+      ]
     },
     {
       "id": "NUM_031_number_word_mismatch",
@@ -258,7 +348,10 @@
       "check": "output.numberWord.numericEquivalent != source.numericValue",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: 15 → Output: 'sixteen'", "Source: R$ 2.500 → Output: 'two thousand'"]
+      "examples": [
+        "Source: 15 → Output: 'sixteen'",
+        "Source: R$ 2.500 → Output: 'two thousand'"
+      ]
     },
     {
       "id": "NUM_032_variance_sign_flip",
@@ -266,7 +359,10 @@
       "check": "output.changeDirection != source.changeDirection",
       "failureAction": "BLOCK_AND_REGEN",
       "severity": "error",
-      "examples": ["Source: decreased by 12% → Output: increased by 12%", "Source: +$500 → Output: -$500"]
+      "examples": [
+        "Source: decreased by 12% → Output: increased by 12%",
+        "Source: +$500 → Output: -$500"
+      ]
     }
   ],
   "templates": {
@@ -302,5 +398,8 @@
       "Timestamps must preserve timezone: {{timestamp}} {{timezone}}.",
       "KPI values must match dashboard source: {{kpi}} = {{value}}."
     ]
-  }
+  },
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ]
 }

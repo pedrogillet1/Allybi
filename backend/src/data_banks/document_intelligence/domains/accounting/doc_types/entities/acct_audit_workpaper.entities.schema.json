@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -71,16 +71,40 @@
       "description": "Reviewer name"
     },
     {
-      "id": "conclusion",
-      "type": "string",
-      "required": false,
-      "description": "Conclusion or result summary"
-    },
-    {
       "id": "issueCount",
       "type": "number",
       "required": false,
-      "description": "Number of findings/issues"
+      "description": "Number of findings or exceptions"
+    },
+    {
+      "id": "sampleSize",
+      "type": "number",
+      "required": false,
+      "description": "Number of samples tested"
+    },
+    {
+      "id": "testingConclusion",
+      "type": "string",
+      "required": false,
+      "description": "Overall testing conclusion"
+    },
+    {
+      "id": "outOfBalanceAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Difference between tied out debit and credit totals"
+    },
+    {
+      "id": "totalDebit",
+      "type": "currency",
+      "required": false,
+      "description": "Total debit amount in test tie-out"
+    },
+    {
+      "id": "totalCredit",
+      "type": "currency",
+      "required": false,
+      "description": "Total credit amount in test tie-out"
     }
   ]
 }

@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "id": "di_everyday_sections_every_tax_return",
+    "version": "1.0.0",
+    "description": "Section map for every_tax_return.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_return"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["return", "tax return", "declaration", "document title"]
+    },
+    {
+      "id": "taxpayer_profile",
+      "name": {
+        "en": "Taxpayer Profile",
+        "pt": "Perfil do Contribuinte"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["taxpayer", "nome", "contribuinte", "cnpj", "cpf"]
+    },
+    {
+      "id": "filing_section",
+      "name": {
+        "en": "Filing Information",
+        "pt": "Informacoes de Entrega"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["fiscal year", "tax year", "period", "due date"]
+    },
+    {
+      "id": "income_section",
+      "name": {
+        "en": "Income",
+        "pt": "Rendimentos"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["income", "wages", "salary", "rendimento"]
+    },
+    {
+      "id": "deductions",
+      "name": {
+        "en": "Deductions",
+        "pt": "Deducoes"
+      },
+      "order": 5,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["deduction", "dependents", "expenses", "dedução"]
+    },
+    {
+      "id": "credits",
+      "name": {
+        "en": "Tax Credits",
+        "pt": "Creditos Fiscais"
+      },
+      "order": 6,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["credits", "withholding", "reimbursements", "impugnation"]
+    },
+    {
+      "id": "tax_summary",
+      "name": {
+        "en": "Tax Summary",
+        "pt": "Resumo Fiscal"
+      },
+      "order": 7,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["tax summary", "total due", "total tax", "valor devido"]
+    },
+    {
+      "id": "payment_or_refund",
+      "name": {
+        "en": "Payment or Refund",
+        "pt": "Pagamento ou Reembolso"
+      },
+      "order": 8,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["refund", "payment", "tax payable", "credito"]
+    },
+    {
+      "id": "signatures",
+      "name": {
+        "en": "Signatures",
+        "pt": "Assinaturas"
+      },
+      "order": 9,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["signature", "authorized", "assinatura"]
+    },
+    {
+      "id": "footnotes_or_annexes",
+      "name": {
+        "en": "Footnotes and Annexes",
+        "pt": "Notas e Anexos"
+      },
+      "order": 10,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["footnote", "annex", "attachment", "anexo"]
+    }
+  ]
+}

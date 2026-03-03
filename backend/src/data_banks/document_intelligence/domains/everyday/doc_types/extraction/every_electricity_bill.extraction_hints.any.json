@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "id": "di_everyday_extraction_every_electricity_bill",
+    "version": "1.0.0",
+    "description": "Extraction hints for every_electricity_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_electricity_bill"
+  },
+  "hints": [
+    { "id": "hint_01", "entity": "service_address", "anchors": ["service address", "endereco", "instalacao"], "location": "service_address", "extractionMethod": "heading_proximity", "whereItHides": ["address block", "top section"] },
+    { "id": "hint_02", "entity": "meter_number", "anchors": ["meter", "medidor", "numero"], "location": "meter_readings", "extractionMethod": "heading_proximity", "whereItHides": ["meter line", "header"] },
+    { "id": "hint_03", "entity": "reading_previous", "anchors": ["previous", "anterior"], "location": "meter_readings", "extractionMethod": "table_row_match", "whereItHides": ["meter table", "first row"] },
+    { "id": "hint_04", "entity": "reading_current", "anchors": ["current", "atual"], "location": "meter_readings", "extractionMethod": "table_row_match", "whereItHides": ["meter table", "first row"] },
+    { "id": "hint_05", "entity": "consumption_kwh", "anchors": ["consumption", "kwh", "energia"], "location": "consumption_summary", "extractionMethod": "table_row_match", "whereItHides": ["consumption block", "energy summary"] },
+    { "id": "hint_06", "entity": "tariff_rate", "anchors": ["tariff", "tarifa", "rate"], "location": "tariff_breakdown", "extractionMethod": "heading_proximity", "whereItHides": ["tariff section", "component list"] },
+    { "id": "hint_07", "entity": "energy_charge", "anchors": ["energy charge", "energia"], "location": "charges_by_component", "extractionMethod": "table_row_match", "whereItHides": ["charges table", "component section"] },
+    { "id": "hint_08", "entity": "tax_amount", "anchors": ["tax", "icms", "pis"], "location": "charges_by_component", "extractionMethod": "table_row_match", "whereItHides": ["tax lines"] },
+    { "id": "hint_09", "entity": "total_amount", "anchors": ["total", "valor total", "total"], "location": "totals_and_due", "extractionMethod": "table_row_match", "whereItHides": ["totals summary"] },
+    { "id": "hint_10", "entity": "due_date", "anchors": ["due", "vencimento", "date"], "location": "totals_and_due", "extractionMethod": "heading_proximity", "whereItHides": ["due section"] }
+  ]
+}

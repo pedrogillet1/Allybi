@@ -1,0 +1,279 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_rent_receipt",
+    "version": "1.0.0",
+    "description": "Entity schema for every_rent_receipt.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_rent_receipt"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "landlord_name",
+      "type": "string",
+      "required": true,
+      "description": "Landlord or property owner name.",
+      "section": "property_and_parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["landlord", "lessor", "locador"],
+        "disallowInference": true,
+        "preferredSources": ["property_and_parties"]
+      }
+    },
+    {
+      "id": "tenant_name",
+      "type": "string",
+      "required": true,
+      "description": "Tenant name.",
+      "section": "property_and_parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["tenant", "locatario", "inhabitant"],
+        "disallowInference": true,
+        "preferredSources": ["property_and_parties"]
+      }
+    },
+    {
+      "id": "landlord_id",
+      "type": "string",
+      "required": false,
+      "description": "Landlord tax identifier when present.",
+      "section": "property_and_parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["cnpj", "cpf", "landlord id"],
+        "disallowInference": true,
+        "preferredSources": ["document_header", "property_and_parties"]
+      }
+    },
+    {
+      "id": "tenant_id",
+      "type": "string",
+      "required": false,
+      "description": "Tenant tax identifier when present.",
+      "section": "property_and_parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["tenant id", "cpf", "tenant tax id"],
+        "disallowInference": true,
+        "preferredSources": ["property_and_parties"]
+      }
+    },
+    {
+      "id": "property_address",
+      "type": "string",
+      "required": true,
+      "description": "Rented property address.",
+      "section": "property_and_parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["property", "address", "endereco", "imovel"],
+        "disallowInference": true,
+        "preferredSources": ["property_and_parties", "lease_info"]
+      }
+    },
+    {
+      "id": "property_unit",
+      "type": "string",
+      "required": false,
+      "description": "Apartment, unit, or lot identifier.",
+      "section": "property_and_parties",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["unit", "apt", "apartamento", "bloco"],
+        "disallowInference": true,
+        "preferredSources": ["property_and_parties"]
+      }
+    },
+    {
+      "id": "lease_number",
+      "type": "string",
+      "required": false,
+      "description": "Lease contract number tied to payment.",
+      "section": "lease_info",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["lease", "contract", "locacao", "rental contract"],
+        "disallowInference": true,
+        "preferredSources": ["lease_info"]
+      }
+    },
+    {
+      "id": "lease_start_date",
+      "type": "date",
+      "required": true,
+      "description": "Lease period start date.",
+      "section": "lease_info",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["lease start", "from", "inicio", "inicio contrato"],
+        "disallowInference": true,
+        "preferredSources": ["lease_info"]
+      }
+    },
+    {
+      "id": "lease_end_date",
+      "type": "date",
+      "required": true,
+      "description": "Lease period end date.",
+      "section": "lease_info",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["lease end", "to", "fim", "termino"],
+        "disallowInference": true,
+        "preferredSources": ["lease_info"]
+      }
+    },
+    {
+      "id": "payment_period_start",
+      "type": "date",
+      "required": true,
+      "description": "Invoice reference period start.",
+      "section": "payment_period",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["reference period", "periodo", "from", "inicio"],
+        "disallowInference": true,
+        "preferredSources": ["payment_period"]
+      }
+    },
+    {
+      "id": "payment_period_end",
+      "type": "date",
+      "required": true,
+      "description": "Invoice reference period end.",
+      "section": "payment_period",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["reference period", "periodo", "to", "fim"],
+        "disallowInference": true,
+        "preferredSources": ["payment_period"]
+      }
+    },
+    {
+      "id": "rent_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Base rent amount for the period.",
+      "section": "charges_breakdown",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["rent", "aluguel", "rental amount", "basic rent"],
+        "disallowInference": true,
+        "preferredSources": ["charges_breakdown"]
+      }
+    },
+    {
+      "id": "utilities_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Utilities reimbursement amount.",
+      "section": "utilities_or_services",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["utilities", "agua", "luz", "condominio"],
+        "disallowInference": true,
+        "preferredSources": ["utilities_or_services"]
+      }
+    },
+    {
+      "id": "service_fee_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Additional fees (maintenance/service).",
+      "section": "charges_breakdown",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["fee", "service", "charge", "taxa"],
+        "disallowInference": true,
+        "preferredSources": ["charges_breakdown"]
+      }
+    },
+    {
+      "id": "late_fee_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Late fee or penalty for late payment.",
+      "section": "late_fees",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["late fee", "penalty", "multa", "juros"],
+        "disallowInference": true,
+        "preferredSources": ["late_fees"]
+      }
+    },
+    {
+      "id": "total_amount_due",
+      "type": "currency",
+      "required": true,
+      "description": "Total payable amount on the receipt.",
+      "section": "payment_confirmation",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["total", "total due", "total amount", "valor total"],
+        "disallowInference": true,
+        "preferredSources": ["payment_confirmation"]
+      }
+    },
+    {
+      "id": "receipt_payment_date",
+      "type": "date",
+      "required": false,
+      "description": "Date the rent payment was made.",
+      "section": "payment_confirmation",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["payment date", "paid on", "data pagamento"],
+        "disallowInference": true,
+        "preferredSources": ["payment_confirmation"]
+      }
+    },
+    {
+      "id": "payment_method",
+      "type": "string",
+      "required": false,
+      "description": "Method used to make the payment.",
+      "section": "payment_confirmation",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["payment method", "boleto", "pix", "transfer"],
+        "disallowInference": false,
+        "preferredSources": ["payment_confirmation"]
+      }
+    },
+    {
+      "id": "receipt_currency",
+      "type": "string",
+      "required": true,
+      "description": "Currency code used.",
+      "section": "payment_confirmation",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["currency", "moeda", "currency code"],
+        "disallowInference": false,
+        "preferredSources": ["payment_confirmation", "document_header"]
+      }
+    },
+    {
+      "id": "receipt_number",
+      "type": "string",
+      "required": false,
+      "description": "Official receipt number.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["receipt", "recibo", "document number"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    }
+  ]
+}

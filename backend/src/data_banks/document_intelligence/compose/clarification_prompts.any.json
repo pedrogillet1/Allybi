@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "id": "clarification_prompts",
+    "version": "1.0.0",
+    "description": "Clarification prompts for scoped and high-risk document intelligence queries.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxPrompts": 2,
+    "tone": "helpful"
+  },
+  "prompts": [
+    {
+      "id": "CLAR_001_scope_ambiguous_doc",
+      "trigger": "Multiple documents match a doc alias query",
+      "prompt": {
+        "en": "I found multiple matching documents. Which one should I use: {{options}}?",
+        "pt": "Encontrei varios documentos correspondentes. Qual voce quer usar: {{options}}?"
+      },
+      "priority": "high",
+      "failureAction": "ASK_SINGLE_CHOICE"
+    },
+    {
+      "id": "CLAR_002_period_missing",
+      "trigger": "Query is time-sensitive but no period is specified",
+      "prompt": {
+        "en": "Which period should I use (example: Jan 2025, Q1 2024, or current billing cycle)?",
+        "pt": "Qual periodo devo usar (ex.: Jan 2025, Q1 2024, ou ciclo atual)?"
+      },
+      "priority": "high",
+      "failureAction": "ASK_PERIOD"
+    },
+    {
+      "id": "CLAR_003_compare_doc_missing",
+      "trigger": "Compare intent lacks one explicit side",
+      "prompt": {
+        "en": "To compare, please provide both documents or choose 'across all my docs' if you want a broad scan.",
+        "pt": "Para comparar, indique os dois documentos ou escolha 'em todos os documentos' para varredura ampla."
+      },
+      "priority": "high",
+      "failureAction": "ASK_TWO_DOCS_OR_BROAD_SCOPE"
+    },
+    {
+      "id": "CLAR_004_unit_interpretation",
+      "trigger": "Query contains a numeric value with ambiguous unit",
+      "prompt": {
+        "en": "I can answer both ways; should I treat this as {{unitA}} or {{unitB}}?",
+        "pt": "Posso responder de duas formas; devo usar {{unitA}} ou {{unitB}}?"
+      },
+      "priority": "medium",
+      "failureAction": "ASK_UNIT_CHOICE"
+    },
+    {
+      "id": "CLAR_005_entity_role",
+      "trigger": "A role/party term is ambiguous in legal/financial context",
+      "prompt": {
+        "en": "This query mentions '{{entity}}'. Is this the {{roleA}} or {{roleB}}?",
+        "pt": "A consulta menciona '{{entity}}'. Refere-se a {{roleA}} ou {{roleB}}?"
+      },
+      "priority": "medium",
+      "failureAction": "ASK_ENTITY_ROLE"
+    }
+  ],
+  "rules": [
+    {
+      "id": "CP_001_prompt_required_for_ambiguity",
+      "trigger": "query is ambiguous but no clarification prompt fired",
+      "check": "context.ambiguityDetected == true AND context.clarificationPromptEmitted == false",
+      "failureAction": "FORCE_CLARIFICATION_FLOW"
+    },
+    {
+      "id": "CP_002_period_prompt_for_time_scope",
+      "trigger": "period-dependent query is processed without period question",
+      "check": "context.queryNeedsPeriod == true AND context.periodResolved == false AND context.clarificationPromptIds.excludes('CLAR_002_period_missing')",
+      "failureAction": "PREFER_PROMPT_002"
+    },
+    {
+      "id": "CP_003_compare_prompt_guard",
+      "trigger": "compare request with incomplete scope",
+      "check": "context.intent == 'compare' AND context.explicitDocCount < 2",
+      "failureAction": "PREFER_PROMPT_003"
+    },
+    {
+      "id": "CP_004_unit_prompt_guard",
+      "trigger": "numeric value has multiple plausible units",
+      "check": "context.numericUnitAmbiguity == true AND context.unitPromptChosen == false",
+      "failureAction": "PREFER_PROMPT_004"
+    },
+    {
+      "id": "CP_005_entity_role_gate",
+      "trigger": "legal or finance query has mixed party terms",
+      "check": "context.domain IN ['legal','finance'] AND context.partyRoleAmbiguous == true AND context.clarificationPromptIds.excludes('CLAR_005_entity_role')",
+      "failureAction": "PREFER_PROMPT_005"
+    }
+  ],
+  "templates": [
+    {
+      "id": "CLARIFICATION_PROMPTS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in clarification_prompts.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

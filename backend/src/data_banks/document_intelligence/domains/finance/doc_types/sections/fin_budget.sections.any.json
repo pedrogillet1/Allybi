@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_budget",
-    "version": "2.0.0",
-    "description": "Section map for fin_budget.",
+    "version": "2.1.0",
+    "description": "Sections mapping for Budget Pack.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,76 +15,1368 @@
   },
   "sections": [
     {
-      "id": "executive_summary",
+      "id": "planning_assumptions_1",
       "name": {
-        "en": "Executive Summary",
-        "pt": "Resumo Executivo"
+        "en": "Planning Assumptions Segment 1",
+        "pt": "Planning Assumptions segmento 1"
       },
-      "required": true,
-      "order": 1
+      "mustHave": true,
+      "order": 1,
+      "headingAnchors": [
+        "Planning Assumptions 1",
+        "planning_assumptions 1",
+        "Planning Assumptions section",
+        "seção Planning Assumptions 1"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bplanning_assumptions\b",
+        "\bplanning_assumptions_1\b",
+        "\bplanning_assumptions section\b"
+      ],
+      "description": "Canonical section planning_assumptions for Budget Pack"
     },
     {
-      "id": "period_scope",
+      "id": "revenue_budget_2",
       "name": {
-        "en": "Period and Scope",
-        "pt": "Periodo e Escopo"
+        "en": "Revenue Budget Segment 2",
+        "pt": "Revenue Orcamento segmento 2"
       },
-      "required": true,
-      "order": 2
+      "mustHave": true,
+      "order": 2,
+      "headingAnchors": [
+        "Revenue Budget 2",
+        "revenue_budget 2",
+        "Revenue Budget section",
+        "seção Revenue Budget 2"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\brevenue_budget\b",
+        "\brevenue_budget_2\b",
+        "\brevenue_budget section\b"
+      ],
+      "description": "Canonical section revenue_budget for Budget Pack"
     },
     {
-      "id": "assumptions",
+      "id": "expense_budget_3",
       "name": {
-        "en": "Assumptions",
-        "pt": "Premissas"
+        "en": "Expense Budget Segment 3",
+        "pt": "Expense Orcamento segmento 3"
       },
-      "required": false,
-      "order": 3
+      "mustHave": true,
+      "order": 3,
+      "headingAnchors": [
+        "Expense Budget 3",
+        "expense_budget 3",
+        "Expense Budget section",
+        "seção Expense Budget 3"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bexpense_budget\b",
+        "\bexpense_budget_3\b",
+        "\bexpense_budget section\b"
+      ],
+      "description": "Canonical section expense_budget for Budget Pack"
     },
     {
-      "id": "tables_primary",
+      "id": "headcount_plan_4",
       "name": {
-        "en": "Primary Tables",
-        "pt": "Tabelas Principais"
+        "en": "Headcount Plan Segment 4",
+        "pt": "Headcount Plan segmento 4"
       },
-      "required": true,
-      "order": 4
+      "mustHave": true,
+      "order": 4,
+      "headingAnchors": [
+        "Headcount Plan 4",
+        "headcount_plan 4",
+        "Headcount Plan section",
+        "seção Headcount Plan 4"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bheadcount_plan\b",
+        "\bheadcount_plan_4\b",
+        "\bheadcount_plan section\b"
+      ],
+      "description": "Canonical section headcount_plan for Budget Pack"
     },
     {
-      "id": "variance_and_drivers",
+      "id": "capex_plan_5",
       "name": {
-        "en": "Variance and Drivers",
-        "pt": "Variacoes e Drivers"
+        "en": "Capex Plan Segment 5",
+        "pt": "Capex Plan segmento 5"
       },
-      "required": false,
-      "order": 5
+      "mustHave": true,
+      "order": 5,
+      "headingAnchors": [
+        "Capex Plan 5",
+        "capex_plan 5",
+        "Capex Plan section",
+        "seção Capex Plan 5"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bcapex_plan\b",
+        "\bcapex_plan_5\b",
+        "\bcapex_plan section\b"
+      ],
+      "description": "Canonical section capex_plan for Budget Pack"
     },
     {
-      "id": "risks_and_constraints",
+      "id": "capability_plan_6",
       "name": {
-        "en": "Risks and Constraints",
-        "pt": "Riscos e Restricoes"
+        "en": "Capability Plan Segment 6",
+        "pt": "Capability Plan segmento 6"
       },
-      "required": false,
-      "order": 6
+      "mustHave": true,
+      "order": 6,
+      "headingAnchors": [
+        "Capability Plan 6",
+        "capability_plan 6",
+        "Capability Plan section",
+        "seção Capability Plan 6"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bcapability_plan\b",
+        "\bcapability_plan_6\b",
+        "\bcapability_plan section\b"
+      ],
+      "description": "Canonical section capability_plan for Budget Pack"
     },
     {
-      "id": "definitions",
+      "id": "variance_plan_7",
       "name": {
-        "en": "Definitions",
-        "pt": "Definicoes"
+        "en": "Variance Plan Segment 7",
+        "pt": "Variacao Plan segmento 7"
       },
-      "required": true,
-      "order": 7
+      "mustHave": true,
+      "order": 7,
+      "headingAnchors": [
+        "Variance Plan 7",
+        "variance_plan 7",
+        "Variance Plan section",
+        "seção Variance Plan 7"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bvariance_plan\b",
+        "\bvariance_plan_7\b",
+        "\bvariance_plan section\b"
+      ],
+      "description": "Canonical section variance_plan for Budget Pack"
     },
     {
-      "id": "appendix",
+      "id": "approval_section_8",
       "name": {
-        "en": "Appendix",
-        "pt": "Anexos"
+        "en": "Approval Section Segment 8",
+        "pt": "Approval Section segmento 8"
       },
-      "required": false,
-      "order": 8
+      "mustHave": true,
+      "order": 8,
+      "headingAnchors": [
+        "Approval Section 8",
+        "approval_section 8",
+        "Approval Section section",
+        "seção Approval Section 8"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bapproval_section\b",
+        "\bapproval_section_8\b",
+        "\bapproval_section section\b"
+      ],
+      "description": "Canonical section approval_section for Budget Pack"
+    },
+    {
+      "id": "scenario_analysis_9",
+      "name": {
+        "en": "Scenario Analysis Segment 9",
+        "pt": "Scenario Analysis segmento 9"
+      },
+      "mustHave": true,
+      "order": 9,
+      "headingAnchors": [
+        "Scenario Analysis 9",
+        "scenario_analysis 9",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 9"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_9\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Budget Pack"
+    },
+    {
+      "id": "risk_buffer_10",
+      "name": {
+        "en": "Risk Buffer Segment 10",
+        "pt": "Risk Buffer segmento 10"
+      },
+      "mustHave": true,
+      "order": 10,
+      "headingAnchors": [
+        "Risk Buffer 10",
+        "risk_buffer 10",
+        "Risk Buffer section",
+        "seção Risk Buffer 10"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\brisk_buffer\b",
+        "\brisk_buffer_10\b",
+        "\brisk_buffer section\b"
+      ],
+      "description": "Canonical section risk_buffer for Budget Pack"
+    },
+    {
+      "id": "rollover_plan_11",
+      "name": {
+        "en": "Rollover Plan Segment 11",
+        "pt": "Rollover Plan segmento 11"
+      },
+      "mustHave": false,
+      "order": 11,
+      "headingAnchors": [
+        "Rollover Plan 11",
+        "rollover_plan 11",
+        "Rollover Plan section",
+        "seção Rollover Plan 11"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\brollover_plan\b",
+        "\brollover_plan_11\b",
+        "\brollover_plan section\b"
+      ],
+      "description": "Canonical section rollover_plan for Budget Pack"
+    },
+    {
+      "id": "signoff_matrix_12",
+      "name": {
+        "en": "Signoff Matrix Segment 12",
+        "pt": "Signoff Matrix segmento 12"
+      },
+      "mustHave": false,
+      "order": 12,
+      "headingAnchors": [
+        "Signoff Matrix 12",
+        "signoff_matrix 12",
+        "Signoff Matrix section",
+        "seção Signoff Matrix 12"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bsignoff_matrix\b",
+        "\bsignoff_matrix_12\b",
+        "\bsignoff_matrix section\b"
+      ],
+      "description": "Canonical section signoff_matrix for Budget Pack"
+    },
+    {
+      "id": "budget_cover_13",
+      "name": {
+        "en": "Budget Cover Segment 13",
+        "pt": "Orcamento Cover segmento 13"
+      },
+      "mustHave": false,
+      "order": 13,
+      "headingAnchors": [
+        "Budget Cover 13",
+        "budget_cover 13",
+        "Budget Cover section",
+        "seção Budget Cover 13"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bbudget_cover\b",
+        "\bbudget_cover_13\b",
+        "\bbudget_cover section\b"
+      ],
+      "description": "Canonical section budget_cover for Budget Pack"
+    },
+    {
+      "id": "planning_assumptions_14",
+      "name": {
+        "en": "Planning Assumptions Segment 14",
+        "pt": "Planning Assumptions segmento 14"
+      },
+      "mustHave": false,
+      "order": 14,
+      "headingAnchors": [
+        "Planning Assumptions 14",
+        "planning_assumptions 14",
+        "Planning Assumptions section",
+        "seção Planning Assumptions 14"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bplanning_assumptions\b",
+        "\bplanning_assumptions_14\b",
+        "\bplanning_assumptions section\b"
+      ],
+      "description": "Canonical section planning_assumptions for Budget Pack"
+    },
+    {
+      "id": "revenue_budget_15",
+      "name": {
+        "en": "Revenue Budget Segment 15",
+        "pt": "Revenue Orcamento segmento 15"
+      },
+      "mustHave": false,
+      "order": 15,
+      "headingAnchors": [
+        "Revenue Budget 15",
+        "revenue_budget 15",
+        "Revenue Budget section",
+        "seção Revenue Budget 15"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\brevenue_budget\b",
+        "\brevenue_budget_15\b",
+        "\brevenue_budget section\b"
+      ],
+      "description": "Canonical section revenue_budget for Budget Pack"
+    },
+    {
+      "id": "expense_budget_16",
+      "name": {
+        "en": "Expense Budget Segment 16",
+        "pt": "Expense Orcamento segmento 16"
+      },
+      "mustHave": false,
+      "order": 16,
+      "headingAnchors": [
+        "Expense Budget 16",
+        "expense_budget 16",
+        "Expense Budget section",
+        "seção Expense Budget 16"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bexpense_budget\b",
+        "\bexpense_budget_16\b",
+        "\bexpense_budget section\b"
+      ],
+      "description": "Canonical section expense_budget for Budget Pack"
+    },
+    {
+      "id": "headcount_plan_17",
+      "name": {
+        "en": "Headcount Plan Segment 17",
+        "pt": "Headcount Plan segmento 17"
+      },
+      "mustHave": false,
+      "order": 17,
+      "headingAnchors": [
+        "Headcount Plan 17",
+        "headcount_plan 17",
+        "Headcount Plan section",
+        "seção Headcount Plan 17"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bheadcount_plan\b",
+        "\bheadcount_plan_17\b",
+        "\bheadcount_plan section\b"
+      ],
+      "description": "Canonical section headcount_plan for Budget Pack"
+    },
+    {
+      "id": "capex_plan_18",
+      "name": {
+        "en": "Capex Plan Segment 18",
+        "pt": "Capex Plan segmento 18"
+      },
+      "mustHave": false,
+      "order": 18,
+      "headingAnchors": [
+        "Capex Plan 18",
+        "capex_plan 18",
+        "Capex Plan section",
+        "seção Capex Plan 18"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bcapex_plan\b",
+        "\bcapex_plan_18\b",
+        "\bcapex_plan section\b"
+      ],
+      "description": "Canonical section capex_plan for Budget Pack"
+    },
+    {
+      "id": "capability_plan_19",
+      "name": {
+        "en": "Capability Plan Segment 19",
+        "pt": "Capability Plan segmento 19"
+      },
+      "mustHave": false,
+      "order": 19,
+      "headingAnchors": [
+        "Capability Plan 19",
+        "capability_plan 19",
+        "Capability Plan section",
+        "seção Capability Plan 19"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bcapability_plan\b",
+        "\bcapability_plan_19\b",
+        "\bcapability_plan section\b"
+      ],
+      "description": "Canonical section capability_plan for Budget Pack"
+    },
+    {
+      "id": "variance_plan_20",
+      "name": {
+        "en": "Variance Plan Segment 20",
+        "pt": "Variacao Plan segmento 20"
+      },
+      "mustHave": false,
+      "order": 20,
+      "headingAnchors": [
+        "Variance Plan 20",
+        "variance_plan 20",
+        "Variance Plan section",
+        "seção Variance Plan 20"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bvariance_plan\b",
+        "\bvariance_plan_20\b",
+        "\bvariance_plan section\b"
+      ],
+      "description": "Canonical section variance_plan for Budget Pack"
+    },
+    {
+      "id": "approval_section_21",
+      "name": {
+        "en": "Approval Section Segment 21",
+        "pt": "Approval Section segmento 21"
+      },
+      "mustHave": false,
+      "order": 21,
+      "headingAnchors": [
+        "Approval Section 21",
+        "approval_section 21",
+        "Approval Section section",
+        "seção Approval Section 21"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bapproval_section\b",
+        "\bapproval_section_21\b",
+        "\bapproval_section section\b"
+      ],
+      "description": "Canonical section approval_section for Budget Pack"
+    },
+    {
+      "id": "scenario_analysis_22",
+      "name": {
+        "en": "Scenario Analysis Segment 22",
+        "pt": "Scenario Analysis segmento 22"
+      },
+      "mustHave": false,
+      "order": 22,
+      "headingAnchors": [
+        "Scenario Analysis 22",
+        "scenario_analysis 22",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 22"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_22\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Budget Pack"
+    },
+    {
+      "id": "risk_buffer_23",
+      "name": {
+        "en": "Risk Buffer Segment 23",
+        "pt": "Risk Buffer segmento 23"
+      },
+      "mustHave": false,
+      "order": 23,
+      "headingAnchors": [
+        "Risk Buffer 23",
+        "risk_buffer 23",
+        "Risk Buffer section",
+        "seção Risk Buffer 23"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\brisk_buffer\b",
+        "\brisk_buffer_23\b",
+        "\brisk_buffer section\b"
+      ],
+      "description": "Canonical section risk_buffer for Budget Pack"
+    },
+    {
+      "id": "rollover_plan_24",
+      "name": {
+        "en": "Rollover Plan Segment 24",
+        "pt": "Rollover Plan segmento 24"
+      },
+      "mustHave": false,
+      "order": 24,
+      "headingAnchors": [
+        "Rollover Plan 24",
+        "rollover_plan 24",
+        "Rollover Plan section",
+        "seção Rollover Plan 24"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\brollover_plan\b",
+        "\brollover_plan_24\b",
+        "\brollover_plan section\b"
+      ],
+      "description": "Canonical section rollover_plan for Budget Pack"
+    },
+    {
+      "id": "signoff_matrix_25",
+      "name": {
+        "en": "Signoff Matrix Segment 25",
+        "pt": "Signoff Matrix segmento 25"
+      },
+      "mustHave": false,
+      "order": 25,
+      "headingAnchors": [
+        "Signoff Matrix 25",
+        "signoff_matrix 25",
+        "Signoff Matrix section",
+        "seção Signoff Matrix 25"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bsignoff_matrix\b",
+        "\bsignoff_matrix_25\b",
+        "\bsignoff_matrix section\b"
+      ],
+      "description": "Canonical section signoff_matrix for Budget Pack"
+    },
+    {
+      "id": "budget_cover_26",
+      "name": {
+        "en": "Budget Cover Segment 26",
+        "pt": "Orcamento Cover segmento 26"
+      },
+      "mustHave": false,
+      "order": 26,
+      "headingAnchors": [
+        "Budget Cover 26",
+        "budget_cover 26",
+        "Budget Cover section",
+        "seção Budget Cover 26"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bbudget_cover\b",
+        "\bbudget_cover_26\b",
+        "\bbudget_cover section\b"
+      ],
+      "description": "Canonical section budget_cover for Budget Pack"
+    },
+    {
+      "id": "planning_assumptions_27",
+      "name": {
+        "en": "Planning Assumptions Segment 27",
+        "pt": "Planning Assumptions segmento 27"
+      },
+      "mustHave": false,
+      "order": 27,
+      "headingAnchors": [
+        "Planning Assumptions 27",
+        "planning_assumptions 27",
+        "Planning Assumptions section",
+        "seção Planning Assumptions 27"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bplanning_assumptions\b",
+        "\bplanning_assumptions_27\b",
+        "\bplanning_assumptions section\b"
+      ],
+      "description": "Canonical section planning_assumptions for Budget Pack"
+    },
+    {
+      "id": "revenue_budget_28",
+      "name": {
+        "en": "Revenue Budget Segment 28",
+        "pt": "Revenue Orcamento segmento 28"
+      },
+      "mustHave": false,
+      "order": 28,
+      "headingAnchors": [
+        "Revenue Budget 28",
+        "revenue_budget 28",
+        "Revenue Budget section",
+        "seção Revenue Budget 28"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\brevenue_budget\b",
+        "\brevenue_budget_28\b",
+        "\brevenue_budget section\b"
+      ],
+      "description": "Canonical section revenue_budget for Budget Pack"
+    },
+    {
+      "id": "expense_budget_29",
+      "name": {
+        "en": "Expense Budget Segment 29",
+        "pt": "Expense Orcamento segmento 29"
+      },
+      "mustHave": false,
+      "order": 29,
+      "headingAnchors": [
+        "Expense Budget 29",
+        "expense_budget 29",
+        "Expense Budget section",
+        "seção Expense Budget 29"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bexpense_budget\b",
+        "\bexpense_budget_29\b",
+        "\bexpense_budget section\b"
+      ],
+      "description": "Canonical section expense_budget for Budget Pack"
+    },
+    {
+      "id": "headcount_plan_30",
+      "name": {
+        "en": "Headcount Plan Segment 30",
+        "pt": "Headcount Plan segmento 30"
+      },
+      "mustHave": false,
+      "order": 30,
+      "headingAnchors": [
+        "Headcount Plan 30",
+        "headcount_plan 30",
+        "Headcount Plan section",
+        "seção Headcount Plan 30"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bheadcount_plan\b",
+        "\bheadcount_plan_30\b",
+        "\bheadcount_plan section\b"
+      ],
+      "description": "Canonical section headcount_plan for Budget Pack"
+    },
+    {
+      "id": "capex_plan_31",
+      "name": {
+        "en": "Capex Plan Segment 31",
+        "pt": "Capex Plan segmento 31"
+      },
+      "mustHave": false,
+      "order": 31,
+      "headingAnchors": [
+        "Capex Plan 31",
+        "capex_plan 31",
+        "Capex Plan section",
+        "seção Capex Plan 31"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bcapex_plan\b",
+        "\bcapex_plan_31\b",
+        "\bcapex_plan section\b"
+      ],
+      "description": "Canonical section capex_plan for Budget Pack"
+    },
+    {
+      "id": "capability_plan_32",
+      "name": {
+        "en": "Capability Plan Segment 32",
+        "pt": "Capability Plan segmento 32"
+      },
+      "mustHave": false,
+      "order": 32,
+      "headingAnchors": [
+        "Capability Plan 32",
+        "capability_plan 32",
+        "Capability Plan section",
+        "seção Capability Plan 32"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bcapability_plan\b",
+        "\bcapability_plan_32\b",
+        "\bcapability_plan section\b"
+      ],
+      "description": "Canonical section capability_plan for Budget Pack"
+    },
+    {
+      "id": "variance_plan_33",
+      "name": {
+        "en": "Variance Plan Segment 33",
+        "pt": "Variacao Plan segmento 33"
+      },
+      "mustHave": false,
+      "order": 33,
+      "headingAnchors": [
+        "Variance Plan 33",
+        "variance_plan 33",
+        "Variance Plan section",
+        "seção Variance Plan 33"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bvariance_plan\b",
+        "\bvariance_plan_33\b",
+        "\bvariance_plan section\b"
+      ],
+      "description": "Canonical section variance_plan for Budget Pack"
+    },
+    {
+      "id": "approval_section_34",
+      "name": {
+        "en": "Approval Section Segment 34",
+        "pt": "Approval Section segmento 34"
+      },
+      "mustHave": false,
+      "order": 34,
+      "headingAnchors": [
+        "Approval Section 34",
+        "approval_section 34",
+        "Approval Section section",
+        "seção Approval Section 34"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bapproval_section\b",
+        "\bapproval_section_34\b",
+        "\bapproval_section section\b"
+      ],
+      "description": "Canonical section approval_section for Budget Pack"
+    },
+    {
+      "id": "scenario_analysis_35",
+      "name": {
+        "en": "Scenario Analysis Segment 35",
+        "pt": "Scenario Analysis segmento 35"
+      },
+      "mustHave": false,
+      "order": 35,
+      "headingAnchors": [
+        "Scenario Analysis 35",
+        "scenario_analysis 35",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 35"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_35\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Budget Pack"
+    },
+    {
+      "id": "risk_buffer_36",
+      "name": {
+        "en": "Risk Buffer Segment 36",
+        "pt": "Risk Buffer segmento 36"
+      },
+      "mustHave": false,
+      "order": 36,
+      "headingAnchors": [
+        "Risk Buffer 36",
+        "risk_buffer 36",
+        "Risk Buffer section",
+        "seção Risk Buffer 36"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\brisk_buffer\b",
+        "\brisk_buffer_36\b",
+        "\brisk_buffer section\b"
+      ],
+      "description": "Canonical section risk_buffer for Budget Pack"
+    },
+    {
+      "id": "rollover_plan_37",
+      "name": {
+        "en": "Rollover Plan Segment 37",
+        "pt": "Rollover Plan segmento 37"
+      },
+      "mustHave": false,
+      "order": 37,
+      "headingAnchors": [
+        "Rollover Plan 37",
+        "rollover_plan 37",
+        "Rollover Plan section",
+        "seção Rollover Plan 37"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\brollover_plan\b",
+        "\brollover_plan_37\b",
+        "\brollover_plan section\b"
+      ],
+      "description": "Canonical section rollover_plan for Budget Pack"
+    },
+    {
+      "id": "signoff_matrix_38",
+      "name": {
+        "en": "Signoff Matrix Segment 38",
+        "pt": "Signoff Matrix segmento 38"
+      },
+      "mustHave": false,
+      "order": 38,
+      "headingAnchors": [
+        "Signoff Matrix 38",
+        "signoff_matrix 38",
+        "Signoff Matrix section",
+        "seção Signoff Matrix 38"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bsignoff_matrix\b",
+        "\bsignoff_matrix_38\b",
+        "\bsignoff_matrix section\b"
+      ],
+      "description": "Canonical section signoff_matrix for Budget Pack"
+    },
+    {
+      "id": "budget_cover_39",
+      "name": {
+        "en": "Budget Cover Segment 39",
+        "pt": "Orcamento Cover segmento 39"
+      },
+      "mustHave": false,
+      "order": 39,
+      "headingAnchors": [
+        "Budget Cover 39",
+        "budget_cover 39",
+        "Budget Cover section",
+        "seção Budget Cover 39"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bbudget_cover\b",
+        "\bbudget_cover_39\b",
+        "\bbudget_cover section\b"
+      ],
+      "description": "Canonical section budget_cover for Budget Pack"
+    },
+    {
+      "id": "planning_assumptions_40",
+      "name": {
+        "en": "Planning Assumptions Segment 40",
+        "pt": "Planning Assumptions segmento 40"
+      },
+      "mustHave": false,
+      "order": 40,
+      "headingAnchors": [
+        "Planning Assumptions 40",
+        "planning_assumptions 40",
+        "Planning Assumptions section",
+        "seção Planning Assumptions 40"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bplanning_assumptions\b",
+        "\bplanning_assumptions_40\b",
+        "\bplanning_assumptions section\b"
+      ],
+      "description": "Canonical section planning_assumptions for Budget Pack"
+    },
+    {
+      "id": "revenue_budget_41",
+      "name": {
+        "en": "Revenue Budget Segment 41",
+        "pt": "Revenue Orcamento segmento 41"
+      },
+      "mustHave": false,
+      "order": 41,
+      "headingAnchors": [
+        "Revenue Budget 41",
+        "revenue_budget 41",
+        "Revenue Budget section",
+        "seção Revenue Budget 41"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\brevenue_budget\b",
+        "\brevenue_budget_41\b",
+        "\brevenue_budget section\b"
+      ],
+      "description": "Canonical section revenue_budget for Budget Pack"
+    },
+    {
+      "id": "expense_budget_42",
+      "name": {
+        "en": "Expense Budget Segment 42",
+        "pt": "Expense Orcamento segmento 42"
+      },
+      "mustHave": false,
+      "order": 42,
+      "headingAnchors": [
+        "Expense Budget 42",
+        "expense_budget 42",
+        "Expense Budget section",
+        "seção Expense Budget 42"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bexpense_budget\b",
+        "\bexpense_budget_42\b",
+        "\bexpense_budget section\b"
+      ],
+      "description": "Canonical section expense_budget for Budget Pack"
+    },
+    {
+      "id": "headcount_plan_43",
+      "name": {
+        "en": "Headcount Plan Segment 43",
+        "pt": "Headcount Plan segmento 43"
+      },
+      "mustHave": false,
+      "order": 43,
+      "headingAnchors": [
+        "Headcount Plan 43",
+        "headcount_plan 43",
+        "Headcount Plan section",
+        "seção Headcount Plan 43"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bheadcount_plan\b",
+        "\bheadcount_plan_43\b",
+        "\bheadcount_plan section\b"
+      ],
+      "description": "Canonical section headcount_plan for Budget Pack"
+    },
+    {
+      "id": "capex_plan_44",
+      "name": {
+        "en": "Capex Plan Segment 44",
+        "pt": "Capex Plan segmento 44"
+      },
+      "mustHave": false,
+      "order": 44,
+      "headingAnchors": [
+        "Capex Plan 44",
+        "capex_plan 44",
+        "Capex Plan section",
+        "seção Capex Plan 44"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bcapex_plan\b",
+        "\bcapex_plan_44\b",
+        "\bcapex_plan section\b"
+      ],
+      "description": "Canonical section capex_plan for Budget Pack"
+    },
+    {
+      "id": "capability_plan_45",
+      "name": {
+        "en": "Capability Plan Segment 45",
+        "pt": "Capability Plan segmento 45"
+      },
+      "mustHave": false,
+      "order": 45,
+      "headingAnchors": [
+        "Capability Plan 45",
+        "capability_plan 45",
+        "Capability Plan section",
+        "seção Capability Plan 45"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bcapability_plan\b",
+        "\bcapability_plan_45\b",
+        "\bcapability_plan section\b"
+      ],
+      "description": "Canonical section capability_plan for Budget Pack"
+    },
+    {
+      "id": "variance_plan_46",
+      "name": {
+        "en": "Variance Plan Segment 46",
+        "pt": "Variacao Plan segmento 46"
+      },
+      "mustHave": false,
+      "order": 46,
+      "headingAnchors": [
+        "Variance Plan 46",
+        "variance_plan 46",
+        "Variance Plan section",
+        "seção Variance Plan 46"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bvariance_plan\b",
+        "\bvariance_plan_46\b",
+        "\bvariance_plan section\b"
+      ],
+      "description": "Canonical section variance_plan for Budget Pack"
+    },
+    {
+      "id": "approval_section_47",
+      "name": {
+        "en": "Approval Section Segment 47",
+        "pt": "Approval Section segmento 47"
+      },
+      "mustHave": false,
+      "order": 47,
+      "headingAnchors": [
+        "Approval Section 47",
+        "approval_section 47",
+        "Approval Section section",
+        "seção Approval Section 47"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bapproval_section\b",
+        "\bapproval_section_47\b",
+        "\bapproval_section section\b"
+      ],
+      "description": "Canonical section approval_section for Budget Pack"
+    },
+    {
+      "id": "scenario_analysis_48",
+      "name": {
+        "en": "Scenario Analysis Segment 48",
+        "pt": "Scenario Analysis segmento 48"
+      },
+      "mustHave": false,
+      "order": 48,
+      "headingAnchors": [
+        "Scenario Analysis 48",
+        "scenario_analysis 48",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 48"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_48\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Budget Pack"
+    },
+    {
+      "id": "risk_buffer_49",
+      "name": {
+        "en": "Risk Buffer Segment 49",
+        "pt": "Risk Buffer segmento 49"
+      },
+      "mustHave": false,
+      "order": 49,
+      "headingAnchors": [
+        "Risk Buffer 49",
+        "risk_buffer 49",
+        "Risk Buffer section",
+        "seção Risk Buffer 49"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\brisk_buffer\b",
+        "\brisk_buffer_49\b",
+        "\brisk_buffer section\b"
+      ],
+      "description": "Canonical section risk_buffer for Budget Pack"
+    },
+    {
+      "id": "rollover_plan_50",
+      "name": {
+        "en": "Rollover Plan Segment 50",
+        "pt": "Rollover Plan segmento 50"
+      },
+      "mustHave": false,
+      "order": 50,
+      "headingAnchors": [
+        "Rollover Plan 50",
+        "rollover_plan 50",
+        "Rollover Plan section",
+        "seção Rollover Plan 50"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\brollover_plan\b",
+        "\brollover_plan_50\b",
+        "\brollover_plan section\b"
+      ],
+      "description": "Canonical section rollover_plan for Budget Pack"
+    },
+    {
+      "id": "signoff_matrix_51",
+      "name": {
+        "en": "Signoff Matrix Segment 51",
+        "pt": "Signoff Matrix segmento 51"
+      },
+      "mustHave": false,
+      "order": 51,
+      "headingAnchors": [
+        "Signoff Matrix 51",
+        "signoff_matrix 51",
+        "Signoff Matrix section",
+        "seção Signoff Matrix 51"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bsignoff_matrix\b",
+        "\bsignoff_matrix_51\b",
+        "\bsignoff_matrix section\b"
+      ],
+      "description": "Canonical section signoff_matrix for Budget Pack"
+    },
+    {
+      "id": "budget_cover_52",
+      "name": {
+        "en": "Budget Cover Segment 52",
+        "pt": "Orcamento Cover segmento 52"
+      },
+      "mustHave": false,
+      "order": 52,
+      "headingAnchors": [
+        "Budget Cover 52",
+        "budget_cover 52",
+        "Budget Cover section",
+        "seção Budget Cover 52"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bbudget_cover\b",
+        "\bbudget_cover_52\b",
+        "\bbudget_cover section\b"
+      ],
+      "description": "Canonical section budget_cover for Budget Pack"
+    },
+    {
+      "id": "planning_assumptions_53",
+      "name": {
+        "en": "Planning Assumptions Segment 53",
+        "pt": "Planning Assumptions segmento 53"
+      },
+      "mustHave": false,
+      "order": 53,
+      "headingAnchors": [
+        "Planning Assumptions 53",
+        "planning_assumptions 53",
+        "Planning Assumptions section",
+        "seção Planning Assumptions 53"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bplanning_assumptions\b",
+        "\bplanning_assumptions_53\b",
+        "\bplanning_assumptions section\b"
+      ],
+      "description": "Canonical section planning_assumptions for Budget Pack"
+    },
+    {
+      "id": "revenue_budget_54",
+      "name": {
+        "en": "Revenue Budget Segment 54",
+        "pt": "Revenue Orcamento segmento 54"
+      },
+      "mustHave": false,
+      "order": 54,
+      "headingAnchors": [
+        "Revenue Budget 54",
+        "revenue_budget 54",
+        "Revenue Budget section",
+        "seção Revenue Budget 54"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\brevenue_budget\b",
+        "\brevenue_budget_54\b",
+        "\brevenue_budget section\b"
+      ],
+      "description": "Canonical section revenue_budget for Budget Pack"
+    },
+    {
+      "id": "expense_budget_55",
+      "name": {
+        "en": "Expense Budget Segment 55",
+        "pt": "Expense Orcamento segmento 55"
+      },
+      "mustHave": false,
+      "order": 55,
+      "headingAnchors": [
+        "Expense Budget 55",
+        "expense_budget 55",
+        "Expense Budget section",
+        "seção Expense Budget 55"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bexpense_budget\b",
+        "\bexpense_budget_55\b",
+        "\bexpense_budget section\b"
+      ],
+      "description": "Canonical section expense_budget for Budget Pack"
+    },
+    {
+      "id": "headcount_plan_56",
+      "name": {
+        "en": "Headcount Plan Segment 56",
+        "pt": "Headcount Plan segmento 56"
+      },
+      "mustHave": false,
+      "order": 56,
+      "headingAnchors": [
+        "Headcount Plan 56",
+        "headcount_plan 56",
+        "Headcount Plan section",
+        "seção Headcount Plan 56"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bheadcount_plan\b",
+        "\bheadcount_plan_56\b",
+        "\bheadcount_plan section\b"
+      ],
+      "description": "Canonical section headcount_plan for Budget Pack"
+    },
+    {
+      "id": "capex_plan_57",
+      "name": {
+        "en": "Capex Plan Segment 57",
+        "pt": "Capex Plan segmento 57"
+      },
+      "mustHave": false,
+      "order": 57,
+      "headingAnchors": [
+        "Capex Plan 57",
+        "capex_plan 57",
+        "Capex Plan section",
+        "seção Capex Plan 57"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bcapex_plan\b",
+        "\bcapex_plan_57\b",
+        "\bcapex_plan section\b"
+      ],
+      "description": "Canonical section capex_plan for Budget Pack"
+    },
+    {
+      "id": "capability_plan_58",
+      "name": {
+        "en": "Capability Plan Segment 58",
+        "pt": "Capability Plan segmento 58"
+      },
+      "mustHave": false,
+      "order": 58,
+      "headingAnchors": [
+        "Capability Plan 58",
+        "capability_plan 58",
+        "Capability Plan section",
+        "seção Capability Plan 58"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bcapability_plan\b",
+        "\bcapability_plan_58\b",
+        "\bcapability_plan section\b"
+      ],
+      "description": "Canonical section capability_plan for Budget Pack"
+    },
+    {
+      "id": "variance_plan_59",
+      "name": {
+        "en": "Variance Plan Segment 59",
+        "pt": "Variacao Plan segmento 59"
+      },
+      "mustHave": false,
+      "order": 59,
+      "headingAnchors": [
+        "Variance Plan 59",
+        "variance_plan 59",
+        "Variance Plan section",
+        "seção Variance Plan 59"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bvariance_plan\b",
+        "\bvariance_plan_59\b",
+        "\bvariance_plan section\b"
+      ],
+      "description": "Canonical section variance_plan for Budget Pack"
+    },
+    {
+      "id": "approval_section_60",
+      "name": {
+        "en": "Approval Section Segment 60",
+        "pt": "Approval Section segmento 60"
+      },
+      "mustHave": false,
+      "order": 60,
+      "headingAnchors": [
+        "Approval Section 60",
+        "approval_section 60",
+        "Approval Section section",
+        "seção Approval Section 60"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bapproval_section\b",
+        "\bapproval_section_60\b",
+        "\bapproval_section section\b"
+      ],
+      "description": "Canonical section approval_section for Budget Pack"
+    },
+    {
+      "id": "scenario_analysis_61",
+      "name": {
+        "en": "Scenario Analysis Segment 61",
+        "pt": "Scenario Analysis segmento 61"
+      },
+      "mustHave": false,
+      "order": 61,
+      "headingAnchors": [
+        "Scenario Analysis 61",
+        "scenario_analysis 61",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 61"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_61\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Budget Pack"
+    },
+    {
+      "id": "risk_buffer_62",
+      "name": {
+        "en": "Risk Buffer Segment 62",
+        "pt": "Risk Buffer segmento 62"
+      },
+      "mustHave": false,
+      "order": 62,
+      "headingAnchors": [
+        "Risk Buffer 62",
+        "risk_buffer 62",
+        "Risk Buffer section",
+        "seção Risk Buffer 62"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\brisk_buffer\b",
+        "\brisk_buffer_62\b",
+        "\brisk_buffer section\b"
+      ],
+      "description": "Canonical section risk_buffer for Budget Pack"
     }
   ]
 }

@@ -1,0 +1,98 @@
+{
+  "_meta": {
+    "id": "di_everyday_extraction_every_tax_return",
+    "version": "1.0.0",
+    "description": "Extraction hints for every_tax_return.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_return"
+  },
+  "hints": [
+    {
+      "id": "every_tax_return_hint_01",
+      "entity": "taxpayer_name",
+      "anchors": ["taxpayer", "nome", "contribuinte", "taxpayer name"],
+      "location": "taxpayer_profile",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["first page header", "footer profile block"]
+    },
+    {
+      "id": "every_tax_return_hint_02",
+      "entity": "taxpayer_id",
+      "anchors": ["cpf", "cnpj", "tin", "id number"],
+      "location": "taxpayer_profile",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["personal info box", "taxpayer header lines"]
+    },
+    {
+      "id": "every_tax_return_hint_03",
+      "entity": "tax_year",
+      "anchors": ["tax year", "fiscal year", "ano fiscal", "periodo"],
+      "location": "filing_section",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["left banner", "fiscal-year summary"]
+    },
+    {
+      "id": "every_tax_return_hint_04",
+      "entity": "gross_income",
+      "anchors": ["gross income", "rendimento bruto", "salary"],
+      "location": "income_section",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["income table row", "schedule summary lines"]
+    },
+    {
+      "id": "every_tax_return_hint_05",
+      "entity": "total_deductions",
+      "anchors": ["total deductions", "deducoes", "deduções"],
+      "location": "deductions",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["deduction lines", "schedule 5"]
+    },
+    {
+      "id": "every_tax_return_hint_06",
+      "entity": "taxable_income",
+      "anchors": ["taxable income", "base de calculo", "imposto de renda"],
+      "location": "tax_summary",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["summary block", "computed amount line"]
+    },
+    {
+      "id": "every_tax_return_hint_07",
+      "entity": "total_tax",
+      "anchors": ["total tax", "imposto devido", "tributo total"],
+      "location": "tax_summary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["summary rows", "bottom totals block"]
+    },
+    {
+      "id": "every_tax_return_hint_08",
+      "entity": "refund_amount",
+      "anchors": ["refund", "reembolso", "credito"],
+      "location": "payment_or_refund",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["payment schedule", "refund section"]
+    },
+    {
+      "id": "every_tax_return_hint_09",
+      "entity": "amount_due",
+      "anchors": ["amount due", "valor devido", "total due"],
+      "location": "payment_or_refund",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["due section", "payment summary"]
+    },
+    {
+      "id": "every_tax_return_hint_10",
+      "entity": "document_currency",
+      "anchors": ["currency", "moeda", "currency code"],
+      "location": "document_header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["table header", "document title"]
+    }
+  ]
+}

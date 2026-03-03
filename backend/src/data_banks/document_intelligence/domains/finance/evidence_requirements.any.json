@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_evidence_requirements",
-    "version": "2.0.0",
-    "description": "Finance evidence requirements enforcing period/currency/unit and header-context integrity.",
+    "version": "2.1.0",
+    "description": "Finance evidence requirements with strict numeric-context rules for financial claims.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -20,17 +20,17 @@
       "rank": 1,
       "type": "audited_statement",
       "label": {
-        "en": "Audited statement",
-        "pt": "Demonstracao auditada"
+        "en": "Audited financial statement",
+        "pt": "Demonstração financeira auditada"
       },
       "trustLevel": "high"
     },
     {
       "rank": 2,
-      "type": "regulatory_filing",
+      "type": "regulated_filing",
       "label": {
         "en": "Regulatory filing",
-        "pt": "Arquivo regulatorio"
+        "pt": "Arquivo regulatório"
       },
       "trustLevel": "high"
     },
@@ -38,48 +38,782 @@
       "rank": 3,
       "type": "board_approved_pack",
       "label": {
-        "en": "Board approved pack",
+        "en": "Board pack",
         "pt": "Pacote aprovado pelo conselho"
       },
       "trustLevel": "medium"
     },
     {
       "rank": 4,
-      "type": "management_report",
+      "type": "approved_management_report",
       "label": {
         "en": "Management report",
-        "pt": "Relatorio gerencial"
+        "pt": "Relatório gerencial"
       },
       "trustLevel": "medium"
     },
     {
       "rank": 5,
-      "type": "raw_export",
+      "type": "raw_data_export",
       "label": {
         "en": "Raw export",
-        "pt": "Exportacao bruta"
+        "pt": "Exportação bruta"
       },
       "trustLevel": "low"
     }
   ],
   "rules": [
     {
-      "id": "fin_ev_001_numeric_claim_requires_header_context",
-      "description": "numeric claim requires header context",
+      "id": "fin_ev_001_numeric_guard",
+      "description": "numeric claim for fin_10k requires explicit unit+period+table header",
       "applies": [
-        "extract"
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
       ],
       "requiredDimensions": [
-        "period",
-        "currency",
         "unit",
-        "header_context"
+        "period",
+        "table_header_context"
       ],
+      "contextRule": "require_at_least_two_of_table_headers",
       "failureAction": "FALLBACK_WEAK_EVIDENCE"
     },
     {
-      "id": "fin_ev_002_numeric_claim_requires_row_and_column",
-      "description": "numeric claim requires row and column",
+      "id": "fin_ev_002_numeric_guard",
+      "description": "numeric claim for fin_10q requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_003_numeric_guard",
+      "description": "numeric claim for fin_8k requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_004_numeric_guard",
+      "description": "numeric claim for fin_annual_report requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_005_numeric_guard",
+      "description": "numeric claim for fin_annual_financials requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_006_numeric_guard",
+      "description": "numeric claim for fin_income_statement requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_007_numeric_guard",
+      "description": "numeric claim for fin_balance_sheet requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_008_numeric_guard",
+      "description": "numeric claim for fin_cash_flow requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_009_numeric_guard",
+      "description": "numeric claim for fin_efs requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_010_numeric_guard",
+      "description": "numeric claim for fin_cap_table requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_011_numeric_guard",
+      "description": "numeric claim for fin_unit_economics_model requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_012_numeric_guard",
+      "description": "numeric claim for fin_arr_mrr_report requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_013_numeric_guard",
+      "description": "numeric claim for fin_cohort_analysis requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_014_numeric_guard",
+      "description": "numeric claim for fin_benchmarking_report requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_015_numeric_guard",
+      "description": "numeric claim for fin_budget requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_016_numeric_guard",
+      "description": "numeric claim for fin_forecast requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_017_numeric_guard",
+      "description": "numeric claim for fin_budget_vs_actual requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_018_numeric_guard",
+      "description": "numeric claim for fin_rolling_forecast requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_019_numeric_guard",
+      "description": "numeric claim for fin_monthly_close_pack requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_020_numeric_guard",
+      "description": "numeric claim for fin_quarterly_close_pack requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_021_numeric_guard",
+      "description": "numeric claim for fin_board_deck_finance requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_022_numeric_guard",
+      "description": "numeric claim for fin_investor_presentation requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_023_numeric_guard",
+      "description": "numeric claim for fin_earnings_release requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_024_numeric_guard",
+      "description": "numeric claim for fin_covenant_compliance_certificate requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_025_numeric_guard",
+      "description": "numeric claim for fin_debt_schedule requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_026_numeric_guard",
+      "description": "numeric claim for fin_bank_statement requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_027_numeric_guard",
+      "description": "numeric claim for fin_credit_facility requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_028_numeric_guard",
+      "description": "numeric claim for fin_cash_management requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_029_numeric_guard",
+      "description": "numeric claim for fin_tax_return_summary requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_030_numeric_guard",
+      "description": "numeric claim for fin_audit_compliance_pack requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_031_numeric_guard",
+      "description": "numeric claim for fin_tax_deed_summary requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_032_numeric_guard",
+      "description": "numeric claim for fin_dividend_policy requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_033_numeric_guard",
+      "description": "numeric claim for fin_kpi_dashboard requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_034_numeric_guard",
+      "description": "numeric claim for fin_cash_forecast requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_035_numeric_guard",
+      "description": "numeric claim for fin_treasury_memo requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_036_numeric_guard",
+      "description": "numeric claim for fin_investor_termsheet requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_037_numeric_guard",
+      "description": "numeric claim for fin_financing_term_sheet requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_038_numeric_guard",
+      "description": "numeric claim for fin_board_minutes_finance requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_039_numeric_guard",
+      "description": "numeric claim for fin_revenue_operational_review requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_040_numeric_guard",
+      "description": "numeric claim for fin_incentive_plan requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_041_numeric_guard",
+      "description": "numeric claim for fin_esg_finance_linkage requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_042_numeric_guard",
+      "description": "numeric claim for fin_fx_exposure_report requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_043_numeric_guard",
+      "description": "numeric claim for fin_investment_portfolio requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_044_numeric_guard",
+      "description": "numeric claim for fin_fixed_income_portfolio requires explicit unit+period+table header",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "unit",
+        "period",
+        "table_header_context"
+      ],
+      "contextRule": "require_at_least_two_of_table_headers",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+    },
+    {
+      "id": "fin_ev_unified_01",
+      "description": "numeric extract requires row and column",
       "applies": [
         "extract"
       ],
@@ -87,294 +821,122 @@
         "row_header",
         "column_header",
         "period",
-        "currency",
         "unit",
-        "header_context"
+        "currency",
+        "table_context"
       ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+      "failureAction": "BLOCK_IF_MISSING_TABLE_CONTEXT"
     },
     {
-      "id": "fin_ev_003_calculation_requires_inputs",
-      "description": "calculation requires inputs",
+      "id": "fin_ev_unified_02",
+      "description": "calculate requires formula source traceability",
       "applies": [
         "calculate"
       ],
       "requiredDimensions": [
         "numerator_source",
         "denominator_source",
+        "formula",
         "period",
-        "currency",
         "unit",
-        "header_context"
+        "currency",
+        "table_header_context"
       ],
       "failureAction": "FALLBACK_WEAK_EVIDENCE"
     },
     {
-      "id": "fin_ev_004_mixed_currency_block",
-      "description": "mixed currency block",
-      "applies": [
-        "calculate"
-      ],
-      "requiredDimensions": [
-        "currency",
-        "conversion_rate",
-        "period",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_005_period_alignment_for_compare",
-      "description": "period alignment for compare",
+      "id": "fin_ev_unified_03",
+      "description": "compare requires same metric basis and period",
       "applies": [
         "compare"
       ],
       "requiredDimensions": [
         "period",
         "granularity",
-        "currency",
+        "metric_basis",
         "unit",
-        "header_context"
+        "currency",
+        "table_header_context"
       ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+      "failureAction": "BLOCK_IF_MIXED_BASIS"
     },
     {
-      "id": "fin_ev_006_budget_vs_actual_explicit_label",
-      "description": "budget vs actual explicit label",
+      "id": "fin_ev_unified_04",
+      "description": "ratio must include unit/scale metadata and period alignment",
       "applies": [
-        "compare"
-      ],
-      "requiredDimensions": [
-        "scenario_label",
-        "period",
-        "currency",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_007_forecast_must_disclose_assumptions",
-      "description": "forecast must disclose assumptions",
-      "applies": [
+        "calculate",
         "evaluate"
       ],
       "requiredDimensions": [
-        "assumptions",
-        "period",
+        "ratio_formula",
         "unit",
-        "currency",
-        "header_context"
+        "scale",
+        "period",
+        "table_header_context"
       ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
+      "failureAction": "WARN_AND_EXPLAIN"
     },
     {
-      "id": "fin_ev_008_variance_must_include_base",
-      "description": "variance must include base",
+      "id": "fin_ev_unified_05",
+      "description": "forecast outputs must include scenario label, assumptions, and horizon",
       "applies": [
-        "compare"
-      ],
-      "requiredDimensions": [
-        "base_value",
-        "comparison_value",
-        "unit",
-        "period",
-        "currency",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_009_table_value_requires_table_name",
-      "description": "table value requires table name",
-      "applies": [
-        "extract"
-      ],
-      "requiredDimensions": [
-        "table_name",
-        "row_header",
-        "column_header",
-        "period",
-        "currency",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_010_ratio_requires_unit_consistency",
-      "description": "ratio requires unit consistency",
-      "applies": [
-        "calculate"
-      ],
-      "requiredDimensions": [
-        "unit",
-        "period",
-        "currency",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_011_kpi_dashboard_requires_timestamp",
-      "description": "kpi dashboard requires timestamp",
-      "applies": [
-        "monitor"
-      ],
-      "requiredDimensions": [
-        "period",
-        "data_timestamp",
-        "unit",
-        "currency",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_012_arr_mrr_requires_recurring_scope",
-      "description": "arr mrr requires recurring scope",
-      "applies": [
-        "extract"
-      ],
-      "requiredDimensions": [
-        "recurring_scope",
-        "period",
-        "currency",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_013_pipeline_requires_stage_definition",
-      "description": "pipeline requires stage definition",
-      "applies": [
-        "evaluate"
-      ],
-      "requiredDimensions": [
-        "stage_definition",
-        "period",
-        "currency",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_014_cohort_requires_cohort_key",
-      "description": "cohort requires cohort key",
-      "applies": [
-        "compare"
-      ],
-      "requiredDimensions": [
-        "cohort_key",
-        "period",
-        "unit",
-        "currency",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_015_cash_forecast_requires_opening_and_closing",
-      "description": "cash forecast requires opening and closing",
-      "applies": [
-        "validate"
-      ],
-      "requiredDimensions": [
-        "opening_balance",
-        "closing_balance",
-        "currency",
-        "period",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_016_bank_statement_requires_account_context",
-      "description": "bank statement requires account context",
-      "applies": [
-        "extract"
-      ],
-      "requiredDimensions": [
-        "account_id",
-        "statement_period",
-        "currency",
-        "period",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_017_debt_schedule_requires_maturity_and_rate",
-      "description": "debt schedule requires maturity and rate",
-      "applies": [
-        "extract"
-      ],
-      "requiredDimensions": [
-        "maturity_date",
-        "interest_rate",
-        "currency",
-        "period",
-        "unit",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_018_covenant_requires_threshold_and_result",
-      "description": "covenant requires threshold and result",
-      "applies": [
-        "validate"
-      ],
-      "requiredDimensions": [
-        "threshold",
-        "actual",
-        "period",
-        "unit",
-        "currency",
-        "header_context"
-      ],
-      "failureAction": "FALLBACK_WEAK_EVIDENCE"
-    },
-    {
-      "id": "fin_ev_019_board_deck_requires_source_trace",
-      "description": "board deck requires source trace",
-      "applies": [
+        "evaluate",
         "summarize"
       ],
       "requiredDimensions": [
-        "source_table",
+        "scenario",
+        "assumptions",
+        "horizon",
         "period",
-        "currency",
-        "unit",
-        "header_context"
+        "table_header_context"
       ],
       "failureAction": "FALLBACK_WEAK_EVIDENCE"
     },
     {
-      "id": "fin_ev_020_esg_numeric_requires_boundary",
-      "description": "esg numeric requires boundary",
+      "id": "fin_ev_currency_integrity",
+      "description": "all values in cross-table calculations must include currency and conversion basis",
       "applies": [
-        "extract"
+        "calculate",
+        "compare"
       ],
       "requiredDimensions": [
-        "boundary_definition",
-        "period",
-        "unit",
         "currency",
-        "header_context"
+        "conversion_basis",
+        "unit",
+        "table_header_context"
+      ],
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_ev_audit_status",
+      "description": "must capture audit status for financial claims",
+      "applies": [
+        "summarize",
+        "validate"
+      ],
+      "requiredDimensions": [
+        "audit_status",
+        "source_type",
+        "period",
+        "table_header_context"
+      ],
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_ev_pipeline",
+      "description": "pipeline figures need stage definition and reporting timestamp",
+      "applies": [
+        "extract",
+        "monitor"
+      ],
+      "requiredDimensions": [
+        "pipeline_stage_definition",
+        "period",
+        "timestamp",
+        "table_header_context",
+        "unit"
       ],
       "failureAction": "FALLBACK_WEAK_EVIDENCE"
     }
-  ],
-  "mandatoryContext": [
-    "period",
-    "currency",
-    "unit",
-    "header_context"
   ]
 }

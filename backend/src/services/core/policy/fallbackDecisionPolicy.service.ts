@@ -99,6 +99,12 @@ type FallbackRuntime = {
   };
 };
 
+type FallbackPolicyBank = {
+  config?: {
+    enabled?: boolean;
+  };
+};
+
 export type FallbackDecisionPolicyResult = {
   reasonCode: string;
   selectedBankId: string;
@@ -254,6 +260,8 @@ export class FallbackDecisionPolicyService {
     req: ChatRequest,
     retrievalPack: EvidencePack | null,
   ): FallbackDecisionPolicyResult | null {
+    const fallbackPolicy = getOptionalBank<FallbackPolicyBank>("fallback_policy");
+    if (fallbackPolicy?.config?.enabled === false) return null;
     if (!retrievalPack) return null;
 
     const runtime = this.buildRuntime(req, retrievalPack);

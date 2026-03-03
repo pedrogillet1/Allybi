@@ -473,10 +473,14 @@
     "banking",
     "billing",
     "education",
+    "everyday",
     "housing",
     "hr_payroll",
     "identity",
     "insurance",
+    "compliance",
+    "education_research",
+    "procurement",
     "tax",
     "travel"
   ]

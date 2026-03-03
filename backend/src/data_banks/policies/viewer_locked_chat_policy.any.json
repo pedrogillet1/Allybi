@@ -3,9 +3,16 @@
     "id": "viewer_locked_chat_policy",
     "version": "1.0.0",
     "description": "Policy contract for Ask Allybi in document viewer. Keeps answers grounded to the active document by default and defines scope relax behavior.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-03-02",
-    "owner": "allybi-viewer"
+    "owner": "allybi-viewer",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,

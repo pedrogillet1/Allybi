@@ -1,0 +1,97 @@
+{
+  "_meta": {
+    "id": "di_everyday_reasoning_scaffolds",
+    "version": "1.0.0",
+    "description": "Reasoning scaffolds for everyday document extraction and interpretation.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "scaffolds": [
+    {
+      "id": "every_scaffold_001_scope",
+      "name": "Scope and Doc-Type Confirmation",
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "steps": [
+        "Detect candidate doc type via lexical and table markers",
+        "Verify against negative disambiguation rules (medical vs bill/receipt)",
+        "Confirm document period, party identity, and issuer",
+        "Mark uncertain fields for explicit follow-up",
+        "Report extracted values with confidence and citations"
+      ]
+    },
+    {
+      "id": "every_scaffold_002_line_items",
+      "name": "Billing and Receipt Line-Item Extraction",
+      "operators": [
+        "extract",
+        "calculate",
+        "summarize"
+      ],
+      "steps": [
+        "Identify all pricing/quantity/total columns",
+        "Capture unit/scale marker near totals",
+        "Sum categories where explicit line totals exist",
+        "Cross-check subtotal and taxes against final amount",
+        "List mismatches with missing-citation notes"
+      ]
+    },
+    {
+      "id": "every_scaffold_003_periodic_balance",
+      "name": "Period and Statement Validation",
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "steps": [
+        "Extract period start/end and due dates",
+        "Locate opening and closing balances where present",
+        "Verify movement arithmetic against listed movements/transactions",
+        "Check if tax/late fee components apply to period",
+        "Flag temporal gaps and duplicate period overlaps"
+      ]
+    },
+    {
+      "id": "every_scaffold_004_claim_coverage_logic",
+      "name": "Insurance Claim Interpretation",
+      "operators": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "steps": [
+        "Parse claim number, policy number, loss date, and status",
+        "Capture reserve/status/payment events table rows",
+        "Do not infer medical causality or liability beyond text",
+        "Compare status with listed required docs and next steps",
+        "Return only evidence-backed coverage and settlement details"
+      ]
+    },
+    {
+      "id": "every_scaffold_005_identity_verification",
+      "name": "Identity Document Hardening",
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ],
+      "steps": [
+        "Extract holder name, document number, document type, issuer and expiry",
+        "Extract security and validity fields only from visible source",
+        "Verify redaction safety before returning sensitive identifiers",
+        "Separate personal identifiers from financial fields",
+        "Return with explicit identity-scope disclaimer"
+      ]
+    }
+  ]
+}

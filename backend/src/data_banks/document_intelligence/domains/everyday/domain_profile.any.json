@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "id": "di_everyday_domain_profile",
+    "version": "1.0.0",
+    "description": "Everyday domain profile for mass consumer documents such as bills, receipts, policy notices, and identity proofs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "displayName": {
+    "en": "Everyday Finance and Consumer Docs",
+    "pt": "Documentos de Consumo e Bens"
+  },
+  "scope": "Phone bills, utility bills, internet invoices, tax statements, bank statements, insurance policies/claims, identity documents, and retail/loan invoices with practical extraction and evidence-aware answers.",
+  "coreConcepts": [
+    "amount due",
+    "billing period",
+    "consumption",
+    "contract term",
+    "coverage",
+    "due date",
+    "identity",
+    "late fee",
+    "meter reading",
+    "net total",
+    "payment method",
+    "payment status",
+    "policy number",
+    "receipt total",
+    "service provider",
+    "statement period",
+    "tax component",
+    "total charged"
+  ],
+  "supportedOperators": [
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
+  ],
+  "detectionSignals": {
+    "highConfidence": [
+      "amount due",
+      "account number",
+      "bill date",
+      "due date",
+      "invoice number",
+      "meter",
+      "insurance policy",
+      "identity document",
+      "statement period",
+      "receipt total",
+      "policy holder"
+    ],
+    "mediumConfidence": [
+      "coverage",
+      "payment history",
+      "tax return",
+      "bank account",
+      "charges",
+      "subtotal",
+      "phone plan",
+      "internet usage",
+      "rental period",
+      "claim number",
+      "social security number"
+    ]
+  },
+  "relatedDomains": [
+    "billing",
+    "finance",
+    "insurance",
+    "identity",
+    "tax",
+    "medical",
+    "banking",
+    "travel"
+  ],
+  "ontologyPrefix": "everyday"
+}

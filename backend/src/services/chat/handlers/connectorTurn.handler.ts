@@ -353,6 +353,23 @@ function parseEmailDraft(text: string): {
   };
 }
 
+function createDefaultHandlerDeps(overrides?: Partial<HandlerDeps>): HandlerDeps {
+  const tokenVault = new TokenVaultService();
+  return {
+    connectorHandler:
+      overrides?.connectorHandler ?? new ConnectorHandlerService(),
+    tokenVault: overrides?.tokenVault ?? tokenVault,
+    gmailOAuth: overrides?.gmailOAuth ?? new GmailOAuthService(tokenVault),
+    outlookOAuth:
+      overrides?.outlookOAuth ?? new OutlookOAuthService({ tokenVault }),
+    slackOAuth:
+      overrides?.slackOAuth ?? new SlackOAuthService({ tokenVault }),
+    gmailClient: overrides?.gmailClient ?? new GmailClientService(),
+    graphClient: overrides?.graphClient ?? new GraphClientService(),
+    slackClient: overrides?.slackClient ?? new SlackClientService(),
+  };
+}
+
 export class ConnectorTurnHandler {
   private readonly deps: HandlerDeps;
 
@@ -360,18 +377,7 @@ export class ConnectorTurnHandler {
     private readonly executor: TurnExecutor,
     deps?: Partial<HandlerDeps>,
   ) {
-    const tokenVault = new TokenVaultService();
-    this.deps = {
-      connectorHandler: deps?.connectorHandler ?? new ConnectorHandlerService(),
-      tokenVault: deps?.tokenVault ?? tokenVault,
-      gmailOAuth: deps?.gmailOAuth ?? new GmailOAuthService(tokenVault),
-      outlookOAuth:
-        deps?.outlookOAuth ?? new OutlookOAuthService({ tokenVault }),
-      slackOAuth: deps?.slackOAuth ?? new SlackOAuthService({ tokenVault }),
-      gmailClient: deps?.gmailClient ?? new GmailClientService(),
-      graphClient: deps?.graphClient ?? new GraphClientService(),
-      slackClient: deps?.slackClient ?? new SlackClientService(),
-    };
+    this.deps = createDefaultHandlerDeps(deps);
   }
 
   async handle(params: {
@@ -526,7 +532,7 @@ export class ConnectorTurnHandler {
       assistantTelemetry: undefined,
       sources: [],
       followups: [],
-      answerMode: (patch.answerMode as any) || "action_receipt",
+      answerMode: asString(patch.answerMode) || "action_receipt",
       answerClass: "GENERAL",
       navType: null,
       status: patch.status || "success",
@@ -666,8 +672,9 @@ export class ConnectorTurnHandler {
       timer = setTimeout(() => {
         reject(new Error(`${label} timed out after ${timeoutMs}ms.`));
       }, timeoutMs);
-      if (typeof (timer as any)?.unref === "function") {
-        (timer as any).unref();
+      const maybeTimer = timer as NodeJS.Timeout & { unref?: () => void };
+      if (typeof maybeTimer.unref === "function") {
+        maybeTimer.unref();
       }
 
       run()
@@ -713,7 +720,7 @@ export class ConnectorTurnHandler {
       if (!messageId) return null;
 
       const message = await this.deps.gmailClient.getMessage(token, messageId);
-      const headers = (message?.payload as any)?.headers;
+      const headers = asRecord(message?.payload).headers;
       const subject = parseGmailHeader(headers, "Subject") || "(no subject)";
       const from = parseGmailHeader(headers, "From");
       const to = parseGmailHeader(headers, "To");
@@ -747,15 +754,21 @@ export class ConnectorTurnHandler {
       top: 1,
       folder: "Inbox",
     });
-    const msg = Array.isArray((list as any)?.value) ? (list as any).value[0] : null;
+    const listRecord = asRecord(list);
+    const listValue = Array.isArray(listRecord.value) ? listRecord.value : [];
+    const msg = listValue.length > 0 ? listValue[0] : null;
     if (!msg) return null;
+    const messageRecord = asRecord(msg);
+    const fromRecord = asRecord(messageRecord.from);
+    const fromAddressRecord = asRecord(fromRecord.emailAddress);
 
     const firstAddress = (arr: unknown): string => {
       const list = Array.isArray(arr) ? arr : [];
-      const first = list[0] as any;
+      const first = asRecord(list[0]);
+      const emailAddress = asRecord(first.emailAddress);
       return (
-        asString(first?.emailAddress?.address) ||
-        asString(first?.emailAddress?.name) ||
+        asString(emailAddress.address) ||
+        asString(emailAddress.name) ||
         ""
       );
     };
@@ -763,18 +776,19 @@ export class ConnectorTurnHandler {
     return {
       type: "connector_email_ref",
       provider,
-      messageId: asString(msg.id),
+      messageId: asString(messageRecord.id),
       cardTitle: "Latest email",
       actionLabel: "Open",
-      subject: asString(msg.subject) || "(no subject)",
-      from:
-        asString(msg?.from?.emailAddress?.address) ||
-        asString(msg?.from?.emailAddress?.name),
-      to: firstAddress(msg?.toRecipients),
-      cc: firstAddress(msg?.ccRecipients),
-      receivedAt: asString(msg.receivedDateTime),
-      preview: normalizePreview(this.deps.graphClient.getMessageText(msg), 320),
-      bodyText: normalizePreview(this.deps.graphClient.getMessageText(msg), 1200),
+      subject: asString(messageRecord.subject) || "(no subject)",
+      from: asString(fromAddressRecord.address) || asString(fromAddressRecord.name),
+      to: firstAddress(messageRecord.toRecipients),
+      cc: firstAddress(messageRecord.ccRecipients),
+      receivedAt: asString(messageRecord.receivedDateTime),
+      preview: normalizePreview(this.deps.graphClient.getMessageText(messageRecord), 320),
+      bodyText: normalizePreview(
+        this.deps.graphClient.getMessageText(messageRecord),
+        1200,
+      ),
     };
   }
 
@@ -825,7 +839,8 @@ export class ConnectorTurnHandler {
       : [];
 
     for (const channel of channels) {
-      const channelId = asString((channel as any)?.id);
+      const channelRecord = asRecord(channel);
+      const channelId = asString(channelRecord.id);
       if (!channelId) continue;
       try {
         const history = await this.deps.slackClient.getConversationHistory({
@@ -838,14 +853,14 @@ export class ConnectorTurnHandler {
           : null;
         if (!latest) continue;
         const preview = normalizePreview(
-          this.deps.slackClient.extractMessageText(latest as any),
+          this.deps.slackClient.extractMessageText(asRecord(latest)),
           320,
         );
         if (!preview) continue;
         return {
           type: "connector_slack_message",
           channelId,
-          channelName: asString((channel as any)?.name),
+          channelName: asString(channelRecord.name),
           preview,
         };
       } catch {
@@ -1243,6 +1258,7 @@ export class ConnectorTurnHandler {
           ? hit.documentId.slice(syntheticPrefix.length).trim()
           : "";
         if (provider === "slack") {
+          const hitRecord = asRecord(hit);
           const parsedChannel = (() => {
             const parts = hit.documentId.split(":");
             if (parts.length >= 2 && parts[0] === "slack") return parts[1];
@@ -1251,14 +1267,15 @@ export class ConnectorTurnHandler {
           const card: SlackCardAttachment = {
             type: "connector_slack_message",
             channelId:
-              asString((hit as any).providerChannelId) || parsedChannel || undefined,
+              asString(hitRecord.providerChannelId) || parsedChannel || undefined,
             preview: normalizePreview(hit.snippet, 320),
           };
           return card;
         }
 
+        const hitRecord = asRecord(hit);
         const messageId =
-          asString((hit as any).providerMessageId) || syntheticId || undefined;
+          asString(hitRecord.providerMessageId) || syntheticId || undefined;
         const card: EmailCardAttachment = {
           type: "connector_email_ref",
           provider: provider as EmailProvider,

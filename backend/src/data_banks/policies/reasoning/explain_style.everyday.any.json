@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "explain_style_everyday",
+    "version": "1.0.0",
+    "description": "Explanation style policy for everyday document queries.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Added everyday explain style and machine-actionable checks"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "rules": [
+    {
+      "id": "EVERYDAY_EXPL_001_plain_language_first",
+      "trigger": "Everyday response contains technical terms with consumer-facing query",
+      "check": "context.domain == 'everyday' AND context.userProfile == 'consumer' AND output.containsTechnicalTerms == true",
+      "failureAction": "REWRITE_FOR_CONSUMER",
+      "severity": "medium"
+    },
+    {
+      "id": "EVERYDAY_EXPL_002_unit_visibility",
+      "trigger": "Everyday numeric response omits units present in source",
+      "check": "context.domain == 'everyday' AND source.unitsPresent == true AND output.unitsPresent == false",
+      "failureAction": "REJECT_MISSING_UNITS",
+      "severity": "error"
+    },
+    {
+      "id": "EVERYDAY_EXPL_003_clarify_when_partial_scope",
+      "trigger": "Everyday answer uses partial document scope",
+      "check": "context.domain == 'everyday' AND context.scopePartial == true",
+      "failureAction": "ADD_SCOPE_NOTE",
+      "severity": "warning"
+    },
+    {
+      "id": "EVERYDAY_EXPL_004_compare_disclosure",
+      "trigger": "Everyday compare output merges two docs without explicit disclosure",
+      "check": "context.domain == 'everyday' AND context.intent == 'compare' AND output.crossDocDisclosure == false",
+      "failureAction": "REQUIRE_DISCLOSURE",
+      "severity": "error"
+    },
+    {
+      "id": "EVERYDAY_EXPL_005_no_medical_legal_overreach",
+      "trigger": "Everyday query triggers legal/medical inference",
+      "check": "context.domain == 'everyday' AND context.overlapDomain IN ['legal', 'medical']",
+      "failureAction": "RESTRICT_TO_PROVIDED_DOCUMENT_TEXT",
+      "severity": "high"
+    }
+  ],
+  "audienceStyles": [
+    {
+      "audience": "consumer",
+      "tone": "clear",
+      "defaultDepth": "summary"
+    },
+    {
+      "audience": "manager",
+      "tone": "practical",
+      "defaultDepth": "paragraph"
+    },
+    {
+      "audience": "auditor",
+      "tone": "skeptical",
+      "defaultDepth": "detailed"
+    }
+  ],
+  "depthLadder": [
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo"
+  ],
+  "templates": [
+    {
+      "id": "EVERYDAY_EXPL_T01",
+      "audience": "consumer",
+      "depth": "summary",
+      "language": "en",
+      "tone": "clear",
+      "structure": [
+        "answer",
+        "top_evidence",
+        "uncertainty",
+        "next_step"
+      ],
+      "template": "Here is what the document says: {answer}."
+    },
+    {
+      "id": "EVERYDAY_EXPL_T02",
+      "audience": "manager",
+      "depth": "paragraph",
+      "language": "en",
+      "tone": "practical",
+      "structure": [
+        "answer",
+        "risks",
+        "uncertainty",
+        "evidence"
+      ],
+      "template": "Based on the provided documents: {answer}."
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "EVERYDAY_EXPL_SMOKE_001"
+      }
+    ]
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "_meta": {
+    "id": "pii_patterns",
+    "version": "1.0.0",
+    "description": "PII and sensitive pattern catalog for document intelligence runtime safety checks.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultSensitivity": "medium",
+    "allowHashedIds": true
+  },
+  "patterns": [
+    {
+      "id": "PII_EMAIL",
+      "name": "Email",
+      "type": "pii",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "severity": "high",
+      "examples": [
+        "alice@company.com",
+        "admin@org.org"
+      ]
+    },
+    {
+      "id": "PII_PHONE",
+      "name": "Phone Number",
+      "type": "pii",
+      "pattern": "\\+?[0-9][0-9\\-() ]{7,}[0-9]",
+      "severity": "medium",
+      "examples": [
+        "+1 555 123 4567",
+        "(11) 99999-1111"
+      ]
+    },
+    {
+      "id": "PII_SSN",
+      "name": "US SSN-like",
+      "type": "pii",
+      "pattern": "\\\b\\d{3}-\\d{2}-\\d{4}\\\b",
+      "severity": "high",
+      "examples": [
+        "123-45-6789"
+      ]
+    },
+    {
+      "id": "PII_TAX_ID_GENERIC",
+      "name": "Tax Identifier",
+      "type": "pii",
+      "pattern": "\\\b(?:CPF|CNPJ|TIN|SSN|NIF|EIN)\\s*[:#-]?\\s*[A-Z0-9.-]{6,}\\\b",
+      "severity": "high",
+      "examples": [
+        "CPF 123.456.789-00",
+        "EIN 12-3456789"
+      ]
+    },
+    {
+      "id": "PII_PASSPORT",
+      "name": "Passport-like",
+      "type": "pii",
+      "pattern": "\\\b(?:passport|passaporte)\\s*#?\\s*[A-Z0-9]{6,12}\\\b",
+      "severity": "high",
+      "examples": [
+        "passport X123456"
+      ]
+    },
+    {
+      "id": "PII_CREDIT_CARD",
+      "name": "Credit Card",
+      "type": "pii",
+      "pattern": "\\\b(?:\\d{4}[ -]?){3}\\d{4}\\\b",
+      "severity": "high",
+      "examples": [
+        "4111 1111 1111 1111",
+        "5555-4444-3333-2222"
+      ]
+    },
+    {
+      "id": "PII_BANK_ROUTING",
+      "name": "Bank Routing",
+      "type": "pii",
+      "pattern": "\\\b(aba|routing|routing number|bank|sort code)\\s*[:#-]?\\s*[0-9]{9}\\\b",
+      "severity": "high",
+      "examples": [
+        "Routing number: 123456789"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "PII_001_pattern_presence_guard",
+      "trigger": "detected text contains raw pattern with no explicit suppression",
+      "check": "detected.patternMatches == true AND detected.redactionRequested == false",
+      "failureAction": "ENFORCE_REDACTION"
+    },
+    {
+      "id": "PII_002_high_risk_only",
+      "trigger": "high severity pattern detected in doc-grounded answer",
+      "check": "detected.severity == 'high' AND output.destination == 'user_message'",
+      "failureAction": "MASK_AND_AUDIT"
+    },
+    {
+      "id": "PII_003_credit_card_gate",
+      "trigger": "credit-card-like tokens found",
+      "check": "detected.patternId == 'PII_CREDIT_CARD'",
+      "failureAction": "HIGHEST_PRIORITY_MASK"
+    },
+    {
+      "id": "PII_004_phone_format_check",
+      "trigger": "phone pattern appears but confidence is low",
+      "check": "detected.patternId == 'PII_PHONE' AND detected.patternConfidence < 0.75",
+      "failureAction": "MARK_AS_POTENTIAL_PII"
+    },
+    {
+      "id": "PII_005_no_false_negative",
+      "trigger": "critical pii type is configured but pattern missing",
+      "check": "config.enabled == true AND config.defaultSensitivity == 'high' AND detected.allCriticalMatched == false",
+      "failureAction": "ESCALATE_REVIEW_QUEUE"
+    }
+  ],
+  "templates": [
+    {
+      "id": "PII_PATTERNS_GEN_TEMPLATE_001",
+      "text": "Pattern-based redaction safety should mask {{piiType}} occurrences deterministically.",
+      "language": "any"
+    }
+  ]
+}

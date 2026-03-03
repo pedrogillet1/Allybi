@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_tables_fin_budget",
-    "version": "2.0.0",
-    "description": "Table patterns for fin_budget with header mappings and units rules.",
+    "version": "2.1.0",
+    "description": "Table signatures for Budget Pack.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,298 +15,2344 @@
   },
   "tables": [
     {
-      "id": "summary_table",
-      "name": {
-        "en": "Summary Financial Table",
-        "pt": "Tabela Financeira Resumo"
+      "id": "budget_by_cost_center_1",
+      "canonicalName": {
+        "en": "Budget By Cost Center",
+        "pt": "Budget By Cost Center"
       },
-      "section": "tables_primary",
-      "expectedColumns": [
-        "metric",
-        "period",
-        "value",
-        "unit"
+      "section": "planning_assumptions",
+      "signaturePatterns": [
+        "\\bbudget by cost center\\b",
+        "\\bbudget_by_cost_center_1\\b",
+        "\\btable 1\\b"
       ],
-      "keyRows": [
-        "revenue",
-        "ebitda",
-        "net_income",
-        "cash"
-      ]
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_budget_by_cost_center_1_01",
+        "fn_budget_by_cost_center_1_02",
+        "fn_budget_by_cost_center_1_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
     },
     {
-      "id": "detail_table",
-      "name": {
-        "en": "Detailed Breakdown",
-        "pt": "Detalhamento"
+      "id": "revenue_budget_2",
+      "canonicalName": {
+        "en": "Revenue Budget",
+        "pt": "Revenue Budget"
       },
-      "section": "tables_primary",
-      "expectedColumns": [
-        "line_item",
+      "section": "revenue_budget",
+      "signaturePatterns": [
+        "\\brevenue budget\\b",
+        "\\brevenue_budget_2\\b",
+        "\\btable 2\\b"
+      ],
+      "requiredHeaders": [
         "period",
-        "actual",
-        "plan",
+        "metric",
+        "value",
+        "unit",
+        "currency",
         "variance"
       ],
-      "keyRows": [
-        "gross_profit",
-        "opex",
-        "capex"
-      ]
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_revenue_budget_2_01",
+        "fn_revenue_budget_2_02",
+        "fn_revenue_budget_2_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
     },
     {
-      "id": "trend_table",
-      "name": {
-        "en": "Trend Table",
-        "pt": "Tabela de Tendencia"
+      "id": "expense_budget_3",
+      "canonicalName": {
+        "en": "Expense Budget",
+        "pt": "Expense Budget"
       },
-      "section": "variance_and_drivers",
-      "expectedColumns": [
+      "section": "expense_budget",
+      "signaturePatterns": [
+        "\\bexpense budget\\b",
+        "\\bexpense_budget_3\\b",
+        "\\btable 3\\b"
+      ],
+      "requiredHeaders": [
+        "period",
         "metric",
-        "current_period",
-        "prior_period",
-        "yoy_change"
+        "value",
+        "unit",
+        "currency",
+        "table_note"
       ],
-      "keyRows": [
-        "revenue",
-        "ebitda",
-        "cash"
-      ]
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_expense_budget_3_01",
+        "fn_expense_budget_3_02",
+        "fn_expense_budget_3_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
     },
     {
-      "id": "support_table",
-      "name": {
-        "en": "Supporting Schedule",
-        "pt": "Cronograma de Suporte"
+      "id": "cash_budget_4",
+      "canonicalName": {
+        "en": "Cash Budget",
+        "pt": "Cash Budget"
       },
-      "section": "appendix",
-      "expectedColumns": [
-        "item",
-        "date",
-        "amount",
-        "note_ref"
+      "section": "headcount_plan",
+      "signaturePatterns": [
+        "\\bcash budget\\b",
+        "\\bcash_budget_4\\b",
+        "\\btable 4\\b"
       ],
-      "keyRows": [
-        "total"
-      ]
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cash_budget_4_01",
+        "fn_cash_budget_4_02",
+        "fn_cash_budget_4_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "capex_budget_5",
+      "canonicalName": {
+        "en": "Capex Budget",
+        "pt": "Capex Budget"
+      },
+      "section": "capex_plan",
+      "signaturePatterns": [
+        "\\bcapex budget\\b",
+        "\\bcapex_budget_5\\b",
+        "\\btable 5\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_capex_budget_5_01",
+        "fn_capex_budget_5_02",
+        "fn_capex_budget_5_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "headcount_budget_6",
+      "canonicalName": {
+        "en": "Headcount Budget",
+        "pt": "Headcount Budget"
+      },
+      "section": "capability_plan",
+      "signaturePatterns": [
+        "\\bheadcount budget\\b",
+        "\\bheadcount_budget_6\\b",
+        "\\btable 6\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_headcount_budget_6_01",
+        "fn_headcount_budget_6_02",
+        "fn_headcount_budget_6_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "variance_vs_actual_7",
+      "canonicalName": {
+        "en": "Variance Vs Actual",
+        "pt": "Variance Vs Actual"
+      },
+      "section": "variance_plan",
+      "signaturePatterns": [
+        "\\bvariance vs actual\\b",
+        "\\bvariance_vs_actual_7\\b",
+        "\\btable 7\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_variance_vs_actual_7_01",
+        "fn_variance_vs_actual_7_02",
+        "fn_variance_vs_actual_7_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "forecast_adjustments_8",
+      "canonicalName": {
+        "en": "Forecast Adjustments",
+        "pt": "Forecast Adjustments"
+      },
+      "section": "approval_section",
+      "signaturePatterns": [
+        "\\bforecast adjustments\\b",
+        "\\bforecast_adjustments_8\\b",
+        "\\btable 8\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_forecast_adjustments_8_01",
+        "fn_forecast_adjustments_8_02",
+        "fn_forecast_adjustments_8_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "scenario_table_9",
+      "canonicalName": {
+        "en": "Scenario Table",
+        "pt": "Scenario Table"
+      },
+      "section": "scenario_analysis",
+      "signaturePatterns": [
+        "\\bscenario table\\b",
+        "\\bscenario_table_9\\b",
+        "\\btable 9\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_scenario_table_9_01",
+        "fn_scenario_table_9_02",
+        "fn_scenario_table_9_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "approval_matrix_10",
+      "canonicalName": {
+        "en": "Approval Matrix",
+        "pt": "Approval Matrix"
+      },
+      "section": "risk_buffer",
+      "signaturePatterns": [
+        "\\bapproval matrix\\b",
+        "\\bapproval_matrix_10\\b",
+        "\\btable 10\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_approval_matrix_10_01",
+        "fn_approval_matrix_10_02",
+        "fn_approval_matrix_10_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "budget_by_department_11",
+      "canonicalName": {
+        "en": "Budget By Department",
+        "pt": "Budget By Department"
+      },
+      "section": "rollover_plan",
+      "signaturePatterns": [
+        "\\bbudget by department\\b",
+        "\\bbudget_by_department_11\\b",
+        "\\btable 11\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_budget_by_department_11_01",
+        "fn_budget_by_department_11_02",
+        "fn_budget_by_department_11_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "budget_by_cost_center_12",
+      "canonicalName": {
+        "en": "Budget By Cost Center",
+        "pt": "Budget By Cost Center"
+      },
+      "section": "signoff_matrix",
+      "signaturePatterns": [
+        "\\bbudget by cost center\\b",
+        "\\bbudget_by_cost_center_12\\b",
+        "\\btable 12\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_budget_by_cost_center_12_01",
+        "fn_budget_by_cost_center_12_02",
+        "fn_budget_by_cost_center_12_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "revenue_budget_13",
+      "canonicalName": {
+        "en": "Revenue Budget",
+        "pt": "Revenue Budget"
+      },
+      "section": "budget_cover",
+      "signaturePatterns": [
+        "\\brevenue budget\\b",
+        "\\brevenue_budget_13\\b",
+        "\\btable 13\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_revenue_budget_13_01",
+        "fn_revenue_budget_13_02",
+        "fn_revenue_budget_13_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "expense_budget_14",
+      "canonicalName": {
+        "en": "Expense Budget",
+        "pt": "Expense Budget"
+      },
+      "section": "planning_assumptions",
+      "signaturePatterns": [
+        "\\bexpense budget\\b",
+        "\\bexpense_budget_14\\b",
+        "\\btable 14\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_expense_budget_14_01",
+        "fn_expense_budget_14_02",
+        "fn_expense_budget_14_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "cash_budget_15",
+      "canonicalName": {
+        "en": "Cash Budget",
+        "pt": "Cash Budget"
+      },
+      "section": "revenue_budget",
+      "signaturePatterns": [
+        "\\bcash budget\\b",
+        "\\bcash_budget_15\\b",
+        "\\btable 15\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cash_budget_15_01",
+        "fn_cash_budget_15_02",
+        "fn_cash_budget_15_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "capex_budget_16",
+      "canonicalName": {
+        "en": "Capex Budget",
+        "pt": "Capex Budget"
+      },
+      "section": "expense_budget",
+      "signaturePatterns": [
+        "\\bcapex budget\\b",
+        "\\bcapex_budget_16\\b",
+        "\\btable 16\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_capex_budget_16_01",
+        "fn_capex_budget_16_02",
+        "fn_capex_budget_16_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "headcount_budget_17",
+      "canonicalName": {
+        "en": "Headcount Budget",
+        "pt": "Headcount Budget"
+      },
+      "section": "headcount_plan",
+      "signaturePatterns": [
+        "\\bheadcount budget\\b",
+        "\\bheadcount_budget_17\\b",
+        "\\btable 17\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_headcount_budget_17_01",
+        "fn_headcount_budget_17_02",
+        "fn_headcount_budget_17_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "variance_vs_actual_18",
+      "canonicalName": {
+        "en": "Variance Vs Actual",
+        "pt": "Variance Vs Actual"
+      },
+      "section": "capex_plan",
+      "signaturePatterns": [
+        "\\bvariance vs actual\\b",
+        "\\bvariance_vs_actual_18\\b",
+        "\\btable 18\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_variance_vs_actual_18_01",
+        "fn_variance_vs_actual_18_02",
+        "fn_variance_vs_actual_18_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "forecast_adjustments_19",
+      "canonicalName": {
+        "en": "Forecast Adjustments",
+        "pt": "Forecast Adjustments"
+      },
+      "section": "capability_plan",
+      "signaturePatterns": [
+        "\\bforecast adjustments\\b",
+        "\\bforecast_adjustments_19\\b",
+        "\\btable 19\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_forecast_adjustments_19_01",
+        "fn_forecast_adjustments_19_02",
+        "fn_forecast_adjustments_19_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "scenario_table_20",
+      "canonicalName": {
+        "en": "Scenario Table",
+        "pt": "Scenario Table"
+      },
+      "section": "variance_plan",
+      "signaturePatterns": [
+        "\\bscenario table\\b",
+        "\\bscenario_table_20\\b",
+        "\\btable 20\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_scenario_table_20_01",
+        "fn_scenario_table_20_02",
+        "fn_scenario_table_20_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "approval_matrix_21",
+      "canonicalName": {
+        "en": "Approval Matrix",
+        "pt": "Approval Matrix"
+      },
+      "section": "approval_section",
+      "signaturePatterns": [
+        "\\bapproval matrix\\b",
+        "\\bapproval_matrix_21\\b",
+        "\\btable 21\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_approval_matrix_21_01",
+        "fn_approval_matrix_21_02",
+        "fn_approval_matrix_21_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "budget_by_department_22",
+      "canonicalName": {
+        "en": "Budget By Department",
+        "pt": "Budget By Department"
+      },
+      "section": "scenario_analysis",
+      "signaturePatterns": [
+        "\\bbudget by department\\b",
+        "\\bbudget_by_department_22\\b",
+        "\\btable 22\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_budget_by_department_22_01",
+        "fn_budget_by_department_22_02",
+        "fn_budget_by_department_22_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "budget_by_cost_center_23",
+      "canonicalName": {
+        "en": "Budget By Cost Center",
+        "pt": "Budget By Cost Center"
+      },
+      "section": "risk_buffer",
+      "signaturePatterns": [
+        "\\bbudget by cost center\\b",
+        "\\bbudget_by_cost_center_23\\b",
+        "\\btable 23\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_budget_by_cost_center_23_01",
+        "fn_budget_by_cost_center_23_02",
+        "fn_budget_by_cost_center_23_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "revenue_budget_24",
+      "canonicalName": {
+        "en": "Revenue Budget",
+        "pt": "Revenue Budget"
+      },
+      "section": "rollover_plan",
+      "signaturePatterns": [
+        "\\brevenue budget\\b",
+        "\\brevenue_budget_24\\b",
+        "\\btable 24\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_revenue_budget_24_01",
+        "fn_revenue_budget_24_02",
+        "fn_revenue_budget_24_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
     }
   ],
   "tableHeaderMappings": [
     {
-      "canonicalHeader": "period",
-      "synonyms": [
-        "period",
-        "fiscal period",
-        "mes",
-        "trimestre",
-        "periodo"
-      ]
+      "canonicalHeader": "metric_1",
+      "aliases": [
+        "metric 1",
+        "metrica 1",
+        "kpi_1",
+        "item"
+      ],
+      "enAliases": [
+        "item 1",
+        "line item 1"
+      ],
+      "ptAliases": [
+        "item 1",
+        "linha 1"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "revenue",
-      "synonyms": [
-        "revenue",
-        "sales",
-        "receita",
-        "faturamento"
-      ]
+      "canonicalHeader": "metric_2",
+      "aliases": [
+        "metric 2",
+        "metrica 2",
+        "kpi_2",
+        "item"
+      ],
+      "enAliases": [
+        "item 2",
+        "line item 2"
+      ],
+      "ptAliases": [
+        "item 2",
+        "linha 2"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "gross_profit",
-      "synonyms": [
-        "gross profit",
-        "gross margin value",
-        "lucro bruto"
-      ]
+      "canonicalHeader": "metric_3",
+      "aliases": [
+        "metric 3",
+        "metrica 3",
+        "kpi_3",
+        "item"
+      ],
+      "enAliases": [
+        "item 3",
+        "line item 3"
+      ],
+      "ptAliases": [
+        "item 3",
+        "linha 3"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "ebitda",
-      "synonyms": [
-        "ebitda",
-        "lajida"
-      ]
+      "canonicalHeader": "metric_4",
+      "aliases": [
+        "metric 4",
+        "metrica 4",
+        "kpi_4",
+        "item"
+      ],
+      "enAliases": [
+        "item 4",
+        "line item 4"
+      ],
+      "ptAliases": [
+        "item 4",
+        "linha 4"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "operating_income",
-      "synonyms": [
-        "operating income",
-        "resultado operacional"
-      ]
+      "canonicalHeader": "metric_5",
+      "aliases": [
+        "metric 5",
+        "metrica 5",
+        "kpi_5",
+        "item"
+      ],
+      "enAliases": [
+        "item 5",
+        "line item 5"
+      ],
+      "ptAliases": [
+        "item 5",
+        "linha 5"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "net_income",
-      "synonyms": [
-        "net income",
-        "profit after tax",
-        "lucro liquido"
-      ]
+      "canonicalHeader": "metric_6",
+      "aliases": [
+        "metric 6",
+        "metrica 6",
+        "kpi_6",
+        "item"
+      ],
+      "enAliases": [
+        "item 6",
+        "line item 6"
+      ],
+      "ptAliases": [
+        "item 6",
+        "linha 6"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "cash",
-      "synonyms": [
-        "cash",
-        "cash position",
-        "caixa"
-      ]
+      "canonicalHeader": "metric_7",
+      "aliases": [
+        "metric 7",
+        "metrica 7",
+        "kpi_7",
+        "item"
+      ],
+      "enAliases": [
+        "item 7",
+        "line item 7"
+      ],
+      "ptAliases": [
+        "item 7",
+        "linha 7"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "capex",
-      "synonyms": [
-        "capex",
-        "capital expenditure",
-        "investimento"
-      ]
+      "canonicalHeader": "metric_8",
+      "aliases": [
+        "metric 8",
+        "metrica 8",
+        "kpi_8",
+        "item"
+      ],
+      "enAliases": [
+        "item 8",
+        "line item 8"
+      ],
+      "ptAliases": [
+        "item 8",
+        "linha 8"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "opex",
-      "synonyms": [
-        "opex",
-        "operating expense",
-        "despesa operacional"
-      ]
+      "canonicalHeader": "metric_9",
+      "aliases": [
+        "metric 9",
+        "metrica 9",
+        "kpi_9",
+        "item"
+      ],
+      "enAliases": [
+        "item 9",
+        "line item 9"
+      ],
+      "ptAliases": [
+        "item 9",
+        "linha 9"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "currency",
-      "synonyms": [
-        "currency",
-        "moeda"
-      ]
+      "canonicalHeader": "metric_10",
+      "aliases": [
+        "metric 10",
+        "metrica 10",
+        "kpi_10",
+        "item"
+      ],
+      "enAliases": [
+        "item 10",
+        "line item 10"
+      ],
+      "ptAliases": [
+        "item 10",
+        "linha 10"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "unit_scale",
-      "synonyms": [
-        "in thousands",
-        "in millions",
-        "em milhares",
-        "em milhoes"
-      ]
+      "canonicalHeader": "metric_11",
+      "aliases": [
+        "metric 11",
+        "metrica 11",
+        "kpi_11",
+        "item"
+      ],
+      "enAliases": [
+        "item 11",
+        "line item 11"
+      ],
+      "ptAliases": [
+        "item 11",
+        "linha 11"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "variance",
-      "synonyms": [
-        "variance",
-        "delta",
-        "variacao"
-      ]
+      "canonicalHeader": "metric_12",
+      "aliases": [
+        "metric 12",
+        "metrica 12",
+        "kpi_12",
+        "item"
+      ],
+      "enAliases": [
+        "item 12",
+        "line item 12"
+      ],
+      "ptAliases": [
+        "item 12",
+        "linha 12"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "variance_percent",
-      "synonyms": [
-        "variance %",
-        "delta %",
-        "variacao %"
-      ]
+      "canonicalHeader": "metric_13",
+      "aliases": [
+        "metric 13",
+        "metrica 13",
+        "kpi_13",
+        "item"
+      ],
+      "enAliases": [
+        "item 13",
+        "line item 13"
+      ],
+      "ptAliases": [
+        "item 13",
+        "linha 13"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "yoy_change",
-      "synonyms": [
-        "yoy",
-        "year over year",
-        "ano contra ano"
-      ]
+      "canonicalHeader": "metric_14",
+      "aliases": [
+        "metric 14",
+        "metrica 14",
+        "kpi_14",
+        "item"
+      ],
+      "enAliases": [
+        "item 14",
+        "line item 14"
+      ],
+      "ptAliases": [
+        "item 14",
+        "linha 14"
+      ],
+      "normalizeTo": "text"
     },
     {
-      "canonicalHeader": "qoq_change",
-      "synonyms": [
-        "qoq",
-        "quarter over quarter",
-        "trimestre contra trimestre"
-      ]
+      "canonicalHeader": "metric_15",
+      "aliases": [
+        "metric 15",
+        "metrica 15",
+        "kpi_15",
+        "item"
+      ],
+      "enAliases": [
+        "item 15",
+        "line item 15"
+      ],
+      "ptAliases": [
+        "item 15",
+        "linha 15"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_16",
+      "aliases": [
+        "metric 16",
+        "metrica 16",
+        "kpi_16",
+        "item"
+      ],
+      "enAliases": [
+        "item 16",
+        "line item 16"
+      ],
+      "ptAliases": [
+        "item 16",
+        "linha 16"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_17",
+      "aliases": [
+        "metric 17",
+        "metrica 17",
+        "kpi_17",
+        "item"
+      ],
+      "enAliases": [
+        "item 17",
+        "line item 17"
+      ],
+      "ptAliases": [
+        "item 17",
+        "linha 17"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_18",
+      "aliases": [
+        "metric 18",
+        "metrica 18",
+        "kpi_18",
+        "item"
+      ],
+      "enAliases": [
+        "item 18",
+        "line item 18"
+      ],
+      "ptAliases": [
+        "item 18",
+        "linha 18"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_19",
+      "aliases": [
+        "metric 19",
+        "metrica 19",
+        "kpi_19",
+        "item"
+      ],
+      "enAliases": [
+        "item 19",
+        "line item 19"
+      ],
+      "ptAliases": [
+        "item 19",
+        "linha 19"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_20",
+      "aliases": [
+        "metric 20",
+        "metrica 20",
+        "kpi_20",
+        "item"
+      ],
+      "enAliases": [
+        "item 20",
+        "line item 20"
+      ],
+      "ptAliases": [
+        "item 20",
+        "linha 20"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_21",
+      "aliases": [
+        "metric 21",
+        "metrica 21",
+        "kpi_21",
+        "item"
+      ],
+      "enAliases": [
+        "item 21",
+        "line item 21"
+      ],
+      "ptAliases": [
+        "item 21",
+        "linha 21"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_22",
+      "aliases": [
+        "metric 22",
+        "metrica 22",
+        "kpi_22",
+        "item"
+      ],
+      "enAliases": [
+        "item 22",
+        "line item 22"
+      ],
+      "ptAliases": [
+        "item 22",
+        "linha 22"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_23",
+      "aliases": [
+        "metric 23",
+        "metrica 23",
+        "kpi_23",
+        "item"
+      ],
+      "enAliases": [
+        "item 23",
+        "line item 23"
+      ],
+      "ptAliases": [
+        "item 23",
+        "linha 23"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_24",
+      "aliases": [
+        "metric 24",
+        "metrica 24",
+        "kpi_24",
+        "item"
+      ],
+      "enAliases": [
+        "item 24",
+        "line item 24"
+      ],
+      "ptAliases": [
+        "item 24",
+        "linha 24"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_25",
+      "aliases": [
+        "metric 25",
+        "metrica 25",
+        "kpi_25",
+        "item"
+      ],
+      "enAliases": [
+        "item 25",
+        "line item 25"
+      ],
+      "ptAliases": [
+        "item 25",
+        "linha 25"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_26",
+      "aliases": [
+        "metric 26",
+        "metrica 26",
+        "kpi_26",
+        "item"
+      ],
+      "enAliases": [
+        "item 26",
+        "line item 26"
+      ],
+      "ptAliases": [
+        "item 26",
+        "linha 26"
+      ],
+      "normalizeTo": "text"
     }
   ],
   "unitsRules": [
     {
-      "id": "unit_rule_currency_required",
-      "appliesToHeaders": [
-        "revenue",
-        "gross_profit",
-        "ebitda",
-        "operating_income",
-        "net_income",
-        "cash",
-        "capex",
-        "opex"
+      "id": "fin_unit_rule_1",
+      "appliesTo": [
+        "metric_1",
+        "number"
       ],
-      "rule": "currency_must_be_explicit_or_inherited_from_header_context"
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
     },
     {
-      "id": "unit_rule_scale_normalization",
-      "appliesToHeaders": [
-        "revenue",
-        "ebitda",
-        "net_income",
-        "cash"
+      "id": "fin_unit_rule_2",
+      "appliesTo": [
+        "metric_2",
+        "currency"
       ],
-      "rule": "normalize_k_m_b_thousands_millions_billions_and_record_scale"
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
     },
     {
-      "id": "unit_rule_percent_fields",
-      "appliesToHeaders": [
-        "variance_percent",
-        "yoy_change",
-        "qoq_change"
+      "id": "fin_unit_rule_3",
+      "appliesTo": [
+        "metric_3",
+        "number"
       ],
-      "rule": "percent_fields_must_use_percent_unit_not_currency"
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
     },
     {
-      "id": "unit_rule_negative_style",
-      "appliesToHeaders": [
-        "revenue",
-        "ebitda",
-        "net_income",
-        "cash",
-        "capex",
-        "opex"
+      "id": "fin_unit_rule_4",
+      "appliesTo": [
+        "metric_4",
+        "currency"
       ],
-      "rule": "support_parentheses_and_minus_as_negative"
+      "rule": "scale_mandatory",
+      "failureAction": "WARN"
     },
     {
-      "id": "unit_rule_rounding",
-      "appliesToHeaders": [
-        "revenue",
-        "ebitda",
-        "net_income"
+      "id": "fin_unit_rule_5",
+      "appliesTo": [
+        "metric_5",
+        "number"
       ],
-      "rule": "round_only_for_display_keep_raw_precision"
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
     },
     {
-      "id": "unit_rule_header_context",
-      "appliesToHeaders": [
-        "all"
+      "id": "fin_unit_rule_6",
+      "appliesTo": [
+        "metric_6",
+        "currency"
       ],
-      "rule": "table_cell_value_requires_header_and_row_context_before_use"
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
     },
     {
-      "id": "unit_rule_period_alignment",
-      "appliesToHeaders": [
-        "all"
+      "id": "fin_unit_rule_7",
+      "appliesTo": [
+        "metric_7",
+        "number"
       ],
-      "rule": "comparisons_require_same_period_granularity"
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
     },
     {
-      "id": "unit_rule_mixed_currency_guard",
-      "appliesToHeaders": [
-        "all"
+      "id": "fin_unit_rule_8",
+      "appliesTo": [
+        "metric_8",
+        "currency"
       ],
-      "rule": "block_calculation_when_mixed_currencies_without_conversion_rate"
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_9",
+      "appliesTo": [
+        "metric_9",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_10",
+      "appliesTo": [
+        "metric_10",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_11",
+      "appliesTo": [
+        "metric_11",
+        "number"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_12",
+      "appliesTo": [
+        "metric_12",
+        "currency"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_13",
+      "appliesTo": [
+        "metric_13",
+        "number"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_14",
+      "appliesTo": [
+        "metric_14",
+        "currency"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_15",
+      "appliesTo": [
+        "metric_15",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_16",
+      "appliesTo": [
+        "metric_16",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_17",
+      "appliesTo": [
+        "metric_17",
+        "number"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_18",
+      "appliesTo": [
+        "metric_18",
+        "currency"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_19",
+      "appliesTo": [
+        "metric_19",
+        "number"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_20",
+      "appliesTo": [
+        "metric_20",
+        "currency"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_21",
+      "appliesTo": [
+        "metric_21",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_22",
+      "appliesTo": [
+        "metric_22",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
     }
   ],
-  "headerContextRules": [
+  "footnoteLinking": [
     {
-      "id": "ctx_row_header_required",
-      "check": "row_and_column_headers_required_for_numeric_extraction"
+      "footnoteId": "fn_global_01",
+      "targetTables": [
+        "table_1",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
     },
     {
-      "id": "ctx_period_header_required",
-      "check": "period_header_required_for_time_series_claims"
+      "footnoteId": "fn_global_02",
+      "targetTables": [
+        "table_2",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
     },
     {
-      "id": "ctx_total_reconcile",
-      "check": "line_items_should_reconcile_to_total_when_total_row_present"
+      "footnoteId": "fn_global_03",
+      "targetTables": [
+        "table_3",
+        "income_statement_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
     },
     {
-      "id": "ctx_unit_header_required",
-      "check": "unit_or_scale_header_required_for_currency_values"
+      "footnoteId": "fn_global_04",
+      "targetTables": [
+        "table_4",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_05",
+      "targetTables": [
+        "table_5",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_06",
+      "targetTables": [
+        "table_6",
+        "income_statement_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_07",
+      "targetTables": [
+        "table_7",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_08",
+      "targetTables": [
+        "table_8",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_09",
+      "targetTables": [
+        "table_9",
+        "income_statement_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_10",
+      "targetTables": [
+        "table_10",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_11",
+      "targetTables": [
+        "table_11",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_12",
+      "targetTables": [
+        "table_12",
+        "income_statement_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
     }
   ]
 }

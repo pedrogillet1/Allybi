@@ -2,11 +2,11 @@
   "_meta": {
     "id": "medical_med_lab_results_report_extraction_hints",
     "version": "2.0.0",
-    "description": "Extraction hints and pitfalls for Lab Results Report.",
+    "description": "Extraction hints for med lab results report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -16,101 +16,113 @@
   "hints": [
     {
       "id": "med_lab_results_report_hint_001",
-      "entity": "patient_identifier_masked",
+      "entity": "patient_name_masked",
       "anchors": [
-        "patient identifier masked",
-        "lab results report patient identifier masked",
-        "see section",
-        "documented as"
+        "patient name masked",
+        "patient name masked lab results report",
+        "see section"
       ],
       "location": "document_header",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "patient identifier masked med_lab_results_report",
-        "document_header patient identifier masked"
+        "patient_name_masked med_lab_results_report",
+        "med_lab_results_report patient name masked extracted from document_header"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_lab_results_report_hint_002",
-      "entity": "patient_age",
+      "entity": "medical_record_number_masked",
       "anchors": [
-        "patient age",
-        "lab results report patient age",
-        "see section",
-        "documented as"
+        "medical record number masked",
+        "medical record number masked lab results report",
+        "see section"
       ],
       "location": "patient_identification",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "patient age med_lab_results_report",
-        "patient_identification patient age"
+        "medical_record_number_masked med_lab_results_report",
+        "med_lab_results_report medical record number masked extracted from patient_identification"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_003",
-      "entity": "patient_sex_documented",
+      "entity": "date_of_birth_masked",
       "anchors": [
-        "patient sex documented",
-        "lab results report patient sex documented",
-        "see section",
-        "documented as"
+        "date of birth masked",
+        "date of birth masked lab results report",
+        "see section"
       ],
-      "location": "encounter_context",
+      "location": "sample_collection",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "patient sex documented med_lab_results_report",
-        "encounter_context patient sex documented"
+        "date_of_birth_masked med_lab_results_report",
+        "med_lab_results_report date of birth masked extracted from sample_collection"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_004",
       "entity": "encounter_date",
       "anchors": [
         "encounter date",
-        "lab results report encounter date",
-        "see section",
-        "documented as"
+        "encounter date lab results report",
+        "see section"
       ],
-      "location": "chief_complaint_reason",
+      "location": "results_table",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "encounter date med_lab_results_report",
-        "chief_complaint_reason encounter date"
+        "encounter_date med_lab_results_report",
+        "med_lab_results_report encounter date extracted from results_table"
       ],
       "confidenceBias": "high"
     },
@@ -119,650 +131,504 @@
       "entity": "encounter_time",
       "anchors": [
         "encounter time",
-        "lab results report encounter time",
-        "see section",
-        "documented as"
+        "encounter time lab results report",
+        "see section"
       ],
-      "location": "history_background",
+      "location": "chemistry_panel",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "encounter time med_lab_results_report",
-        "history_background encounter time"
+        "encounter_time med_lab_results_report",
+        "med_lab_results_report encounter time extracted from chemistry_panel"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_006",
-      "entity": "chief_complaint_text",
+      "entity": "specimen_type",
       "anchors": [
-        "chief complaint text",
-        "lab results report chief complaint text",
-        "see section",
-        "documented as"
+        "specimen type",
+        "specimen type lab results report",
+        "see section"
       ],
-      "location": "objective_findings",
+      "location": "critical_values",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "chief complaint text med_lab_results_report",
-        "objective_findings chief complaint text"
+        "specimen_type med_lab_results_report",
+        "med_lab_results_report specimen type extracted from critical_values"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_007",
-      "entity": "history_duration",
+      "entity": "collection_datetime",
       "anchors": [
-        "history duration",
-        "lab results report history duration",
-        "see section",
-        "documented as"
+        "collection datetime",
+        "collection datetime lab results report",
+        "see section"
       ],
-      "location": "vitals_and_measurements",
+      "location": "plan_and_orders",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "history duration med_lab_results_report",
-        "vitals_and_measurements history duration"
+        "collection_datetime med_lab_results_report",
+        "med_lab_results_report collection datetime extracted from plan_and_orders"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_lab_results_report_hint_008",
-      "entity": "blood_pressure_systolic",
+      "entity": "ordering_provider",
       "anchors": [
-        "blood pressure systolic",
-        "lab results report blood pressure systolic",
-        "see section",
-        "documented as"
+        "ordering provider",
+        "ordering provider lab results report",
+        "see section"
       ],
-      "location": "labs_imaging",
+      "location": "signature_block",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "blood pressure systolic med_lab_results_report",
-        "labs_imaging blood pressure systolic"
+        "ordering_provider med_lab_results_report",
+        "med_lab_results_report ordering provider extracted from signature_block"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_009",
-      "entity": "blood_pressure_diastolic",
+      "entity": "ordered_panel",
       "anchors": [
-        "blood pressure diastolic",
-        "lab results report blood pressure diastolic",
-        "see section",
-        "documented as"
+        "ordered panel",
+        "ordered panel lab results report",
+        "see section"
       ],
-      "location": "assessment_documented",
+      "location": "document_header",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "blood pressure diastolic med_lab_results_report",
-        "assessment_documented blood pressure diastolic"
+        "ordered_panel med_lab_results_report",
+        "med_lab_results_report ordered panel extracted from document_header"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_010",
-      "entity": "heart_rate",
+      "entity": "result_panel_name",
       "anchors": [
-        "heart rate",
-        "lab results report heart rate",
-        "see section",
-        "documented as"
+        "result panel name",
+        "result panel name lab results report",
+        "see section"
       ],
-      "location": "plan_and_orders",
+      "location": "patient_identification",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "heart rate med_lab_results_report",
-        "plan_and_orders heart rate"
+        "result_panel_name med_lab_results_report",
+        "med_lab_results_report result panel name extracted from patient_identification"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_lab_results_report_hint_011",
-      "entity": "respiratory_rate",
+      "entity": "test_name",
       "anchors": [
-        "respiratory rate",
-        "lab results report respiratory rate",
-        "see section",
-        "documented as"
+        "test name",
+        "test name lab results report",
+        "see section"
       ],
-      "location": "medications_allergies",
+      "location": "sample_collection",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "respiratory rate med_lab_results_report",
-        "medications_allergies respiratory rate"
+        "test_name med_lab_results_report",
+        "med_lab_results_report test name extracted from sample_collection"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_012",
-      "entity": "temperature",
+      "entity": "result_value",
       "anchors": [
-        "temperature",
-        "lab results report temperature",
-        "see section",
-        "documented as"
+        "result value",
+        "result value lab results report",
+        "see section"
       ],
-      "location": "followup_and_disposition",
+      "location": "results_table",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "temperature med_lab_results_report",
-        "followup_and_disposition temperature"
+        "result_value med_lab_results_report",
+        "med_lab_results_report result value extracted from results_table"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_013",
-      "entity": "oxygen_saturation",
+      "entity": "result_unit",
       "anchors": [
-        "oxygen saturation",
-        "lab results report oxygen saturation",
-        "see section",
-        "documented as"
+        "result unit",
+        "result unit lab results report",
+        "see section"
       ],
-      "location": "patient_instructions",
+      "location": "chemistry_panel",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "oxygen saturation med_lab_results_report",
-        "patient_instructions oxygen saturation"
+        "result_unit med_lab_results_report",
+        "med_lab_results_report result unit extracted from chemistry_panel"
       ],
-      "confidenceBias": "medium"
+      "confidenceBias": "high"
     },
     {
       "id": "med_lab_results_report_hint_014",
-      "entity": "weight",
+      "entity": "reference_range_text",
       "anchors": [
-        "weight",
-        "lab results report weight",
-        "see section",
-        "documented as"
+        "reference range text",
+        "reference range text lab results report",
+        "see section"
       ],
-      "location": "signoff_and_attestation",
+      "location": "critical_values",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "weight med_lab_results_report",
-        "signoff_and_attestation weight"
+        "reference_range_text med_lab_results_report",
+        "med_lab_results_report reference range text extracted from critical_values"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_015",
-      "entity": "height",
+      "entity": "abnormal_flag",
       "anchors": [
-        "height",
-        "lab results report height",
-        "see section",
-        "documented as"
+        "abnormal flag",
+        "abnormal flag lab results report",
+        "see section"
       ],
-      "location": "annexes_tables",
+      "location": "plan_and_orders",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "height med_lab_results_report",
-        "annexes_tables height"
+        "abnormal_flag med_lab_results_report",
+        "med_lab_results_report abnormal flag extracted from plan_and_orders"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_016",
-      "entity": "body_mass_index",
+      "entity": "critical_flag",
       "anchors": [
-        "body mass index",
-        "lab results report body mass index",
-        "see section",
-        "documented as"
+        "critical flag",
+        "critical flag lab results report",
+        "see section"
       ],
-      "location": "document_header",
+      "location": "signature_block",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "body mass index med_lab_results_report",
-        "document_header body mass index"
+        "critical_flag med_lab_results_report",
+        "med_lab_results_report critical flag extracted from signature_block"
       ],
-      "confidenceBias": "medium"
+      "confidenceBias": "high"
     },
     {
       "id": "med_lab_results_report_hint_017",
-      "entity": "pain_score",
+      "entity": "result_interpretation",
       "anchors": [
-        "pain score",
-        "lab results report pain score",
-        "see section",
-        "documented as"
+        "result interpretation",
+        "result interpretation lab results report",
+        "see section"
       ],
-      "location": "patient_identification",
+      "location": "document_header",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "pain score med_lab_results_report",
-        "patient_identification pain score"
+        "result_interpretation med_lab_results_report",
+        "med_lab_results_report result interpretation extracted from document_header"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_018",
-      "entity": "glucose_value",
+      "entity": "delta_reference",
       "anchors": [
-        "glucose value",
-        "lab results report glucose value",
-        "see section",
-        "documented as"
+        "delta reference",
+        "delta reference lab results report",
+        "see section"
       ],
-      "location": "encounter_context",
+      "location": "patient_identification",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "glucose value med_lab_results_report",
-        "encounter_context glucose value"
+        "delta_reference med_lab_results_report",
+        "med_lab_results_report delta reference extracted from patient_identification"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_019",
-      "entity": "hemoglobin_value",
+      "entity": "recommendation",
       "anchors": [
-        "hemoglobin value",
-        "lab results report hemoglobin value",
-        "see section",
-        "documented as"
+        "recommendation",
+        "recommendation lab results report",
+        "see section"
       ],
-      "location": "chief_complaint_reason",
+      "location": "sample_collection",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "hemoglobin value med_lab_results_report",
-        "chief_complaint_reason hemoglobin value"
+        "recommendation med_lab_results_report",
+        "med_lab_results_report recommendation extracted from sample_collection"
       ],
-      "confidenceBias": "medium"
+      "confidenceBias": "high"
     },
     {
       "id": "med_lab_results_report_hint_020",
-      "entity": "white_cell_count",
+      "entity": "disposition",
       "anchors": [
-        "white cell count",
-        "lab results report white cell count",
-        "see section",
-        "documented as"
+        "disposition",
+        "disposition lab results report",
+        "see section"
       ],
-      "location": "history_background",
+      "location": "results_table",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "white cell count med_lab_results_report",
-        "history_background white cell count"
+        "disposition med_lab_results_report",
+        "med_lab_results_report disposition extracted from results_table"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_021",
-      "entity": "creatinine_value",
+      "entity": "reporting_clinician",
       "anchors": [
-        "creatinine value",
-        "lab results report creatinine value",
-        "see section",
-        "documented as"
+        "reporting clinician",
+        "reporting clinician lab results report",
+        "see section"
       ],
-      "location": "objective_findings",
+      "location": "chemistry_panel",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "creatinine value med_lab_results_report",
-        "objective_findings creatinine value"
+        "reporting_clinician med_lab_results_report",
+        "med_lab_results_report reporting clinician extracted from chemistry_panel"
       ],
-      "confidenceBias": "low"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_lab_results_report_hint_022",
-      "entity": "sodium_value",
+      "entity": "document_footer",
       "anchors": [
-        "sodium value",
-        "lab results report sodium value",
-        "see section",
-        "documented as"
+        "document footer",
+        "document footer lab results report",
+        "see section"
       ],
-      "location": "vitals_and_measurements",
+      "location": "critical_values",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "sodium value med_lab_results_report",
-        "vitals_and_measurements sodium value"
+        "document_footer med_lab_results_report",
+        "med_lab_results_report document footer extracted from critical_values"
       ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_023",
-      "entity": "potassium_value",
-      "anchors": [
-        "potassium value",
-        "lab results report potassium value",
-        "see section",
-        "documented as"
-      ],
-      "location": "labs_imaging",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "potassium value med_lab_results_report",
-        "labs_imaging potassium value"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_024",
-      "entity": "radiology_modality",
-      "anchors": [
-        "radiology modality",
-        "lab results report radiology modality",
-        "see section",
-        "documented as"
-      ],
-      "location": "assessment_documented",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "radiology modality med_lab_results_report",
-        "assessment_documented radiology modality"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_025",
-      "entity": "radiology_impression_text",
-      "anchors": [
-        "radiology impression text",
-        "lab results report radiology impression text",
-        "see section",
-        "documented as"
-      ],
-      "location": "plan_and_orders",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "radiology impression text med_lab_results_report",
-        "plan_and_orders radiology impression text"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_026",
-      "entity": "pathology_specimen_type",
-      "anchors": [
-        "pathology specimen type",
-        "lab results report pathology specimen type",
-        "see section",
-        "documented as"
-      ],
-      "location": "medications_allergies",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "pathology specimen type med_lab_results_report",
-        "medications_allergies pathology specimen type"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_027",
-      "entity": "ecg_rate",
-      "anchors": [
-        "ecg rate",
-        "lab results report ecg rate",
-        "see section",
-        "documented as"
-      ],
-      "location": "followup_and_disposition",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "ecg rate med_lab_results_report",
-        "followup_and_disposition ecg rate"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_028",
-      "entity": "ecg_qtc",
-      "anchors": [
-        "ecg qtc",
-        "lab results report ecg qtc",
-        "see section",
-        "documented as"
-      ],
-      "location": "patient_instructions",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "ecg qtc med_lab_results_report",
-        "patient_instructions ecg qtc"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_029",
-      "entity": "documented_assessment_text",
-      "anchors": [
-        "documented assessment text",
-        "lab results report documented assessment text",
-        "see section",
-        "documented as"
-      ],
-      "location": "signoff_and_attestation",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "documented assessment text med_lab_results_report",
-        "signoff_and_attestation documented assessment text"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_lab_results_report_hint_030",
-      "entity": "ordered_intervention_text",
-      "anchors": [
-        "ordered intervention text",
-        "lab results report ordered intervention text",
-        "see section",
-        "documented as"
-      ],
-      "location": "annexes_tables",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "ordered intervention text med_lab_results_report",
-        "annexes_tables ordered intervention text"
-      ],
-      "confidenceBias": "low"
+      "confidenceBias": "high"
     }
   ]
 }

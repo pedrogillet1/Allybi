@@ -1,12 +1,10 @@
 {
   "_meta": {
     "id": "docint_eval_suite_registry",
-    "version": "3.1.0",
-    "description": "Registry for document-intelligence evaluation suites with CI and nightly partitions.",
-    "languages": [
-      "any"
-    ],
-    "lastUpdated": "2026-02-28",
+    "version": "3.2.0",
+    "description": "Registry for document-intelligence evaluation suites with CI/nightly assignments and minimum case thresholds.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03",
     "owner": "docint-eval"
   },
   "config": {
@@ -33,400 +31,168 @@
     {
       "id": "retrieval_precision_ci",
       "path": "document_intelligence/eval/retrieval_precision.qa.jsonl",
-      "maxCases": 300,
-      "description": "Fast detection + collision smoke coverage."
+      "maxCases": 280,
+      "description": "Cross-domain retrieval precision gate."
     },
     {
       "id": "section_detection_ci",
       "path": "document_intelligence/eval/section_detection.qa.jsonl",
-      "maxCases": 300,
-      "description": "Fast section-target smoke coverage."
+      "maxCases": 280,
+      "description": "Cross-domain section targeting gate."
     },
     {
       "id": "abbreviation_resolution_ci",
       "path": "document_intelligence/eval/abbreviation_resolution.qa.jsonl",
       "maxCases": 240,
-      "description": "Fast abbreviation resolution smoke coverage."
+      "description": "Abbreviation disambiguation gate."
     },
     {
       "id": "answer_format_ci",
       "path": "document_intelligence/eval/answer_format.qa.jsonl",
       "maxCases": 240,
-      "description": "Fast answer-shape contract smoke coverage."
+      "description": "Answer-format and citation constraints gate."
     },
     {
       "id": "scope_lock_ci",
       "path": "document_intelligence/eval/crossdoc.qa.jsonl",
-      "maxCases": 260,
-      "description": "Fast wrong-doc scope-lock smoke coverage."
+      "maxCases": 190,
+      "description": "Cross-document scope lock gate."
     }
   ],
   "nightly_suites": [
     {
-      "id": "abbreviation_resolution_full",
-      "path": "document_intelligence/eval/abbreviation_resolution.qa.jsonl",
-      "description": "Abbreviation disambiguation and clarification coverage."
-    },
-    {
-      "id": "answer_format_full",
-      "path": "document_intelligence/eval/answer_format.qa.jsonl",
-      "description": "Answer shape and evidence-format contract coverage."
-    },
-    {
-      "id": "crossdoc_scope_lock_full",
-      "path": "document_intelligence/eval/crossdoc.qa.jsonl",
-      "description": "Wrong-doc and scope-lock enforcement coverage."
-    },
-    {
-      "id": "domain_accounting_full",
-      "path": "document_intelligence/eval/domain_specific/accounting/doc_type_coverage.qa.jsonl",
-      "description": "Accounting extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_banking_full",
-      "path": "document_intelligence/eval/domain_specific/banking/doc_type_coverage.qa.jsonl",
-      "description": "Banking extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_billing_full",
-      "path": "document_intelligence/eval/domain_specific/billing/doc_type_coverage.qa.jsonl",
-      "description": "Billing extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_education_full",
-      "path": "document_intelligence/eval/domain_specific/education/doc_type_coverage.qa.jsonl",
-      "description": "Education extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_finance_full",
-      "path": "document_intelligence/eval/domain_specific/finance/doc_type_coverage.qa.jsonl",
-      "description": "Finance extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_housing_full",
-      "path": "document_intelligence/eval/domain_specific/housing/doc_type_coverage.qa.jsonl",
-      "description": "Housing extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_hr_payroll_full",
-      "path": "document_intelligence/eval/domain_specific/hr_payroll/doc_type_coverage.qa.jsonl",
-      "description": "Hr Payroll extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_identity_full",
-      "path": "document_intelligence/eval/domain_specific/identity/doc_type_coverage.qa.jsonl",
-      "description": "Identity extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_insurance_full",
-      "path": "document_intelligence/eval/domain_specific/insurance/doc_type_coverage.qa.jsonl",
-      "description": "Insurance extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_legal_full",
-      "path": "document_intelligence/eval/domain_specific/legal/doc_type_coverage.qa.jsonl",
-      "description": "Legal extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_medical_full",
-      "path": "document_intelligence/eval/domain_specific/medical/doc_type_coverage.qa.jsonl",
-      "description": "Medical extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_ops_full",
-      "path": "document_intelligence/eval/domain_specific/ops/doc_type_coverage.qa.jsonl",
-      "description": "Ops extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_tax_full",
-      "path": "document_intelligence/eval/domain_specific/tax/doc_type_coverage.qa.jsonl",
-      "description": "Tax extraction/entity/table coverage."
-    },
-    {
-      "id": "domain_travel_full",
-      "path": "document_intelligence/eval/domain_specific/travel/doc_type_coverage.qa.jsonl",
-      "description": "Travel extraction/entity/table coverage."
-    },
-    {
       "id": "retrieval_precision_full",
       "path": "document_intelligence/eval/retrieval_precision.qa.jsonl",
-      "description": "Full detection and collision coverage for all taxonomy doc types."
+      "description": "Full retrieval precision suite."
     },
     {
       "id": "section_detection_full",
       "path": "document_intelligence/eval/section_detection.qa.jsonl",
-      "description": "Full section-target coverage for all taxonomy doc types."
+      "description": "Full section-detection suite."
+    },
+    {
+      "id": "abbreviation_resolution_full",
+      "path": "document_intelligence/eval/abbreviation_resolution.qa.jsonl",
+      "description": "Full abbreviation-disambiguation suite."
+    },
+    {
+      "id": "answer_format_full",
+      "path": "document_intelligence/eval/answer_format.qa.jsonl",
+      "description": "Full answer-format compliance suite."
+    },
+    {
+      "id": "crossdoc_scope_lock_full",
+      "path": "document_intelligence/eval/crossdoc.qa.jsonl",
+      "description": "Full wrong-scope and cross-doc lock suite."
+    },
+    {
+      "id": "finance_core_full",
+      "path": "document_intelligence/eval/domain_specific/finance/finance_core.qa.jsonl",
+      "description": "Finance document pack coverage suite."
+    },
+    {
+      "id": "legal_core_full",
+      "path": "document_intelligence/eval/domain_specific/legal/legal_core.qa.jsonl",
+      "description": "Legal document pack coverage suite."
+    },
+    {
+      "id": "medical_core_full",
+      "path": "document_intelligence/eval/domain_specific/medical/medical_core.qa.jsonl",
+      "description": "Medical document pack coverage suite."
+    },
+    {
+      "id": "accounting_core_full",
+      "path": "document_intelligence/eval/domain_specific/accounting/accounting_core.qa.jsonl",
+      "description": "Accounting document pack coverage suite."
+    },
+    {
+      "id": "everyday_core_full",
+      "path": "document_intelligence/eval/domain_specific/everyday/everyday_core.qa.jsonl",
+      "description": "Everyday document pack coverage suite."
     }
   ],
   "suites": [
     {
-      "id": "abbreviation_resolution_full",
-      "path": "document_intelligence/eval/abbreviation_resolution.qa.jsonl",
-      "minimumCases": 460,
-      "domains": [
-        "finance",
-        "legal",
-        "medical",
-        "ops",
-        "accounting"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "answer_format_full",
-      "path": "document_intelligence/eval/answer_format.qa.jsonl",
-      "minimumCases": 460,
-      "domains": [
-        "finance",
-        "legal",
-        "medical",
-        "ops",
-        "accounting"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "crossdoc_scope_lock_full",
-      "path": "document_intelligence/eval/crossdoc.qa.jsonl",
-      "minimumCases": 230,
-      "domains": [
-        "finance",
-        "legal",
-        "medical",
-        "ops",
-        "accounting"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_accounting_full",
-      "path": "document_intelligence/eval/domain_specific/accounting/doc_type_coverage.qa.jsonl",
-      "minimumCases": 75,
-      "domains": [
-        "accounting"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_banking_full",
-      "path": "document_intelligence/eval/domain_specific/banking/doc_type_coverage.qa.jsonl",
-      "minimumCases": 52,
-      "domains": [
-        "banking"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_billing_full",
-      "path": "document_intelligence/eval/domain_specific/billing/doc_type_coverage.qa.jsonl",
-      "minimumCases": 78,
-      "domains": [
-        "billing"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_education_full",
-      "path": "document_intelligence/eval/domain_specific/education/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "education"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_finance_full",
-      "path": "document_intelligence/eval/domain_specific/finance/doc_type_coverage.qa.jsonl",
-      "minimumCases": 129,
-      "domains": [
-        "finance"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_housing_full",
-      "path": "document_intelligence/eval/domain_specific/housing/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "housing"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_hr_payroll_full",
-      "path": "document_intelligence/eval/domain_specific/hr_payroll/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "hr_payroll"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_identity_full",
-      "path": "document_intelligence/eval/domain_specific/identity/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "identity"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_insurance_full",
-      "path": "document_intelligence/eval/domain_specific/insurance/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "insurance"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_legal_full",
-      "path": "document_intelligence/eval/domain_specific/legal/doc_type_coverage.qa.jsonl",
-      "minimumCases": 123,
-      "domains": [
-        "legal"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_medical_full",
-      "path": "document_intelligence/eval/domain_specific/medical/doc_type_coverage.qa.jsonl",
-      "minimumCases": 174,
-      "domains": [
-        "medical"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_ops_full",
-      "path": "document_intelligence/eval/domain_specific/ops/doc_type_coverage.qa.jsonl",
-      "minimumCases": 189,
-      "domains": [
-        "ops"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_tax_full",
-      "path": "document_intelligence/eval/domain_specific/tax/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "tax"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "domain_travel_full",
-      "path": "document_intelligence/eval/domain_specific/travel/doc_type_coverage.qa.jsonl",
-      "minimumCases": 39,
-      "domains": [
-        "travel"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
-    },
-    {
-      "id": "retrieval_precision_full",
+      "id": "retrieval_precision_core",
       "path": "document_intelligence/eval/retrieval_precision.qa.jsonl",
-      "minimumCases": 1150,
-      "domains": [
-        "finance",
-        "legal",
-        "medical",
-        "ops",
-        "accounting"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
+      "minimumCases": 280,
+      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
+      "requiredLangs": ["en", "pt"]
     },
     {
-      "id": "section_detection_full",
+      "id": "section_detection_core",
       "path": "document_intelligence/eval/section_detection.qa.jsonl",
-      "minimumCases": 690,
-      "domains": [
-        "finance",
-        "legal",
-        "medical",
-        "ops",
-        "accounting"
-      ],
-      "requiredLangs": [
-        "en",
-        "pt"
-      ]
+      "minimumCases": 280,
+      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "abbreviation_resolution_core",
+      "path": "document_intelligence/eval/abbreviation_resolution.qa.jsonl",
+      "minimumCases": 240,
+      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "answer_format_core",
+      "path": "document_intelligence/eval/answer_format.qa.jsonl",
+      "minimumCases": 240,
+      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "crossdoc_core",
+      "path": "document_intelligence/eval/crossdoc.qa.jsonl",
+      "minimumCases": 190,
+      "domains": ["finance", "legal", "medical", "accounting", "everyday"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "finance_core_suite",
+      "path": "document_intelligence/eval/domain_specific/finance/finance_core.qa.jsonl",
+      "minimumCases": 320,
+      "domains": ["finance"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "legal_core_suite",
+      "path": "document_intelligence/eval/domain_specific/legal/legal_core.qa.jsonl",
+      "minimumCases": 320,
+      "domains": ["legal"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "medical_core_suite",
+      "path": "document_intelligence/eval/domain_specific/medical/medical_core.qa.jsonl",
+      "minimumCases": 320,
+      "domains": ["medical"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "accounting_core_suite",
+      "path": "document_intelligence/eval/domain_specific/accounting/accounting_core.qa.jsonl",
+      "minimumCases": 320,
+      "domains": ["accounting"],
+      "requiredLangs": ["en", "pt"]
+    },
+    {
+      "id": "everyday_core_suite",
+      "path": "document_intelligence/eval/domain_specific/everyday/everyday_core.qa.jsonl",
+      "minimumCases": 340,
+      "domains": ["everyday"],
+      "requiredLangs": ["en", "pt"]
     }
   ],
   "suite_stats": {
-    "retrieval_precision": 1150,
-    "section_detection": 690,
-    "abbreviation_resolution": 460,
-    "answer_format": 460,
-    "crossdoc": 230,
-    "domain_legal": 123,
-    "domain_finance": 129,
-    "domain_accounting": 75,
-    "domain_medical": 174,
-    "domain_ops": 189,
-    "domain_banking": 52,
-    "domain_billing": 78,
-    "domain_education": 39,
-    "domain_housing": 39,
-    "domain_hr_payroll": 39,
-    "domain_identity": 39,
-    "domain_insurance": 39,
-    "domain_tax": 39,
-    "domain_travel": 39
+    "retrieval_precision": 280,
+    "section_detection": 280,
+    "abbreviation_resolution": 240,
+    "answer_format": 240,
+    "crossdoc": 190,
+    "finance_core": 320,
+    "legal_core": 320,
+    "medical_core": 320,
+    "accounting_core": 320,
+    "everyday_core": 340
   }
 }

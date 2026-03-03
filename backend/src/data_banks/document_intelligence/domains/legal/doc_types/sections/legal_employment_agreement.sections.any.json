@@ -11,7 +11,7 @@
   "config": {
     "enabled": true,
     "domain": "legal",
-    "docType": "employment_agreement"
+    "docType": "legal_employment_agreement"
   },
   "sections": [
     {

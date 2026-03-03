@@ -142,6 +142,11 @@
       "required": false,
       "category": "ambiguity"
     },
+    "connector_operators.any.json": {
+      "sha256": "37de95e17a1d781ff6c7c42fbce4ef650dc4476e7fbcc8a2cfec93ff16a961df",
+      "required": true,
+      "category": "operators"
+    },
     "dictionaries/allybi_font_aliases.any.json": {
       "sha256": "2e2da233bc03674786fc7836bfe01bdf3fd3c0ed4edb292fc911d77970a612ff",
       "required": false,
@@ -157,18 +162,43 @@
       "required": false,
       "category": "dictionaries"
     },
+    "document_intelligence/compose/citation_policy.any.json": {
+      "sha256": "c55d4f0d348b7a45b0663d0abe3eef9ca7cfa855849d9812c0605fd431f84211",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/clarification_prompts.any.json": {
+      "sha256": "0e0b2d966da86c6e60aa3b95a70b82ae117447edf6c61b8d363b6e1d8e9236df",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/response_templates.any.json": {
+      "sha256": "e6f5d20b1d7aa958ba83af00983f8e7a5bd4501afd8febc91b83897a8cccb85e",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/table_render_policy.any.json": {
+      "sha256": "f283d0cbad41e6465d1553c17ad5ce61d5e1dabf32a348f5c211d3a02ddd190b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/compose/tone_profiles.any.json": {
+      "sha256": "5a62235e657b5f84cbe35c514f386cbd7b2d844290e7066726a9e29dd15332a8",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/accounting/abbreviations/accounting.en.any.json": {
-      "sha256": "d48d80d657785af18fb6382a91741bb258711347f42add1a473a30ae03a55993",
+      "sha256": "82d4af69ea0fb633c71873caba041e3c3c82ce25cac3fc0f4c98b114a2a84e03",
       "required": false,
       "category": "dictionaries"
     },
     "document_intelligence/domains/accounting/abbreviations/accounting.pt.any.json": {
-      "sha256": "88c16625048ca68dc43e4c23efe8468d0f930fe4443d082e8763dc4442f6ddc9",
+      "sha256": "9c142b55cecac5a81e77a1201ef3ec35fcf7e69dee7f43a1108f702a3ee6d637",
       "required": false,
       "category": "dictionaries"
     },
     "document_intelligence/domains/accounting/answer_style_bank.any.json": {
-      "sha256": "183ceb3813daf4c5dcf9dde7bdbc3cdc8b6901a30a6c8110cfc4ab0186c594af",
+      "sha256": "27cf2347706bdbb8adde008f1f16b20425f0b09ea8b9fcf6625357b38f7422eb",
       "required": false,
       "category": "formatting"
     },
@@ -178,7 +208,7 @@
       "category": "policies"
     },
     "document_intelligence/domains/accounting/doc_types/doc_type_catalog.any.json": {
-      "sha256": "e1e67e8599fac54777f0dd269f424c32afe86d5c34f47b68c2ace6a567c56509",
+      "sha256": "483ff1373facf333f499b949480828e10a11d13fe14ec8768899d0289b08ab97",
       "required": false,
       "category": "semantics"
     },
@@ -188,17 +218,17 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_ap_aging.extraction_hints.any.json": {
-      "sha256": "a23a9c9cb1be63faa32f29406c50b159d1bb3c40d07d280ef81bdaea518c20bf",
+      "sha256": "4f581bfb1acddf8b4a2d859556b0feadf2825c3e6d995b2e590f477c98bf3696",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_ar_aging.extraction_hints.any.json": {
-      "sha256": "e8663f42b83cb64afb3596fb2ef24bb742155901b8381a284c5d962231d0d62d",
+      "sha256": "17b8a2477033ee45eeec8b6e6756b0dcc4eb09061959b0cd23e23ea21007ceb4",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_audit_workpaper.extraction_hints.any.json": {
-      "sha256": "0247692b36f895bac7fc8729257c36328c48cc58da97af0dbfb56fbfe09c3fc1",
+      "sha256": "07615c8169042394b8c998bf5d1b6ef1f2f53660129a26a83d85d7dd72ac1d04",
       "required": false,
       "category": "semantics"
     },
@@ -208,7 +238,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_bank_reconciliation.extraction_hints.any.json": {
-      "sha256": "5040b5eff7a014d589791e1bb53af939d7bc8e5e2af3d510120ee2668f31762a",
+      "sha256": "dcc0869221e97b8753bb88754e274f5953c7367f0d5ea48520233aee54ac104b",
       "required": false,
       "category": "semantics"
     },
@@ -218,7 +248,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_controls_narrative.extraction_hints.any.json": {
-      "sha256": "9508c39a81087498c8aa3634d8a54c31c8058f63848d9c0a81e5e7e073374fa8",
+      "sha256": "112a3d742db2dae628eaabb761545d6067cdbf9472d82169d78797ae86848568",
       "required": false,
       "category": "semantics"
     },
@@ -238,7 +268,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_gl_export.extraction_hints.any.json": {
-      "sha256": "b7c18e70420fdda944eaa8c2d81179f8482469fe7a2905ede1a88407d6c65ea1",
+      "sha256": "f041a29a6aec5ca76fe0da9c56d7e87597b296978c2977a2b55e97d82fa030e5",
       "required": false,
       "category": "semantics"
     },
@@ -258,7 +288,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_je_support.extraction_hints.any.json": {
-      "sha256": "c177891ee99bbd8eca9309b92d5eeb47287d7167b7becd95b96820c1dc238433",
+      "sha256": "cfe09be05d7d1c32dee026f020066ae5df463b0a1895dceac1ea67df2718d27a",
       "required": false,
       "category": "semantics"
     },
@@ -298,7 +328,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/extraction/acct_trial_balance.extraction_hints.any.json": {
-      "sha256": "df20f45abdb98f19734e9a6868b4c123664c5a99b46e97bf044725116b1d71ff",
+      "sha256": "ab273b9969bcc2dd878ff273a6d3dc4782e0a38bd5dbfaad735063bcc3086d29",
       "required": false,
       "category": "semantics"
     },
@@ -308,17 +338,17 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_ap_aging.sections.any.json": {
-      "sha256": "8f89b97b4c1d07b8f9f1082357dadb355b27d80a9c454ed071c67179f7251e55",
+      "sha256": "0f0503574453f77c5962e893e552369b97703d33571230acfbe3ebb53891c130",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_ar_aging.sections.any.json": {
-      "sha256": "a3da35b3b46fc8059e9271ca5d3e843f78a51c6ecd64109ec252842cc49cbd34",
+      "sha256": "50dcf51675e313536442599c4050a11ac29c48fbed2c3b3c87043d976041176b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_audit_workpaper.sections.any.json": {
-      "sha256": "5ea649f0a64b2536d37eeff5acd615452bc114ad9c886ab3c7337d9b0ae01822",
+      "sha256": "e62eea2037bd550abd97365de9165f60772696c9a7704ab32b187244b6a63192",
       "required": false,
       "category": "semantics"
     },
@@ -328,7 +358,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_bank_reconciliation.sections.any.json": {
-      "sha256": "12fc573952243045783320c2745300431307dfb44e8e79be1c1a6bb276f63e84",
+      "sha256": "48cee83c4fc71b949232410d9be4222926266233d380e2223fe8d889cc4b7a5b",
       "required": false,
       "category": "semantics"
     },
@@ -338,7 +368,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_controls_narrative.sections.any.json": {
-      "sha256": "86d93ec84a42547dc942c70322fb1230f827e4fbb4e138e317bf24360b8d8b49",
+      "sha256": "22f936e7c5a4b21c401b286e8a3c84fa6eb5a7426d1482a07f1b58f7eeea64fb",
       "required": false,
       "category": "semantics"
     },
@@ -358,7 +388,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_gl_export.sections.any.json": {
-      "sha256": "edb9333f6a5233f7d2c6926fab83940f6b3f15cb9755a2b76e6bde99dbcdd356",
+      "sha256": "3a12eb3fc5efcb293578cc788aa7051e4bd768f2420a5f9da520be5c8c5a1894",
       "required": false,
       "category": "semantics"
     },
@@ -378,7 +408,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_je_support.sections.any.json": {
-      "sha256": "2b8ca0add080a24dfc88b2dc936946bd3230482b046dba066f61cb48c2043701",
+      "sha256": "b4ab0b564942ffebb676ad888da4456c9244fd78eec9b8b34cb7b8019b74d781",
       "required": false,
       "category": "semantics"
     },
@@ -418,7 +448,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/sections/acct_trial_balance.sections.any.json": {
-      "sha256": "eeff0fe9840e5fbcad19c2a8c961f6e53ff8d6923085307bbba878ed1cebbd81",
+      "sha256": "1554ef9dc205348d4e0dabeb66f9e2e46a10c3d1d3d35bec977d9a0c65007c8a",
       "required": false,
       "category": "semantics"
     },
@@ -428,17 +458,17 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_ap_aging.tables.any.json": {
-      "sha256": "1b5a78b13738628e9dcb215ef65b987197294c40095013f74d0c8f26ffb05d49",
+      "sha256": "e8657e2eca4aa9edd7b80fbb23641edd8d962f01b0a892893164062ae1700955",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_ar_aging.tables.any.json": {
-      "sha256": "900c24c37b93646fecece41ea547cb2d3142ba4d91d5c18b0be0ba1748dd2f2b",
+      "sha256": "eda488d8bdfff96911bf6d552c87902e5b41eea13ba65ba2927e171c44262e4e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_audit_workpaper.tables.any.json": {
-      "sha256": "be04c553210b850089e9443bb811922048fffc309bc3f23cd69c930af5c97845",
+      "sha256": "33b7127022e0ee37859b1074ff1e07aa1bb4f73939e69e6cd872da2fc4e2431f",
       "required": false,
       "category": "semantics"
     },
@@ -448,7 +478,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_bank_reconciliation.tables.any.json": {
-      "sha256": "97691c6e6e04c55baf410e52da8b24dd5dac9dbb61ad1f06132c105a9fd0dd3c",
+      "sha256": "749c9ae2647002e808a537a09dfc0a582b19b47925b71c2cb6d9ff69d68a26f5",
       "required": false,
       "category": "semantics"
     },
@@ -458,7 +488,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_controls_narrative.tables.any.json": {
-      "sha256": "da628aaf16cea354e258022d43b073bc66216f34fda3d9fba6ed05d165015752",
+      "sha256": "ddd8bbbe8eff66c4800f2d3c0ece54cf3a0139440c29eaccdde25b5b14e5b592",
       "required": false,
       "category": "semantics"
     },
@@ -478,7 +508,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_gl_export.tables.any.json": {
-      "sha256": "fd7153832771c1a072fb89b6e3fd2a3599fa2eda0b79331d78a675f272632213",
+      "sha256": "2f6899569621c3e1f4be9aebd3cdea45bbc42df4ff648ec03c9570a0dc9e741c",
       "required": false,
       "category": "semantics"
     },
@@ -498,7 +528,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_je_support.tables.any.json": {
-      "sha256": "abdc87914550d28bd6129ae694643aaf445e463ca3cb0da2dad9b9d0c9c33088",
+      "sha256": "f4777eab9165c2688ca41b528bbb9fd4bc156f05782f6cc91b9412cc1d6a9e9c",
       "required": false,
       "category": "semantics"
     },
@@ -538,52 +568,52 @@
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/doc_types/tables/acct_trial_balance.tables.any.json": {
-      "sha256": "59155559f49bdfa35571216b19598063d5ef72610a2fbf05498ff76b18825c27",
+      "sha256": "07f194805703ef5749edeb2508ec5c826bcc767059138ecf623fceda9c5c2fdc",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/domain_detection_rules.any.json": {
-      "sha256": "eff9317e2fe1ba185f376ee87c442883aa9cf2aca1eeec85cf89b0bcea11a0b1",
+      "sha256": "9907b1fd53ddb8069caccc6b616cb305a65f5503a7d16d206c94769a0965b33c",
       "required": false,
       "category": "routing"
     },
     "document_intelligence/domains/accounting/domain_profile.any.json": {
-      "sha256": "b3c98744cf1d6f453e1028b692be1c54aae49c29fb1d7d260427ed43f5aba89d",
+      "sha256": "fa2ac64f7cd0a806728ad277fe02f3c5225847fb5458d4614d95c79ffabf5f9b",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/accounting/evidence_requirements.any.json": {
-      "sha256": "f8f1b5fb306f59f62c74367508806b66a29f395913a803e53109294df6b4ca9f",
+      "sha256": "d01002a7813c171a547cfc0828356ed445836719f79a8eb0776497d51d87616e",
       "required": false,
       "category": "quality"
     },
     "document_intelligence/domains/accounting/lexicons/accounting.en.any.json": {
-      "sha256": "159f8707ef79a6aa9bcf284cb99d447686bc185ad6312f1b96f23bb7bbec9dcd",
+      "sha256": "605f748c77eb7bbd206d94fe3ad2aa453a83ea061ae3704ca51246aebededf78",
       "required": false,
       "category": "lexicons"
     },
     "document_intelligence/domains/accounting/lexicons/accounting.pt.any.json": {
-      "sha256": "0c1d9502c1d46b19a0e8a43f29f65e5d246e7eea97c1093455818956e0675d4a",
+      "sha256": "fdf237fae6e736f723edc4df8e0a1b26d8bf8444960182fcd8f568f13088514b",
       "required": false,
       "category": "lexicons"
     },
     "document_intelligence/domains/accounting/reasoning_scaffolds.any.json": {
-      "sha256": "2750b435d016e614b59b067e981918c80fc3f87a3c1b200479bbc4ff17c38ee5",
+      "sha256": "f96742d550742e66d1614ebe878b5853b36290abc9927792a2a0659925cceac7",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/accounting/redaction_and_safety_rules.any.json": {
-      "sha256": "a3846ebc6d1181e901c0b8b2934f0a5a267574ed268a15027f8f700d3702fc37",
+      "sha256": "203a456ba5d357308aede73a9deb85c138f92601f3635895ec6ba429ee322590",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/accounting/retrieval_strategies.any.json": {
-      "sha256": "fe0c2a019ec661bbad6979ff473b02fcd55c43d1a0d5f51d1cc39947fa4e77db",
+      "sha256": "30ab774705151c8cf01ec0b5ef328ff0672231d0c901ab6781966e8734464c91",
       "required": false,
       "category": "retrieval"
     },
     "document_intelligence/domains/accounting/validation_policies.any.json": {
-      "sha256": "650c277d3d557acc997494294eddb8c6ff0bb485fcba4b1cbda8e573be02ff60",
+      "sha256": "faeacd1888580587d580bfcfcc367d6eb462b4fdf8d908e1790dcdc95c310e57",
       "required": false,
       "category": "quality"
     },
@@ -1037,43 +1067,293 @@
       "required": false,
       "category": "quality"
     },
+    "document_intelligence/domains/everyday/abbreviations/everyday.en.any.json": {
+      "sha256": "b17a7e09a33772926b27cb66cf0c0042398ba5c00c75da4ad4698affa9e8a1b2",
+      "required": false,
+      "category": "dictionaries"
+    },
+    "document_intelligence/domains/everyday/abbreviations/everyday.pt.any.json": {
+      "sha256": "f0617f2bb0d0ce90a076f6cd423010cd94f1114d5e7b0685cd84dd3afb516e70",
+      "required": false,
+      "category": "dictionaries"
+    },
+    "document_intelligence/domains/everyday/answer_style_bank.any.json": {
+      "sha256": "5c99976ea61dfd02d14853e7c0608798658af1e7c33c456cc27244c4541bff9d",
+      "required": false,
+      "category": "formatting"
+    },
+    "document_intelligence/domains/everyday/disclaimer_policy.any.json": {
+      "sha256": "504096b4df9d6e0a7c43cd44a094256b4ae36bc8b7a4d66dacae082424084b8c",
+      "required": false,
+      "category": "policies"
+    },
+    "document_intelligence/domains/everyday/doc_types/doc_type_catalog.any.json": {
+      "sha256": "f8f7cfc518c038eb72515b514cb630f5a584e764b04947012f3fec880857aec0",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_bank_statement.extraction_hints.any.json": {
+      "sha256": "8533d89fd89ba30c788df605efa1d9da4692802c2c49c19da25eac19c2816305",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_electricity_bill.extraction_hints.any.json": {
+      "sha256": "b03a7a55911c629d2227d1bbb53bad64c1d1b1245a14fcd59bc195f7430eed4d",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_identity_document.extraction_hints.any.json": {
+      "sha256": "17b94a180b253525776141faedcde46a22ad9a65a989c6fdf5d2274002557e83",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_insurance_claim.extraction_hints.any.json": {
+      "sha256": "75075d78b86dcb2fb4aff01f6355324966dcf3ffd2505d3fc97c121086c19e16",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_insurance_policy.extraction_hints.any.json": {
+      "sha256": "e66bf53665d3a63c1a27074dbed9acda82fc5c3410e4849feecebf939300de7f",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_internet_bill.extraction_hints.any.json": {
+      "sha256": "d3466a2bf010095e86040ad4ace960d93e67ddae80346781623586ecb0419b7b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_invoice.extraction_hints.any.json": {
+      "sha256": "01a870eddf9eea5768451c4856c1f5bb4825ece45c969624e97ede1aabe70697",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_phone_bill.extraction_hints.any.json": {
+      "sha256": "39f084b8fa989999f5143605c08a7cd8ed28c76e2cfbb87f60fe85ffa4977d36",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_rent_receipt.extraction_hints.any.json": {
+      "sha256": "d88a743670e185c5a5e87166bb02885c7467fd3705cf276db14486f6fa7d62ac",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_retail_receipt.extraction_hints.any.json": {
+      "sha256": "c23e8d68e3abc93134f3add457db8d6fe89a67e24f388fe3981aa2a670bfaf4d",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_tax_notice.extraction_hints.any.json": {
+      "sha256": "0b5a2ea2c27029cb833454e492edc15e5d36a9e3ff63af94c64b75f23852ed8e",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/extraction/every_tax_return.extraction_hints.any.json": {
+      "sha256": "0c0a7c69144b87ff57711632f199a4fc2c405819d1bf16a9539611c825cb8366",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_bank_statement.sections.any.json": {
+      "sha256": "dcf459116b9217f156474f7c7b5cab8d326093abdbf5b2d8e64980ff8d775d72",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_electricity_bill.sections.any.json": {
+      "sha256": "9c2eee08aa0a687862c51cf73cd6272e85d4fd45d4b7e25352e074451f97db19",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_identity_document.sections.any.json": {
+      "sha256": "ff3383b540c88ac222d09ba76f7c57d6fb1da428a84dfc0824ba1c71786b0ca6",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_insurance_claim.sections.any.json": {
+      "sha256": "1db2cbc67cba85390c013e47605378be1dd7b19cd3e489c9c62bf5be201de590",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_insurance_policy.sections.any.json": {
+      "sha256": "203a8a3c3168e0a481ebcb19ea11acfa9a4a44c68a3e819630ae53c1a036bc62",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_internet_bill.sections.any.json": {
+      "sha256": "73da05d115471ca10bc8373322a2e7e904654482de5658ad34374242a8c39ec9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_invoice.sections.any.json": {
+      "sha256": "32b5879d2efdef9319acfe3c48e2478d21438cc6a960df2be2bcf6d59c7d5997",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_phone_bill.sections.any.json": {
+      "sha256": "3ff41ca71508af1ef7ab5aa1a57f8e1118f884100eb5b56613f8dc683a607a91",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_rent_receipt.sections.any.json": {
+      "sha256": "6cce04436f951f761ceb23cd2094a38b007d8266be8c2681c1f6f69faaed15b9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_retail_receipt.sections.any.json": {
+      "sha256": "c881e386677045476ae4ba631de2c2a7bdde090ef1efc72fafb113bc079dfe4c",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_tax_notice.sections.any.json": {
+      "sha256": "20f3d9df6a52242c1d03db69f308f8f8b9c84278c3ca34ac57293a6f763d989d",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/sections/every_tax_return.sections.any.json": {
+      "sha256": "cbe33d24f41d14508a0a5a49be30c6037fe92e0ddba4a2f24715c5bf39a851d4",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_bank_statement.tables.any.json": {
+      "sha256": "b6888c9477dd49e5fb7b50de8bd21a93b562cb811f0ab899ffe5e6f546ac60e0",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_electricity_bill.tables.any.json": {
+      "sha256": "ac082c2ccdd9afa8b5faf102140f4c0fa3732f03947f5f07a6c0aa91d4dc08e8",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_identity_document.tables.any.json": {
+      "sha256": "85eaf54336be0b46f8c5702dd9ed30db3ed0c0f0d5223fadd14d4fb31f61bdb9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_insurance_claim.tables.any.json": {
+      "sha256": "0ab4207a03ea313632540747bb50f112be352b401d0199b4137717280b0b7e2b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_insurance_policy.tables.any.json": {
+      "sha256": "5aa4fa80372d8ea0475a0f71154d81552d90a9d4f459e6d8571b0779280f8be7",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_internet_bill.tables.any.json": {
+      "sha256": "9511e2ed7cb86f1b7eb75c75842209a2a6e51abd326fa1811a2559664d11c5dd",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_invoice.tables.any.json": {
+      "sha256": "2d5ea6871f7fd19e7c62311c2ca61039ef13d8bf51a4cb8fdc4a31a6ea30bb57",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_phone_bill.tables.any.json": {
+      "sha256": "eb03bf7ad90ab33a62cbaca62fb887cd35a8c1c76a717749ac744ec349c7cf24",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_rent_receipt.tables.any.json": {
+      "sha256": "080e0874416edf2fad423e09e387b7828bef1285e902621be8dba141f8191796",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_retail_receipt.tables.any.json": {
+      "sha256": "0240946e5874e791d7a2910e89740e70572d5ddf870a48f2430696367aec3071",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_tax_notice.tables.any.json": {
+      "sha256": "dd416d302e5bf6b1464c47579cb08739d264cb681453500ce2b5f3f38cd5a7ec",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/doc_types/tables/every_tax_return.tables.any.json": {
+      "sha256": "f64ee5c62d9bd242ab97ac37e1866fb095063530d61ffda219e35c080d0679b5",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/domain_detection_rules.any.json": {
+      "sha256": "33787bf041f759b6bdb586fd3420d8c8e04c1205c71f0651932788ef798fc5df",
+      "required": false,
+      "category": "routing"
+    },
+    "document_intelligence/domains/everyday/domain_profile.any.json": {
+      "sha256": "f32b0fa25fe85ae6405c2298eed6e02b607d6e544ded1a013baf39eb40cefaf3",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/domains/everyday/evidence_requirements.any.json": {
+      "sha256": "bd9a91cd5b2d8075dec41492ad8187ceac6ee45e55b2a2ab0b18128c2a0756fd",
+      "required": false,
+      "category": "quality"
+    },
+    "document_intelligence/domains/everyday/lexicons/everyday.en.any.json": {
+      "sha256": "846dd596689c32913e62163e396776b3fe5582337fb549853d0c220377988803",
+      "required": false,
+      "category": "lexicons"
+    },
+    "document_intelligence/domains/everyday/lexicons/everyday.pt.any.json": {
+      "sha256": "ae3bb219216867c0c54f51a9edd14e4467dc5a55d7a8a1af38cb9f86e92e958c",
+      "required": false,
+      "category": "lexicons"
+    },
+    "document_intelligence/domains/everyday/reasoning_scaffolds.any.json": {
+      "sha256": "822921477cdb15f2a9d21a4386c2ea721d503d8e82e04955d84645210d391bc6",
+      "required": false,
+      "category": "policies"
+    },
+    "document_intelligence/domains/everyday/redaction_and_safety_rules.any.json": {
+      "sha256": "7fe149a688fb2cc2ea1eb52195078324e3c15067c5a06a24e396cb4953e5f045",
+      "required": false,
+      "category": "policies"
+    },
+    "document_intelligence/domains/everyday/retrieval_strategies.any.json": {
+      "sha256": "f41e44c3dc1ba15a1f86fbc84ab7b09905503af080787ba1e633026f6fb8946a",
+      "required": false,
+      "category": "retrieval"
+    },
+    "document_intelligence/domains/everyday/validation_policies.any.json": {
+      "sha256": "7770892048e676d098961384d724f79b9c8b56404282b438a8c1553497d7f64f",
+      "required": false,
+      "category": "quality"
+    },
     "document_intelligence/domains/finance/abbreviations/finance.en.any.json": {
-      "sha256": "c5af301755adf0eb20c2ef0d3e17e976c2691f58ee73c3af185bd63956abd563",
+      "sha256": "ac70e6f2548cab72270d9e29a2a325ba8a2318fc80b80a52516adcb454c7a70c",
       "required": false,
       "category": "dictionaries"
     },
     "document_intelligence/domains/finance/abbreviations/finance.pt.any.json": {
-      "sha256": "950f6281bac4d694c62296bb748de9188b44ab23b438d7f5c9f92a3628dbae5f",
+      "sha256": "ec7d382f9333d38767e3684c74bad26a08b4bbe441e45de4b890432a1d9fdf7c",
       "required": false,
       "category": "dictionaries"
     },
     "document_intelligence/domains/finance/answer_style_bank.any.json": {
-      "sha256": "05b9d4816f4a0adc2783a4dd2485db9efbddf156710bc76a58c192410a91ad9d",
+      "sha256": "ee8a4dfa382a4331e8bcedcdb87451f16154c7440a91253c32f83f9850089b24",
       "required": false,
       "category": "formatting"
     },
     "document_intelligence/domains/finance/disclaimer_policy.any.json": {
-      "sha256": "cc4eaa3005de41cca18dee657acec356a3ed6592421604cbca0ce1ec344e1115",
+      "sha256": "af7457327a8d24fbe0df0f9da116f683cd82a9cc7eec0917f24c04256b3dddc3",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/finance/doc_types/doc_type_catalog.any.json": {
-      "sha256": "5c085893275983709d2bbbbaa22262e789f4902a1a9076cb4cc1860906acb8cb",
+      "sha256": "658d46986b8b2fe9c25132930cd031d42588fad69b18dec5b8338fa8cef761e5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_10k.extraction_hints.any.json": {
-      "sha256": "c20b37f0d91fda94136dc7fd205f4cca276ffff6a085afce171c23aa370eaf72",
+      "sha256": "b3818bbfe0e402615423b201eb24b7e52c53d28619480ff9dc82b127f75ab629",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_10q.extraction_hints.any.json": {
-      "sha256": "96cb4d674665080e4d41fb2284d39f40923eaff7653eedc4aa2fb194aaeca014",
+      "sha256": "a46c0fcfffbd2d7935f05aa0640c9bf9ef0feefaad68c16efae877e2c02e029e",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_8k.extraction_hints.any.json": {
-      "sha256": "4d041edca349822d1ca3ba854a894e8d4468e1dabaee91ea87c8c58653f457e8",
+      "sha256": "27f6ac8e3644162be6c05714cd5dd01d469e3e53f7fd9b6e54bd04296e7270f8",
       "required": false,
       "category": "semantics"
     },
@@ -1093,12 +1373,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_budget.extraction_hints.any.json": {
-      "sha256": "8c879d551434d027b8cb1c3295ea6186bd0d6c54b6413fd533f9a59e3c083e93",
+      "sha256": "c6ca3bb89eb9b57a621eed4a97cace992be4713b75458afbaaae544a15cadc28",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_cap_table.extraction_hints.any.json": {
-      "sha256": "aa56738a9532c8a3b12142932a22d98e22b96f023e46ddb31190d7f226b56f71",
+      "sha256": "0fa660d674966bf660a4adca670e31022c77e7b05d93130b53b4b08ee3c0dc0b",
       "required": false,
       "category": "semantics"
     },
@@ -1117,6 +1397,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/finance/doc_types/extraction/fin_covenant_report.extraction_hints.any.json": {
+      "sha256": "67e3e6706bc6fb016682fa189587aa1ac8f494af0b5545d3bfc12f94a727304b",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/finance/doc_types/extraction/fin_covenant.extraction_hints.any.json": {
       "sha256": "94f65b07b9cd9f6f4d7807f18497012cb88a9d921f18eea34e9063a77f6e9873",
       "required": false,
@@ -1128,7 +1413,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_earnings_release.extraction_hints.any.json": {
-      "sha256": "9f6a8b5fdae52aa1b5a5b20dff1cfc7bff5e3bfb1d16f311d151292cd7024215",
+      "sha256": "3985964fc188b4bf766fe97e917aefc8e875ae23bc5579d6ce7211351913c81a",
       "required": false,
       "category": "semantics"
     },
@@ -1138,7 +1423,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_forecast.extraction_hints.any.json": {
-      "sha256": "e8011087afc1268bf8f45e99530ddc64f04b998098b3712d633133c88a3b7327",
+      "sha256": "0538077bbf0225f6cf6191aba81e271ffd72a2b0cca1551dace9c99e19604e7b",
       "required": false,
       "category": "semantics"
     },
@@ -1168,7 +1453,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_statements_pack.extraction_hints.any.json": {
-      "sha256": "d29508f98617128d8a5bbce073918eae08b17c23951668de79c92c0aca960490",
+      "sha256": "8e3f4f87393bdcd9dbf56919f7d6385654cc2cec7ed20c3386a844ae3338abc5",
       "required": false,
       "category": "semantics"
     },
@@ -1183,22 +1468,22 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/extraction/fin_variance.extraction_hints.any.json": {
-      "sha256": "2081a750780ad7bca8ac4e60cf33c7e9033343a3cbaa6956a8e24f1e7c47f7e4",
+      "sha256": "9090c62061e336b6e0bda359bf2bf0d16bf34ebb9135afaf80c26e3aac971924",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_10k.sections.any.json": {
-      "sha256": "00c837532bcce06f311220b41d03f27cc989bc37617441f954f7105a4c7b5724",
+      "sha256": "ad998334fdf27c550f993217de3644826a3c887553898689f4890e4d427a3aa5",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_10q.sections.any.json": {
-      "sha256": "ecb3202379f1ac10e4d94006fb7ef67ec6481b9b6d4583dae9100047b4819581",
+      "sha256": "8bc27e3ebd96615c43d190ab6e6d81036319c89543e8f584866a95fbe5aec163",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_8k.sections.any.json": {
-      "sha256": "a13bb45689774f77a223d8ea7df7328afd4b9b7010ecf8860daa2b5c3678ec36",
+      "sha256": "0b9bd343f47672981068be1e2bd6800b865f771498d52012e96d2c7a4954a217",
       "required": false,
       "category": "semantics"
     },
@@ -1218,12 +1503,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_budget.sections.any.json": {
-      "sha256": "4c62d2d7e1e44bf8e6ba6b83991ab03ca6f54d094592e2ead63075113fcf508b",
+      "sha256": "1aaf5fa94b194fc1422fe8b30380f2af6fe5780ece70a8b78df8b513bd5ae8a3",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_cap_table.sections.any.json": {
-      "sha256": "b0993230cc7169378f86a16702a4d695fb623abf03d76316403032602be767c1",
+      "sha256": "5c80662963148b8f061d07538cbeb93d1f1782ff985068b7a86e2822f99cdbd1",
       "required": false,
       "category": "semantics"
     },
@@ -1242,6 +1527,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/finance/doc_types/sections/fin_covenant_report.sections.any.json": {
+      "sha256": "e64f6eaa220ff3326640c74a637f0f287b3b51861b84757f85f0295b9342b368",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/finance/doc_types/sections/fin_covenant.sections.any.json": {
       "sha256": "27cf86ac4bb1500283d7b35fd1fe57faf81de2a8b17a2540dd544b56b21ecb64",
       "required": false,
@@ -1253,7 +1543,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_earnings_release.sections.any.json": {
-      "sha256": "512e3e5dfbaed0c9c226b9e58db08626adad6e6adc1ecdfec227572d68dd4121",
+      "sha256": "111a0a0649ea8029ff80fc412e509abaa4e42547227f11f9263679517bcb0f8d",
       "required": false,
       "category": "semantics"
     },
@@ -1263,7 +1553,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_forecast.sections.any.json": {
-      "sha256": "5d2d495ad545a00344d8c6b7640f34b98952cf6254fc7d5cb87d04151f9400d6",
+      "sha256": "0dbcf196746d980c102ccb2079500f370b4d46f6ebcefd052c0063a1af3311bc",
       "required": false,
       "category": "semantics"
     },
@@ -1293,7 +1583,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_statements_pack.sections.any.json": {
-      "sha256": "c465ac60b23bb30cef10a3e0e6b471299373f5bc67d3e5a7afbc9b952212ef8b",
+      "sha256": "c749b6262293fea6509fada9b2f089bee495e6a00926aec82b5b63096ecc1efc",
       "required": false,
       "category": "semantics"
     },
@@ -1308,22 +1598,22 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/sections/fin_variance.sections.any.json": {
-      "sha256": "c227bd35434bfd633c3d0816337ae40f3d6069ce275c117f236990c1d72b8424",
+      "sha256": "70c3b643266f6020b62374b21e227ebffed2fef8b8086a94aef069f55db302cf",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_10k.tables.any.json": {
-      "sha256": "4335d2ef120212f9e89607e656892fd377597676a739fc054cf5823bf846d87d",
+      "sha256": "930115b8a04a76cdb4cef7870a75700120fc2e472d365eea240cba8fb9535948",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_10q.tables.any.json": {
-      "sha256": "e7655f410f92b45ec448944608158280bc6c42b316a33190e0fd9601b84d7736",
+      "sha256": "4ba66a1cb56c363f367f66989dcafd28eb7830c4cb582b1c7f0b094dc4c9d801",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_8k.tables.any.json": {
-      "sha256": "269854f91fade07e549225ba716e7e2a04cc72cde7df92477bb71a45ea9b3d63",
+      "sha256": "b8e337042cb6b90a99ff0c88cee56d1fdc2773282fc62965b7607446b29fe716",
       "required": false,
       "category": "semantics"
     },
@@ -1343,12 +1633,12 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_budget.tables.any.json": {
-      "sha256": "51ec5625153005bbe016bb03c78e9486357ba42783499db1fa73c5a1bbd74833",
+      "sha256": "9e4e47d0476c3410acd9c67c72cd55768286fcbf7db2862a338d28b429a72d77",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_cap_table.tables.any.json": {
-      "sha256": "c9491eaba916318a819ffd8cac38489c31d66b829212254f45fb87ebed1dcde8",
+      "sha256": "67bd3b88e00716bde7507ebbbe5f8206acad4ed0f5c7b12949e0e68ec5a9135d",
       "required": false,
       "category": "semantics"
     },
@@ -1367,6 +1657,11 @@
       "required": false,
       "category": "semantics"
     },
+    "document_intelligence/domains/finance/doc_types/tables/fin_covenant_report.tables.any.json": {
+      "sha256": "13bf44820ea1fa924aebb4383650bae9cc1636efb6f5b6beb422096aba3ea542",
+      "required": false,
+      "category": "semantics"
+    },
     "document_intelligence/domains/finance/doc_types/tables/fin_covenant.tables.any.json": {
       "sha256": "f3ba3bd3a3f605b7716db6a19e6768d7fcdfc5828d8444d119de08be6afc338d",
       "required": false,
@@ -1378,7 +1673,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_earnings_release.tables.any.json": {
-      "sha256": "43735db670540c4f1e716ed065eb45690c4127d8d900ddd260374330ec57a0e0",
+      "sha256": "af0c3682625d579858766c83684d305a8e949bd929df6074297000338d0b699e",
       "required": false,
       "category": "semantics"
     },
@@ -1388,7 +1683,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_forecast.tables.any.json": {
-      "sha256": "fa7bdf941c7b314610e01753f77a65182b911cad9cf6b2f74268e68a70888563",
+      "sha256": "6ef3bd65b2d069a610139ef895e73a1bd79d6580868b07b1ea3bd52873217011",
       "required": false,
       "category": "semantics"
     },
@@ -1418,7 +1713,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_statements_pack.tables.any.json": {
-      "sha256": "f565fcf7470d25675f390e1070520b6378f8866d3a2e256fb4f5feb08908bbc4",
+      "sha256": "f50a96b1aae5af04651bfae5d48160b17cbab8a9c2e4186de2de4b9ddd25cfe7",
       "required": false,
       "category": "semantics"
     },
@@ -1433,52 +1728,52 @@
       "category": "semantics"
     },
     "document_intelligence/domains/finance/doc_types/tables/fin_variance.tables.any.json": {
-      "sha256": "c2ff0d92ded2585d4096c5daeebb0b68704ec93b0d6427eb652de82a34e6ba2f",
+      "sha256": "cd378fd3a06fa618ca393503dc6fd20edaeb77bde65e3f6b7872c8f0c4eb65d8",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/domain_detection_rules.any.json": {
-      "sha256": "dcab04417ad8822337d8fd5a49b27880a79d0c941513c6fb5055b1373ecad5d0",
+      "sha256": "7181b3903937d284073deed1dece99d2101d38a5779667e75396a2c71cb299ac",
       "required": false,
       "category": "routing"
     },
     "document_intelligence/domains/finance/domain_profile.any.json": {
-      "sha256": "2c7896ca854dc5afe5ea05c5e72734714ef90a7e42e5e26622ef6db161148c69",
+      "sha256": "253a345e3964970b7c75a102436065877dc3511d14c4d7b902be968e8f488872",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/finance/evidence_requirements.any.json": {
-      "sha256": "7d66b248503015e19187a89e2ac36f06a7ca2ffef5b318c9dcf237905857d65f",
+      "sha256": "653a48d6958e10f6247cdca4f352348b78fe96bf288767318640a016c0d11909",
       "required": false,
       "category": "quality"
     },
     "document_intelligence/domains/finance/lexicons/finance.en.any.json": {
-      "sha256": "61ac1325ee12d7c3db121447ff0bdbc0ade55fd8f7a569988835ce62375f3d02",
+      "sha256": "485d77d1a617a290bd07a655ff4387690619cd65e5fd0df3a733606b03013c94",
       "required": false,
       "category": "lexicons"
     },
     "document_intelligence/domains/finance/lexicons/finance.pt.any.json": {
-      "sha256": "aa1c1fa9aed3ec703bc6da305ec408486104f20007587a7a7a31a2aaae95d7fa",
+      "sha256": "40dc7c299757c76f2277aff8d8a4787a5f0e3e917031b5d0d95b0c0bdb1e71bd",
       "required": false,
       "category": "lexicons"
     },
     "document_intelligence/domains/finance/reasoning_scaffolds.any.json": {
-      "sha256": "e24380ad4515d97780b0ea7ecaf2b1b5f43dd5b86574cb82f8ff5c5eeebb2951",
+      "sha256": "7512ba01325b88b7a8db3bc48f6c2fa41652e41bd1380f6affead9518e91351a",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/finance/redaction_and_safety_rules.any.json": {
-      "sha256": "8eb77cf66a034e0f1b39ce7fe7c89a4fe08b28d200ad10cff3c47e53c6cb1d25",
+      "sha256": "77fca6dfdb1142bbe8fecc9ea2a8168a0a74d9b2fdde9559e15a5cad8d79faf7",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/finance/retrieval_strategies.any.json": {
-      "sha256": "c337d6a6ef90bee8fc423677599c19791c4d761f70ed0562b453a1b0974bb876",
+      "sha256": "eeecca48432dae8eeb929327543bd385b3b844fd9f61041ae5debffac2828a7d",
       "required": false,
       "category": "retrieval"
     },
     "document_intelligence/domains/finance/validation_policies.any.json": {
-      "sha256": "382d13870bf87b77bb420d53ec8035f0114f9f9244e589e73dcc5ea23132ff3d",
+      "sha256": "d168bb4b3999ea297a7ecbb2ff5c001a5ca2d8b1ea071e0db642dd3528f786ee",
       "required": false,
       "category": "quality"
     },
@@ -2058,17 +2353,17 @@
       "category": "dictionaries"
     },
     "document_intelligence/domains/legal/answer_style_bank.any.json": {
-      "sha256": "ee010dee9fd7c5f519d705ca366456f114cd464a263c9f8294b7990d3c865661",
+      "sha256": "f62ae53f36a08b1cb12c43963fd6c929ff82828fb2968709ccdad66af5bbac1d",
       "required": false,
       "category": "formatting"
     },
     "document_intelligence/domains/legal/disclaimer_policy.any.json": {
-      "sha256": "98c27432892c33c3d5aa1993c4380f5d90f3f3df94d58c61bb044ce830dd20a9",
+      "sha256": "a2a214a70a23e980b1adbc1597645a517696caf39f872b4e66fe7ebc2fd07a51",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/legal/doc_types/doc_type_catalog.any.json": {
-      "sha256": "f6a5203fd409c6d992260eca3d71e5f7045d6d32c0b00e7b69581aecf7766685",
+      "sha256": "c01125cf37973324183b82c4d72cd974998fcb63762dfee67836f8e661f263a1",
       "required": false,
       "category": "semantics"
     },
@@ -2598,17 +2893,17 @@
       "category": "semantics"
     },
     "document_intelligence/domains/legal/domain_detection_rules.any.json": {
-      "sha256": "779977e9fd34a1736e63eda51d37be7872d44581942f027c55551019946b90da",
+      "sha256": "a94865e511727ec841f4ab9dc22696a0f6390f34b2d0ec67890cf441a760878b",
       "required": false,
       "category": "routing"
     },
     "document_intelligence/domains/legal/domain_profile.any.json": {
-      "sha256": "b11d1db6fe75c4f2510bfe1767f3abfb387d15373125613ff48536b80516ebe0",
+      "sha256": "8e87c24d5e322ec692fa890ff757a5274c26147ba450b1c3ee3434aab5b722ea",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/domains/legal/evidence_requirements.any.json": {
-      "sha256": "aea3d10ffff8b8ed79fc74b038278edbd621c70321b3ada236b1d81e07c7c584",
+      "sha256": "4e65758fe97cbb3642cf2da7bbbbb4360646947b4be2a3eab3d64ad29b7ea2be",
       "required": false,
       "category": "quality"
     },
@@ -2623,22 +2918,22 @@
       "category": "lexicons"
     },
     "document_intelligence/domains/legal/reasoning_scaffolds.any.json": {
-      "sha256": "d6331f0e9707a7023e6b8edecdb0c7ba86efa08c67239eb3f82b5b290438c33c",
+      "sha256": "591c9d973a0c18f55df58e70aea0730e64eaa1f71530d2677396909fc20d5773",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/legal/redaction_and_safety_rules.any.json": {
-      "sha256": "f031d4dcba0637b7631bbbd3332f8dfae14ccddb77f69754c0f06c06cb94be1c",
+      "sha256": "44eb24a55dbeda038bf53b4f568c159c759f4b39b360fa3e625417ed2daaa5df",
       "required": false,
       "category": "policies"
     },
     "document_intelligence/domains/legal/retrieval_strategies.any.json": {
-      "sha256": "4e0490cfb465edfd5d288f34b94cd735363a648bcd8d5cfaf546faf26468de1d",
+      "sha256": "26405eda36a3327f84b26e3cd719457fb34b2095beb88ceeff9fac8cd72b3dc3",
       "required": false,
       "category": "retrieval"
     },
     "document_intelligence/domains/legal/validation_policies.any.json": {
-      "sha256": "f51cc61a9d932eed0169f61c106de90b931e5958080fbc7988ef3196ffefe7a2",
+      "sha256": "2b971ebb48090ab79ce84d0aaced4c5bfdc179da699b0427483f42920065468b",
       "required": false,
       "category": "quality"
     },
@@ -2733,7 +3028,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/extraction/med_lab_results_report.extraction_hints.any.json": {
-      "sha256": "74ecb7b7146867cf5fc748e0533322d1d7df7ceafc311e70cde71403cf13325b",
+      "sha256": "503f8f8bee4a9598279deb67847f50483cb759d6f7b21fe64ee3857f5f854ba5",
       "required": false,
       "category": "semantics"
     },
@@ -2773,7 +3068,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/extraction/med_radiology_report.extraction_hints.any.json": {
-      "sha256": "e0f2a5ec7758d25ae8fc529b3b4960169ae08f78072325d2181cf1ce3010618c",
+      "sha256": "e779d64fbcc708d3a61e63d106a7ff3ebc75ef032a766e9df30d48fcd713b940",
       "required": false,
       "category": "semantics"
     },
@@ -2783,7 +3078,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/extraction/med_referral_note.extraction_hints.any.json": {
-      "sha256": "26213986e8b2783186cdc3b83653431fe43a12f2afe67e68b67f98c36aeecea2",
+      "sha256": "c3bb402ed518b9af1fb76c06d4b7f68e37a1842a6a1e66efec17cef05a2e0207",
       "required": false,
       "category": "semantics"
     },
@@ -2883,7 +3178,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_lab_results_report.sections.any.json": {
-      "sha256": "36597d9aa58eaefc1641df6148131f7f270fe8b4d936bf89e30659b011c39d16",
+      "sha256": "d9fa881b9a27edb69590ef6da588d43ca163ca4d7ac3905b0a706d743213c8aa",
       "required": false,
       "category": "semantics"
     },
@@ -2923,7 +3218,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_radiology_report.sections.any.json": {
-      "sha256": "d45a55548e21da77ecc3b85bd1f62e60791b8f1017a1d6a61b1190b793188e5f",
+      "sha256": "03e6742bbc6eb3a4d479221ab6d5b3ee168f3315689b512fe760adde1ea4fb52",
       "required": false,
       "category": "semantics"
     },
@@ -2933,7 +3228,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/sections/med_referral_note.sections.any.json": {
-      "sha256": "69d93bc57d944b71e234f21cc8d55c2346e2a2a18eff13e2a1b57803dc90422d",
+      "sha256": "7c2b872aa222d00eee671f81bc38c8bcafd4995deed27ffc7f7476e23fc29db4",
       "required": false,
       "category": "semantics"
     },
@@ -3033,7 +3328,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/tables/med_lab_results_report.tables.any.json": {
-      "sha256": "c75766f9abbca1a237bd6521e9faadf9ba89ee5b9c0d98fdb398d7b15dc6398e",
+      "sha256": "3eeed66ded42fcd553a9a45365c70f923bc68321b4b49048a2d132148c82dd54",
       "required": false,
       "category": "semantics"
     },
@@ -3073,7 +3368,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/tables/med_radiology_report.tables.any.json": {
-      "sha256": "ffbc344ef66d3ecf57862095cb14dbcbe9b8d88cd28aec9b52320183b2680090",
+      "sha256": "13c87f7d1b769dcbce9e0f68fbd9b0861616aaf0318178e5674c4c0045801a8e",
       "required": false,
       "category": "semantics"
     },
@@ -3083,7 +3378,7 @@
       "category": "semantics"
     },
     "document_intelligence/domains/medical/doc_types/tables/med_referral_note.tables.any.json": {
-      "sha256": "2aa01e163a887a6d988eb7acc41d1d4e15c6e9a43c35103a39b5efbf902876a0",
+      "sha256": "3b3f48321b2a122f4ba5d9cb1123ee2b2d882145dadf0954fb2202d24c58c5d5",
       "required": false,
       "category": "semantics"
     },
@@ -3613,17 +3908,17 @@
       "category": "quality"
     },
     "document_intelligence/eval/suites/suite_registry.any.json": {
-      "sha256": "5f373a0c833750adf31a3ad8f10a920a9bc37905dd82835c67bae0aff48d68ac",
+      "sha256": "8b84cd93039c6fd707279bca2f99e7f1ea3b7d06e029480432c3d0cad3a21e96",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/language/abbreviation_global.any.json": {
-      "sha256": "a9f5ef90f1b0fd7e8640b13e147e53f6437e9a4516672d72a5e41b75b9096bb2",
+      "sha256": "341535b736eb4be3bb1cec8269aaf0e2bcb4fcf3ec445fa508da3e16a6fc9a89",
       "required": false,
       "category": "normalizers"
     },
     "document_intelligence/language/normalization_rules.any.json": {
-      "sha256": "46c0697322ba5fdb38b34dc995058219cc2bb3fb3b458486e741fe87bf33d141",
+      "sha256": "6c9c21e7a8f57bf94416fe43c5ab099808beb9c788e6d96b16255ed9dad969ce",
       "required": false,
       "category": "normalizers"
     },
@@ -3648,37 +3943,107 @@
       "category": "manifest"
     },
     "document_intelligence/manifest/usage_manifest.any.json": {
-      "sha256": "1e1f8391dcf7a026c4f5feb747e39e1520cdfd038c7eb0d334ce7a31f82046c1",
+      "sha256": "6561d31a20bc588c3d1d61994b446d624ebfd302ee5a1d98f1c64fa6fdfd0ae4",
       "required": true,
       "category": "manifest"
     },
+    "document_intelligence/retrieval/crossdoc_alignment_rules.any.json": {
+      "sha256": "fcfdf4f4c69752565d9430fbdb32d8b1f58888713ad69285acb5dd11f5a1092b",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/retrieval/doc_lock_policy.any.json": {
+      "sha256": "1f50738ef5eafb6f8e1250ec87406bb8f2ca6232da19537aead135f2c3a304b9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/retrieval/evidence_packaging_policy.any.json": {
+      "sha256": "33f7bb7ebf528ac1c329e240746505b83759c50f3226ca978f1823101043e6f9",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/retrieval/ranker_config.any.json": {
+      "sha256": "8cf5c5e143c3196c3dabbe91b891d5c4914ff424a3bdeaf787310ae6d628df1e",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/retrieval/section_boost_rules.any.json": {
+      "sha256": "47ece16694240880d420c4f134ff167531a3ca16d46e3afadd7c751a291e2028",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/retrieval/snippet_compression_policy.any.json": {
+      "sha256": "8ef0e15b51af3969320c2ad3ed31ec58e36fc9cd81bb58541f659a2109711040",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/retrieval/table_boost_rules.any.json": {
+      "sha256": "da7954aba3338da20dd44d2d8551f0efc7c711080b8e7aa0a2c55ad14f5aedea",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/routing/followup_policy.any.json": {
+      "sha256": "c16abdb1aea84ec4d35a8f9ed3226575ca6e821e2958f29a311c33fb989857f1",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/routing/query_family_catalog.any.json": {
+      "sha256": "b858ed1c785ef63490d2235188a07b4eb1f8700fcf54d2853663f95baea04f12",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/routing/query_intent_patterns.any.json": {
+      "sha256": "6fc9060f7b9eb585b2c53bfd5c70467b37b8f7e5919f782e7cb558bb2d6bfd1a",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/routing/scope_resolution_rules.any.json": {
+      "sha256": "50665fcd9d2af555e272fc012c2d5a061cfc36c7e4d74f341c3b1cb2796005b4",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/safety/domain_sensitive_content.any.json": {
+      "sha256": "5fe6f99a9a2567f4cee9ff2c463112454bf033e19bd2df14dd0c12303f32c310",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/safety/pii_patterns.any.json": {
+      "sha256": "7e8148e8126f258623c3c2e369cc2935a843b21fc483c7885d94bc30495cc901",
+      "required": false,
+      "category": "semantics"
+    },
+    "document_intelligence/safety/redaction_actions.any.json": {
+      "sha256": "0fd7d0fd10bba7c33be7014512786d68427f15b324b39babd71d23a00e8e734e",
+      "required": false,
+      "category": "policies"
+    },
     "document_intelligence/semantics/doc_type_ontology.any.json": {
-      "sha256": "d79ea790e1f9a8eeee2117a51d5db586ed2a7382228e62fa82d3b64d63947320",
+      "sha256": "8cb2e8932268c4f24ddc85a39d4d0f24264486ce02b612b896255cef4364e0c1",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/semantics/domain_ontology.any.json": {
-      "sha256": "2a8f9e3113fc741cf758c6cf0f7c897f618ad8c4c35d163e6041620872434821",
+      "sha256": "7d88593eb326a4a4c2ea287ea5be705c92c1fe69e5f8d4422b4cb5bb028d7f6d",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/semantics/entity_ontology.any.json": {
-      "sha256": "7528a8a95923a72530fab7da11bb4eb65305ca71a660c2af6ed6ad94f22835c6",
+      "sha256": "ee134f16f3883091f1d0db3ad97c7a23c671bfbbabf648f5c429d8e86d69b3fa",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/semantics/metric_ontology.any.json": {
-      "sha256": "a22086779271e1e15587d238ed60882ef0e79d8decaf32dba23d5e45e98ca322",
+      "sha256": "881527949bc8610e987e3b307a928d4e442dd7a70fec65c79b191c426acd86dd",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/semantics/section_ontology.any.json": {
-      "sha256": "4ab34816e1bd21d4851abd5a029cd5644492dbf73eefc7a6d8f4785aa569e543",
+      "sha256": "855e386c90c4e0ce084739fd241052dd1c0e099d350f3a540878cbffe6161a7c",
       "required": false,
       "category": "semantics"
     },
     "document_intelligence/semantics/unit_and_measurement_ontology.any.json": {
-      "sha256": "e7f8f9c50029ce60fc530931ad2e53249656b5b57138e4dd8da440c20f61137f",
+      "sha256": "f352c8ae56799192f9573a2875695927c57935b8ed172340301a6f1f62de3e6a",
       "required": false,
       "category": "semantics"
     },
@@ -3813,7 +4178,7 @@
       "category": "lexicons"
     },
     "manifest/bank_aliases.any.json": {
-      "sha256": "ba344013eb65cc430eee7433bad3fb0d6af60226c52de5d7e70c15c4515e00dd",
+      "sha256": "ed384116e45d8933afa49e1a7f66ee804a6d50a7a70161b6675b5366cad8daac",
       "required": true,
       "category": "manifest"
     },
@@ -3823,7 +4188,7 @@
       "category": "manifest"
     },
     "manifest/bank_dependencies.any.json": {
-      "sha256": "5a20e2b347eadc50e14cadfde531f9132bfa027fbea13e9413b4fc92ff391584",
+      "sha256": "e8b385d58762bb52f6a2bb73598dce8c12570423df214d4b8339d76f811db1a9",
       "required": true,
       "category": "manifest"
     },
@@ -3928,7 +4293,7 @@
       "category": "normalizers"
     },
     "normalizers/doc_aliases/accounting.any.json": {
-      "sha256": "25f0d4020c20b893cc9aedca91b90bfbf6af73383beefb874431e9cbd6e847c9",
+      "sha256": "3d2e85393369dc4b4467920342f93c57925e7696be9249859d76e447813fc77f",
       "required": true,
       "category": "normalizers"
     },
@@ -3942,8 +4307,13 @@
       "required": false,
       "category": "semantics"
     },
+    "normalizers/doc_aliases/everyday.any.json": {
+      "sha256": "c4a8fb4143ea2bb31e6602ccf3e6efdcf28b239df2775a7eb72e9fc3ffa490c3",
+      "required": false,
+      "category": "semantics"
+    },
     "normalizers/doc_aliases/finance.any.json": {
-      "sha256": "0344ffc18dcdda64e612f94d15f514a67832ef51e85d4102d63b9f6dc78bb72c",
+      "sha256": "60cc0a379b28bdf5963631f5ae49b13a1336e1a894a6afe4d3a043de2d3f2db4",
       "required": true,
       "category": "normalizers"
     },
@@ -3963,12 +4333,12 @@
       "category": "semantics"
     },
     "normalizers/doc_aliases/legal.any.json": {
-      "sha256": "8dce61e53aae7dcc3a00f659201684a2dc3f142ba9bcbc0c199c59362c20f9b0",
+      "sha256": "100d39818a2f251f9b5818dfbfa682b5057ae8e7924f77aa74a3671f4567fab8",
       "required": true,
       "category": "normalizers"
     },
     "normalizers/doc_aliases/medical.any.json": {
-      "sha256": "3e96f9e96a9f070c93e1228a5dc115564f828b1817187aa77df177c936af6f34",
+      "sha256": "b7bd0f7236aa7d76b820212b741e6e0f3ace67154d87535040c6811bd09738fa",
       "required": true,
       "category": "normalizers"
     },
@@ -3983,7 +4353,7 @@
       "category": "semantics"
     },
     "normalizers/doc_archetypes.any.json": {
-      "sha256": "d48e79e4bf4d8aef68bee47cf47be43b1b6dacd560769ec01444f284ca073793",
+      "sha256": "35eda4a735dd83df3d4d69684d8aeafc8bec3014247559c6e2fe86f95e47a320",
       "required": false,
       "category": "semantics"
     },
@@ -4005,11 +4375,6 @@
     "operators/allybi_xlsx_operators.any.json": {
       "sha256": "417dbb82a5d08f04a7997609409ba820c42d4cd533e531cc54b6e1fee6987518",
       "required": false,
-      "category": "operators"
-    },
-    "operators/connector_operators.any.json": {
-      "sha256": "37de95e17a1d781ff6c7c42fbce4ef650dc4476e7fbcc8a2cfec93ff16a961df",
-      "required": true,
       "category": "operators"
     },
     "operators/file_action_operators.any.json": {
@@ -4322,134 +4687,174 @@
       "required": false,
       "category": "parsers"
     },
+    "policies/access_control_policy.any.json": {
+      "sha256": "2c959230004d9202af125bcea1afcf7bd81c1da9a69ff359810b21c69142ddf3",
+      "required": true,
+      "category": "semantics"
+    },
     "policies/allybi_connector_permissions.any.json": {
-      "sha256": "c142b27d99d79a662fbe5ec31f3ac38335c0c5cc5cdbebebacbec9954040bdfc",
+      "sha256": "0e05b2351a8307ddc39cf22a144c2a97945ca7a45ef7d38a996716db9a2641d7",
       "required": false,
       "category": "policies"
     },
     "policies/clarification_policy.any.json": {
-      "sha256": "1f9eae6319e025096d3e045e29d9c71d343a39af2decb4712e5174a109142518",
+      "sha256": "004376d292cc72b12e467773357fde5d345ba332e41db7814b2e15de20363af6",
       "required": true,
       "category": "policies"
     },
     "policies/compliance_policy.any.json": {
-      "sha256": "d7dff2c2452c4d95dbf60ab7d2a72c89ef734450bb46bf464aef671d21c18900",
-      "required": false,
+      "sha256": "0a09ccbc9b1189be473fde0be2fd5f819b9789e4f1daf8cf0c6b68f72b16dc81",
+      "required": true,
+      "category": "semantics"
+    },
+    "policies/data_retention_deletion_policy.any.json": {
+      "sha256": "b3c6396cd33c7c591b6484ffe68803e6985a2fee6f2da4c27caca32b275cdf7a",
+      "required": true,
       "category": "semantics"
     },
     "policies/editing_agent_policy.any.json": {
-      "sha256": "02bd4fb284fe3da5d861506970311d7c788ea65ea4ed54351f653d4c3a0a9eaa",
+      "sha256": "e4ed824ce6c1a8f03a79bd5da6c5de1809927b8df33e00946266a530b6309a74",
       "required": true,
       "category": "policies"
     },
     "policies/editing.policy.any.json": {
-      "sha256": "01b8ca5e23f7a1841a1f6e3f1ff9c938c935c3d8d79e6736d4e84f0e4867ed4e",
+      "sha256": "02f23fb712b13c2d26ecc8a361a13c11ddf61af28e25161254fe7053708b2566",
       "required": true,
       "category": "policies"
     },
     "policies/fallback_policy.any.json": {
-      "sha256": "f7d165b1027788cff2734b82ed94400e5e6211aa8716d86f94bd362cfff0d8d5",
+      "sha256": "86eb77311ecd8c01f4f828af26ddc7986004c6b69c6b3cfb216e7bdb65d9bf3a",
       "required": true,
       "category": "policies"
     },
+    "policies/incident_response_policy.any.json": {
+      "sha256": "1ec87acf08abc8a5634fd31ae25c2aa92490cde4bc7fe3662ce747e0cd5f4897",
+      "required": true,
+      "category": "semantics"
+    },
     "policies/llm_builder_policy.any.json": {
-      "sha256": "3a33a326ea6b936adad0129793c47c09fd47e52601edc50db284ac4f8a10760d",
+      "sha256": "96d776712cbe36cff05b62f7242d1a71688d26a39743a287b4039e1d4bc87bc4",
       "required": true,
       "category": "policies"
     },
     "policies/logging_policy.any.json": {
-      "sha256": "7b4bcf816bf21f8f09d7ec3232dcb648ff5c68934d1be028d628f423a995f559",
-      "required": false,
+      "sha256": "df1d220afe733d33ce8774577d34472c14068fdd06e16335b9fbd62297164fdf",
+      "required": true,
       "category": "semantics"
     },
     "policies/memory_policy_tests.any.json": {
-      "sha256": "a73250c21deb191c984d4d62cfcd21550d73b771d859e77098ac4d8a8c5f4d0e",
+      "sha256": "0cc933f399ccb578a9c0f3d6f7b024c4ec9576963019b66380ee338eb30fe310",
       "required": false,
       "category": "policies"
     },
     "policies/memory_policy.any.json": {
-      "sha256": "f660c0d2205eef76cbfe57fd7bcf544eecab370f1f6b2c867c055bc53de58504",
+      "sha256": "a4e04784117c0711de0936394589c1e450a6b37cda6d9eb85185a6071d16df9f",
       "required": true,
       "category": "policies"
     },
+    "policies/model_release_policy.any.json": {
+      "sha256": "a53ccacebdc821db7798f0570c3c8c6da54c7191f90c0b26b7ed654af1ec0c13",
+      "required": true,
+      "category": "semantics"
+    },
     "policies/orchestrator_certification.any.json": {
-      "sha256": "e7c804b4d886f812d552af91a8a3ade3f681582073a2c1de7f44c1214b45ce46",
-      "required": false,
+      "sha256": "4c162432b323ea2b838b308142583bbbc25bb206145f5125fbd3c41b8d44d621",
+      "required": true,
       "category": "policies"
     },
+    "policies/policy_exceptions_policy.any.json": {
+      "sha256": "f92653c75fec8c26bc6cd65efc99cf4b93d396077ca3d985846d4135857eb596",
+      "required": true,
+      "category": "semantics"
+    },
     "policies/python_sandbox_policy.any.json": {
-      "sha256": "1b4b539481690d7df4f4d178f48bffaf1673deb66d50077831f460b29046b63e",
+      "sha256": "ba4cf9a56c8efb4837458e0909476c8c8dd81a1ee77863cf9241d5c6cc0219f3",
       "required": false,
       "category": "policies"
     },
     "policies/rate_limit_policy.any.json": {
-      "sha256": "fa7be0568c71af7fcb407adc8b7fcf9b40d78db5224ff84090218cd251d764fb",
-      "required": false,
+      "sha256": "6b7a60acdda746fb7b8966e135c07aa5bea030a0df8876fcb42a524d2617b961",
+      "required": true,
       "category": "semantics"
     },
     "policies/reasoning/assumption_policy.any.json": {
-      "sha256": "1b1fe3cf46b9a3f95dd9464caed82728d7300e3b7250ef64eceef978066b174a",
+      "sha256": "228cb6e9fcf71503f0fea0717216504fc952c8619bf50a9bd0dc774813ea3622",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/decision_support.accounting.any.json": {
-      "sha256": "be7db623a5cba63906cc00b6120afeba029db0bdc676b7db356c1b083707ee2c",
+      "sha256": "765464e47623852c19073bf2127e5cac4ef08ad6aac5fc23edf53e0cfd02bfc8",
       "required": false,
       "category": "policies"
     },
+    "policies/reasoning/decision_support.everyday.any.json": {
+      "sha256": "da444efe400777867546d609c8fc66c2c56afd1423b828dcb217facd1037d95d",
+      "required": false,
+      "category": "semantics"
+    },
     "policies/reasoning/decision_support.finance.any.json": {
-      "sha256": "0d200b60d8908d4323f9a09adb3adafe57105c249f45272a7d412f947485a76b",
+      "sha256": "4954ba970a807f9e34b25564d721c491fab24438454e13b40fb046429a4b673d",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/decision_support.legal.any.json": {
-      "sha256": "d4c89c049d358ba7db61d0cbe78c173a5a09c3e9e1ccb083f2d6039b666c2231",
+      "sha256": "b8748ea99004e1c71e84074fef3e1500788f8fabf115f733d564561ab7911e79",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/decision_support.medical.any.json": {
-      "sha256": "38924603be904b3f90f504a90f6917cbf3743ed455aa073c3b99910781628323",
+      "sha256": "8fdeda4605c7989a95609ae2c5e394c066896d9e38eb7224e292ba5eca74481e",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/decision_support.ops.any.json": {
-      "sha256": "9600a4fb78dcd474549114b14d1a652fff008d23f0bba61967f20aab2582b23a",
+      "sha256": "bd00917296588cd8df6cada19a754f9e0632b0ea1168ce02c5da93c46ff4e908",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/explain_style.accounting.any.json": {
-      "sha256": "5457eb68203c84d6556d71095aec32d7f9ff6a70f4cdedf6724f793b816c40be",
+      "sha256": "029682f6b99da1b26fed27696d002bdb4c1b0f44355efaaace2a2c6c928e5226",
       "required": false,
       "category": "policies"
     },
+    "policies/reasoning/explain_style.everyday.any.json": {
+      "sha256": "f20d335d63a74ccf85b259fef9f13b8fb1a94ada1e24d997cc897c70b83d50e9",
+      "required": false,
+      "category": "semantics"
+    },
     "policies/reasoning/explain_style.finance.any.json": {
-      "sha256": "0eb115d1191bdd6a8745371189be8d9800f382ed90188bd29101ad58814f7b89",
+      "sha256": "9a78228b8f3283f37ccfb91522f4681acb37f276cf2b276c805831ec58d350c3",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/explain_style.legal.any.json": {
-      "sha256": "b7a86ba0ab8537d56c562a5f15ec4b04245bd018bb92715eaba8b47b5a3ad51b",
+      "sha256": "8b8b21ba45831a501fea371764311dc86e6f8fe884932977df500e977882bbdc",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/explain_style.medical.any.json": {
-      "sha256": "2c5784007429299adcb27a495d758abcbb9405f8a997db3602594d2b7b3e9d6d",
+      "sha256": "b18cd890af44ab6779cfa291c1cf580746fd0127e512dc6c4b64b28dd96c7958",
       "required": true,
       "category": "policies"
     },
     "policies/reasoning/explain_style.ops.any.json": {
-      "sha256": "00d8afde3384a4bd9e5816d7299d842087c143ed67282208b4f05e79677bdf11",
+      "sha256": "af500468aa60974d099a073c3152e5dcd7bfde3f9035cf16bd80929b0b7ce0a4",
       "required": true,
       "category": "policies"
     },
     "policies/refusal_policy.any.json": {
-      "sha256": "c4fd32a22a2e74911054f7054aab40841d2b2f95df3d5a6fbce014ee53aad905",
+      "sha256": "46e4b5158a92446f35158695ef77ba0b7e31dffee28c2e9c885ff29fca54f374",
       "required": true,
       "category": "policies"
     },
+    "policies/secrets_rotation_policy.any.json": {
+      "sha256": "f00699ae11cbda994882349b60cf6deba29f194375c515b9a26c1c350765ae01",
+      "required": true,
+      "category": "semantics"
+    },
     "policies/viewer_locked_chat_policy.any.json": {
-      "sha256": "e7433af14ed5f4072e461041a74962261421916986072534d68946ab0c49843f",
-      "required": false,
+      "sha256": "f4db8166bab5eeb8e2792c0c96f260e99d8c01fa217f43b58f87fa5f7f467941",
+      "required": true,
       "category": "policies"
     },
     "probes/excel_edit_regression.any.json": {
@@ -4578,22 +4983,22 @@
       "category": "semantics"
     },
     "quality/document_intelligence/ambiguity_questions.any.json": {
-      "sha256": "4dca3e93514bcc6f4e54ca79c34f3fa56e7a496bb35273e6447a5ef182dcf656",
+      "sha256": "8eae0a6c363533bf4cd0768ef8a641127604c625a34fc5feecd51f5b587debae",
       "required": true,
       "category": "quality"
     },
     "quality/document_intelligence/numeric_integrity.any.json": {
-      "sha256": "360cfa1d52ebd1ea57d223b210a5dc1f7b7a3a351cb55939b6ff61dc6c55bf81",
+      "sha256": "6cc8a42c6bab751789c46bb8417743cbb681879a1d35c145afda1be20677af2a",
       "required": true,
       "category": "quality"
     },
     "quality/document_intelligence/source_policy.any.json": {
-      "sha256": "382cfae4228607926555ef36e9794503740dd881f511b574126d4f8dbfc0f299",
+      "sha256": "18b0d2d047b7c21b21c68c9a831ccf80a573b11af852620cd6e3bca9b84d54f3",
       "required": true,
       "category": "quality"
     },
     "quality/document_intelligence/wrong_doc_lock.any.json": {
-      "sha256": "0db69944f4611a4e8b98fda5ceb9bc13e5f0d1a22adefc35260c9a74c03a5145",
+      "sha256": "545801b1612b35234d3e7443a6e185bdcd50fb11cac1a298647d79de2d919ce4",
       "required": true,
       "category": "quality"
     },
@@ -4620,7 +5025,7 @@
     "retrieval/boost_rules.accounting.any.json": {
       "sha256": "e80200afd7ff9f615768fd937125f0174784abd17ce2c5fc76fbb3106f067ab2",
       "required": true,
-      "category": "semantics"
+      "category": "retrieval"
     },
     "retrieval/boost_rules.finance.any.json": {
       "sha256": "573a19b745be8a41cac9a98d18cd6e03806ac83afe4fe4bee780d29e6e385d16",
@@ -4670,7 +5075,7 @@
     "retrieval/query_rewrites.accounting.any.json": {
       "sha256": "3ad3f12d2a224d731fec564a064ccb15bb37295e238c115cf43d54a468cab623",
       "required": true,
-      "category": "semantics"
+      "category": "retrieval"
     },
     "retrieval/query_rewrites.finance.any.json": {
       "sha256": "cb43a2b80a58c38f49c0493dbc3d7cf42becee5928715527144a8f269b5f0460",
@@ -4710,7 +5115,7 @@
     "retrieval/section_priority.accounting.any.json": {
       "sha256": "7b84f22113d05e8a74f8b0787abb89ce05cbe08a03a6349d319af6a049c9586d",
       "required": true,
-      "category": "semantics"
+      "category": "retrieval"
     },
     "retrieval/section_priority.finance.any.json": {
       "sha256": "fb91f73c5a09c84747175118e264338bf52213b6c0fb98da9b512bba4d9c14e4",
@@ -4888,7 +5293,7 @@
       "category": "scope"
     },
     "semantics/allybi_capabilities.any.json": {
-      "sha256": "c8a1f57272422ec17aac842e4435cefedcd9606b2a5af7d13dab220db350a399",
+      "sha256": "0a574a00aed6aac7297178e6052b9502ea5082f246ab59e240882a9c80c0418a",
       "required": false,
       "category": "semantics"
     },
@@ -4913,7 +5318,7 @@
       "category": "semantics"
     },
     "semantics/document_intelligence_bank_map.any.json": {
-      "sha256": "4a107a7acee9dd78d2578e5000399ba0eb84a18f734a3d438b2ce864472a3ade",
+      "sha256": "9649f4223c110025d480dfe690569af895411c8e7e9c5e2ef180371a03b85efe",
       "required": true,
       "category": "semantics"
     },
@@ -4978,22 +5383,22 @@
       "category": "semantics"
     },
     "semantics/entities/date_patterns.any.json": {
-      "sha256": "8ef7b6ebdb2942f6343e63a97ed3ae406d57e3d0b85c2507721f7573474c44a5",
+      "sha256": "0bcd717bfdb05ea1ee2bb3152af15904413b1621a6874245acab4e27dd963dd5",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/identifier_patterns.any.json": {
-      "sha256": "b6cbb85e7bf9b695157f5ede944b63d3e14d5bd7a05e7355d3a9ab04f7736fe5",
+      "sha256": "45931b85190632219bc79c43638f7e3c59113ff062ef390b2e0c59dc782c5fb1",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/money_patterns.any.json": {
-      "sha256": "360bb6aa443f1fde92fe4bc32c5c266e27440a6c2168ae1ca4aa024fc484f737",
+      "sha256": "ed513a4226ba2dff6fb8f29c3a2a5a74c8682181e871774c05c8274dafd6db21",
       "required": true,
       "category": "semantics"
     },
     "semantics/entities/party_patterns.any.json": {
-      "sha256": "3cf7ea6aaa9375dbef6a1ed433d32f2487132dd5877dfdd6666a1795a428f19a",
+      "sha256": "4e605444755db26bbf45b536f95841a847e2f39768da1de0375ae0ac18856751",
       "required": true,
       "category": "semantics"
     },
@@ -5043,22 +5448,22 @@
       "category": "semantics"
     },
     "semantics/structure/headings_map.any.json": {
-      "sha256": "e33ea1fa5153518acc36b8a28a540f1cf75d604ae03f91f4c82a31ca0aad3274",
+      "sha256": "9faa042142ca0fb7eea084314deb443c0adfce16bf7c637083901a63c3f1bad7",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/layout_cues.any.json": {
-      "sha256": "ac01eef0a77c903cda273c254af5d1e332364defff63ac7416ef284db99229f4",
+      "sha256": "a52d319c13b4ad9d17cf7c78a9b447c5187f4513f0f8164b6d816519c45ffa2e",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/sheetname_patterns.any.json": {
-      "sha256": "5e836db7c5742bb22d1db1575a24438429cf83110cb74e0994117db829089a7a",
+      "sha256": "ba1c46b1b2873e7200dff00343fde2610f5c1c2a06889169148cebb32c7b1a6c",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.accounting.any.json": {
-      "sha256": "57b0854f1c33ce22139ae61ef0e929823f5ade008162bfb140f8f3aa05645056",
+      "sha256": "e86264328804be4fee706a1a1cd094f33fa1a71a8b85ce23bd3a94565c2e5c77",
       "required": false,
       "category": "semantics"
     },
@@ -5072,8 +5477,13 @@
       "required": false,
       "category": "semantics"
     },
+    "semantics/structure/table_header_ontology.everyday.any.json": {
+      "sha256": "ca868f92ff7fa6a25f594b2bed9fcc8d2c07f4b74f6f0d36a725a295e3b86dc7",
+      "required": false,
+      "category": "semantics"
+    },
     "semantics/structure/table_header_ontology.finance.any.json": {
-      "sha256": "e80e43dca869c623ac97fb00fe9b11a7b3a9d8d63b0a04c0ed252bfeba30e4fc",
+      "sha256": "065650de72f30bdb0f8bd989008edd87cbf2505c894b633b3888efdb9ef8b40f",
       "required": true,
       "category": "semantics"
     },
@@ -5083,12 +5493,12 @@
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.legal.any.json": {
-      "sha256": "dc20d5f0970106c533612896a516ffae4a433979b398c103bf55bc96c29e411c",
+      "sha256": "02d9f6270583248fccd2551e1a7de3ba5334bc1f4ddbadc45a9c47efb94c6f85",
       "required": true,
       "category": "semantics"
     },
     "semantics/structure/table_header_ontology.medical.any.json": {
-      "sha256": "7a6fd56ee81dc2de05a9f5eb6f5a8c5bff7a449d4c91ad5697bc87a48634e487",
+      "sha256": "c4f7fe3e1b3bccd10af9d6b5809ad3352ddcdb2c71a4be99a298cf58be52e592",
       "required": true,
       "category": "semantics"
     },

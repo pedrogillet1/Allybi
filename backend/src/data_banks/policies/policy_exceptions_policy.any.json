@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "policy_exceptions_policy",
+    "version": "1.0.0",
+    "description": "Policy exception lifecycle rules (approval, expiry, and revocation).",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "platform-governance",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Initial policy exception governance bank"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": false,
+    "defaultAction": "deny_exception"
+  },
+  "constraints": {
+    "maxDurationDays": 30,
+    "requireBusinessJustification": true,
+    "requireTicketId": true,
+    "autoRevokeOnExpiry": true
+  },
+  "rules": [
+    {
+      "id": "PEP_1000_expired_exception",
+      "priority": 1000,
+      "when": {
+        "path": "signals.exceptionExpired",
+        "op": "eq",
+        "value": true
+      },
+      "then": {
+        "action": "revoke_exception",
+        "notify": "policy_owner"
+      },
+      "reasonCode": "policy_exception_expired",
+      "terminal": true
+    },
+    {
+      "id": "PEP_900_missing_approvals",
+      "priority": 900,
+      "when": {
+        "path": "signals.approved",
+        "op": "neq",
+        "value": true
+      },
+      "then": {
+        "action": "deny_exception",
+        "userMessage": "Policy exceptions require explicit approval."
+      },
+      "reasonCode": "policy_exception_unapproved",
+      "terminal": true
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "PEP_T_001",
+        "runtime": {
+          "signals": {
+            "approved": false
+          }
+        },
+        "expect": {
+          "action": "deny_exception"
+        }
+      }
+    ]
+  }
+}

@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-20"
+    "lastUpdated": "2026-02-20",
+    "owner": "runtime-certification",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -180,6 +186,15 @@
         "src/services/preview/previewOrchestrator.service.ts",
         "src/services/creative/creativeOrchestrator.service.ts"
       ]
-    }
+    },
+    "configModeOnly": true
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "ORCH_CERT_T_001",
+        "assert": "gate score sections must all be present and > 0"
+      }
+    ]
   }
 }

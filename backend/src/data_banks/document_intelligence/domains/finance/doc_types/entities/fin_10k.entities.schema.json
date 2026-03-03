@@ -1,114 +1,1045 @@
 {
   "_meta": {
     "id": "di_finance_entities_fin_10k",
-    "version": "2.0.0",
-    "description": "Entity extraction schema for fin_10k.",
+    "version": "2.1.0",
+    "description": "Entity schema for 10-K Annual Report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "docType": "fin_10k"
+    "docType": "fin_10k",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
   },
   "entities": [
     {
       "id": "document_id",
       "type": "string",
       "required": true,
-      "description": "Unique document identifier"
+      "evidenceRequirement": [
+        "header_id",
+        "source_table"
+      ],
+      "notes": "document-level evidence required"
     },
     {
-      "id": "reporting_entity",
+      "id": "source_file_name",
       "type": "string",
       "required": true,
-      "description": "Entity or BU covered"
+      "evidenceRequirement": [
+        "file_metadata"
+      ],
+      "notes": "source file provenance"
     },
     {
-      "id": "period_start",
-      "type": "date",
+      "id": "extraction_timestamp",
+      "type": "datetime",
       "required": true,
-      "description": "Period start date"
+      "evidenceRequirement": [
+        "ingestion_metadata"
+      ],
+      "notes": "must include parse timestamp"
     },
     {
-      "id": "period_end",
-      "type": "date",
-      "required": true,
-      "description": "Period end date"
-    },
-    {
-      "id": "currency",
+      "id": "ticker",
+      "canonical": "ticker",
       "type": "string",
       "required": true,
-      "description": "ISO currency code"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: ticker from table/header context."
+    },
+    {
+      "id": "company_name",
+      "canonical": "company_name",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: company_name from table/header context."
+    },
+    {
+      "id": "fiscal_year_end",
+      "canonical": "fiscal_year_end",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: fiscal_year_end from table/header context."
+    },
+    {
+      "id": "filing_period",
+      "canonical": "filing_period",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: filing_period from table/header context."
+    },
+    {
+      "id": "audited_by",
+      "canonical": "audited_by",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: audited_by from table/header context."
+    },
+    {
+      "id": "auditor_opinion",
+      "canonical": "auditor_opinion",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: auditor_opinion from table/header context."
+    },
+    {
+      "id": "reporting_currency",
+      "canonical": "reporting_currency",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: reporting_currency from table/header context."
     },
     {
       "id": "unit_scale",
+      "canonical": "unit_scale",
       "type": "string",
       "required": true,
-      "description": "Unit scale (units, thousands, millions)"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: unit_scale from table/header context."
     },
     {
       "id": "revenue",
-      "type": "currency",
-      "required": false,
-      "description": "Revenue amount"
+      "canonical": "revenue",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: revenue from table/header context."
+    },
+    {
+      "id": "gross_margin",
+      "canonical": "gross_margin",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: gross_margin from table/header context."
     },
     {
       "id": "ebitda",
+      "canonical": "ebitda",
       "type": "currency",
-      "required": false,
-      "description": "EBITDA amount"
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: ebitda from table/header context."
+    },
+    {
+      "id": "operating_income",
+      "canonical": "operating_income",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: operating_income from table/header context."
     },
     {
       "id": "net_income",
-      "type": "currency",
+      "canonical": "net_income",
+      "type": "boolean",
       "required": false,
-      "description": "Net income amount"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: net_income from table/header context."
     },
     {
-      "id": "cash_position",
-      "type": "currency",
+      "id": "total_assets",
+      "canonical": "total_assets",
+      "type": "array",
       "required": false,
-      "description": "Cash balance"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: total_assets from table/header context."
     },
     {
-      "id": "variance_percent",
-      "type": "number",
-      "required": false,
-      "description": "Variance percentage"
-    },
-    {
-      "id": "source_table_ref",
+      "id": "total_liabilities",
+      "canonical": "total_liabilities",
       "type": "string",
-      "required": true,
-      "description": "Source table identifier"
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: total_liabilities from table/header context."
     },
     {
-      "id": "kpi_revenue",
+      "id": "equity",
+      "canonical": "equity",
       "type": "number",
       "required": false,
-      "description": "KPI reference for revenue"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: equity from table/header context."
     },
     {
-      "id": "kpi_ebitda",
-      "type": "number",
+      "id": "cash_and_equivalents",
+      "canonical": "cash_and_equivalents",
+      "type": "date",
       "required": false,
-      "description": "KPI reference for ebitda"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: cash_and_equivalents from table/header context."
     },
     {
-      "id": "kpi_net_income",
-      "type": "number",
+      "id": "operating_cash_flow",
+      "canonical": "operating_cash_flow",
+      "type": "currency",
       "required": false,
-      "description": "KPI reference for net_income"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: operating_cash_flow from table/header context."
     },
     {
-      "id": "kpi_operating_cash_flow",
+      "id": "capital_expenditures",
+      "canonical": "capital_expenditures",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: capital_expenditures from table/header context."
+    },
+    {
+      "id": "free_cash_flow",
+      "canonical": "free_cash_flow",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: free_cash_flow from table/header context."
+    },
+    {
+      "id": "shares_outstanding",
+      "canonical": "shares_outstanding",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: shares_outstanding from table/header context."
+    },
+    {
+      "id": "eps_diluted",
+      "canonical": "eps_diluted",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: eps_diluted from table/header context."
+    },
+    {
+      "id": "eps_basic",
+      "canonical": "eps_basic",
       "type": "number",
       "required": false,
-      "description": "KPI reference for operating_cash_flow"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: eps_basic from table/header context."
+    },
+    {
+      "id": "tax_rate",
+      "canonical": "tax_rate",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: tax_rate from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_25",
+      "canonical": "10_k_annual_report_metric_25",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_25 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_26",
+      "canonical": "10_k_annual_report_metric_26",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_26 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_27",
+      "canonical": "10_k_annual_report_metric_27",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_27 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_28",
+      "canonical": "10_k_annual_report_metric_28",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_28 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_29",
+      "canonical": "10_k_annual_report_metric_29",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_29 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_30",
+      "canonical": "10_k_annual_report_metric_30",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_30 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_31",
+      "canonical": "10_k_annual_report_metric_31",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_31 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_32",
+      "canonical": "10_k_annual_report_metric_32",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_32 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_33",
+      "canonical": "10_k_annual_report_metric_33",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_33 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_34",
+      "canonical": "10_k_annual_report_metric_34",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_34 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_35",
+      "canonical": "10_k_annual_report_metric_35",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_35 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_36",
+      "canonical": "10_k_annual_report_metric_36",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_36 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_37",
+      "canonical": "10_k_annual_report_metric_37",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_37 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_38",
+      "canonical": "10_k_annual_report_metric_38",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_38 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_39",
+      "canonical": "10_k_annual_report_metric_39",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_39 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_40",
+      "canonical": "10_k_annual_report_metric_40",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_40 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_41",
+      "canonical": "10_k_annual_report_metric_41",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_41 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_42",
+      "canonical": "10_k_annual_report_metric_42",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_42 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_43",
+      "canonical": "10_k_annual_report_metric_43",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_43 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_44",
+      "canonical": "10_k_annual_report_metric_44",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_44 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_45",
+      "canonical": "10_k_annual_report_metric_45",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_45 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_46",
+      "canonical": "10_k_annual_report_metric_46",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_46 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_47",
+      "canonical": "10_k_annual_report_metric_47",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_47 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_48",
+      "canonical": "10_k_annual_report_metric_48",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_48 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_49",
+      "canonical": "10_k_annual_report_metric_49",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_49 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_50",
+      "canonical": "10_k_annual_report_metric_50",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_50 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_51",
+      "canonical": "10_k_annual_report_metric_51",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_51 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_52",
+      "canonical": "10_k_annual_report_metric_52",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_52 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_53",
+      "canonical": "10_k_annual_report_metric_53",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_53 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_54",
+      "canonical": "10_k_annual_report_metric_54",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_54 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_55",
+      "canonical": "10_k_annual_report_metric_55",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_55 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_56",
+      "canonical": "10_k_annual_report_metric_56",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_56 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_57",
+      "canonical": "10_k_annual_report_metric_57",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_57 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_58",
+      "canonical": "10_k_annual_report_metric_58",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_58 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_59",
+      "canonical": "10_k_annual_report_metric_59",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_59 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_60",
+      "canonical": "10_k_annual_report_metric_60",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_60 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_61",
+      "canonical": "10_k_annual_report_metric_61",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_61 from table/header context."
+    },
+    {
+      "id": "10_k_annual_report_metric_62",
+      "canonical": "10_k_annual_report_metric_62",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-K Annual Report: 10_k_annual_report_metric_62 from table/header context."
     }
   ]
 }

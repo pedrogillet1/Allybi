@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_bank_statement",
+    "version": "1.0.0",
+    "description": "Tables expected in every_bank_statement.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_bank_statement"
+  },
+  "tableHeaderSynonyms": {
+    "date": ["date", "data", "post date", "lançamento"],
+    "description": ["description", "descricao", "history", "history text"],
+    "debit": ["debit", "debito", "saida", "outflow"],
+    "credit": ["credit", "credito", "entrada", "inflow"],
+    "balance": ["balance", "saldo", "running balance"]
+  },
+  "tables": [
+    {
+      "id": "bank_statement_balance_table",
+      "canonicalName": {
+        "en": "Opening and Closing Balances",
+        "pt": "Saldo Inicial e Final"
+      },
+      "section": "opening_and_closing",
+      "signaturePatterns": ["\\bopening balance\\b", "\\bclosing balance\\b", "\\bsaldo inicial\\b", "\\bsaldo final\\b"],
+      "requiredHeaders": ["label", "balance", "currency", "date"],
+      "headerAliases": [["label", "tipo"], ["balance", "saldo"], ["currency", "moeda"], ["date", "data"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["bank_statement_fn_01"]
+    },
+    {
+      "id": "bank_statement_transactions_table",
+      "canonicalName": {
+        "en": "Transactions",
+        "pt": "Tabela de Transacoes"
+      },
+      "section": "transactions",
+      "signaturePatterns": ["\\btransactions\\b", "\\bdebit\\b", "\\bcredit\\b", "\\blancamentos\\b"],
+      "requiredHeaders": ["date", "description", "debit", "credit", "balance"],
+      "headerAliases": [["date", "data"], ["description", "descricao"], ["debit", "debito"], ["credit", "credito"], ["balance", "saldo"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["bank_statement_fn_02"]
+    },
+    {
+      "id": "bank_statement_fees_table",
+      "canonicalName": {
+        "en": "Charges and Interest",
+        "pt": "Tabela de Taxas e Juros"
+      },
+      "section": "charges_and_interest",
+      "signaturePatterns": ["\\bfees\\b", "\\bcharges\\b", "\\binterest\\b", "\\btaxas\\b"],
+      "requiredHeaders": ["description", "amount", "type", "currency"],
+      "headerAliases": [["description", "descricao"], ["amount", "valor"], ["type", "tipo"], ["currency", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["bank_statement_fn_03"]
+    },
+    {
+      "id": "bank_statement_summary_table",
+      "canonicalName": {
+        "en": "Cash Flow Summary",
+        "pt": "Resumo Financeiro"
+      },
+      "section": "cash_flow_summary",
+      "signaturePatterns": ["\\bcash flow\\b", "\\bsummary\\b", "\\bnet change\\b"],
+      "requiredHeaders": ["metric", "amount", "currency", "unit"],
+      "headerAliases": [["metric", "indicador"], ["amount", "valor"], ["currency", "moeda"], ["unit", "un"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["bank_statement_fn_04"]
+    },
+    {
+      "id": "bank_statement_card_transfer_table",
+      "canonicalName": {
+        "en": "Card and Transfers",
+        "pt": "Transacoes de Cartao e Transferencias"
+      },
+      "section": "foreign_or_card_transactions",
+      "signaturePatterns": ["\\bcard\\b", "\\btransfer\\b", "\\binternational\\b", "\\bforeign\\b"],
+      "requiredHeaders": ["date", "description", "method", "amount", "currency"],
+      "headerAliases": [["date", "data"], ["description", "descricao"], ["method", "meio"], ["amount", "valor"], ["currency", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["bank_statement_fn_05"]
+    }
+  ]
+}

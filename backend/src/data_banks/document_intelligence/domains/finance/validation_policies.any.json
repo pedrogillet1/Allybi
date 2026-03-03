@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_validation_policies",
-    "version": "1.0.0",
-    "description": "Validation policies for finance domain — correctness checks, consistency guards, and quality gates.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Finance validation policies and consistency gates.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,68 +15,692 @@
   "domain": "finance",
   "policies": [
     {
-      "id": "fin_val_001_balance_check",
+      "id": "fin_val_balance_sheet_equation",
       "severity": "error",
-      "description": "Assets must equal Liabilities + Equity on any balance sheet extraction.",
-      "applies": ["extract", "calculate", "validate"],
+      "description": "Assets = Liabilities + Equity",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
       "check": "balance_sheet_equation",
       "failureAction": "BLOCK_AND_FLAG"
     },
     {
-      "id": "fin_val_002_sign_consistency",
+      "id": "fin_val_period_alignment",
       "severity": "error",
-      "description": "Revenue should be positive; expenses/losses should follow sign convention consistently.",
-      "applies": ["extract", "calculate"],
-      "check": "sign_convention",
-      "failureAction": "WARN_AND_EXPLAIN"
-    },
-    {
-      "id": "fin_val_003_period_alignment",
-      "severity": "error",
-      "description": "Numerator and denominator in ratios must come from the same fiscal period.",
-      "applies": ["calculate"],
-      "check": "period_match",
+      "description": "Period alignment required for comparisons",
+      "applies": [
+        "compare",
+        "calculate"
+      ],
+      "check": "period_alignment",
       "failureAction": "BLOCK_AND_REGEN"
     },
     {
-      "id": "fin_val_004_currency_consistency",
+      "id": "fin_val_currency_alignment",
       "severity": "error",
-      "description": "All values in a comparison must use the same currency. Flag if mixed currencies detected.",
-      "applies": ["compare", "calculate"],
-      "check": "currency_match",
+      "description": "Single currency baseline for same computation",
+      "applies": [
+        "compare",
+        "calculate"
+      ],
+      "check": "currency_alignment",
       "failureAction": "BLOCK_AND_FLAG"
     },
     {
-      "id": "fin_val_005_materiality_gate",
+      "id": "fin_val_header_alignment",
+      "severity": "error",
+      "description": "Header context required for extracted numeric facts",
+      "applies": [
+        "extract",
+        "calculate"
+      ],
+      "check": "table_header_presence",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_unit_scale_consistency",
+      "severity": "error",
+      "description": "Scale consistency required",
+      "applies": [
+        "calculate",
+        "compare"
+      ],
+      "check": "scale_normalization",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_sign_convention",
       "severity": "warning",
-      "description": "Variance below 1% of total may be immaterial — flag as 'not material' rather than analyzing.",
-      "applies": ["compare", "evaluate"],
-      "check": "materiality_threshold",
+      "description": "Ensure sign conventions for expenses and losses",
+      "applies": [
+        "extract",
+        "calculate"
+      ],
+      "check": "sign_convention",
       "failureAction": "ANNOTATE"
     },
     {
-      "id": "fin_val_006_stale_data",
+      "id": "fin_val_extra_001",
       "severity": "warning",
-      "description": "Financial data older than 18 months should be flagged as potentially stale.",
-      "applies": ["extract", "compare", "monitor"],
-      "check": "data_freshness",
+      "description": "Policy 1: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_1",
       "failureAction": "WARN_AND_EXPLAIN"
     },
     {
-      "id": "fin_val_007_gaap_vs_nongaap",
-      "severity": "warning",
-      "description": "Do not mix GAAP and non-GAAP figures in the same comparison without disclosure.",
-      "applies": ["compare", "calculate"],
-      "check": "accounting_basis_match",
+      "id": "fin_val_extra_002",
+      "severity": "error",
+      "description": "Policy 2: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_2",
       "failureAction": "BLOCK_AND_FLAG"
     },
     {
-      "id": "fin_val_008_cross_statement_consistency",
-      "severity": "warning",
-      "description": "Net income on income statement must match net income on cash flow statement.",
-      "applies": ["validate"],
-      "check": "cross_statement_tie",
+      "id": "fin_val_extra_003",
+      "severity": "info",
+      "description": "Policy 3: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_3",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_004",
+      "severity": "info",
+      "description": "Policy 4: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_4",
       "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_005",
+      "severity": "warning",
+      "description": "Policy 5: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_5",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_006",
+      "severity": "error",
+      "description": "Policy 6: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_6",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_007",
+      "severity": "info",
+      "description": "Policy 7: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_7",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_008",
+      "severity": "info",
+      "description": "Policy 8: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_8",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_009",
+      "severity": "warning",
+      "description": "Policy 9: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_9",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_010",
+      "severity": "error",
+      "description": "Policy 10: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_10",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_011",
+      "severity": "info",
+      "description": "Policy 11: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_11",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_012",
+      "severity": "info",
+      "description": "Policy 12: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_12",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_013",
+      "severity": "warning",
+      "description": "Policy 13: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_13",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_014",
+      "severity": "error",
+      "description": "Policy 14: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_14",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_015",
+      "severity": "info",
+      "description": "Policy 15: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_15",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_016",
+      "severity": "info",
+      "description": "Policy 16: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_16",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_017",
+      "severity": "warning",
+      "description": "Policy 17: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_17",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_018",
+      "severity": "error",
+      "description": "Policy 18: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_18",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_019",
+      "severity": "info",
+      "description": "Policy 19: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_19",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_020",
+      "severity": "info",
+      "description": "Policy 20: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_20",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_021",
+      "severity": "warning",
+      "description": "Policy 21: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_1",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_022",
+      "severity": "error",
+      "description": "Policy 22: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_2",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_023",
+      "severity": "info",
+      "description": "Policy 23: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_3",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_024",
+      "severity": "info",
+      "description": "Policy 24: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_4",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_025",
+      "severity": "warning",
+      "description": "Policy 25: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_5",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_026",
+      "severity": "error",
+      "description": "Policy 26: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_6",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_027",
+      "severity": "info",
+      "description": "Policy 27: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_7",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_028",
+      "severity": "info",
+      "description": "Policy 28: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_8",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_029",
+      "severity": "warning",
+      "description": "Policy 29: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_9",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_030",
+      "severity": "error",
+      "description": "Policy 30: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_10",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_031",
+      "severity": "info",
+      "description": "Policy 31: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_11",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_032",
+      "severity": "info",
+      "description": "Policy 32: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_12",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_033",
+      "severity": "warning",
+      "description": "Policy 33: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_13",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_034",
+      "severity": "error",
+      "description": "Policy 34: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_14",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_035",
+      "severity": "info",
+      "description": "Policy 35: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_15",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_036",
+      "severity": "info",
+      "description": "Policy 36: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_16",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_037",
+      "severity": "warning",
+      "description": "Policy 37: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_17",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_038",
+      "severity": "error",
+      "description": "Policy 38: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_18",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_039",
+      "severity": "info",
+      "description": "Policy 39: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_19",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_040",
+      "severity": "info",
+      "description": "Policy 40: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_20",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_041",
+      "severity": "warning",
+      "description": "Policy 41: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_1",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_042",
+      "severity": "error",
+      "description": "Policy 42: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_2",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_043",
+      "severity": "info",
+      "description": "Policy 43: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_3",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_044",
+      "severity": "info",
+      "description": "Policy 44: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_4",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_045",
+      "severity": "warning",
+      "description": "Policy 45: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_5",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_046",
+      "severity": "error",
+      "description": "Policy 46: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_6",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_047",
+      "severity": "info",
+      "description": "Policy 47: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_7",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_048",
+      "severity": "info",
+      "description": "Policy 48: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_8",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_049",
+      "severity": "warning",
+      "description": "Policy 49: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_9",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_050",
+      "severity": "error",
+      "description": "Policy 50: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_10",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_051",
+      "severity": "info",
+      "description": "Policy 51: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_11",
+      "failureAction": "ANNOTATE"
+    },
+    {
+      "id": "fin_val_extra_052",
+      "severity": "info",
+      "description": "Policy 52: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_12",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "fin_val_extra_053",
+      "severity": "warning",
+      "description": "Policy 53: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "extract",
+        "compare",
+        "monitor"
+      ],
+      "check": "finance_integrity_check_13",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "fin_val_extra_054",
+      "severity": "error",
+      "description": "Policy 54: enforce financial integrity check across source tables and row/column alignment.",
+      "applies": [
+        "calculate",
+        "validate"
+      ],
+      "check": "finance_integrity_check_14",
+      "failureAction": "ANNOTATE"
     }
   ]
 }

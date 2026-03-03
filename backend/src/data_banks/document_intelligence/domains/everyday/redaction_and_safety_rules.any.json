@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "id": "di_everyday_redaction_and_safety_rules",
+    "version": "1.0.0",
+    "description": "Redaction and safety rules for everyday documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "redactionRules": [
+    {
+      "id": "every_redact_001_ssn_like",
+      "dataType": "social_security_like",
+      "pattern": "\\b(?:\\d{3}[- ]?\\d{2}[- ]?\\d{4}|\\d{9})\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[SSN REDACTED]"
+    },
+    {
+      "id": "every_redact_002_identity_numbers",
+      "dataType": "identity_number",
+      "pattern": "\\b(?:id|cpf|rg|passport|cnh|license|nif|tin|ein|license id)\\s*[:#-]?\\s*[A-Za-z0-9-]{6,24}\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[ID REDACTED]"
+    },
+    {
+      "id": "every_redact_003_bank_account",
+      "dataType": "bank_account_or_card",
+      "pattern": "\\b(?:acct|account|agencia|ag\\.|cc|checking|savings|card|aba|routing)\\s*[:#-]?\\s*[0-9A-Za-z]{6,24}\\b",
+      "action": "MASK_KEEP_LAST4",
+      "replacement": "[ACCOUNT REDACTED]"
+    },
+    {
+      "id": "every_redact_004_address",
+      "dataType": "address_like",
+      "pattern": "\\b(?:street|st\\.?|avenue|ave\\.?|road|rd\\.?|blvd|bairro|cidade)\\b.{0,90}",
+      "action": "PARTIAL_REDACT",
+      "replacement": "[ADDRESS REDACTED]"
+    },
+    {
+      "id": "every_redact_005_phone_number",
+      "dataType": "phone",
+      "pattern": "\\b\\(?\\d{2,3}\\)?[- ]?\\d{3}[- ]?\\d{4}\\b",
+      "action": "PARTIAL_REDACT",
+      "replacement": "[PHONE REDACTED]"
+    },
+    {
+      "id": "every_redact_006_tax_id",
+      "dataType": "tax_identifier",
+      "pattern": "\\b(?:ie|cnpj|cpf|tin|ein|tax id|nif|rut)\\s*[:#-]?\\s*[0-9A-Za-z./-]{8,20}\\b",
+      "action": "MASK_KEEP_LAST3",
+      "replacement": "[TAX_ID REDACTED]"
+    }
+  ],
+  "safetyRules": [
+    {
+      "id": "every_safety_001_never_medical_infer",
+      "severity": "error",
+      "description": "Do not infer diagnosis, treatment outcome, or medical advice from bills or notices.",
+      "trigger": "query asks medical interpretation from non-medical doc",
+      "action": "SCOPE_LOCK_NOTICE"
+    },
+    {
+      "id": "every_safety_002_identity_scope",
+      "severity": "error",
+      "description": "Do not claim identity verification certainty based on a single identity doc.",
+      "trigger": "user asks definitive identity validation",
+      "action": "BLOCK_WITH_DISCLAIMER"
+    },
+    {
+      "id": "every_safety_003_no_fabrication",
+      "severity": "error",
+      "description": "Do not fabricate tax liabilities, dues, premiums, claim settlements, or payment status.",
+      "trigger": "missing source",
+      "action": "STATE_UNCERTAINTY"
+    },
+    {
+      "id": "every_safety_004_scope_lock",
+      "severity": "warning",
+      "description": "Keep reasoning strictly inside document; no external financial/inventory systems.",
+      "trigger": "cross-file or external assumption",
+      "action": "SCOPE_LOCK_NOTICE"
+    }
+  ]
+}

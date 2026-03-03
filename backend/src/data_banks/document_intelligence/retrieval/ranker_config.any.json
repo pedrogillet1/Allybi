@@ -1,0 +1,139 @@
+{
+  "_meta": {
+    "id": "ranker_config",
+    "version": "1.0.0",
+    "description": "Document-intelligence-specific ranking config and deterministic score policy.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "mode": "document_intelligence_ranker_v2",
+    "neverInventEvidence": true,
+    "stableSortKeys": [
+      "finalScore",
+      "docId",
+      "locationKey",
+      "chunkId"
+    ],
+    "actionIfEmpty": "ASK_FOR_MORE_SCOPE",
+    "scoreCaps": {
+      "minFinal": 0.24,
+      "minSemantic": 0.14,
+      "minLexical": 0.08
+    },
+    "maxItems": {
+      "soft": 18,
+      "hard": 36,
+      "perDocSoft": 6,
+      "perDocHard": 10
+    }
+  },
+  "weights": {
+    "semantic": 0.46,
+    "lexical": 0.2,
+    "structural": 0.14,
+    "title": 0.08,
+    "docScope": 0.1,
+    "riskPenalty": 0.06,
+    "recency": 0.06
+  },
+  "priorities": [
+    {
+      "id": "PRIO_001_locked_scope",
+      "label": "locked_doc_scope",
+      "weight": 0.3,
+      "appliesWhen": "docLock.active"
+    },
+    {
+      "id": "PRIO_002_query_family",
+      "label": "query_family_match",
+      "weight": 0.22,
+      "appliesWhen": "queryFamily.score > 0"
+    },
+    {
+      "id": "PRIO_003_section_structural",
+      "label": "section_title_match",
+      "weight": 0.15,
+      "appliesWhen": "sectionMatch.confidence > 0.55"
+    },
+    {
+      "id": "PRIO_004_domain_match",
+      "label": "domain_hint_match",
+      "weight": 0.1,
+      "appliesWhen": "domainConfidence > 0.4"
+    }
+  ],
+  "rules": [
+    {
+      "id": "RANK_001_enforce_doc_lock",
+      "trigger": "Doc lock is active and candidate does not belong to active doc",
+      "check": "context.docLock.active == true AND candidate.docId != context.docLock.docId",
+      "failureAction": "EXCLUDE_OR_DOWNSCORE",
+      "severity": "error",
+      "action": {
+        "type": "downscore",
+        "delta": -0.55
+      }
+    },
+    {
+      "id": "RANK_002_prefer_exact_heading_match",
+      "trigger": "Candidate has direct heading match from section cues",
+      "check": "candidate.section.headingMatch == true",
+      "failureAction": "APPLY_HEADING_BOOST",
+      "severity": "high",
+      "action": {
+        "type": "boost",
+        "delta": 0.12
+      }
+    },
+    {
+      "id": "RANK_003_table_preference_for_tabular_queries",
+      "trigger": "Query indicates a table-oriented extraction need",
+      "check": "query.hasTabularSignal == true",
+      "failureAction": "APPLY_TABULAR_CANDIDATE_BOOST",
+      "severity": "high",
+      "action": {
+        "type": "boost",
+        "delta": 0.1
+      }
+    },
+    {
+      "id": "RANK_004_soft_penalize_low_relevance_chunk",
+      "trigger": "Candidate chunk relevance is very low",
+      "check": "candidate.finalScore < 0.22 OR candidate.chunkRelevance < 0.18",
+      "failureAction": "EXCLUDE_CANDIDATE",
+      "severity": "warning",
+      "action": {
+        "type": "downscore",
+        "delta": -0.2
+      }
+    },
+    {
+      "id": "RANK_005_balance_diversity",
+      "trigger": "Too many high-score chunks from same document",
+      "check": "docChunkCount[candidate.docId] > 6 AND candidate.rank > 10",
+      "failureAction": "DOWNRANK_DOC_CROWD",
+      "severity": "info",
+      "action": {
+        "type": "downscore",
+        "delta": -0.08
+      }
+    }
+  ],
+  "templates": [
+    {
+      "id": "RANKER_CONFIG_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in ranker_config.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

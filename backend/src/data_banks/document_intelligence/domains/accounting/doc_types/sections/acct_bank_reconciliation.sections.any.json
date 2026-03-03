@@ -25,6 +25,7 @@
       "headingAnchors": [
         "Bank Reconciliation",
         "Conciliacao Bancaria",
+        "Reconciliation",
         "Period",
         "Entity"
       ]
@@ -32,23 +33,24 @@
     {
       "id": "line_items",
       "name": {
-        "en": "Line Items",
-        "pt": "Itens"
+        "en": "Reconciliation Items",
+        "pt": "Itens da Conciliacao"
       },
       "required": true,
       "order": 2,
       "headingAnchors": [
         "Detail",
-        "Transactions",
-        "Lines",
-        "Detalhes"
+        "Outstanding",
+        "Items",
+        "Detalhes",
+        "Transacoes"
       ]
     },
     {
-      "id": "summary",
+      "id": "reconciliation_summary",
       "name": {
-        "en": "Summary",
-        "pt": "Resumo"
+        "en": "Reconciliation Summary",
+        "pt": "Resumo da Conciliacao"
       },
       "required": true,
       "order": 3,
@@ -60,17 +62,31 @@
       ]
     },
     {
+      "id": "currency_adjustments",
+      "name": {
+        "en": "Currency Adjustments",
+        "pt": "Ajustes de Moeda"
+      },
+      "required": false,
+      "order": 4,
+      "headingAnchors": [
+        "Exchange",
+        "Currency",
+        "FX",
+        "Moeda"
+      ]
+    },
+    {
       "id": "signoff",
       "name": {
         "en": "Sign-off",
         "pt": "Aprovacao"
       },
       "required": false,
-      "order": 4,
+      "order": 5,
       "headingAnchors": [
-        "Approval",
-        "Reviewed by",
         "Approved by",
+        "Reviewed by",
         "Aprovado por"
       ]
     }

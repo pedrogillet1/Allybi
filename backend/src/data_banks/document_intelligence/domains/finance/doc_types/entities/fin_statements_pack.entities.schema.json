@@ -1,114 +1,1045 @@
 {
   "_meta": {
     "id": "di_finance_entities_fin_statements_pack",
-    "version": "2.0.0",
-    "description": "Entity extraction schema for fin_statements_pack.",
+    "version": "2.1.0",
+    "description": "Entity schema for Statements Pack.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "docType": "fin_statements_pack"
+    "docType": "fin_statements_pack",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
   },
   "entities": [
     {
       "id": "document_id",
       "type": "string",
       "required": true,
-      "description": "Unique document identifier"
+      "evidenceRequirement": [
+        "header_id",
+        "source_table"
+      ],
+      "notes": "document-level evidence required"
     },
     {
-      "id": "reporting_entity",
+      "id": "source_file_name",
       "type": "string",
       "required": true,
-      "description": "Entity or BU covered"
+      "evidenceRequirement": [
+        "file_metadata"
+      ],
+      "notes": "source file provenance"
     },
     {
-      "id": "period_start",
-      "type": "date",
+      "id": "extraction_timestamp",
+      "type": "datetime",
       "required": true,
-      "description": "Period start date"
-    },
-    {
-      "id": "period_end",
-      "type": "date",
-      "required": true,
-      "description": "Period end date"
+      "evidenceRequirement": [
+        "ingestion_metadata"
+      ],
+      "notes": "must include parse timestamp"
     },
     {
       "id": "currency",
+      "canonical": "currency",
       "type": "string",
       "required": true,
-      "description": "ISO currency code"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: currency from table/header context."
     },
     {
       "id": "unit_scale",
-      "type": "string",
+      "canonical": "unit_scale",
+      "type": "number",
       "required": true,
-      "description": "Unit scale (units, thousands, millions)"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: unit_scale from table/header context."
+    },
+    {
+      "id": "reporting_period_start",
+      "canonical": "reporting_period_start",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: reporting_period_start from table/header context."
+    },
+    {
+      "id": "reporting_period_end",
+      "canonical": "reporting_period_end",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: reporting_period_end from table/header context."
+    },
+    {
+      "id": "comparative_period_2",
+      "canonical": "comparative_period_2",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: comparative_period_2 from table/header context."
+    },
+    {
+      "id": "company_name",
+      "canonical": "company_name",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: company_name from table/header context."
+    },
+    {
+      "id": "report_type",
+      "canonical": "report_type",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: report_type from table/header context."
     },
     {
       "id": "revenue",
-      "type": "currency",
-      "required": false,
-      "description": "Revenue amount"
+      "canonical": "revenue",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: revenue from table/header context."
+    },
+    {
+      "id": "gross_profit",
+      "canonical": "gross_profit",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: gross_profit from table/header context."
     },
     {
       "id": "ebitda",
+      "canonical": "ebitda",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: ebitda from table/header context."
+    },
+    {
+      "id": "ebit",
+      "canonical": "ebit",
       "type": "currency",
-      "required": false,
-      "description": "EBITDA amount"
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: ebit from table/header context."
+    },
+    {
+      "id": "income_tax_expense",
+      "canonical": "income_tax_expense",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: income_tax_expense from table/header context."
     },
     {
       "id": "net_income",
-      "type": "currency",
+      "canonical": "net_income",
+      "type": "boolean",
       "required": false,
-      "description": "Net income amount"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: net_income from table/header context."
     },
     {
-      "id": "cash_position",
-      "type": "currency",
+      "id": "assets",
+      "canonical": "assets",
+      "type": "array",
       "required": false,
-      "description": "Cash balance"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: assets from table/header context."
     },
     {
-      "id": "variance_percent",
-      "type": "number",
-      "required": false,
-      "description": "Variance percentage"
-    },
-    {
-      "id": "source_table_ref",
+      "id": "liabilities",
+      "canonical": "liabilities",
       "type": "string",
-      "required": true,
-      "description": "Source table identifier"
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: liabilities from table/header context."
     },
     {
-      "id": "kpi_revenue",
+      "id": "equity",
+      "canonical": "equity",
       "type": "number",
       "required": false,
-      "description": "KPI reference for revenue"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: equity from table/header context."
     },
     {
-      "id": "kpi_gross_profit",
-      "type": "number",
+      "id": "operating_cash_flow",
+      "canonical": "operating_cash_flow",
+      "type": "date",
       "required": false,
-      "description": "KPI reference for gross_profit"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: operating_cash_flow from table/header context."
     },
     {
-      "id": "kpi_total_assets",
-      "type": "number",
+      "id": "investing_cash_flow",
+      "canonical": "investing_cash_flow",
+      "type": "currency",
       "required": false,
-      "description": "KPI reference for total_assets"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: investing_cash_flow from table/header context."
     },
     {
-      "id": "kpi_cash",
+      "id": "financing_cash_flow",
+      "canonical": "financing_cash_flow",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: financing_cash_flow from table/header context."
+    },
+    {
+      "id": "tax_line_items",
+      "canonical": "tax_line_items",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: tax_line_items from table/header context."
+    },
+    {
+      "id": "extraordinary_items",
+      "canonical": "extraordinary_items",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: extraordinary_items from table/header context."
+    },
+    {
+      "id": "share_based_comp",
+      "canonical": "share_based_comp",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: share_based_comp from table/header context."
+    },
+    {
+      "id": "preferred_stock",
+      "canonical": "preferred_stock",
       "type": "number",
       "required": false,
-      "description": "KPI reference for cash"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: preferred_stock from table/header context."
+    },
+    {
+      "id": "equity_attribution",
+      "canonical": "equity_attribution",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: equity_attribution from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_25",
+      "canonical": "statements_pack_metric_25",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_25 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_26",
+      "canonical": "statements_pack_metric_26",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_26 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_27",
+      "canonical": "statements_pack_metric_27",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_27 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_28",
+      "canonical": "statements_pack_metric_28",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_28 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_29",
+      "canonical": "statements_pack_metric_29",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_29 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_30",
+      "canonical": "statements_pack_metric_30",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_30 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_31",
+      "canonical": "statements_pack_metric_31",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_31 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_32",
+      "canonical": "statements_pack_metric_32",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_32 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_33",
+      "canonical": "statements_pack_metric_33",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_33 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_34",
+      "canonical": "statements_pack_metric_34",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_34 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_35",
+      "canonical": "statements_pack_metric_35",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_35 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_36",
+      "canonical": "statements_pack_metric_36",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_36 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_37",
+      "canonical": "statements_pack_metric_37",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_37 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_38",
+      "canonical": "statements_pack_metric_38",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_38 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_39",
+      "canonical": "statements_pack_metric_39",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_39 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_40",
+      "canonical": "statements_pack_metric_40",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_40 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_41",
+      "canonical": "statements_pack_metric_41",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_41 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_42",
+      "canonical": "statements_pack_metric_42",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_42 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_43",
+      "canonical": "statements_pack_metric_43",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_43 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_44",
+      "canonical": "statements_pack_metric_44",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_44 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_45",
+      "canonical": "statements_pack_metric_45",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_45 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_46",
+      "canonical": "statements_pack_metric_46",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_46 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_47",
+      "canonical": "statements_pack_metric_47",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_47 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_48",
+      "canonical": "statements_pack_metric_48",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_48 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_49",
+      "canonical": "statements_pack_metric_49",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_49 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_50",
+      "canonical": "statements_pack_metric_50",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_50 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_51",
+      "canonical": "statements_pack_metric_51",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_51 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_52",
+      "canonical": "statements_pack_metric_52",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_52 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_53",
+      "canonical": "statements_pack_metric_53",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_53 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_54",
+      "canonical": "statements_pack_metric_54",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_54 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_55",
+      "canonical": "statements_pack_metric_55",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_55 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_56",
+      "canonical": "statements_pack_metric_56",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_56 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_57",
+      "canonical": "statements_pack_metric_57",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_57 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_58",
+      "canonical": "statements_pack_metric_58",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_58 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_59",
+      "canonical": "statements_pack_metric_59",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_59 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_60",
+      "canonical": "statements_pack_metric_60",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_60 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_61",
+      "canonical": "statements_pack_metric_61",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_61 from table/header context."
+    },
+    {
+      "id": "statements_pack_metric_62",
+      "canonical": "statements_pack_metric_62",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Statements Pack: statements_pack_metric_62 from table/header context."
     }
   ]
 }

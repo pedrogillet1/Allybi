@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "doc_lock_policy",
+    "version": "1.0.0",
+    "description": "Document lock and scope enforcement policy for retrieval stage.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLockTtlMinutes": 90,
+    "maxConsecutiveFollowupsWithLock": 12,
+    "allowUnlockOnExplicitCompare": true
+  },
+  "rules": [
+    {
+      "id": "LOCK_001_activate_on_explicit",
+      "trigger": "A specific document filename, alias, or ID is explicitly referenced",
+      "check": "context.explicitDocReference == true",
+      "failureAction": "ACTIVATE_DOC_LOCK",
+      "severity": "high"
+    },
+    {
+      "id": "LOCK_002_keep_lock_on_followup",
+      "trigger": "Follow-up does not change target and current lock is active",
+      "check": "context.docLock.active == true AND context.currentQuery.isFollowup == true AND context.currentQuery.hasNewDocRef == false",
+      "failureAction": "PRESERVE_DOC_LOCK",
+      "severity": "medium"
+    },
+    {
+      "id": "LOCK_003_release_on_compare_scope",
+      "trigger": "Compare intent includes explicit second doc or across-all cue",
+      "check": "context.intent == 'compare' OR context.currentQuery.includes('across')",
+      "failureAction": "RELEASE_DOC_LOCK_FOR_COMPARISON",
+      "severity": "medium"
+    },
+    {
+      "id": "LOCK_004_block_cross_doc_without_compare",
+      "trigger": "Active doc lock exists and retrieval includes other documents in non-compare mode",
+      "check": "context.docLock.active == true AND context.intent != 'compare' AND context.explicitDocCandidatesFromRetrieval > 1",
+      "failureAction": "FILTER_TO_LOCKED_DOC",
+      "severity": "error"
+    },
+    {
+      "id": "LOCK_005_release_on_discovery",
+      "trigger": "Discovery/list-all query while lock is active",
+      "check": "context.intentFamily == 'discovery' OR context.queryText.matches('(all|any|any of|todos|todas)')",
+      "failureAction": "RELEASE_DOC_LOCK",
+      "severity": "warning"
+    },
+    {
+      "id": "LOCK_006_refresh_lock_on_new_ref",
+      "trigger": "New explicit doc reference differs from current lock",
+      "check": "context.docLock.active == true AND context.currentQuery.explicitDocId != context.docLock.docId",
+      "failureAction": "SWAP_DOC_LOCK",
+      "severity": "medium"
+    }
+  ],
+  "templates": [
+    {
+      "id": "DOC_LOCK_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in doc_lock_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "id": "di_everyday_abbreviations_en",
+    "version": "1.0.0",
+    "description": "EN abbreviations for everyday domain.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "language": "en"
+  },
+  "domain": "everyday",
+  "abbreviations": [
+    { "abbr": "acct", "expansion": "account" },
+    { "abbr": "acc", "expansion": "account" },
+    { "abbr": "AP", "expansion": "accounts payable" },
+    { "abbr": "AR", "expansion": "accounts receivable" },
+    { "abbr": "APR", "expansion": "annual percentage rate" },
+    { "abbr": "DOB", "expansion": "date of birth" },
+    { "abbr": "due", "expansion": "due" },
+    { "abbr": "ed", "expansion": "estimated delivery" },
+    { "abbr": "eop", "expansion": "end of period" },
+    { "abbr": "ER", "expansion": "earned revenue" },
+    { "abbr": "FY", "expansion": "fiscal year" },
+    { "abbr": "ID", "expansion": "identification" },
+    { "abbr": "IMEI", "expansion": "international mobile equipment identity" },
+    { "abbr": "IR", "expansion": "income statement" },
+    { "abbr": "KWH", "expansion": "kilowatt hour" },
+    { "abbr": "MTD", "expansion": "month to date" },
+    { "abbr": "PO", "expansion": "purchase order" },
+    { "abbr": "pp", "expansion": "pay period" },
+    { "abbr": "PSP", "expansion": "payment settlement process" },
+    { "abbr": "PTO", "expansion": "prior tax obligation" },
+    { "abbr": "RF", "expansion": "receipt footer" },
+    { "abbr": "ROI", "expansion": "return on investment" },
+    { "abbr": "SMS", "expansion": "short message service" },
+    { "abbr": "SSN", "expansion": "social security number" },
+    { "abbr": "T&C", "expansion": "terms and conditions" },
+    { "abbr": "TLF", "expansion": "telephony" },
+    { "abbr": "TP", "expansion": "tenant profile" },
+    { "abbr": "UOM", "expansion": "unit of measure" },
+    { "abbr": "VAT", "expansion": "value added tax" },
+    { "abbr": "VOIP", "expansion": "voice over internet protocol" },
+    { "abbr": "YTD", "expansion": "year to date" }
+  ]
+}

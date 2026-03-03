@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -720,5 +726,47 @@
       "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
       "template": "Audiencia=auditor; Profundidade=detailed; Forneca explicacao com limites de evidencia, opcoes, riscos e o que muda minha opiniao."
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "MED_EXPL_001_medical_disclaimer",
+      "trigger": "medical explanation lacks clinical disclaimer",
+      "check": "context.domain=='medical' && output.includesHealthAdvice == true && output.disclaimerPresent == false",
+      "failureAction": "INSERT_CLINICAL_DISCLAIMER"
+    },
+    {
+      "id": "MED_EXPL_002_lab_unit_guard",
+      "trigger": "medical explanation omits lab units",
+      "check": "context.domain=='medical' && output.labValuesPresent == true && output.unitCoverage < 1",
+      "failureAction": "APPEND_UNIT_CONTEXT"
+    },
+    {
+      "id": "MED_EXPL_003_reference_uncertainty",
+      "trigger": "medical answer includes uncertain claim unsupported by evidence",
+      "check": "context.domain=='medical' && output.uncertaintyState == 'none' && context.clinicalEvidenceQuality < 0.8",
+      "failureAction": "ADD_UNCERTAINTY_MARKER"
+    },
+    {
+      "id": "MED_EXPL_004_scope_guard",
+      "trigger": "medical response spans multiple patients without clear scope",
+      "check": "context.domain=='medical' && context.patientAmbiguous == true",
+      "failureAction": "ASK_PATIENT_SCOPE"
+    },
+    {
+      "id": "MED_EXPL_005_compare_disclosure",
+      "trigger": "medical compare mode missing explicit side labels",
+      "check": "context.domain=='medical' && context.intent=='compare' && output.comparisonLabelsMissing == true",
+      "failureAction": "RENDER_SIDE_LABELS"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "MED_EXPL_SMOKE_001"
+      }
+    ]
+  }
 }

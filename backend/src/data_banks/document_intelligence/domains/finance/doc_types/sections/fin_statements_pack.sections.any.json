@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_statements_pack",
-    "version": "2.0.0",
-    "description": "Section map for fin_statements_pack.",
+    "version": "2.1.0",
+    "description": "Sections mapping for Statements Pack.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,76 +15,1368 @@
   },
   "sections": [
     {
-      "id": "executive_summary",
+      "id": "balance_sheet_1",
       "name": {
-        "en": "Executive Summary",
-        "pt": "Resumo Executivo"
+        "en": "Balance Sheet Segment 1",
+        "pt": "Balance Sheet segmento 1"
       },
-      "required": true,
-      "order": 1
+      "mustHave": true,
+      "order": 1,
+      "headingAnchors": [
+        "Balance Sheet 1",
+        "balance_sheet 1",
+        "Balance Sheet section",
+        "seção Balance Sheet 1"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bbalance_sheet\b",
+        "\bbalance_sheet_1\b",
+        "\bbalance_sheet section\b"
+      ],
+      "description": "Canonical section balance_sheet for Statements Pack"
     },
     {
-      "id": "period_scope",
+      "id": "income_statement_2",
       "name": {
-        "en": "Period and Scope",
-        "pt": "Periodo e Escopo"
+        "en": "Income Statement Segment 2",
+        "pt": "Income Statement segmento 2"
       },
-      "required": true,
-      "order": 2
+      "mustHave": true,
+      "order": 2,
+      "headingAnchors": [
+        "Income Statement 2",
+        "income_statement 2",
+        "Income Statement section",
+        "seção Income Statement 2"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bincome_statement\b",
+        "\bincome_statement_2\b",
+        "\bincome_statement section\b"
+      ],
+      "description": "Canonical section income_statement for Statements Pack"
     },
     {
-      "id": "assumptions",
+      "id": "cash_flow_3",
       "name": {
-        "en": "Assumptions",
-        "pt": "Premissas"
+        "en": "Cash Flow Segment 3",
+        "pt": "Cash Flow segmento 3"
       },
-      "required": false,
-      "order": 3
+      "mustHave": true,
+      "order": 3,
+      "headingAnchors": [
+        "Cash Flow 3",
+        "cash_flow 3",
+        "Cash Flow section",
+        "seção Cash Flow 3"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bcash_flow\b",
+        "\bcash_flow_3\b",
+        "\bcash_flow section\b"
+      ],
+      "description": "Canonical section cash_flow for Statements Pack"
     },
     {
-      "id": "tables_primary",
+      "id": "equity_changes_4",
       "name": {
-        "en": "Primary Tables",
-        "pt": "Tabelas Principais"
+        "en": "Equity Changes Segment 4",
+        "pt": "Equity Changes segmento 4"
       },
-      "required": true,
-      "order": 4
+      "mustHave": true,
+      "order": 4,
+      "headingAnchors": [
+        "Equity Changes 4",
+        "equity_changes 4",
+        "Equity Changes section",
+        "seção Equity Changes 4"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bequity_changes\b",
+        "\bequity_changes_4\b",
+        "\bequity_changes section\b"
+      ],
+      "description": "Canonical section equity_changes for Statements Pack"
     },
     {
-      "id": "variance_and_drivers",
+      "id": "notes_summary_5",
       "name": {
-        "en": "Variance and Drivers",
-        "pt": "Variacoes e Drivers"
+        "en": "Notes Summary Segment 5",
+        "pt": "Notes Summary segmento 5"
       },
-      "required": false,
-      "order": 5
+      "mustHave": true,
+      "order": 5,
+      "headingAnchors": [
+        "Notes Summary 5",
+        "notes_summary 5",
+        "Notes Summary section",
+        "seção Notes Summary 5"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bnotes_summary\b",
+        "\bnotes_summary_5\b",
+        "\bnotes_summary section\b"
+      ],
+      "description": "Canonical section notes_summary for Statements Pack"
     },
     {
-      "id": "risks_and_constraints",
+      "id": "policy_discussion_6",
       "name": {
-        "en": "Risks and Constraints",
-        "pt": "Riscos e Restricoes"
+        "en": "Policy Discussion Segment 6",
+        "pt": "Policy Discussion segmento 6"
       },
-      "required": false,
-      "order": 6
+      "mustHave": true,
+      "order": 6,
+      "headingAnchors": [
+        "Policy Discussion 6",
+        "policy_discussion 6",
+        "Policy Discussion section",
+        "seção Policy Discussion 6"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bpolicy_discussion\b",
+        "\bpolicy_discussion_6\b",
+        "\bpolicy_discussion section\b"
+      ],
+      "description": "Canonical section policy_discussion for Statements Pack"
     },
     {
-      "id": "definitions",
+      "id": "variance_note_7",
       "name": {
-        "en": "Definitions",
-        "pt": "Definicoes"
+        "en": "Variance Note Segment 7",
+        "pt": "Variacao Note segmento 7"
       },
-      "required": true,
-      "order": 7
+      "mustHave": true,
+      "order": 7,
+      "headingAnchors": [
+        "Variance Note 7",
+        "variance_note 7",
+        "Variance Note section",
+        "seção Variance Note 7"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bvariance_note\b",
+        "\bvariance_note_7\b",
+        "\bvariance_note section\b"
+      ],
+      "description": "Canonical section variance_note for Statements Pack"
     },
     {
-      "id": "appendix",
+      "id": "ratios_8",
       "name": {
-        "en": "Appendix",
-        "pt": "Anexos"
+        "en": "Ratios Segment 8",
+        "pt": "Ratios segmento 8"
       },
-      "required": false,
-      "order": 8
+      "mustHave": true,
+      "order": 8,
+      "headingAnchors": [
+        "Ratios 8",
+        "ratios 8",
+        "Ratios section",
+        "seção Ratios 8"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bratios\b",
+        "\bratios_8\b",
+        "\bratios section\b"
+      ],
+      "description": "Canonical section ratios for Statements Pack"
+    },
+    {
+      "id": "segment_data_9",
+      "name": {
+        "en": "Segment Data Segment 9",
+        "pt": "Segment Data segmento 9"
+      },
+      "mustHave": true,
+      "order": 9,
+      "headingAnchors": [
+        "Segment Data 9",
+        "segment_data 9",
+        "Segment Data section",
+        "seção Segment Data 9"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bsegment_data\b",
+        "\bsegment_data_9\b",
+        "\bsegment_data section\b"
+      ],
+      "description": "Canonical section segment_data for Statements Pack"
+    },
+    {
+      "id": "audit_summary_10",
+      "name": {
+        "en": "Audit Summary Segment 10",
+        "pt": "Audit Summary segmento 10"
+      },
+      "mustHave": true,
+      "order": 10,
+      "headingAnchors": [
+        "Audit Summary 10",
+        "audit_summary 10",
+        "Audit Summary section",
+        "seção Audit Summary 10"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\baudit_summary\b",
+        "\baudit_summary_10\b",
+        "\baudit_summary section\b"
+      ],
+      "description": "Canonical section audit_summary for Statements Pack"
+    },
+    {
+      "id": "signatures_11",
+      "name": {
+        "en": "Signatures Segment 11",
+        "pt": "Signatures segmento 11"
+      },
+      "mustHave": false,
+      "order": 11,
+      "headingAnchors": [
+        "Signatures 11",
+        "signatures 11",
+        "Signatures section",
+        "seção Signatures 11"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bsignatures\b",
+        "\bsignatures_11\b",
+        "\bsignatures section\b"
+      ],
+      "description": "Canonical section signatures for Statements Pack"
+    },
+    {
+      "id": "statement_bundle_12",
+      "name": {
+        "en": "Statement Bundle Segment 12",
+        "pt": "Statement Bundle segmento 12"
+      },
+      "mustHave": false,
+      "order": 12,
+      "headingAnchors": [
+        "Statement Bundle 12",
+        "statement_bundle 12",
+        "Statement Bundle section",
+        "seção Statement Bundle 12"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bstatement_bundle\b",
+        "\bstatement_bundle_12\b",
+        "\bstatement_bundle section\b"
+      ],
+      "description": "Canonical section statement_bundle for Statements Pack"
+    },
+    {
+      "id": "balance_sheet_13",
+      "name": {
+        "en": "Balance Sheet Segment 13",
+        "pt": "Balance Sheet segmento 13"
+      },
+      "mustHave": false,
+      "order": 13,
+      "headingAnchors": [
+        "Balance Sheet 13",
+        "balance_sheet 13",
+        "Balance Sheet section",
+        "seção Balance Sheet 13"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bbalance_sheet\b",
+        "\bbalance_sheet_13\b",
+        "\bbalance_sheet section\b"
+      ],
+      "description": "Canonical section balance_sheet for Statements Pack"
+    },
+    {
+      "id": "income_statement_14",
+      "name": {
+        "en": "Income Statement Segment 14",
+        "pt": "Income Statement segmento 14"
+      },
+      "mustHave": false,
+      "order": 14,
+      "headingAnchors": [
+        "Income Statement 14",
+        "income_statement 14",
+        "Income Statement section",
+        "seção Income Statement 14"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bincome_statement\b",
+        "\bincome_statement_14\b",
+        "\bincome_statement section\b"
+      ],
+      "description": "Canonical section income_statement for Statements Pack"
+    },
+    {
+      "id": "cash_flow_15",
+      "name": {
+        "en": "Cash Flow Segment 15",
+        "pt": "Cash Flow segmento 15"
+      },
+      "mustHave": false,
+      "order": 15,
+      "headingAnchors": [
+        "Cash Flow 15",
+        "cash_flow 15",
+        "Cash Flow section",
+        "seção Cash Flow 15"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bcash_flow\b",
+        "\bcash_flow_15\b",
+        "\bcash_flow section\b"
+      ],
+      "description": "Canonical section cash_flow for Statements Pack"
+    },
+    {
+      "id": "equity_changes_16",
+      "name": {
+        "en": "Equity Changes Segment 16",
+        "pt": "Equity Changes segmento 16"
+      },
+      "mustHave": false,
+      "order": 16,
+      "headingAnchors": [
+        "Equity Changes 16",
+        "equity_changes 16",
+        "Equity Changes section",
+        "seção Equity Changes 16"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bequity_changes\b",
+        "\bequity_changes_16\b",
+        "\bequity_changes section\b"
+      ],
+      "description": "Canonical section equity_changes for Statements Pack"
+    },
+    {
+      "id": "notes_summary_17",
+      "name": {
+        "en": "Notes Summary Segment 17",
+        "pt": "Notes Summary segmento 17"
+      },
+      "mustHave": false,
+      "order": 17,
+      "headingAnchors": [
+        "Notes Summary 17",
+        "notes_summary 17",
+        "Notes Summary section",
+        "seção Notes Summary 17"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bnotes_summary\b",
+        "\bnotes_summary_17\b",
+        "\bnotes_summary section\b"
+      ],
+      "description": "Canonical section notes_summary for Statements Pack"
+    },
+    {
+      "id": "policy_discussion_18",
+      "name": {
+        "en": "Policy Discussion Segment 18",
+        "pt": "Policy Discussion segmento 18"
+      },
+      "mustHave": false,
+      "order": 18,
+      "headingAnchors": [
+        "Policy Discussion 18",
+        "policy_discussion 18",
+        "Policy Discussion section",
+        "seção Policy Discussion 18"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bpolicy_discussion\b",
+        "\bpolicy_discussion_18\b",
+        "\bpolicy_discussion section\b"
+      ],
+      "description": "Canonical section policy_discussion for Statements Pack"
+    },
+    {
+      "id": "variance_note_19",
+      "name": {
+        "en": "Variance Note Segment 19",
+        "pt": "Variacao Note segmento 19"
+      },
+      "mustHave": false,
+      "order": 19,
+      "headingAnchors": [
+        "Variance Note 19",
+        "variance_note 19",
+        "Variance Note section",
+        "seção Variance Note 19"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bvariance_note\b",
+        "\bvariance_note_19\b",
+        "\bvariance_note section\b"
+      ],
+      "description": "Canonical section variance_note for Statements Pack"
+    },
+    {
+      "id": "ratios_20",
+      "name": {
+        "en": "Ratios Segment 20",
+        "pt": "Ratios segmento 20"
+      },
+      "mustHave": false,
+      "order": 20,
+      "headingAnchors": [
+        "Ratios 20",
+        "ratios 20",
+        "Ratios section",
+        "seção Ratios 20"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bratios\b",
+        "\bratios_20\b",
+        "\bratios section\b"
+      ],
+      "description": "Canonical section ratios for Statements Pack"
+    },
+    {
+      "id": "segment_data_21",
+      "name": {
+        "en": "Segment Data Segment 21",
+        "pt": "Segment Data segmento 21"
+      },
+      "mustHave": false,
+      "order": 21,
+      "headingAnchors": [
+        "Segment Data 21",
+        "segment_data 21",
+        "Segment Data section",
+        "seção Segment Data 21"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bsegment_data\b",
+        "\bsegment_data_21\b",
+        "\bsegment_data section\b"
+      ],
+      "description": "Canonical section segment_data for Statements Pack"
+    },
+    {
+      "id": "audit_summary_22",
+      "name": {
+        "en": "Audit Summary Segment 22",
+        "pt": "Audit Summary segmento 22"
+      },
+      "mustHave": false,
+      "order": 22,
+      "headingAnchors": [
+        "Audit Summary 22",
+        "audit_summary 22",
+        "Audit Summary section",
+        "seção Audit Summary 22"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\baudit_summary\b",
+        "\baudit_summary_22\b",
+        "\baudit_summary section\b"
+      ],
+      "description": "Canonical section audit_summary for Statements Pack"
+    },
+    {
+      "id": "signatures_23",
+      "name": {
+        "en": "Signatures Segment 23",
+        "pt": "Signatures segmento 23"
+      },
+      "mustHave": false,
+      "order": 23,
+      "headingAnchors": [
+        "Signatures 23",
+        "signatures 23",
+        "Signatures section",
+        "seção Signatures 23"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bsignatures\b",
+        "\bsignatures_23\b",
+        "\bsignatures section\b"
+      ],
+      "description": "Canonical section signatures for Statements Pack"
+    },
+    {
+      "id": "statement_bundle_24",
+      "name": {
+        "en": "Statement Bundle Segment 24",
+        "pt": "Statement Bundle segmento 24"
+      },
+      "mustHave": false,
+      "order": 24,
+      "headingAnchors": [
+        "Statement Bundle 24",
+        "statement_bundle 24",
+        "Statement Bundle section",
+        "seção Statement Bundle 24"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bstatement_bundle\b",
+        "\bstatement_bundle_24\b",
+        "\bstatement_bundle section\b"
+      ],
+      "description": "Canonical section statement_bundle for Statements Pack"
+    },
+    {
+      "id": "balance_sheet_25",
+      "name": {
+        "en": "Balance Sheet Segment 25",
+        "pt": "Balance Sheet segmento 25"
+      },
+      "mustHave": false,
+      "order": 25,
+      "headingAnchors": [
+        "Balance Sheet 25",
+        "balance_sheet 25",
+        "Balance Sheet section",
+        "seção Balance Sheet 25"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bbalance_sheet\b",
+        "\bbalance_sheet_25\b",
+        "\bbalance_sheet section\b"
+      ],
+      "description": "Canonical section balance_sheet for Statements Pack"
+    },
+    {
+      "id": "income_statement_26",
+      "name": {
+        "en": "Income Statement Segment 26",
+        "pt": "Income Statement segmento 26"
+      },
+      "mustHave": false,
+      "order": 26,
+      "headingAnchors": [
+        "Income Statement 26",
+        "income_statement 26",
+        "Income Statement section",
+        "seção Income Statement 26"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bincome_statement\b",
+        "\bincome_statement_26\b",
+        "\bincome_statement section\b"
+      ],
+      "description": "Canonical section income_statement for Statements Pack"
+    },
+    {
+      "id": "cash_flow_27",
+      "name": {
+        "en": "Cash Flow Segment 27",
+        "pt": "Cash Flow segmento 27"
+      },
+      "mustHave": false,
+      "order": 27,
+      "headingAnchors": [
+        "Cash Flow 27",
+        "cash_flow 27",
+        "Cash Flow section",
+        "seção Cash Flow 27"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bcash_flow\b",
+        "\bcash_flow_27\b",
+        "\bcash_flow section\b"
+      ],
+      "description": "Canonical section cash_flow for Statements Pack"
+    },
+    {
+      "id": "equity_changes_28",
+      "name": {
+        "en": "Equity Changes Segment 28",
+        "pt": "Equity Changes segmento 28"
+      },
+      "mustHave": false,
+      "order": 28,
+      "headingAnchors": [
+        "Equity Changes 28",
+        "equity_changes 28",
+        "Equity Changes section",
+        "seção Equity Changes 28"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bequity_changes\b",
+        "\bequity_changes_28\b",
+        "\bequity_changes section\b"
+      ],
+      "description": "Canonical section equity_changes for Statements Pack"
+    },
+    {
+      "id": "notes_summary_29",
+      "name": {
+        "en": "Notes Summary Segment 29",
+        "pt": "Notes Summary segmento 29"
+      },
+      "mustHave": false,
+      "order": 29,
+      "headingAnchors": [
+        "Notes Summary 29",
+        "notes_summary 29",
+        "Notes Summary section",
+        "seção Notes Summary 29"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bnotes_summary\b",
+        "\bnotes_summary_29\b",
+        "\bnotes_summary section\b"
+      ],
+      "description": "Canonical section notes_summary for Statements Pack"
+    },
+    {
+      "id": "policy_discussion_30",
+      "name": {
+        "en": "Policy Discussion Segment 30",
+        "pt": "Policy Discussion segmento 30"
+      },
+      "mustHave": false,
+      "order": 30,
+      "headingAnchors": [
+        "Policy Discussion 30",
+        "policy_discussion 30",
+        "Policy Discussion section",
+        "seção Policy Discussion 30"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bpolicy_discussion\b",
+        "\bpolicy_discussion_30\b",
+        "\bpolicy_discussion section\b"
+      ],
+      "description": "Canonical section policy_discussion for Statements Pack"
+    },
+    {
+      "id": "variance_note_31",
+      "name": {
+        "en": "Variance Note Segment 31",
+        "pt": "Variacao Note segmento 31"
+      },
+      "mustHave": false,
+      "order": 31,
+      "headingAnchors": [
+        "Variance Note 31",
+        "variance_note 31",
+        "Variance Note section",
+        "seção Variance Note 31"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bvariance_note\b",
+        "\bvariance_note_31\b",
+        "\bvariance_note section\b"
+      ],
+      "description": "Canonical section variance_note for Statements Pack"
+    },
+    {
+      "id": "ratios_32",
+      "name": {
+        "en": "Ratios Segment 32",
+        "pt": "Ratios segmento 32"
+      },
+      "mustHave": false,
+      "order": 32,
+      "headingAnchors": [
+        "Ratios 32",
+        "ratios 32",
+        "Ratios section",
+        "seção Ratios 32"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bratios\b",
+        "\bratios_32\b",
+        "\bratios section\b"
+      ],
+      "description": "Canonical section ratios for Statements Pack"
+    },
+    {
+      "id": "segment_data_33",
+      "name": {
+        "en": "Segment Data Segment 33",
+        "pt": "Segment Data segmento 33"
+      },
+      "mustHave": false,
+      "order": 33,
+      "headingAnchors": [
+        "Segment Data 33",
+        "segment_data 33",
+        "Segment Data section",
+        "seção Segment Data 33"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bsegment_data\b",
+        "\bsegment_data_33\b",
+        "\bsegment_data section\b"
+      ],
+      "description": "Canonical section segment_data for Statements Pack"
+    },
+    {
+      "id": "audit_summary_34",
+      "name": {
+        "en": "Audit Summary Segment 34",
+        "pt": "Audit Summary segmento 34"
+      },
+      "mustHave": false,
+      "order": 34,
+      "headingAnchors": [
+        "Audit Summary 34",
+        "audit_summary 34",
+        "Audit Summary section",
+        "seção Audit Summary 34"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\baudit_summary\b",
+        "\baudit_summary_34\b",
+        "\baudit_summary section\b"
+      ],
+      "description": "Canonical section audit_summary for Statements Pack"
+    },
+    {
+      "id": "signatures_35",
+      "name": {
+        "en": "Signatures Segment 35",
+        "pt": "Signatures segmento 35"
+      },
+      "mustHave": false,
+      "order": 35,
+      "headingAnchors": [
+        "Signatures 35",
+        "signatures 35",
+        "Signatures section",
+        "seção Signatures 35"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bsignatures\b",
+        "\bsignatures_35\b",
+        "\bsignatures section\b"
+      ],
+      "description": "Canonical section signatures for Statements Pack"
+    },
+    {
+      "id": "statement_bundle_36",
+      "name": {
+        "en": "Statement Bundle Segment 36",
+        "pt": "Statement Bundle segmento 36"
+      },
+      "mustHave": false,
+      "order": 36,
+      "headingAnchors": [
+        "Statement Bundle 36",
+        "statement_bundle 36",
+        "Statement Bundle section",
+        "seção Statement Bundle 36"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bstatement_bundle\b",
+        "\bstatement_bundle_36\b",
+        "\bstatement_bundle section\b"
+      ],
+      "description": "Canonical section statement_bundle for Statements Pack"
+    },
+    {
+      "id": "balance_sheet_37",
+      "name": {
+        "en": "Balance Sheet Segment 37",
+        "pt": "Balance Sheet segmento 37"
+      },
+      "mustHave": false,
+      "order": 37,
+      "headingAnchors": [
+        "Balance Sheet 37",
+        "balance_sheet 37",
+        "Balance Sheet section",
+        "seção Balance Sheet 37"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bbalance_sheet\b",
+        "\bbalance_sheet_37\b",
+        "\bbalance_sheet section\b"
+      ],
+      "description": "Canonical section balance_sheet for Statements Pack"
+    },
+    {
+      "id": "income_statement_38",
+      "name": {
+        "en": "Income Statement Segment 38",
+        "pt": "Income Statement segmento 38"
+      },
+      "mustHave": false,
+      "order": 38,
+      "headingAnchors": [
+        "Income Statement 38",
+        "income_statement 38",
+        "Income Statement section",
+        "seção Income Statement 38"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bincome_statement\b",
+        "\bincome_statement_38\b",
+        "\bincome_statement section\b"
+      ],
+      "description": "Canonical section income_statement for Statements Pack"
+    },
+    {
+      "id": "cash_flow_39",
+      "name": {
+        "en": "Cash Flow Segment 39",
+        "pt": "Cash Flow segmento 39"
+      },
+      "mustHave": false,
+      "order": 39,
+      "headingAnchors": [
+        "Cash Flow 39",
+        "cash_flow 39",
+        "Cash Flow section",
+        "seção Cash Flow 39"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bcash_flow\b",
+        "\bcash_flow_39\b",
+        "\bcash_flow section\b"
+      ],
+      "description": "Canonical section cash_flow for Statements Pack"
+    },
+    {
+      "id": "equity_changes_40",
+      "name": {
+        "en": "Equity Changes Segment 40",
+        "pt": "Equity Changes segmento 40"
+      },
+      "mustHave": false,
+      "order": 40,
+      "headingAnchors": [
+        "Equity Changes 40",
+        "equity_changes 40",
+        "Equity Changes section",
+        "seção Equity Changes 40"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bequity_changes\b",
+        "\bequity_changes_40\b",
+        "\bequity_changes section\b"
+      ],
+      "description": "Canonical section equity_changes for Statements Pack"
+    },
+    {
+      "id": "notes_summary_41",
+      "name": {
+        "en": "Notes Summary Segment 41",
+        "pt": "Notes Summary segmento 41"
+      },
+      "mustHave": false,
+      "order": 41,
+      "headingAnchors": [
+        "Notes Summary 41",
+        "notes_summary 41",
+        "Notes Summary section",
+        "seção Notes Summary 41"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bnotes_summary\b",
+        "\bnotes_summary_41\b",
+        "\bnotes_summary section\b"
+      ],
+      "description": "Canonical section notes_summary for Statements Pack"
+    },
+    {
+      "id": "policy_discussion_42",
+      "name": {
+        "en": "Policy Discussion Segment 42",
+        "pt": "Policy Discussion segmento 42"
+      },
+      "mustHave": false,
+      "order": 42,
+      "headingAnchors": [
+        "Policy Discussion 42",
+        "policy_discussion 42",
+        "Policy Discussion section",
+        "seção Policy Discussion 42"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bpolicy_discussion\b",
+        "\bpolicy_discussion_42\b",
+        "\bpolicy_discussion section\b"
+      ],
+      "description": "Canonical section policy_discussion for Statements Pack"
+    },
+    {
+      "id": "variance_note_43",
+      "name": {
+        "en": "Variance Note Segment 43",
+        "pt": "Variacao Note segmento 43"
+      },
+      "mustHave": false,
+      "order": 43,
+      "headingAnchors": [
+        "Variance Note 43",
+        "variance_note 43",
+        "Variance Note section",
+        "seção Variance Note 43"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bvariance_note\b",
+        "\bvariance_note_43\b",
+        "\bvariance_note section\b"
+      ],
+      "description": "Canonical section variance_note for Statements Pack"
+    },
+    {
+      "id": "ratios_44",
+      "name": {
+        "en": "Ratios Segment 44",
+        "pt": "Ratios segmento 44"
+      },
+      "mustHave": false,
+      "order": 44,
+      "headingAnchors": [
+        "Ratios 44",
+        "ratios 44",
+        "Ratios section",
+        "seção Ratios 44"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bratios\b",
+        "\bratios_44\b",
+        "\bratios section\b"
+      ],
+      "description": "Canonical section ratios for Statements Pack"
+    },
+    {
+      "id": "segment_data_45",
+      "name": {
+        "en": "Segment Data Segment 45",
+        "pt": "Segment Data segmento 45"
+      },
+      "mustHave": false,
+      "order": 45,
+      "headingAnchors": [
+        "Segment Data 45",
+        "segment_data 45",
+        "Segment Data section",
+        "seção Segment Data 45"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bsegment_data\b",
+        "\bsegment_data_45\b",
+        "\bsegment_data section\b"
+      ],
+      "description": "Canonical section segment_data for Statements Pack"
+    },
+    {
+      "id": "audit_summary_46",
+      "name": {
+        "en": "Audit Summary Segment 46",
+        "pt": "Audit Summary segmento 46"
+      },
+      "mustHave": false,
+      "order": 46,
+      "headingAnchors": [
+        "Audit Summary 46",
+        "audit_summary 46",
+        "Audit Summary section",
+        "seção Audit Summary 46"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\baudit_summary\b",
+        "\baudit_summary_46\b",
+        "\baudit_summary section\b"
+      ],
+      "description": "Canonical section audit_summary for Statements Pack"
+    },
+    {
+      "id": "signatures_47",
+      "name": {
+        "en": "Signatures Segment 47",
+        "pt": "Signatures segmento 47"
+      },
+      "mustHave": false,
+      "order": 47,
+      "headingAnchors": [
+        "Signatures 47",
+        "signatures 47",
+        "Signatures section",
+        "seção Signatures 47"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bsignatures\b",
+        "\bsignatures_47\b",
+        "\bsignatures section\b"
+      ],
+      "description": "Canonical section signatures for Statements Pack"
+    },
+    {
+      "id": "statement_bundle_48",
+      "name": {
+        "en": "Statement Bundle Segment 48",
+        "pt": "Statement Bundle segmento 48"
+      },
+      "mustHave": false,
+      "order": 48,
+      "headingAnchors": [
+        "Statement Bundle 48",
+        "statement_bundle 48",
+        "Statement Bundle section",
+        "seção Statement Bundle 48"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bstatement_bundle\b",
+        "\bstatement_bundle_48\b",
+        "\bstatement_bundle section\b"
+      ],
+      "description": "Canonical section statement_bundle for Statements Pack"
+    },
+    {
+      "id": "balance_sheet_49",
+      "name": {
+        "en": "Balance Sheet Segment 49",
+        "pt": "Balance Sheet segmento 49"
+      },
+      "mustHave": false,
+      "order": 49,
+      "headingAnchors": [
+        "Balance Sheet 49",
+        "balance_sheet 49",
+        "Balance Sheet section",
+        "seção Balance Sheet 49"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bbalance_sheet\b",
+        "\bbalance_sheet_49\b",
+        "\bbalance_sheet section\b"
+      ],
+      "description": "Canonical section balance_sheet for Statements Pack"
+    },
+    {
+      "id": "income_statement_50",
+      "name": {
+        "en": "Income Statement Segment 50",
+        "pt": "Income Statement segmento 50"
+      },
+      "mustHave": false,
+      "order": 50,
+      "headingAnchors": [
+        "Income Statement 50",
+        "income_statement 50",
+        "Income Statement section",
+        "seção Income Statement 50"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bincome_statement\b",
+        "\bincome_statement_50\b",
+        "\bincome_statement section\b"
+      ],
+      "description": "Canonical section income_statement for Statements Pack"
+    },
+    {
+      "id": "cash_flow_51",
+      "name": {
+        "en": "Cash Flow Segment 51",
+        "pt": "Cash Flow segmento 51"
+      },
+      "mustHave": false,
+      "order": 51,
+      "headingAnchors": [
+        "Cash Flow 51",
+        "cash_flow 51",
+        "Cash Flow section",
+        "seção Cash Flow 51"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bcash_flow\b",
+        "\bcash_flow_51\b",
+        "\bcash_flow section\b"
+      ],
+      "description": "Canonical section cash_flow for Statements Pack"
+    },
+    {
+      "id": "equity_changes_52",
+      "name": {
+        "en": "Equity Changes Segment 52",
+        "pt": "Equity Changes segmento 52"
+      },
+      "mustHave": false,
+      "order": 52,
+      "headingAnchors": [
+        "Equity Changes 52",
+        "equity_changes 52",
+        "Equity Changes section",
+        "seção Equity Changes 52"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bequity_changes\b",
+        "\bequity_changes_52\b",
+        "\bequity_changes section\b"
+      ],
+      "description": "Canonical section equity_changes for Statements Pack"
+    },
+    {
+      "id": "notes_summary_53",
+      "name": {
+        "en": "Notes Summary Segment 53",
+        "pt": "Notes Summary segmento 53"
+      },
+      "mustHave": false,
+      "order": 53,
+      "headingAnchors": [
+        "Notes Summary 53",
+        "notes_summary 53",
+        "Notes Summary section",
+        "seção Notes Summary 53"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bnotes_summary\b",
+        "\bnotes_summary_53\b",
+        "\bnotes_summary section\b"
+      ],
+      "description": "Canonical section notes_summary for Statements Pack"
+    },
+    {
+      "id": "policy_discussion_54",
+      "name": {
+        "en": "Policy Discussion Segment 54",
+        "pt": "Policy Discussion segmento 54"
+      },
+      "mustHave": false,
+      "order": 54,
+      "headingAnchors": [
+        "Policy Discussion 54",
+        "policy_discussion 54",
+        "Policy Discussion section",
+        "seção Policy Discussion 54"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bpolicy_discussion\b",
+        "\bpolicy_discussion_54\b",
+        "\bpolicy_discussion section\b"
+      ],
+      "description": "Canonical section policy_discussion for Statements Pack"
+    },
+    {
+      "id": "variance_note_55",
+      "name": {
+        "en": "Variance Note Segment 55",
+        "pt": "Variacao Note segmento 55"
+      },
+      "mustHave": false,
+      "order": 55,
+      "headingAnchors": [
+        "Variance Note 55",
+        "variance_note 55",
+        "Variance Note section",
+        "seção Variance Note 55"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bvariance_note\b",
+        "\bvariance_note_55\b",
+        "\bvariance_note section\b"
+      ],
+      "description": "Canonical section variance_note for Statements Pack"
+    },
+    {
+      "id": "ratios_56",
+      "name": {
+        "en": "Ratios Segment 56",
+        "pt": "Ratios segmento 56"
+      },
+      "mustHave": false,
+      "order": 56,
+      "headingAnchors": [
+        "Ratios 56",
+        "ratios 56",
+        "Ratios section",
+        "seção Ratios 56"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bratios\b",
+        "\bratios_56\b",
+        "\bratios section\b"
+      ],
+      "description": "Canonical section ratios for Statements Pack"
+    },
+    {
+      "id": "segment_data_57",
+      "name": {
+        "en": "Segment Data Segment 57",
+        "pt": "Segment Data segmento 57"
+      },
+      "mustHave": false,
+      "order": 57,
+      "headingAnchors": [
+        "Segment Data 57",
+        "segment_data 57",
+        "Segment Data section",
+        "seção Segment Data 57"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bsegment_data\b",
+        "\bsegment_data_57\b",
+        "\bsegment_data section\b"
+      ],
+      "description": "Canonical section segment_data for Statements Pack"
+    },
+    {
+      "id": "audit_summary_58",
+      "name": {
+        "en": "Audit Summary Segment 58",
+        "pt": "Audit Summary segmento 58"
+      },
+      "mustHave": false,
+      "order": 58,
+      "headingAnchors": [
+        "Audit Summary 58",
+        "audit_summary 58",
+        "Audit Summary section",
+        "seção Audit Summary 58"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\baudit_summary\b",
+        "\baudit_summary_58\b",
+        "\baudit_summary section\b"
+      ],
+      "description": "Canonical section audit_summary for Statements Pack"
+    },
+    {
+      "id": "signatures_59",
+      "name": {
+        "en": "Signatures Segment 59",
+        "pt": "Signatures segmento 59"
+      },
+      "mustHave": false,
+      "order": 59,
+      "headingAnchors": [
+        "Signatures 59",
+        "signatures 59",
+        "Signatures section",
+        "seção Signatures 59"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bsignatures\b",
+        "\bsignatures_59\b",
+        "\bsignatures section\b"
+      ],
+      "description": "Canonical section signatures for Statements Pack"
+    },
+    {
+      "id": "statement_bundle_60",
+      "name": {
+        "en": "Statement Bundle Segment 60",
+        "pt": "Statement Bundle segmento 60"
+      },
+      "mustHave": false,
+      "order": 60,
+      "headingAnchors": [
+        "Statement Bundle 60",
+        "statement_bundle 60",
+        "Statement Bundle section",
+        "seção Statement Bundle 60"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bstatement_bundle\b",
+        "\bstatement_bundle_60\b",
+        "\bstatement_bundle section\b"
+      ],
+      "description": "Canonical section statement_bundle for Statements Pack"
+    },
+    {
+      "id": "balance_sheet_61",
+      "name": {
+        "en": "Balance Sheet Segment 61",
+        "pt": "Balance Sheet segmento 61"
+      },
+      "mustHave": false,
+      "order": 61,
+      "headingAnchors": [
+        "Balance Sheet 61",
+        "balance_sheet 61",
+        "Balance Sheet section",
+        "seção Balance Sheet 61"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bbalance_sheet\b",
+        "\bbalance_sheet_61\b",
+        "\bbalance_sheet section\b"
+      ],
+      "description": "Canonical section balance_sheet for Statements Pack"
+    },
+    {
+      "id": "income_statement_62",
+      "name": {
+        "en": "Income Statement Segment 62",
+        "pt": "Income Statement segmento 62"
+      },
+      "mustHave": false,
+      "order": 62,
+      "headingAnchors": [
+        "Income Statement 62",
+        "income_statement 62",
+        "Income Statement section",
+        "seção Income Statement 62"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bincome_statement\b",
+        "\bincome_statement_62\b",
+        "\bincome_statement section\b"
+      ],
+      "description": "Canonical section income_statement for Statements Pack"
     }
   ]
 }

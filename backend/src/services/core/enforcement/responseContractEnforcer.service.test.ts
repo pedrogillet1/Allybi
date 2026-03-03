@@ -249,6 +249,67 @@ describe("ResponseContractEnforcerService nav_pills contract", () => {
     expect(out.enforcement.warnings).toContain("ANSWER_MODE_CONTRACT_DRIFT");
   });
 
+  test("enforces analytical template when queryProfile=analytical", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Awareness was highest in urban households.",
+        attachments: [
+          {
+            type: "source_buttons",
+            buttons: [
+              {
+                documentId: "doc-1",
+                title: "Acesso_ao_Cadastro_Unico_PNAD_2014.pdf",
+                location: { type: "page", value: 14, label: "Page 14" },
+                locationKey: "d:doc-1|p:14|c:3",
+                snippet: "In 2014, urban households reported higher awareness rates.",
+              },
+            ],
+          } as any,
+        ],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        signals: { queryProfile: "analytical" },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain("ANALYTICAL_STRUCTURE_ENFORCED");
+    expect(out.content).toContain("Direct answer:");
+    expect(out.content).toContain("Key evidence:");
+    expect(out.content).toContain("Sources used:");
+    expect(out.content).toContain("Page 14");
+  });
+
+  test("enforces analytical template when enforceStructuredAnswer=true", async () => {
+    const { ResponseContractEnforcerService } =
+      await import("./responseContractEnforcer.service");
+    const enforcer = new ResponseContractEnforcerService();
+
+    const out = enforcer.enforce(
+      {
+        content: "Operating revenue increased.",
+        attachments: [],
+      },
+      {
+        answerMode: "general_answer",
+        language: "en",
+        signals: { enforceStructuredAnswer: true },
+      },
+    );
+
+    expect(out.enforcement.blocked).toBe(false);
+    expect(out.enforcement.repairs).toContain("ANALYTICAL_STRUCTURE_ENFORCED");
+    expect(out.content).toContain("Direct answer:");
+    expect(out.content).toContain("Sources used:");
+  });
+
   test("applies banned phrase stripping from patterns schema", async () => {
     mockGetBank.mockImplementation((bankId: string) => {
       const base = bankById(bankId) as any;

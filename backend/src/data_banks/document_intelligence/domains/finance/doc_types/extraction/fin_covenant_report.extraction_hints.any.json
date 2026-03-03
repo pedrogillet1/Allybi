@@ -1,0 +1,2062 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_covenant_report",
+    "version": "2.1.0",
+    "description": "Extraction heuristics for Covenant Report.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_covenant_report"
+  },
+  "hints": [
+    {
+      "id": "fin_covenant_report_hint_001",
+      "entity": "borrower",
+      "primarySignals": [
+        "facility_summary",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_002",
+      "entity": "agreement_id",
+      "primarySignals": [
+        "thresholds",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_003",
+      "entity": "facility_name",
+      "primarySignals": [
+        "calculation_walkthrough",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_004",
+      "entity": "currency",
+      "primarySignals": [
+        "testing_period",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_005",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "compliance_matrix",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_006",
+      "entity": "measurement_period",
+      "primarySignals": [
+        "waivers",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_007",
+      "entity": "testing_metric",
+      "primarySignals": [
+        "breach_analysis",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_008",
+      "entity": "threshold_name",
+      "primarySignals": [
+        "remedies",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_009",
+      "entity": "required_minimum",
+      "primarySignals": [
+        "security_covenants",
+        "\\btrend_compliance\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_010",
+      "entity": "actual_metric",
+      "primarySignals": [
+        "financial_covenants",
+        "\\bcovenant_definition\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_011",
+      "entity": "compliance_status",
+      "primarySignals": [
+        "reporting_requirements",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_012",
+      "entity": "variance_abs",
+      "primarySignals": [
+        "borrower_certification",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_013",
+      "entity": "variance_pct",
+      "primarySignals": [
+        "auditor_attestation",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_014",
+      "entity": "breach_reason",
+      "primarySignals": [
+        "compliance_history",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_015",
+      "entity": "waiver_status",
+      "primarySignals": [
+        "appendix_disclosure",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_016",
+      "entity": "waiver_type",
+      "primarySignals": [
+        "covenant_overview",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_017",
+      "entity": "cure_period_days",
+      "primarySignals": [
+        "facility_summary",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_018",
+      "entity": "remedy_action",
+      "primarySignals": [
+        "thresholds",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_019",
+      "entity": "next_test_date",
+      "primarySignals": [
+        "calculation_walkthrough",
+        "\\btrend_compliance\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_020",
+      "entity": "reporting_quarter",
+      "primarySignals": [
+        "testing_period",
+        "\\bcovenant_definition\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_021",
+      "entity": "covenant_id",
+      "primarySignals": [
+        "compliance_matrix",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_022",
+      "entity": "covenant_name",
+      "primarySignals": [
+        "waivers",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_023",
+      "entity": "source_table",
+      "primarySignals": [
+        "breach_analysis",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_024",
+      "entity": "lender",
+      "primarySignals": [
+        "remedies",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_025",
+      "entity": "borrower",
+      "primarySignals": [
+        "security_covenants",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_026",
+      "entity": "agreement_id",
+      "primarySignals": [
+        "financial_covenants",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_027",
+      "entity": "facility_name",
+      "primarySignals": [
+        "reporting_requirements",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_028",
+      "entity": "currency",
+      "primarySignals": [
+        "borrower_certification",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_029",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "auditor_attestation",
+        "\\btrend_compliance\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_030",
+      "entity": "measurement_period",
+      "primarySignals": [
+        "compliance_history",
+        "\\bcovenant_definition\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_031",
+      "entity": "testing_metric",
+      "primarySignals": [
+        "appendix_disclosure",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_032",
+      "entity": "threshold_name",
+      "primarySignals": [
+        "covenant_overview",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_033",
+      "entity": "required_minimum",
+      "primarySignals": [
+        "facility_summary",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_034",
+      "entity": "actual_metric",
+      "primarySignals": [
+        "thresholds",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_035",
+      "entity": "compliance_status",
+      "primarySignals": [
+        "calculation_walkthrough",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_036",
+      "entity": "variance_abs",
+      "primarySignals": [
+        "testing_period",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_037",
+      "entity": "variance_pct",
+      "primarySignals": [
+        "compliance_matrix",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_038",
+      "entity": "breach_reason",
+      "primarySignals": [
+        "waivers",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_039",
+      "entity": "waiver_status",
+      "primarySignals": [
+        "breach_analysis",
+        "\\btrend_compliance\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_040",
+      "entity": "waiver_type",
+      "primarySignals": [
+        "remedies",
+        "\\bcovenant_definition\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_041",
+      "entity": "cure_period_days",
+      "primarySignals": [
+        "security_covenants",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_042",
+      "entity": "remedy_action",
+      "primarySignals": [
+        "financial_covenants",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_043",
+      "entity": "next_test_date",
+      "primarySignals": [
+        "reporting_requirements",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_044",
+      "entity": "reporting_quarter",
+      "primarySignals": [
+        "borrower_certification",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_045",
+      "entity": "covenant_id",
+      "primarySignals": [
+        "auditor_attestation",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_046",
+      "entity": "covenant_name",
+      "primarySignals": [
+        "compliance_history",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_047",
+      "entity": "source_table",
+      "primarySignals": [
+        "appendix_disclosure",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_048",
+      "entity": "lender",
+      "primarySignals": [
+        "covenant_overview",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_049",
+      "entity": "borrower",
+      "primarySignals": [
+        "facility_summary",
+        "\\btrend_compliance\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_050",
+      "entity": "agreement_id",
+      "primarySignals": [
+        "thresholds",
+        "\\bcovenant_definition\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_051",
+      "entity": "facility_name",
+      "primarySignals": [
+        "calculation_walkthrough",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_052",
+      "entity": "currency",
+      "primarySignals": [
+        "testing_period",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_053",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "compliance_matrix",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_054",
+      "entity": "measurement_period",
+      "primarySignals": [
+        "waivers",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_055",
+      "entity": "testing_metric",
+      "primarySignals": [
+        "breach_analysis",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_056",
+      "entity": "threshold_name",
+      "primarySignals": [
+        "remedies",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_057",
+      "entity": "required_minimum",
+      "primarySignals": [
+        "security_covenants",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_058",
+      "entity": "actual_metric",
+      "primarySignals": [
+        "financial_covenants",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_059",
+      "entity": "compliance_status",
+      "primarySignals": [
+        "reporting_requirements",
+        "\\btrend_compliance\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_060",
+      "entity": "variance_abs",
+      "primarySignals": [
+        "borrower_certification",
+        "\\bcovenant_definition\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_061",
+      "entity": "variance_pct",
+      "primarySignals": [
+        "auditor_attestation",
+        "\\bcovenant_calculation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_062",
+      "entity": "breach_reason",
+      "primarySignals": [
+        "compliance_history",
+        "\\bcoverage_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_063",
+      "entity": "waiver_status",
+      "primarySignals": [
+        "appendix_disclosure",
+        "\\bleverage_ratio_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_064",
+      "entity": "waiver_type",
+      "primarySignals": [
+        "covenant_overview",
+        "\\bliquidity_ratio_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_065",
+      "entity": "cure_period_days",
+      "primarySignals": [
+        "facility_summary",
+        "\\bminimum_test_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_066",
+      "entity": "remedy_action",
+      "primarySignals": [
+        "thresholds",
+        "\\bcure_plan\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_067",
+      "entity": "next_test_date",
+      "primarySignals": [
+        "calculation_walkthrough",
+        "\\bwaiver_register\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    },
+    {
+      "id": "fin_covenant_report_hint_068",
+      "entity": "reporting_quarter",
+      "primarySignals": [
+        "testing_period",
+        "\\bdefault_notification\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_covenant_report."
+    }
+  ],
+  "notes": [
+    "Numeric extraction requires table header context, unit, and period.",
+    "Priority for fin_covenant_report: table continuity across pdf pages/slides."
+  ]
+}

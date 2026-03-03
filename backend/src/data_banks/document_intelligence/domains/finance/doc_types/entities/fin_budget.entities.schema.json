@@ -1,114 +1,1045 @@
 {
   "_meta": {
     "id": "di_finance_entities_fin_budget",
-    "version": "2.0.0",
-    "description": "Entity extraction schema for fin_budget.",
+    "version": "2.1.0",
+    "description": "Entity schema for Budget Pack.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "docType": "fin_budget"
+    "docType": "fin_budget",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
   },
   "entities": [
     {
       "id": "document_id",
       "type": "string",
       "required": true,
-      "description": "Unique document identifier"
+      "evidenceRequirement": [
+        "header_id",
+        "source_table"
+      ],
+      "notes": "document-level evidence required"
     },
     {
-      "id": "reporting_entity",
+      "id": "source_file_name",
       "type": "string",
       "required": true,
-      "description": "Entity or BU covered"
+      "evidenceRequirement": [
+        "file_metadata"
+      ],
+      "notes": "source file provenance"
     },
     {
-      "id": "period_start",
-      "type": "date",
+      "id": "extraction_timestamp",
+      "type": "datetime",
       "required": true,
-      "description": "Period start date"
+      "evidenceRequirement": [
+        "ingestion_metadata"
+      ],
+      "notes": "must include parse timestamp"
     },
     {
-      "id": "period_end",
+      "id": "company_name",
+      "canonical": "company_name",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: company_name from table/header context."
+    },
+    {
+      "id": "fiscal_year",
+      "canonical": "fiscal_year",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: fiscal_year from table/header context."
+    },
+    {
+      "id": "budget_version",
+      "canonical": "budget_version",
       "type": "date",
       "required": true,
-      "description": "Period end date"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_version from table/header context."
     },
     {
       "id": "currency",
-      "type": "string",
+      "canonical": "currency",
+      "type": "currency",
       "required": true,
-      "description": "ISO currency code"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: currency from table/header context."
     },
     {
       "id": "unit_scale",
+      "canonical": "unit_scale",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: unit_scale from table/header context."
+    },
+    {
+      "id": "budgeted_revenue",
+      "canonical": "budgeted_revenue",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budgeted_revenue from table/header context."
+    },
+    {
+      "id": "actual_revenue",
+      "canonical": "actual_revenue",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: actual_revenue from table/header context."
+    },
+    {
+      "id": "budget_variance_abs",
+      "canonical": "budget_variance_abs",
       "type": "string",
       "required": true,
-      "description": "Unit scale (units, thousands, millions)"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_variance_abs from table/header context."
     },
     {
-      "id": "revenue",
-      "type": "currency",
-      "required": false,
-      "description": "Revenue amount"
-    },
-    {
-      "id": "ebitda",
-      "type": "currency",
-      "required": false,
-      "description": "EBITDA amount"
-    },
-    {
-      "id": "net_income",
-      "type": "currency",
-      "required": false,
-      "description": "Net income amount"
-    },
-    {
-      "id": "cash_position",
-      "type": "currency",
-      "required": false,
-      "description": "Cash balance"
-    },
-    {
-      "id": "variance_percent",
+      "id": "budget_variance_pct",
+      "canonical": "budget_variance_pct",
       "type": "number",
-      "required": false,
-      "description": "Variance percentage"
-    },
-    {
-      "id": "source_table_ref",
-      "type": "string",
       "required": true,
-      "description": "Source table identifier"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_variance_pct from table/header context."
     },
     {
-      "id": "kpi_planned_revenue",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for planned_revenue"
+      "id": "headcount_budget",
+      "canonical": "headcount_budget",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: headcount_budget from table/header context."
     },
     {
-      "id": "kpi_planned_opex",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for planned_opex"
+      "id": "capex_budget",
+      "canonical": "capex_budget",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: capex_budget from table/header context."
     },
     {
-      "id": "kpi_planned_capex",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for planned_capex"
+      "id": "opex_budget",
+      "canonical": "opex_budget",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: opex_budget from table/header context."
     },
     {
-      "id": "kpi_planned_headcount",
+      "id": "marketing_budget",
+      "canonical": "marketing_budget",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: marketing_budget from table/header context."
+    },
+    {
+      "id": "sales_budget",
+      "canonical": "sales_budget",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: sales_budget from table/header context."
+    },
+    {
+      "id": "r_and_d_budget",
+      "canonical": "r_and_d_budget",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: r_and_d_budget from table/header context."
+    },
+    {
+      "id": "g_and_a_budget",
+      "canonical": "g_and_a_budget",
       "type": "number",
       "required": false,
-      "description": "KPI reference for planned_headcount"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: g_and_a_budget from table/header context."
+    },
+    {
+      "id": "working_capital_budget",
+      "canonical": "working_capital_budget",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: working_capital_budget from table/header context."
+    },
+    {
+      "id": "runway_target",
+      "canonical": "runway_target",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: runway_target from table/header context."
+    },
+    {
+      "id": "cash_buffer",
+      "canonical": "cash_buffer",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: cash_buffer from table/header context."
+    },
+    {
+      "id": "scenario_a",
+      "canonical": "scenario_a",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: scenario_a from table/header context."
+    },
+    {
+      "id": "scenario_b",
+      "canonical": "scenario_b",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: scenario_b from table/header context."
+    },
+    {
+      "id": "scenario_c",
+      "canonical": "scenario_c",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: scenario_c from table/header context."
+    },
+    {
+      "id": "approval_status",
+      "canonical": "approval_status",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: approval_status from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_24",
+      "canonical": "budget_pack_metric_24",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_24 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_25",
+      "canonical": "budget_pack_metric_25",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_25 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_26",
+      "canonical": "budget_pack_metric_26",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_26 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_27",
+      "canonical": "budget_pack_metric_27",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_27 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_28",
+      "canonical": "budget_pack_metric_28",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_28 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_29",
+      "canonical": "budget_pack_metric_29",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_29 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_30",
+      "canonical": "budget_pack_metric_30",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_30 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_31",
+      "canonical": "budget_pack_metric_31",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_31 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_32",
+      "canonical": "budget_pack_metric_32",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_32 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_33",
+      "canonical": "budget_pack_metric_33",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_33 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_34",
+      "canonical": "budget_pack_metric_34",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_34 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_35",
+      "canonical": "budget_pack_metric_35",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_35 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_36",
+      "canonical": "budget_pack_metric_36",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_36 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_37",
+      "canonical": "budget_pack_metric_37",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_37 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_38",
+      "canonical": "budget_pack_metric_38",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_38 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_39",
+      "canonical": "budget_pack_metric_39",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_39 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_40",
+      "canonical": "budget_pack_metric_40",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_40 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_41",
+      "canonical": "budget_pack_metric_41",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_41 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_42",
+      "canonical": "budget_pack_metric_42",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_42 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_43",
+      "canonical": "budget_pack_metric_43",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_43 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_44",
+      "canonical": "budget_pack_metric_44",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_44 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_45",
+      "canonical": "budget_pack_metric_45",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_45 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_46",
+      "canonical": "budget_pack_metric_46",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_46 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_47",
+      "canonical": "budget_pack_metric_47",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_47 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_48",
+      "canonical": "budget_pack_metric_48",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_48 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_49",
+      "canonical": "budget_pack_metric_49",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_49 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_50",
+      "canonical": "budget_pack_metric_50",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_50 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_51",
+      "canonical": "budget_pack_metric_51",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_51 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_52",
+      "canonical": "budget_pack_metric_52",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_52 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_53",
+      "canonical": "budget_pack_metric_53",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_53 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_54",
+      "canonical": "budget_pack_metric_54",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_54 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_55",
+      "canonical": "budget_pack_metric_55",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_55 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_56",
+      "canonical": "budget_pack_metric_56",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_56 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_57",
+      "canonical": "budget_pack_metric_57",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_57 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_58",
+      "canonical": "budget_pack_metric_58",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_58 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_59",
+      "canonical": "budget_pack_metric_59",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_59 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_60",
+      "canonical": "budget_pack_metric_60",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_60 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_61",
+      "canonical": "budget_pack_metric_61",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_61 from table/header context."
+    },
+    {
+      "id": "budget_pack_metric_62",
+      "canonical": "budget_pack_metric_62",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Budget Pack: budget_pack_metric_62 from table/header context."
     }
   ]
 }

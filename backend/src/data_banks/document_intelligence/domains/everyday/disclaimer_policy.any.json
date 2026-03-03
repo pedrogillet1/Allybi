@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "id": "di_everyday_disclaimer_policy",
+    "version": "1.0.0",
+    "description": "Disclaimer behavior for everyday domain outputs.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "disclaimers": [
+    {
+      "id": "every_disc_001_scope",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "This is a document-only summary and not legal, tax, or financial advice.",
+        "pt": "Este resumo e baseado somente nos documentos anexados e nao constitui orientacao juridica, tributaria ou financeira."
+      }
+    },
+    {
+      "id": "every_disc_002_unverified",
+      "trigger": "contains_unverified_fields",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Some fields are unverified due to missing lines, low quality scan, or ambiguous labels.",
+        "pt": "Alguns campos estao sem verificacao por linhas ausentes, escaneamento ruim ou rotulos ambíguos."
+      }
+    },
+    {
+      "id": "every_disc_003_redaction",
+      "trigger": "pii_redacted",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Sensitive identifiers were masked by default.",
+        "pt": "Dados sensíveis foram ocultados por padrao."
+      }
+    },
+    {
+      "id": "every_disc_004_reclassify",
+      "trigger": "lab_or_medical_markers_detected",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "The document contains medical-style markers and may belong to a medical domain.",
+        "pt": "O documento possui marcadores medicos e pode pertencer ao dominio medico."
+      }
+    },
+    {
+      "id": "every_disc_005_claim_outcome",
+      "trigger": "contains_predicted_payout",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Any claim payout prediction is inferential unless explicitly stated as paid/reserve amounts.",
+        "pt": "Qualquer previsao de pagamento de sinistro e apenas inferencia, salvo valores explicitamente informados."
+      }
+    }
+  ]
+}

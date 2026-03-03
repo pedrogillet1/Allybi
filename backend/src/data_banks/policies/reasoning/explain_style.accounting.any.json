@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -720,5 +726,47 @@
       "uncertaintyStyle": "Declare confianca explicitamente e separe fatos de suposicoes.",
       "template": "Audiencia=auditor; Profundidade=detailed; Forneca explicacao contabil com limites de evidencia, controles, riscos e o que muda minha opiniao."
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "ACC_EXPL_001_controls_visibility",
+      "trigger": "accounting explanation omits control checks",
+      "check": "context.domain=='accounting' && output.controlsMentioned == false",
+      "failureAction": "INSERT_CONTROLS_SECTION"
+    },
+    {
+      "id": "ACC_EXPL_002_unit_guard",
+      "trigger": "accounting explanation drops units",
+      "check": "context.domain=='accounting' && output.numericValuesPresent == true && output.unitCoverage < 1",
+      "failureAction": "APPEND_UNIT_CONTEXT"
+    },
+    {
+      "id": "ACC_EXPL_003_reconciliation_uncertainty",
+      "trigger": "accounting close has unresolved discrepancy",
+      "check": "context.domain=='accounting' && context.reconciliationGap != 0 && output.gapExplained == false",
+      "failureAction": "INSERT_RECONCILIATION_NOTE"
+    },
+    {
+      "id": "ACC_EXPL_004_compare_breakdown",
+      "trigger": "accounting comparison without per-document evidence",
+      "check": "context.domain=='accounting' && context.intent=='compare' && output.sourcesPerDoc < 2",
+      "failureAction": "REQUIRE_PER_DOC_BREAKDOWN"
+    },
+    {
+      "id": "ACC_EXPL_005_threshold_visibility",
+      "trigger": "accounting significance thresholds not shown",
+      "check": "context.domain=='accounting' && context.queryNeedsThreshold == true && output.thresholdsPresent == false",
+      "failureAction": "ADD_THRESHOLD_LINE"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ACC_EXPL_SMOKE_001"
+      }
+    ]
+  }
 }

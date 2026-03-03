@@ -62,25 +62,37 @@
       "id": "totalDebits",
       "type": "currency",
       "required": true,
-      "description": "Total debits"
+      "description": "Total debits from all accounts"
     },
     {
       "id": "totalCredits",
       "type": "currency",
       "required": true,
-      "description": "Total credits"
+      "description": "Total credits from all accounts"
+    },
+    {
+      "id": "totalBalance",
+      "type": "currency",
+      "required": true,
+      "description": "Net total balance at report level"
     },
     {
       "id": "outOfBalanceAmount",
       "type": "currency",
       "required": false,
-      "description": "Difference between total debits and credits"
+      "description": "Difference between total debits and total credits"
     },
     {
       "id": "accountCount",
       "type": "number",
       "required": false,
-      "description": "Number of listed accounts"
+      "description": "Number of account rows"
+    },
+    {
+      "id": "currencyDiscrepancyCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of rows with out-of-band currency values"
     }
   ]
 }

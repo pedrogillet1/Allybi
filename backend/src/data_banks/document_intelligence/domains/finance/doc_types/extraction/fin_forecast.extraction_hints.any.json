@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_extraction_fin_forecast",
-    "version": "2.0.0",
-    "description": "Extraction hints for fin_forecast.",
+    "version": "2.1.0",
+    "description": "Extraction heuristics for Forecast.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,92 +15,2048 @@
   },
   "hints": [
     {
-      "id": "hint_1_period",
-      "entity": "kpi_projected_revenue",
-      "anchors": [
-        "period",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_001",
+      "entity": "forecast_version",
+      "primarySignals": [
+        "base_case",
+        "\\bcase_bridge\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "heading_proximity"
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_2_currency",
-      "entity": "kpi_projected_ebitda",
-      "anchors": [
-        "currency",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_002",
+      "entity": "fiscal_horizon",
+      "primarySignals": [
+        "bull_case",
+        "\\bassumption_sheet\\b",
+        "\\bperiod\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "table_header_row_context"
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_3_unit",
-      "entity": "kpi_projected_cash",
-      "anchors": [
-        "unit",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_003",
+      "entity": "currency",
+      "primarySignals": [
+        "bear_case",
+        "\\bsensitivity_grid\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "heading_proximity"
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_4_total",
-      "entity": "kpi_assumption",
-      "anchors": [
-        "total",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_004",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "assumptions",
+        "\\bcash_runway_table\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_5_variance",
-      "entity": "variance",
-      "anchors": [
-        "variance",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_005",
+      "entity": "base_case_revenue",
+      "primarySignals": [
+        "sensitivity",
+        "\\brevenue_projection\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "heading_proximity"
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_6_guidance",
-      "entity": "guidance",
-      "anchors": [
-        "guidance",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_006",
+      "entity": "base_case_ebitda",
+      "primarySignals": [
+        "driver_model",
+        "\\bgross_margin_projection\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_7_assumption",
-      "entity": "assumption",
-      "anchors": [
-        "assumption",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_007",
+      "entity": "base_case_cash",
+      "primarySignals": [
+        "cash_runway",
+        "\\bexpense_projection\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "heading_proximity"
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     },
     {
-      "id": "hint_8_notes",
-      "entity": "notes",
-      "anchors": [
-        "notes",
-        "forecast",
-        "previsao financeira"
+      "id": "fin_forecast_hint_008",
+      "entity": "forecast_growth_rate",
+      "primarySignals": [
+        "revenue_projection",
+        "\\bbalance_sheet_projection\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_009",
+      "entity": "forecast_churn",
+      "primarySignals": [
+        "cost_projection",
+        "\\bcash_flow_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_010",
+      "entity": "new_arr",
+      "primarySignals": [
+        "gross_margin_projection",
+        "\\bvariance_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_011",
+      "entity": "logo",
+      "primarySignals": [
+        "working_capital_projection",
+        "\\bdriver_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_012",
+      "entity": "forecast_scenarios",
+      "primarySignals": [
+        "balance_sheet_projection",
+        "\\bcase_bridge\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_013",
+      "entity": "confidence_interval",
+      "primarySignals": [
+        "cash_flow_projection",
+        "\\bassumption_sheet\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_014",
+      "entity": "sensitivity_factor",
+      "primarySignals": [
+        "risk_overlay",
+        "\\bsensitivity_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_015",
+      "entity": "driver_assumptions",
+      "primarySignals": [
+        "forecast_purpose",
+        "\\bcash_runway_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_016",
+      "entity": "risk_of_non_realization",
+      "primarySignals": [
+        "base_case",
+        "\\brevenue_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_017",
+      "entity": "capital_required",
+      "primarySignals": [
+        "bull_case",
+        "\\bgross_margin_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_018",
+      "entity": "runway_projection",
+      "primarySignals": [
+        "bear_case",
+        "\\bexpense_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_019",
+      "entity": "scenario_break_even",
+      "primarySignals": [
+        "assumptions",
+        "\\bbalance_sheet_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_020",
+      "entity": "company_name",
+      "primarySignals": [
+        "sensitivity",
+        "\\bcash_flow_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_021",
+      "entity": "forecast_version",
+      "primarySignals": [
+        "driver_model",
+        "\\bvariance_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_022",
+      "entity": "fiscal_horizon",
+      "primarySignals": [
+        "cash_runway",
+        "\\bdriver_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_023",
+      "entity": "currency",
+      "primarySignals": [
+        "revenue_projection",
+        "\\bcase_bridge\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_024",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "cost_projection",
+        "\\bassumption_sheet\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_025",
+      "entity": "base_case_revenue",
+      "primarySignals": [
+        "gross_margin_projection",
+        "\\bsensitivity_grid\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_026",
+      "entity": "base_case_ebitda",
+      "primarySignals": [
+        "working_capital_projection",
+        "\\bcash_runway_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_027",
+      "entity": "base_case_cash",
+      "primarySignals": [
+        "balance_sheet_projection",
+        "\\brevenue_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_028",
+      "entity": "forecast_growth_rate",
+      "primarySignals": [
+        "cash_flow_projection",
+        "\\bgross_margin_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_029",
+      "entity": "forecast_churn",
+      "primarySignals": [
+        "risk_overlay",
+        "\\bexpense_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_030",
+      "entity": "new_arr",
+      "primarySignals": [
+        "forecast_purpose",
+        "\\bbalance_sheet_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_031",
+      "entity": "logo",
+      "primarySignals": [
+        "base_case",
+        "\\bcash_flow_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_032",
+      "entity": "forecast_scenarios",
+      "primarySignals": [
+        "bull_case",
+        "\\bvariance_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_033",
+      "entity": "confidence_interval",
+      "primarySignals": [
+        "bear_case",
+        "\\bdriver_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_034",
+      "entity": "sensitivity_factor",
+      "primarySignals": [
+        "assumptions",
+        "\\bcase_bridge\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_035",
+      "entity": "driver_assumptions",
+      "primarySignals": [
+        "sensitivity",
+        "\\bassumption_sheet\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_036",
+      "entity": "risk_of_non_realization",
+      "primarySignals": [
+        "driver_model",
+        "\\bsensitivity_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_037",
+      "entity": "capital_required",
+      "primarySignals": [
+        "cash_runway",
+        "\\bcash_runway_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_038",
+      "entity": "runway_projection",
+      "primarySignals": [
+        "revenue_projection",
+        "\\brevenue_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_039",
+      "entity": "scenario_break_even",
+      "primarySignals": [
+        "cost_projection",
+        "\\bgross_margin_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_040",
+      "entity": "company_name",
+      "primarySignals": [
+        "gross_margin_projection",
+        "\\bexpense_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_041",
+      "entity": "forecast_version",
+      "primarySignals": [
+        "working_capital_projection",
+        "\\bbalance_sheet_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_042",
+      "entity": "fiscal_horizon",
+      "primarySignals": [
+        "balance_sheet_projection",
+        "\\bcash_flow_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_043",
+      "entity": "currency",
+      "primarySignals": [
+        "cash_flow_projection",
+        "\\bvariance_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_044",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "risk_overlay",
+        "\\bdriver_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_045",
+      "entity": "base_case_revenue",
+      "primarySignals": [
+        "forecast_purpose",
+        "\\bcase_bridge\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_046",
+      "entity": "base_case_ebitda",
+      "primarySignals": [
+        "base_case",
+        "\\bassumption_sheet\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_047",
+      "entity": "base_case_cash",
+      "primarySignals": [
+        "bull_case",
+        "\\bsensitivity_grid\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_048",
+      "entity": "forecast_growth_rate",
+      "primarySignals": [
+        "bear_case",
+        "\\bcash_runway_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_049",
+      "entity": "forecast_churn",
+      "primarySignals": [
+        "assumptions",
+        "\\brevenue_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_050",
+      "entity": "new_arr",
+      "primarySignals": [
+        "sensitivity",
+        "\\bgross_margin_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_051",
+      "entity": "logo",
+      "primarySignals": [
+        "driver_model",
+        "\\bexpense_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_052",
+      "entity": "forecast_scenarios",
+      "primarySignals": [
+        "cash_runway",
+        "\\bbalance_sheet_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_053",
+      "entity": "confidence_interval",
+      "primarySignals": [
+        "revenue_projection",
+        "\\bcash_flow_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_054",
+      "entity": "sensitivity_factor",
+      "primarySignals": [
+        "cost_projection",
+        "\\bvariance_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_055",
+      "entity": "driver_assumptions",
+      "primarySignals": [
+        "gross_margin_projection",
+        "\\bdriver_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_056",
+      "entity": "risk_of_non_realization",
+      "primarySignals": [
+        "working_capital_projection",
+        "\\bcase_bridge\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_057",
+      "entity": "capital_required",
+      "primarySignals": [
+        "balance_sheet_projection",
+        "\\bassumption_sheet\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_058",
+      "entity": "runway_projection",
+      "primarySignals": [
+        "cash_flow_projection",
+        "\\bsensitivity_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_059",
+      "entity": "scenario_break_even",
+      "primarySignals": [
+        "risk_overlay",
+        "\\bcash_runway_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_060",
+      "entity": "company_name",
+      "primarySignals": [
+        "forecast_purpose",
+        "\\brevenue_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_061",
+      "entity": "forecast_version",
+      "primarySignals": [
+        "base_case",
+        "\\bgross_margin_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_062",
+      "entity": "fiscal_horizon",
+      "primarySignals": [
+        "bull_case",
+        "\\bexpense_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_063",
+      "entity": "currency",
+      "primarySignals": [
+        "bear_case",
+        "\\bbalance_sheet_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_064",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "assumptions",
+        "\\bcash_flow_projection\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_065",
+      "entity": "base_case_revenue",
+      "primarySignals": [
+        "sensitivity",
+        "\\bvariance_projection\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_066",
+      "entity": "base_case_ebitda",
+      "primarySignals": [
+        "driver_model",
+        "\\bdriver_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_067",
+      "entity": "base_case_cash",
+      "primarySignals": [
+        "cash_runway",
+        "\\bcase_bridge\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
+    },
+    {
+      "id": "fin_forecast_hint_068",
+      "entity": "forecast_growth_rate",
+      "primarySignals": [
+        "revenue_projection",
+        "\\bassumption_sheet\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_forecast."
     }
+  ],
+  "notes": [
+    "Numeric extraction requires table header context, unit, and period.",
+    "Priority for fin_forecast: table continuity across pdf pages/slides."
   ]
 }

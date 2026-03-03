@@ -1,8 +1,26 @@
 // src/services/retrieval/pinecone.service.ts
 import { Pinecone } from "@pinecone-database/pinecone";
-
-type Primitive = string | number | boolean;
-type PineconeMetaValue = Primitive | Primitive[];
+import {
+  buildDocumentDeleteFilter,
+  buildOperationDeleteFilter,
+  buildScopedFilter,
+  buildSheetFilter,
+  buildSlideFilter,
+} from "./pinecone/pinecone.filters";
+import {
+  hasNonZeroVector,
+  makeVectorId,
+  sanitizePineconeMetadata,
+  toIsoString,
+} from "./pinecone/pinecone.metadata";
+import { mapPineconeMatchesToHits } from "./pinecone/pinecone.mappers";
+import type {
+  PineconeIndexClient,
+  PineconeFilter,
+  PineconeMetadata,
+  PineconeQueryMatch,
+  PineconeVector,
+} from "./pinecone/pinecone.types";
 
 export interface DocumentMetadataForPinecone {
   filename: string;
@@ -29,7 +47,7 @@ export interface ChunkForPineconeUpsert {
   chunkIndex: number;
   content: string;
   embedding: number[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PineconeSearchHit {
@@ -37,7 +55,7 @@ export interface PineconeSearchHit {
   chunkIndex: number;
   content: string;
   similarity: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   document: {
     id: string;
     filename: string;
@@ -104,9 +122,9 @@ export class PineconeService {
     return !!process.env.PINECONE_API_KEY;
   }
 
-  private getIndex() {
+  private getIndex(): PineconeIndexClient {
     if (!this.pc) throw new Error("Pinecone client not initialized");
-    return this.pc.index(this.indexName);
+    return this.pc.index(this.indexName) as unknown as PineconeIndexClient;
   }
 
   private assertVectorDim(vec: number[], label: string): void {
@@ -129,13 +147,11 @@ export class PineconeService {
   }
 
   private makeVectorId(documentId: string, chunkIndex: number): string {
-    return `${documentId}:${chunkIndex}`;
+    return makeVectorId(documentId, chunkIndex);
   }
 
   private toIso(d: Date | string | undefined): string | undefined {
-    if (!d) return undefined;
-    if (typeof d === "string") return d;
-    return d.toISOString();
+    return toIsoString(d);
   }
 
   /**
@@ -145,51 +161,14 @@ export class PineconeService {
    * - Converts objects into JSON strings (truncated)
    */
   private sanitizeMetadata(
-    obj: Record<string, any>,
+    obj: Record<string, unknown>,
     maxJsonChars = 2000,
-  ): Record<string, PineconeMetaValue> {
-    const out: Record<string, PineconeMetaValue> = {};
-
-    for (const [k, v] of Object.entries(obj || {})) {
-      if (v === null || v === undefined) continue;
-
-      const t = typeof v;
-
-      if (t === "string" || t === "number" || t === "boolean") {
-        out[k] = v as Primitive;
-        continue;
-      }
-
-      if (Array.isArray(v)) {
-        // allow string/number/boolean arrays
-        if (
-          v.every(
-            (x) =>
-              typeof x === "string" ||
-              typeof x === "number" ||
-              typeof x === "boolean",
-          )
-        ) {
-          out[k] = v as Primitive[];
-        } else {
-          out[k] = JSON.stringify(v).slice(0, maxJsonChars);
-        }
-        continue;
-      }
-
-      // object/function/etc -> stringify (best-effort)
-      try {
-        out[k] = JSON.stringify(v).slice(0, maxJsonChars);
-      } catch {
-        // ignore unserializable values
-      }
-    }
-
-    return out;
+  ): PineconeMetadata {
+    return sanitizePineconeMetadata(obj, maxJsonChars);
   }
 
   private hasNonZero(vec: number[]): boolean {
-    return vec.some((n) => n !== 0);
+    return hasNonZeroVector(vec);
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -211,7 +190,7 @@ export class PineconeService {
       this.toIso(document.createdAt) || new Date().toISOString();
     const uploadedAt = this.toIso(document.uploadedAt);
 
-    const vectors = [];
+    const vectors: PineconeVector[] = [];
     let skipped = 0;
 
     for (const c of chunks) {
@@ -277,11 +256,11 @@ export class PineconeService {
     }
 
     // batch upsert — parallel for throughput
-    const upsertBatches: any[][] = [];
+    const upsertBatches: PineconeVector[][] = [];
     for (let i = 0; i < vectors.length; i += this.upsertBatchSize) {
       upsertBatches.push(vectors.slice(i, i + this.upsertBatchSize));
     }
-    await Promise.all(upsertBatches.map((batch) => index.upsert(batch as any)));
+    await Promise.all(upsertBatches.map((batch) => index.upsert(batch)));
 
     return { upserted: vectors.length, skipped };
   }
@@ -305,7 +284,7 @@ export class PineconeService {
 
     const index = this.getIndex();
 
-    const filter: any = this.buildFilter({
+    const filter: PineconeFilter = this.buildFilter({
       userId,
       documentId: attachedDocumentId,
       folderId,
@@ -316,7 +295,7 @@ export class PineconeService {
       topK,
       includeMetadata: true,
       filter,
-    } as any);
+    });
 
     const matches = Array.isArray(res?.matches) ? res.matches : [];
     const hits: PineconeSearchHit[] = [];
@@ -325,7 +304,7 @@ export class PineconeService {
       const score = Number(m?.score || 0);
       if (score < minSimilarity) continue;
 
-      const md = (m?.metadata || {}) as Record<string, any>;
+      const md = (m?.metadata || {}) as Record<string, unknown>;
       const documentId = String(md.documentId || "");
       if (!documentId) continue;
 
@@ -395,25 +374,8 @@ export class PineconeService {
     userId: string;
     documentId?: string;
     folderId?: string;
-  }) {
-    // Use $and only when needed (keeps filter simple and compatible)
-    if (args.documentId) {
-      return {
-        $and: [
-          { userId: { $eq: args.userId } },
-          { documentId: { $eq: args.documentId } },
-        ],
-      };
-    }
-    if (args.folderId) {
-      return {
-        $and: [
-          { userId: { $eq: args.userId } },
-          { folderId: { $eq: args.folderId } },
-        ],
-      };
-    }
-    return { userId: { $eq: args.userId } };
+  }): PineconeFilter {
+    return buildScopedFilter(args);
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -430,20 +392,18 @@ export class PineconeService {
     if (!this.isAvailable()) return [];
 
     const index = this.getIndex();
-    const filter: any = {
-      $and: [
-        { userId: { $eq: userId } },
-        { slide: { $eq: slideNumber } },
-        ...(documentId ? [{ documentId: { $eq: documentId } }] : []),
-      ],
-    };
+    const filter: PineconeFilter = buildSlideFilter(
+      userId,
+      slideNumber,
+      documentId,
+    );
 
     const res = await index.query({
       vector: this.makeDummyNonZeroVector(),
       topK,
       includeMetadata: true,
       filter,
-    } as any);
+    });
 
     return this.mapMatchesToHits(res?.matches || []);
   }
@@ -458,55 +418,24 @@ export class PineconeService {
     if (!this.isAvailable()) return [];
 
     const index = this.getIndex();
-    const filter: any = {
-      $and: [
-        { userId: { $eq: userId } },
-        { sheetNumber: { $eq: sheetNumber } },
-        ...(documentId ? [{ documentId: { $eq: documentId } }] : []),
-      ],
-    };
+    const filter: PineconeFilter = buildSheetFilter(
+      userId,
+      sheetNumber,
+      documentId,
+    );
 
     const res = await index.query({
       vector: this.makeDummyNonZeroVector(),
       topK,
       includeMetadata: true,
       filter,
-    } as any);
+    });
 
     return this.mapMatchesToHits(res?.matches || []);
   }
 
-  private mapMatchesToHits(matches: any[]): PineconeSearchHit[] {
-    const hits: PineconeSearchHit[] = [];
-
-    for (const m of matches || []) {
-      const md = (m?.metadata || {}) as Record<string, any>;
-      const documentId = String(md.documentId || "");
-      if (!documentId) continue;
-
-      const status = String(md.status || "active");
-      if (status === "deleted") continue;
-
-      hits.push({
-        documentId,
-        chunkIndex: Number(md.chunkIndex ?? -1),
-        content: String(md.content || ""),
-        similarity: Number(m?.score || 0),
-        metadata: md,
-        document: {
-          id: documentId,
-          filename: String(md.filename || ""),
-          mimeType: String(md.mimeType || ""),
-          createdAt: String(md.createdAt || ""),
-          status,
-          folderId: md.folderId ? String(md.folderId) : undefined,
-          folderPath: md.folderPath ? String(md.folderPath) : undefined,
-          categoryId: md.categoryId ? String(md.categoryId) : undefined,
-        },
-      });
-    }
-
-    return hits;
+  private mapMatchesToHits(matches: PineconeQueryMatch[]): PineconeSearchHit[] {
+    return mapPineconeMatchesToHits(matches);
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -540,14 +469,7 @@ export class PineconeService {
 
     // Fallback path: query vector IDs by metadata filter (bounded to 10k)
     // NOTE: requires userId if your index is multi-tenant and you reuse documentId values.
-    const filter = opts?.userId
-      ? {
-          $and: [
-            { userId: { $eq: opts.userId } },
-            { documentId: { $eq: documentId } },
-          ],
-        }
-      : { documentId: { $eq: documentId } };
+    const filter = buildDocumentDeleteFilter(documentId, opts?.userId);
 
     for (let pass = 0; pass < 25; pass += 1) {
       const res = await index.query({
@@ -555,10 +477,10 @@ export class PineconeService {
         topK: 10000,
         includeMetadata: false,
         filter,
-      } as any);
+      });
 
       const ids = [
-        ...new Set((res?.matches || []).map((m: any) => String(m?.id))),
+        ...new Set((res?.matches || []).map((m) => String(m?.id || ""))),
       ].filter(Boolean);
       if (ids.length === 0) return;
       await this.deleteIdsInBatches(index, ids);
@@ -579,20 +501,7 @@ export class PineconeService {
     if (!docId || !opId) return 0;
 
     const index = this.getIndex();
-    const filter = opts?.userId
-      ? {
-          $and: [
-            { userId: { $eq: opts.userId } },
-            { documentId: { $eq: docId } },
-            { operationId: { $eq: opId } },
-          ],
-        }
-      : {
-          $and: [
-            { documentId: { $eq: docId } },
-            { operationId: { $eq: opId } },
-          ],
-        };
+    const filter = buildOperationDeleteFilter(docId, opId, opts?.userId);
 
     let deleted = 0;
     for (let pass = 0; pass < 25; pass += 1) {
@@ -601,10 +510,10 @@ export class PineconeService {
         topK: 10000,
         includeMetadata: false,
         filter,
-      } as any);
+      });
 
       const ids = [
-        ...new Set((res?.matches || []).map((m: any) => String(m?.id))),
+        ...new Set((res?.matches || []).map((m) => String(m?.id || ""))),
       ]
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b));
@@ -644,7 +553,7 @@ export class PineconeService {
     return deleted;
   }
 
-  private async deleteIdsInBatches(index: any, ids: string[]) {
+  private async deleteIdsInBatches(index: PineconeIndexClient, ids: string[]) {
     for (let i = 0; i < ids.length; i += this.deleteBatchSize) {
       const batch = ids.slice(i, i + this.deleteBatchSize);
       // Node SDK supports deleteMany(arrayOfIds)
@@ -659,7 +568,7 @@ export class PineconeService {
   async getIndexStats(): Promise<{
     available: boolean;
     indexName?: string;
-    stats?: any;
+    stats?: unknown;
     error?: string;
   }> {
     await this.ensureInit();
@@ -669,8 +578,10 @@ export class PineconeService {
       const index = this.getIndex();
       const stats = await index.describeIndexStats();
       return { available: true, indexName: this.indexName, stats };
-    } catch (e: any) {
-      return { available: false, error: e?.message || String(e) };
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      return { available: false, error: errorMessage };
     }
   }
 
@@ -703,7 +614,7 @@ export class PineconeService {
       topK: Math.max(1, Number(opts?.topK || 1000)),
       includeMetadata: true,
       filter,
-    } as any);
+    });
 
     const count = (res?.matches || []).length;
     const minCount = opts?.minCount ?? 1;

@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -79,8 +79,8 @@
       "entity": "processArea",
       "anchors": [
         "process area",
-        "process Area",
-        "processArea"
+        "processarea",
+        "processo"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -90,19 +90,18 @@
       "entity": "controlCount",
       "anchors": [
         "control count",
-        "control Count",
-        "controlCount"
+        "controls count",
+        "total controls"
       ],
-      "location": "header",
-      "extractionMethod": "heading_proximity"
+      "location": "summary",
+      "extractionMethod": "table_row_match"
     },
     {
       "id": "hint_keyControlCount",
       "entity": "keyControlCount",
       "anchors": [
         "key control count",
-        "key Control Count",
-        "keyControlCount"
+        "key controls"
       ],
       "location": "summary",
       "extractionMethod": "table_row_match"
@@ -112,10 +111,48 @@
       "entity": "deficiencyCount",
       "anchors": [
         "deficiency count",
-        "deficiency Count",
-        "deficiencyCount"
+        "deficiencies",
+        "exceptions"
       ],
-      "location": "summary",
+      "location": "deficiencies",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_controlTestingCount",
+      "entity": "controlTestingCount",
+      "anchors": [
+        "tests run",
+        "control tests",
+        "testing count",
+        "tested controls"
+      ],
+      "location": "control_testing",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_matrix_shifted_columns",
+      "entity": "controlCount",
+      "anchors": [
+        "control matrix",
+        "row",
+        "shifted columns",
+        "reordered columns",
+        "csv export"
+      ],
+      "location": "control_matrix",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_controls_csv_export",
+      "entity": "deficiencyCount",
+      "anchors": [
+        "excel",
+        "spreadsheet",
+        "exported table",
+        "messy export",
+        "merged cells"
+      ],
+      "location": "deficiencies",
       "extractionMethod": "table_row_match"
     }
   ]

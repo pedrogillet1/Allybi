@@ -11,6 +11,7 @@ import {
   type EditingDomainAgent,
 } from "../agents";
 import { safeEditingBank } from "../banks/bankService";
+import { PolicyRuntimeEngine } from "../../core/policy/policyRuntimeEngine.service";
 
 export interface EditingAgentExecution {
   agentId: EditingAgentId;
@@ -48,6 +49,7 @@ function normalizeAgentId(value: unknown): EditingAgentId | null {
 export class EditingAgentRouterService {
   private readonly domainAgents: DomainAgent[];
   private readonly fallbackAgent: DefaultEditAgentService;
+  private readonly policyEngine = new PolicyRuntimeEngine();
 
   constructor(opts?: {
     revisionStore?: EditRevisionStore;
@@ -111,6 +113,15 @@ export class EditingAgentRouterService {
     domain: "docx" | "sheets" | null,
   ): EditingAgentId {
     const policy = safeEditingBank<EditingAgentPolicyBank>("editing_agent_policy");
+    const match = this.policyEngine.firstMatch({
+      policyBank: policy as Record<string, unknown>,
+      runtime: {
+        domain,
+      },
+    });
+    const fromRule = normalizeAgentId(match?.then?.agentId);
+    if (fromRule) return fromRule;
+
     const config = policy?.config;
     if (!config || config.enabled === false) {
       return domain === "sheets" ? "edit_agent_sheets" : "edit_agent_docx";

@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "layout_cues",
-    "version": "1.2.0",
-    "description": "Layout cues for structural and visual anchors across everyday document domains.",
+    "version": "1.3.0",
+    "description": "High-depth layout markers for structural extraction.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -26,2846 +26,3458 @@
   },
   "cues": [
     {
-      "id": "account_box",
-      "patterns": [
-        "account box",
-        "Account Box",
-        "account box:",
-        "conta box",
-        "Conta Box",
-        "conta box:"
-      ],
-      "meaning": "account_box",
-      "priority": 500,
-      "scope": "layout:account_box",
-      "disambiguationRuleId": "cues_disambiguation_general_account_box",
-      "curationReason": "weighted:account_box:domain_general"
-    },
-    {
-      "id": "addressee_block",
-      "patterns": [
-        "a/c",
-        "attention:",
-        "dear",
-        "prezada",
-        "prezado",
-        "to:"
-      ],
-      "meaning": "addressee_block",
-      "priority": 500,
-      "scope": "layout:addressee_block",
-      "disambiguationRuleId": "cues_disambiguation_general_addressee_block",
-      "curationReason": "weighted:addressee_block:domain_general"
-    },
-    {
-      "id": "amount_box",
-      "patterns": [
-        "amount box",
-        "Amount Box",
-        "amount box:",
-        "valor box",
-        "Valor Box",
-        "valor box:"
-      ],
-      "meaning": "amount_box",
-      "priority": 680,
-      "scope": "layout:amount_box",
-      "disambiguationRuleId": "cues_disambiguation_general_amount_box",
-      "curationReason": "weighted:amount_box:domain_general"
-    },
-    {
-      "id": "amount_due_badge",
-      "patterns": [
-        "amount due badge",
-        "Amount Due Badge",
-        "amount due badge:",
-        "valor vencimento badge",
-        "Valor Vencimento Badge",
-        "valor vencimento badge:"
-      ],
-      "meaning": "amount_due_badge",
-      "priority": 680,
-      "scope": "layout:amount_due_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_amount_due_badge",
-      "curationReason": "weighted:amount_due_badge:domain_general"
-    },
-    {
-      "id": "annex_marker",
-      "patterns": [
-        "anexo",
-        "anexo i",
-        "anexo ii",
-        "annex",
-        "annex a",
-        "annex b"
-      ],
-      "meaning": "annex_marker",
-      "priority": 380,
-      "scope": "layout:annex_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_annex_marker",
-      "curationReason": "weighted:annex_marker:domain_general"
-    },
-    {
-      "id": "appendix_marker",
-      "patterns": [
-        "apendice",
-        "apendice a",
-        "appendix",
-        "appendix a",
-        "appendix b"
-      ],
-      "meaning": "appendix_marker",
-      "priority": 380,
-      "scope": "layout:appendix_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_appendix_marker",
-      "curationReason": "weighted:appendix_marker:domain_general"
-    },
-    {
-      "id": "attachment_marker",
-      "patterns": [
-        "anexo",
-        "attached",
-        "attachment",
-        "em anexo",
-        "segue anexo"
-      ],
-      "meaning": "attachment_marker",
-      "priority": 500,
-      "scope": "layout:attachment_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_attachment_marker",
-      "curationReason": "weighted:attachment_marker:domain_general"
-    },
-    {
-      "id": "autopay_badge",
-      "patterns": [
-        "autopay badge",
-        "Autopay Badge",
-        "autopay badge:"
-      ],
-      "meaning": "autopay_badge",
-      "priority": 500,
-      "scope": "layout:autopay_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_autopay_badge",
-      "curationReason": "weighted:autopay_badge:domain_general"
-    },
-    {
-      "id": "barcode_block",
-      "patterns": [
-        "barcode block",
-        "Barcode Block",
-        "barcode block:"
-      ],
-      "meaning": "barcode_block",
-      "priority": 500,
-      "scope": "layout:barcode_block",
-      "disambiguationRuleId": "cues_disambiguation_general_barcode_block",
-      "curationReason": "weighted:barcode_block:domain_general"
-    },
-    {
-      "id": "beneficiary_block",
-      "patterns": [
-        "beneficiary block",
-        "Beneficiary Block",
-        "beneficiary block:"
-      ],
-      "meaning": "beneficiary_block",
-      "priority": 500,
-      "scope": "layout:beneficiary_block",
-      "disambiguationRuleId": "cues_disambiguation_general_beneficiary_block",
-      "curationReason": "weighted:beneficiary_block:domain_general"
-    },
-    {
-      "id": "bibliography_entry",
-      "patterns": [
-        "bibliografia",
-        "bibliography",
-        "references",
-        "referencias bibliograficas",
-        "works cited"
-      ],
-      "meaning": "bibliography_entry",
-      "priority": 500,
-      "scope": "layout:bibliography_entry",
-      "disambiguationRuleId": "cues_disambiguation_general_bibliography_entry",
-      "curationReason": "weighted:bibliography_entry:domain_general"
-    },
-    {
-      "id": "billing_header_bar",
-      "patterns": [
-        "billing header bar",
-        "Billing Header Bar",
-        "billing header bar:"
-      ],
-      "meaning": "billing_header_bar",
-      "priority": 500,
-      "scope": "layout:billing_header_bar",
-      "disambiguationRuleId": "cues_disambiguation_general_billing_header_bar",
-      "curationReason": "weighted:billing_header_bar:domain_general"
-    },
-    {
-      "id": "blockquote_marker",
-      "patterns": [
-        "citacao",
-        "excerpt",
-        "quote",
-        "quoted text",
-        "trecho citado"
-      ],
-      "meaning": "blockquote_marker",
-      "priority": 500,
-      "scope": "layout:blockquote_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_blockquote_marker",
-      "curationReason": "weighted:blockquote_marker:domain_general"
-    },
-    {
-      "id": "bullet_list_marker",
-      "patterns": [
-        "–",
-        "·",
-        "•",
-        "■",
-        "▪",
-        "○"
-      ],
-      "meaning": "bullet_list_marker",
-      "priority": 500,
-      "scope": "layout:bullet_list_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_bullet_list_marker",
-      "curationReason": "weighted:bullet_list_marker:domain_general"
-    },
-    {
-      "id": "callout_box",
-      "patterns": [
-        "atencao:",
-        "attention:",
-        "important:",
-        "importante:",
-        "nota:",
-        "note:"
-      ],
-      "meaning": "callout_box",
-      "priority": 500,
-      "scope": "layout:callout_box",
-      "disambiguationRuleId": "cues_disambiguation_general_callout_box",
-      "curationReason": "weighted:callout_box:domain_general"
-    },
-    {
-      "id": "callout_important",
-      "patterns": [
-        "callout important",
-        "Callout Important",
-        "callout important:"
-      ],
-      "meaning": "callout_important",
-      "priority": 500,
-      "scope": "layout:callout_important",
-      "disambiguationRuleId": "cues_disambiguation_general_callout_important",
-      "curationReason": "weighted:callout_important:domain_general"
-    },
-    {
-      "id": "cancellation_stamp",
-      "patterns": [
-        "cancellation stamp",
-        "Cancellation Stamp",
-        "cancellation stamp:"
-      ],
-      "meaning": "cancellation_stamp",
-      "priority": 500,
-      "scope": "layout:cancellation_stamp",
-      "disambiguationRuleId": "cues_disambiguation_general_cancellation_stamp",
-      "curationReason": "weighted:cancellation_stamp:domain_general"
-    },
-    {
-      "id": "card_last4_box",
-      "patterns": [
-        "card last4 box",
-        "Card Last4 Box",
-        "card last4 box:",
-        "cartao last4 box",
-        "Cartao Last4 Box",
-        "cartao last4 box:"
-      ],
-      "meaning": "card_last4_box",
-      "priority": 500,
-      "scope": "layout:card_last4_box",
-      "disambiguationRuleId": "cues_disambiguation_general_card_last4_box",
-      "curationReason": "weighted:card_last4_box:domain_general"
-    },
-    {
-      "id": "cc_line",
-      "patterns": [
-        "c.c.:",
-        "cc:",
-        "com copia para:",
-        "copia para:",
-        "copy to:"
-      ],
-      "meaning": "cc_line",
-      "priority": 500,
-      "scope": "layout:cc_line",
-      "disambiguationRuleId": "cues_disambiguation_general_cc_line",
-      "curationReason": "weighted:cc_line:domain_general"
-    },
-    {
-      "id": "certification_stamp",
-      "patterns": [
-        "certification stamp",
-        "Certification Stamp",
-        "certification stamp:"
-      ],
-      "meaning": "certification_stamp",
-      "priority": 500,
-      "scope": "layout:certification_stamp",
-      "disambiguationRuleId": "cues_disambiguation_general_certification_stamp",
-      "curationReason": "weighted:certification_stamp:domain_general"
-    },
-    {
-      "id": "chart_title",
-      "patterns": [
-        "chart:",
-        "diagrama:",
-        "figure:",
-        "grafico:",
-        "graph:"
-      ],
-      "meaning": "chart_title",
-      "priority": 500,
-      "scope": "layout:chart_title",
-      "disambiguationRuleId": "cues_disambiguation_general_chart_title",
-      "curationReason": "weighted:chart_title:domain_general"
-    },
-    {
-      "id": "checkbox_checked",
-      "patterns": [
-        "(x)",
-        "[x]",
-        "[X]",
-        "☑",
-        "✓",
-        "✔"
-      ],
-      "meaning": "checkbox_checked",
-      "priority": 500,
-      "scope": "layout:checkbox_checked",
-      "disambiguationRuleId": "cues_disambiguation_general_checkbox_checked",
-      "curationReason": "weighted:checkbox_checked:domain_general"
-    },
-    {
-      "id": "checkbox_unchecked",
-      "patterns": [
-        "( )",
-        "[ ]",
-        "□",
-        "◻",
-        "☐"
-      ],
-      "meaning": "checkbox_unchecked",
-      "priority": 500,
-      "scope": "layout:checkbox_unchecked",
-      "disambiguationRuleId": "cues_disambiguation_general_checkbox_unchecked",
-      "curationReason": "weighted:checkbox_unchecked:domain_general"
-    },
-    {
-      "id": "citation_marker",
-      "patterns": [
-        "[1]",
-        "[2]",
-        "apud",
-        "cf.",
-        "ibid.",
-        "op. cit."
-      ],
-      "meaning": "citation_marker",
-      "priority": 500,
-      "scope": "layout:citation_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_citation_marker",
-      "curationReason": "weighted:citation_marker:domain_general"
-    },
-    {
-      "id": "claim_badge",
-      "patterns": [
-        "claim badge",
-        "Claim Badge",
-        "claim badge:",
-        "sinistro badge",
-        "Sinistro Badge",
-        "sinistro badge:"
-      ],
-      "meaning": "claim_badge",
-      "priority": 500,
-      "scope": "layout:claim_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_claim_badge",
-      "curationReason": "weighted:claim_badge:domain_general"
-    },
-    {
-      "id": "claim_timeline",
-      "patterns": [
-        "claim timeline",
-        "Claim Timeline",
-        "claim timeline:",
-        "sinistro timeline",
-        "Sinistro Timeline",
-        "sinistro timeline:"
-      ],
-      "meaning": "claim_timeline",
-      "priority": 500,
-      "scope": "layout:claim_timeline",
-      "disambiguationRuleId": "cues_disambiguation_general_claim_timeline",
-      "curationReason": "weighted:claim_timeline:domain_general"
-    },
-    {
-      "id": "closing_signature_panel",
-      "patterns": [
-        "closing signature panel",
-        "Closing Signature Panel",
-        "closing signature panel:",
-        "fechamento signature panel",
-        "Fechamento Signature Panel",
-        "fechamento signature panel:"
-      ],
-      "meaning": "closing_signature_panel",
-      "priority": 500,
-      "scope": "layout:closing_signature_panel",
-      "disambiguationRuleId": "cues_disambiguation_general_closing_signature_panel",
-      "curationReason": "weighted:closing_signature_panel:domain_general"
-    },
-    {
-      "id": "closing_valediction",
-      "patterns": [
-        "atenciosamente",
-        "best regards",
-        "cordialmente",
-        "regards",
-        "respeitosamente",
-        "sincerely"
-      ],
-      "meaning": "closing_valediction",
-      "priority": 500,
-      "scope": "layout:closing_valediction",
-      "disambiguationRuleId": "cues_disambiguation_general_closing_valediction",
-      "curationReason": "weighted:closing_valediction:domain_general"
-    },
-    {
-      "id": "co_pay_badge",
-      "patterns": [
-        "co pay badge",
-        "Co Pay Badge",
-        "co pay badge:"
-      ],
-      "meaning": "co_pay_badge",
-      "priority": 500,
-      "scope": "layout:co_pay_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_co_pay_badge",
-      "curationReason": "weighted:co_pay_badge:domain_general"
-    },
-    {
-      "id": "code_block",
-      "patterns": [
-        "```",
-        "code:",
-        "codigo:",
-        "command:",
-        "script:"
-      ],
-      "meaning": "code_block",
-      "priority": 500,
-      "scope": "layout:code_block",
-      "disambiguationRuleId": "cues_disambiguation_general_code_block",
-      "curationReason": "weighted:code_block:domain_general"
-    },
-    {
-      "id": "column_break",
-      "patterns": [
-        "column break",
-        "new column",
-        "nova coluna",
-        "quebra de coluna"
-      ],
-      "meaning": "column_break",
-      "priority": 500,
-      "scope": "layout:column_break",
-      "disambiguationRuleId": "cues_disambiguation_general_column_break",
-      "curationReason": "weighted:column_break:domain_general"
-    },
-    {
-      "id": "comment_annotation",
-      "patterns": [
-        "anotacao:",
-        "comentario:",
-        "comment:",
-        "note:",
-        "observacao:",
-        "reviewer:"
-      ],
-      "meaning": "comment_annotation",
-      "priority": 500,
-      "scope": "layout:comment_annotation",
-      "disambiguationRuleId": "cues_disambiguation_general_comment_annotation",
-      "curationReason": "weighted:comment_annotation:domain_general"
-    },
-    {
-      "id": "confidential_footer",
-      "patterns": [
-        "confidencial",
-        "confidential",
-        "do not distribute",
-        "nao divulgar",
-        "privileged",
-        "sigiloso"
-      ],
-      "meaning": "confidential_footer",
-      "priority": 500,
-      "scope": "layout:confidential_footer",
-      "disambiguationRuleId": "cues_disambiguation_general_confidential_footer",
-      "curationReason": "weighted:confidential_footer:domain_general"
-    },
-    {
-      "id": "continuation_marker",
-      "patterns": [
-        "cont.",
-        "cont. na proxima pagina",
-        "continua",
-        "continuacao",
-        "continued",
-        "continued on next page"
-      ],
-      "meaning": "continuation_marker",
-      "priority": 500,
-      "scope": "layout:continuation_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_continuation_marker",
-      "curationReason": "weighted:continuation_marker:domain_general"
-    },
-    {
-      "id": "coverage_badge",
-      "patterns": [
-        "coverage badge",
-        "Coverage Badge",
-        "coverage badge:"
-      ],
-      "meaning": "coverage_badge",
-      "priority": 500,
-      "scope": "layout:coverage_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_coverage_badge",
-      "curationReason": "weighted:coverage_badge:domain_general"
-    },
-    {
-      "id": "credential_watermark",
-      "patterns": [
-        "credential watermark",
-        "Credential Watermark",
-        "credential watermark:"
-      ],
-      "meaning": "credential_watermark",
-      "priority": 500,
-      "scope": "layout:credential_watermark",
-      "disambiguationRuleId": "cues_disambiguation_general_credential_watermark",
-      "curationReason": "weighted:credential_watermark:domain_general"
-    },
-    {
-      "id": "data_usage_chart",
-      "patterns": [
-        "dados uso chart",
-        "Dados Uso Chart",
-        "dados uso chart:",
-        "data usage chart",
-        "Data Usage Chart",
-        "data usage chart:"
-      ],
-      "meaning": "data_usage_chart",
-      "priority": 500,
-      "scope": "layout:data_usage_chart",
-      "disambiguationRuleId": "cues_disambiguation_general_data_usage_chart",
-      "curationReason": "weighted:data_usage_chart:domain_general"
-    },
-    {
-      "id": "date_line",
-      "patterns": [
-        "data:",
-        "datado de",
-        "date:",
-        "dated this",
-        "dated:",
-        "em __/__/____"
-      ],
-      "meaning": "date_line",
-      "priority": 680,
-      "scope": "layout:date_line",
-      "disambiguationRuleId": "cues_disambiguation_general_date_line",
-      "curationReason": "weighted:date_line:domain_general"
-    },
-    {
-      "id": "date_pill",
-      "patterns": [
-        "data pill",
-        "Data Pill",
-        "data pill:",
-        "date pill",
-        "Date Pill",
-        "date pill:"
-      ],
-      "meaning": "date_pill",
-      "priority": 680,
-      "scope": "layout:date_pill",
-      "disambiguationRuleId": "cues_disambiguation_general_date_pill",
-      "curationReason": "weighted:date_pill:domain_general"
-    },
-    {
-      "id": "deduction_grid",
-      "patterns": [
-        "deduction grid",
-        "Deduction Grid",
-        "deduction grid:"
-      ],
-      "meaning": "deduction_grid",
-      "priority": 500,
-      "scope": "layout:deduction_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_deduction_grid",
-      "curationReason": "weighted:deduction_grid:domain_general"
-    },
-    {
-      "id": "delinquency_badge",
-      "patterns": [
-        "delinquency badge",
-        "Delinquency Badge",
-        "delinquency badge:"
-      ],
-      "meaning": "delinquency_badge",
-      "priority": 500,
-      "scope": "layout:delinquency_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_delinquency_badge",
-      "curationReason": "weighted:delinquency_badge:domain_general"
-    },
-    {
-      "id": "disclaimer_block",
-      "patterns": [
-        "aviso legal",
-        "disclaimer",
-        "este documento",
-        "legal notice",
-        "this document"
-      ],
-      "meaning": "disclaimer_block",
-      "priority": 500,
-      "scope": "layout:disclaimer_block",
-      "disambiguationRuleId": "cues_disambiguation_general_disclaimer_block",
-      "curationReason": "weighted:disclaimer_block:domain_general"
-    },
-    {
-      "id": "disclaimer_ribbon",
-      "patterns": [
-        "disclaimer ribbon",
-        "Disclaimer Ribbon",
-        "disclaimer ribbon:"
-      ],
-      "meaning": "disclaimer_ribbon",
-      "priority": 500,
-      "scope": "layout:disclaimer_ribbon",
-      "disambiguationRuleId": "cues_disambiguation_general_disclaimer_ribbon",
-      "curationReason": "weighted:disclaimer_ribbon:domain_general"
-    },
-    {
-      "id": "divider_ornament",
-      "patterns": [
-        "---",
-        "* * *",
-        "***",
-        "• • •",
-        "===",
-        "oOo"
-      ],
-      "meaning": "divider_ornament",
-      "priority": 500,
-      "scope": "layout:divider_ornament",
-      "disambiguationRuleId": "cues_disambiguation_general_divider_ornament",
-      "curationReason": "weighted:divider_ornament:domain_general"
-    },
-    {
-      "id": "document_id_footer",
-      "patterns": [
-        "document id footer",
-        "Document Id Footer",
-        "document id footer:"
-      ],
-      "meaning": "document_id_footer",
-      "priority": 500,
-      "scope": "layout:document_id_footer",
-      "disambiguationRuleId": "cues_disambiguation_general_document_id_footer",
-      "curationReason": "weighted:document_id_footer:domain_general"
-    },
-    {
-      "id": "document_title_banner",
-      "patterns": [
-        "document title banner",
-        "Document Title Banner",
-        "document title banner:"
-      ],
-      "meaning": "document_title_banner",
-      "priority": 500,
-      "scope": "layout:document_title_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_document_title_banner",
-      "curationReason": "weighted:document_title_banner:domain_general"
-    },
-    {
-      "id": "download_upload_split",
-      "patterns": [
-        "download upload split",
-        "Download Upload Split",
-        "download upload split:"
-      ],
-      "meaning": "download_upload_split",
-      "priority": 500,
-      "scope": "layout:download_upload_split",
-      "disambiguationRuleId": "cues_disambiguation_general_download_upload_split",
-      "curationReason": "weighted:download_upload_split:domain_general"
-    },
-    {
-      "id": "due_date_badge",
-      "patterns": [
-        "due date badge",
-        "Due Date Badge",
-        "due date badge:",
-        "vencimento data badge",
-        "Vencimento Data Badge",
-        "vencimento data badge:"
-      ],
-      "meaning": "due_date_badge",
-      "priority": 680,
-      "scope": "layout:due_date_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_due_date_badge",
-      "curationReason": "weighted:due_date_badge:domain_general"
-    },
-    {
-      "id": "education_seal",
-      "patterns": [
-        "education seal",
-        "Education Seal",
-        "education seal:"
-      ],
-      "meaning": "education_seal",
-      "priority": 500,
-      "scope": "layout:education_seal",
-      "disambiguationRuleId": "cues_disambiguation_general_education_seal",
-      "curationReason": "weighted:education_seal:domain_general"
-    },
-    {
-      "id": "employee_id_badge",
-      "patterns": [
-        "employee id badge",
-        "Employee Id Badge",
-        "employee id badge:"
-      ],
-      "meaning": "employee_id_badge",
-      "priority": 500,
-      "scope": "layout:employee_id_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_employee_id_badge",
-      "curationReason": "weighted:employee_id_badge:domain_general"
-    },
-    {
-      "id": "enclosure_line",
-      "patterns": [
-        "anexos:",
-        "documentos anexos:",
-        "enc.:",
-        "encl:",
-        "enclosure:",
-        "enclosures:"
-      ],
-      "meaning": "enclosure_line",
-      "priority": 500,
-      "scope": "layout:enclosure_line",
-      "disambiguationRuleId": "cues_disambiguation_general_enclosure_line",
-      "curationReason": "weighted:enclosure_line:domain_general"
-    },
-    {
-      "id": "end_of_document",
-      "patterns": [
-        "-- end --",
-        "-- fim --",
-        "###",
-        "end of document",
-        "fim do documento"
-      ],
-      "meaning": "end_of_document",
-      "priority": 500,
-      "scope": "layout:end_of_document",
-      "disambiguationRuleId": "cues_disambiguation_general_end_of_document",
-      "curationReason": "weighted:end_of_document:domain_general"
-    },
-    {
-      "id": "endnote_marker",
-      "patterns": [
-        "end note",
-        "endnote",
-        "endnotes",
-        "notas de fim",
-        "notas finais"
-      ],
-      "meaning": "endnote_marker",
-      "priority": 500,
-      "scope": "layout:endnote_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_endnote_marker",
-      "curationReason": "weighted:endnote_marker:domain_general"
-    },
-    {
-      "id": "enrollment_status_badge",
-      "patterns": [
-        "enrollment status badge",
-        "Enrollment Status Badge",
-        "enrollment status badge:",
-        "matricula status badge",
-        "Matricula Status Badge",
-        "matricula status badge:"
-      ],
-      "meaning": "enrollment_status_badge",
-      "priority": 500,
-      "scope": "layout:enrollment_status_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_enrollment_status_badge",
-      "curationReason": "weighted:enrollment_status_badge:domain_general"
-    },
-    {
-      "id": "exhibit_marker",
-      "patterns": [
-        "doc.",
-        "documento",
-        "exhibit",
-        "exhibit a",
-        "exhibit b",
-        "peca"
-      ],
-      "meaning": "exhibit_marker",
-      "priority": 500,
-      "scope": "layout:exhibit_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_exhibit_marker",
-      "curationReason": "weighted:exhibit_marker:domain_general"
-    },
-    {
-      "id": "fare_conditions_box",
-      "patterns": [
-        "fare conditions box",
-        "Fare Conditions Box",
-        "fare conditions box:"
-      ],
-      "meaning": "fare_conditions_box",
-      "priority": 500,
-      "scope": "layout:fare_conditions_box",
-      "disambiguationRuleId": "cues_disambiguation_general_fare_conditions_box",
-      "curationReason": "weighted:fare_conditions_box:domain_general"
-    },
-    {
-      "id": "fee_breakdown_grid",
-      "patterns": [
-        "fee breakdown grid",
-        "Fee Breakdown Grid",
-        "fee breakdown grid:",
-        "taxa breakdown grid",
-        "Taxa Breakdown Grid",
-        "taxa breakdown grid:"
-      ],
-      "meaning": "fee_breakdown_grid",
-      "priority": 500,
-      "scope": "layout:fee_breakdown_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_fee_breakdown_grid",
-      "curationReason": "weighted:fee_breakdown_grid:domain_general"
-    },
-    {
-      "id": "figure_caption",
-      "patterns": [
-        "fig.",
-        "figura",
-        "figure",
-        "illustration",
-        "ilustracao"
-      ],
-      "meaning": "figure_caption",
-      "priority": 500,
-      "scope": "layout:figure_caption",
-      "disambiguationRuleId": "cues_disambiguation_general_figure_caption",
-      "curationReason": "weighted:figure_caption:domain_general"
-    },
-    {
-      "id": "flight_segment_card",
-      "patterns": [
-        "flight segment card",
-        "Flight Segment Card",
-        "flight segment card:",
-        "flight segment cartao",
-        "Flight Segment Cartao",
-        "flight segment cartao:"
-      ],
-      "meaning": "flight_segment_card",
-      "priority": 500,
-      "scope": "layout:flight_segment_card",
-      "disambiguationRuleId": "cues_disambiguation_general_flight_segment_card",
-      "curationReason": "weighted:flight_segment_card:domain_general"
-    },
-    {
-      "id": "footer_repeat",
-      "patterns": [
-        "bottom margin",
-        "footer",
-        "page footer",
-        "rodape",
-        "rodape da pagina"
-      ],
-      "meaning": "footer_repeat",
-      "priority": 500,
-      "scope": "layout:footer_repeat",
-      "disambiguationRuleId": "cues_disambiguation_general_footer_repeat",
-      "curationReason": "weighted:footer_repeat:domain_general"
-    },
-    {
       "id": "footnote_marker",
       "patterns": [
-        "¹",
-        "²",
-        "³",
         "footnote",
+        "f.n.",
+        "fn",
         "nota de rodape",
-        "note:"
+        "nota de rodapé"
       ],
       "meaning": "footnote_marker",
-      "priority": 380,
+      "priority": 700,
       "scope": "layout:footnote_marker",
       "disambiguationRuleId": "cues_disambiguation_general_footnote_marker",
       "curationReason": "weighted:footnote_marker:domain_general"
     },
     {
-      "id": "fraud_notice_banner",
-      "patterns": [
-        "fraud notice banner",
-        "Fraud Notice Banner",
-        "fraud notice banner:"
-      ],
-      "meaning": "fraud_notice_banner",
-      "priority": 500,
-      "scope": "layout:fraud_notice_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_fraud_notice_banner",
-      "curationReason": "weighted:fraud_notice_banner:domain_general"
-    },
-    {
-      "id": "gpa_badge",
-      "patterns": [
-        "gpa badge",
-        "Gpa Badge",
-        "gpa badge:"
-      ],
-      "meaning": "gpa_badge",
-      "priority": 500,
-      "scope": "layout:gpa_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_gpa_badge",
-      "curationReason": "weighted:gpa_badge:domain_general"
-    },
-    {
-      "id": "grace_period_badge",
-      "patterns": [
-        "grace period badge",
-        "Grace Period Badge",
-        "grace period badge:",
-        "grace periodo badge",
-        "Grace Periodo Badge",
-        "grace periodo badge:"
-      ],
-      "meaning": "grace_period_badge",
-      "priority": 680,
-      "scope": "layout:grace_period_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_grace_period_badge",
-      "curationReason": "weighted:grace_period_badge:domain_general"
-    },
-    {
-      "id": "header_logo_lockup",
-      "patterns": [
-        "header logo lockup",
-        "Header Logo Lockup",
-        "header logo lockup:"
-      ],
-      "meaning": "header_logo_lockup",
-      "priority": 500,
-      "scope": "layout:header_logo_lockup",
-      "disambiguationRuleId": "cues_disambiguation_general_header_logo_lockup",
-      "curationReason": "weighted:header_logo_lockup:domain_general"
-    },
-    {
-      "id": "header_repeat",
-      "patterns": [
-        "cabecalho",
-        "cabecalho da pagina",
-        "header",
-        "page header",
-        "running head"
-      ],
-      "meaning": "header_repeat",
-      "priority": 500,
-      "scope": "layout:header_repeat",
-      "disambiguationRuleId": "cues_disambiguation_general_header_repeat",
-      "curationReason": "weighted:header_repeat:domain_general"
-    },
-    {
-      "id": "highlight_marker",
-      "patterns": [
-        "destaque",
-        "emphasis",
-        "highlight",
-        "highlighted",
-        "marcacao"
-      ],
-      "meaning": "highlight_marker",
-      "priority": 500,
-      "scope": "layout:highlight_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_highlight_marker",
-      "curationReason": "weighted:highlight_marker:domain_general"
-    },
-    {
-      "id": "horizontal_rule",
-      "patterns": [
-        "___",
-        "---",
-        "***",
-        "────",
-        "━━━━"
-      ],
-      "meaning": "horizontal_rule",
-      "priority": 500,
-      "scope": "layout:horizontal_rule",
-      "disambiguationRuleId": "cues_disambiguation_general_horizontal_rule",
-      "curationReason": "weighted:horizontal_rule:domain_general"
-    },
-    {
-      "id": "housing_floorplan_embed",
-      "patterns": [
-        "housing floorplan embed",
-        "Housing Floorplan Embed",
-        "housing floorplan embed:"
-      ],
-      "meaning": "housing_floorplan_embed",
-      "priority": 500,
-      "scope": "layout:housing_floorplan_embed",
-      "disambiguationRuleId": "cues_disambiguation_general_housing_floorplan_embed",
-      "curationReason": "weighted:housing_floorplan_embed:domain_general"
-    },
-    {
-      "id": "identity_photo_box",
-      "patterns": [
-        "identidade photo box",
-        "Identidade Photo Box",
-        "identidade photo box:",
-        "identity photo box",
-        "Identity Photo Box",
-        "identity photo box:"
-      ],
-      "meaning": "identity_photo_box",
-      "priority": 680,
-      "scope": "layout:identity_photo_box",
-      "disambiguationRuleId": "cues_disambiguation_general_identity_photo_box",
-      "curationReason": "weighted:identity_photo_box:domain_general"
-    },
-    {
-      "id": "image_placeholder",
-      "patterns": [
-        "[foto]",
-        "[image]",
-        "[imagem]",
-        "[photo]",
-        "inserir imagem aqui",
-        "insert image here"
-      ],
-      "meaning": "image_placeholder",
-      "priority": 500,
-      "scope": "layout:image_placeholder",
-      "disambiguationRuleId": "cues_disambiguation_general_image_placeholder",
-      "curationReason": "weighted:image_placeholder:domain_general"
-    },
-    {
-      "id": "indented_block",
-      "patterns": [
-        "block indent",
-        "indented",
-        "nested",
-        "recuado",
-        "recuo"
-      ],
-      "meaning": "indented_block",
-      "priority": 500,
-      "scope": "layout:indented_block",
-      "disambiguationRuleId": "cues_disambiguation_general_indented_block",
-      "curationReason": "weighted:indented_block:domain_general"
-    },
-    {
-      "id": "info_box",
-      "patterns": [
-        "for your information",
-        "fyi:",
-        "info:",
-        "informacao:",
-        "information:",
-        "para sua informacao"
-      ],
-      "meaning": "info_box",
-      "priority": 500,
-      "scope": "layout:info_box",
-      "disambiguationRuleId": "cues_disambiguation_general_info_box",
-      "curationReason": "weighted:info_box:domain_general"
-    },
-    {
-      "id": "initials_block",
-      "patterns": [
-        "iniciais:",
-        "initials:",
-        "parafo:",
-        "rubrica:",
-        "visto:"
-      ],
-      "meaning": "initials_block",
-      "priority": 500,
-      "scope": "layout:initials_block",
-      "disambiguationRuleId": "cues_disambiguation_general_initials_block",
-      "curationReason": "weighted:initials_block:domain_general"
-    },
-    {
-      "id": "insurance_plan_chip",
-      "patterns": [
-        "insurance plan chip",
-        "Insurance Plan Chip",
-        "insurance plan chip:",
-        "insurance plano chip",
-        "Insurance Plano Chip",
-        "insurance plano chip:"
-      ],
-      "meaning": "insurance_plan_chip",
-      "priority": 500,
-      "scope": "layout:insurance_plan_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_insurance_plan_chip",
-      "curationReason": "weighted:insurance_plan_chip:domain_general"
-    },
-    {
-      "id": "interest_box",
-      "patterns": [
-        "interest box",
-        "Interest Box",
-        "interest box:",
-        "juros box",
-        "Juros Box",
-        "juros box:"
-      ],
-      "meaning": "interest_box",
-      "priority": 500,
-      "scope": "layout:interest_box",
-      "disambiguationRuleId": "cues_disambiguation_general_interest_box",
-      "curationReason": "weighted:interest_box:domain_general"
-    },
-    {
-      "id": "invoice_totals_card",
-      "patterns": [
-        "invoice totals card",
-        "Invoice Totals Card",
-        "invoice totals card:",
-        "nota totals cartao",
-        "Nota Totals Cartao",
-        "nota totals cartao:"
-      ],
-      "meaning": "invoice_totals_card",
-      "priority": 850,
-      "scope": "layout:invoice_totals_card",
-      "disambiguationRuleId": "cues_disambiguation_general_invoice_totals_card",
-      "curationReason": "weighted:invoice_totals_card:domain_general"
-    },
-    {
-      "id": "issuer_signature_strip",
-      "patterns": [
-        "emissor signature strip",
-        "Emissor Signature Strip",
-        "emissor signature strip:",
-        "issuer signature strip",
-        "Issuer Signature Strip",
-        "issuer signature strip:"
-      ],
-      "meaning": "issuer_signature_strip",
-      "priority": 500,
-      "scope": "layout:issuer_signature_strip",
-      "disambiguationRuleId": "cues_disambiguation_general_issuer_signature_strip",
-      "curationReason": "weighted:issuer_signature_strip:domain_general"
-    },
-    {
-      "id": "itemized_table_header",
-      "patterns": [
-        "itemized table header",
-        "Itemized Table Header",
-        "itemized table header:"
-      ],
-      "meaning": "itemized_table_header",
-      "priority": 680,
-      "scope": "layout:itemized_table_header",
-      "disambiguationRuleId": "cues_disambiguation_general_itemized_table_header",
-      "curationReason": "weighted:itemized_table_header:domain_general"
-    },
-    {
-      "id": "lab_result_table_marker",
-      "patterns": [
-        "lab result table marker",
-        "Lab Result Table Marker",
-        "lab result table marker:"
-      ],
-      "meaning": "lab_result_table_marker",
-      "priority": 1030,
-      "scope": "layout:lab_result_table_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_lab_result_table_marker",
-      "curationReason": "weighted:lab_result_table_marker:domain_general"
-    },
-    {
-      "id": "late_fee_banner",
-      "patterns": [
-        "late fee banner",
-        "Late Fee Banner",
-        "late fee banner:",
-        "late taxa banner",
-        "Late Taxa Banner",
-        "late taxa banner:"
-      ],
-      "meaning": "late_fee_banner",
-      "priority": 500,
-      "scope": "layout:late_fee_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_late_fee_banner",
-      "curationReason": "weighted:late_fee_banner:domain_general"
-    },
-    {
-      "id": "letterhead",
-      "patterns": [
-        "cabecalho institucional",
-        "company header",
-        "letterhead",
-        "papel timbrado",
-        "timbre"
-      ],
-      "meaning": "letterhead",
-      "priority": 500,
-      "scope": "layout:letterhead",
-      "disambiguationRuleId": "cues_disambiguation_general_letterhead",
-      "curationReason": "weighted:letterhead:domain_general"
-    },
-    {
-      "id": "line_item_table_grid",
-      "patterns": [
-        "line item table grid",
-        "Line Item Table Grid",
-        "line item table grid:",
-        "linha item table grid",
-        "Linha Item Table Grid",
-        "linha item table grid:"
-      ],
-      "meaning": "line_item_table_grid",
-      "priority": 680,
-      "scope": "layout:line_item_table_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_line_item_table_grid",
-      "curationReason": "weighted:line_item_table_grid:domain_general"
-    },
-    {
-      "id": "loan_amortization_grid",
-      "patterns": [
-        "emprestimo amortization grid",
-        "Emprestimo Amortization Grid",
-        "emprestimo amortization grid:",
-        "loan amortization grid",
-        "Loan Amortization Grid",
-        "loan amortization grid:"
-      ],
-      "meaning": "loan_amortization_grid",
-      "priority": 500,
-      "scope": "layout:loan_amortization_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_loan_amortization_grid",
-      "curationReason": "weighted:loan_amortization_grid:domain_general"
-    },
-    {
-      "id": "logo_placeholder",
-      "patterns": [
-        "[logo]",
-        "company logo",
-        "logo",
-        "logomarca",
-        "logotipo"
-      ],
-      "meaning": "logo_placeholder",
-      "priority": 500,
-      "scope": "layout:logo_placeholder",
-      "disambiguationRuleId": "cues_disambiguation_general_logo_placeholder",
-      "curationReason": "weighted:logo_placeholder:domain_general"
-    },
-    {
-      "id": "map_embed",
-      "patterns": [
-        "map embed",
-        "Map Embed",
-        "map embed:"
-      ],
-      "meaning": "map_embed",
-      "priority": 500,
-      "scope": "layout:map_embed",
-      "disambiguationRuleId": "cues_disambiguation_general_map_embed",
-      "curationReason": "weighted:map_embed:domain_general"
-    },
-    {
-      "id": "margin_note",
-      "patterns": [
-        "margin note",
-        "marginal annotation",
-        "nota lateral",
-        "nota marginal",
-        "side note"
-      ],
-      "meaning": "margin_note",
-      "priority": 500,
-      "scope": "layout:margin_note",
-      "disambiguationRuleId": "cues_disambiguation_general_margin_note",
-      "curationReason": "weighted:margin_note:domain_general"
-    },
-    {
-      "id": "merchant_stamp",
-      "patterns": [
-        "merchant stamp",
-        "Merchant Stamp",
-        "merchant stamp:"
-      ],
-      "meaning": "merchant_stamp",
-      "priority": 500,
-      "scope": "layout:merchant_stamp",
-      "disambiguationRuleId": "cues_disambiguation_general_merchant_stamp",
-      "curationReason": "weighted:merchant_stamp:domain_general"
-    },
-    {
-      "id": "meter_reading_box",
-      "patterns": [
-        "medidor leitura box",
-        "Medidor Leitura Box",
-        "medidor leitura box:",
-        "meter reading box",
-        "Meter Reading Box",
-        "meter reading box:"
-      ],
-      "meaning": "meter_reading_box",
-      "priority": 500,
-      "scope": "layout:meter_reading_box",
-      "disambiguationRuleId": "cues_disambiguation_general_meter_reading_box",
-      "curationReason": "weighted:meter_reading_box:domain_general"
-    },
-    {
-      "id": "minimum_payment_banner",
-      "patterns": [
-        "minimo pagamento banner",
-        "Minimo Pagamento Banner",
-        "minimo pagamento banner:",
-        "minimum payment banner",
-        "Minimum Payment Banner",
-        "minimum payment banner:"
-      ],
-      "meaning": "minimum_payment_banner",
-      "priority": 500,
-      "scope": "layout:minimum_payment_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_minimum_payment_banner",
-      "curationReason": "weighted:minimum_payment_banner:domain_general"
-    },
-    {
-      "id": "mobile_plan_chip",
-      "patterns": [
-        "mobile plan chip",
-        "Mobile Plan Chip",
-        "mobile plan chip:",
-        "mobile plano chip",
-        "Mobile Plano Chip",
-        "mobile plano chip:"
-      ],
-      "meaning": "mobile_plan_chip",
-      "priority": 500,
-      "scope": "layout:mobile_plan_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_mobile_plan_chip",
-      "curationReason": "weighted:mobile_plan_chip:domain_general"
-    },
-    {
-      "id": "mortgage_terms_box",
-      "patterns": [
-        "hipoteca terms box",
-        "Hipoteca Terms Box",
-        "hipoteca terms box:",
-        "mortgage terms box",
-        "Mortgage Terms Box",
-        "mortgage terms box:"
-      ],
-      "meaning": "mortgage_terms_box",
-      "priority": 500,
-      "scope": "layout:mortgage_terms_box",
-      "disambiguationRuleId": "cues_disambiguation_general_mortgage_terms_box",
-      "curationReason": "weighted:mortgage_terms_box:domain_general"
-    },
-    {
-      "id": "national_id_hologram",
-      "patterns": [
-        "national id hologram",
-        "National Id Hologram",
-        "national id hologram:"
-      ],
-      "meaning": "national_id_hologram",
-      "priority": 500,
-      "scope": "layout:national_id_hologram",
-      "disambiguationRuleId": "cues_disambiguation_general_national_id_hologram",
-      "curationReason": "weighted:national_id_hologram:domain_general"
-    },
-    {
-      "id": "net_pay_badge",
-      "patterns": [
-        "net pay badge",
-        "Net Pay Badge",
-        "net pay badge:"
-      ],
-      "meaning": "net_pay_badge",
-      "priority": 500,
-      "scope": "layout:net_pay_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_net_pay_badge",
-      "curationReason": "weighted:net_pay_badge:domain_general"
-    },
-    {
-      "id": "notary_block",
-      "patterns": [
-        "cartorio",
-        "notarial seal",
-        "notarized",
-        "notary public",
-        "reconhecimento de firma",
-        "tabeliao"
-      ],
-      "meaning": "notary_block",
-      "priority": 500,
-      "scope": "layout:notary_block",
-      "disambiguationRuleId": "cues_disambiguation_general_notary_block",
-      "curationReason": "weighted:notary_block:domain_general"
-    },
-    {
-      "id": "notification_banner",
-      "patterns": [
-        "notification banner",
-        "Notification Banner",
-        "notification banner:"
-      ],
-      "meaning": "notification_banner",
-      "priority": 500,
-      "scope": "layout:notification_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_notification_banner",
-      "curationReason": "weighted:notification_banner:domain_general"
-    },
-    {
-      "id": "numbered_list_marker",
-      "patterns": [
-        "1.",
-        "2.",
-        "3.",
-        "a)",
-        "i.",
-        "ii."
-      ],
-      "meaning": "numbered_list_marker",
-      "priority": 500,
-      "scope": "layout:numbered_list_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_numbered_list_marker",
-      "curationReason": "weighted:numbered_list_marker:domain_general"
-    },
-    {
-      "id": "overage_alert_box",
-      "patterns": [
-        "excedente alert box",
-        "Excedente Alert Box",
-        "excedente alert box:",
-        "overage alert box",
-        "Overage Alert Box",
-        "overage alert box:"
-      ],
-      "meaning": "overage_alert_box",
-      "priority": 780,
-      "scope": "layout:overage_alert_box",
-      "disambiguationRuleId": "cues_disambiguation_general_overage_alert_box",
-      "curationReason": "weighted:overage_alert_box:domain_general"
-    },
-    {
-      "id": "owner_signature_box",
-      "patterns": [
-        "owner signature box",
-        "Owner Signature Box",
-        "owner signature box:"
-      ],
-      "meaning": "owner_signature_box",
-      "priority": 500,
-      "scope": "layout:owner_signature_box",
-      "disambiguationRuleId": "cues_disambiguation_general_owner_signature_box",
-      "curationReason": "weighted:owner_signature_box:domain_general"
-    },
-    {
-      "id": "page_break",
-      "patterns": [
-        "form feed",
-        "new page",
-        "nova pagina",
-        "page break",
-        "quebra de pagina"
-      ],
-      "meaning": "page_break",
-      "priority": 500,
-      "scope": "layout:page_break",
-      "disambiguationRuleId": "cues_disambiguation_general_page_break",
-      "curationReason": "weighted:page_break:domain_general"
-    },
-    {
-      "id": "page_number",
-      "patterns": [
-        "p.",
-        "pag.",
-        "page",
-        "pagina",
-        "pg."
-      ],
-      "meaning": "page_number",
-      "priority": 500,
-      "scope": "layout:page_number",
-      "disambiguationRuleId": "cues_disambiguation_general_page_number",
-      "curationReason": "weighted:page_number:domain_general"
-    },
-    {
-      "id": "page_of_total",
-      "patterns": [
-        "1/10",
-        "page 1 of",
-        "page x of y",
-        "pagina 1 de",
-        "pagina x de y"
-      ],
-      "meaning": "page_of_total",
-      "priority": 850,
-      "scope": "layout:page_of_total",
-      "disambiguationRuleId": "cues_disambiguation_general_page_of_total",
-      "curationReason": "weighted:page_of_total:domain_general"
-    },
-    {
-      "id": "page_reference_footer",
-      "patterns": [
-        "page reference footer",
-        "Page Reference Footer",
-        "page reference footer:",
-        "page referencia footer",
-        "Page Referencia Footer",
-        "page referencia footer:"
-      ],
-      "meaning": "page_reference_footer",
-      "priority": 380,
-      "scope": "layout:page_reference_footer",
-      "disambiguationRuleId": "cues_disambiguation_general_page_reference_footer",
-      "curationReason": "weighted:page_reference_footer:domain_general"
-    },
-    {
-      "id": "passenger_panel",
-      "patterns": [
-        "passenger panel",
-        "Passenger Panel",
-        "passenger panel:"
-      ],
-      "meaning": "passenger_panel",
-      "priority": 500,
-      "scope": "layout:passenger_panel",
-      "disambiguationRuleId": "cues_disambiguation_general_passenger_panel",
-      "curationReason": "weighted:passenger_panel:domain_general"
-    },
-    {
-      "id": "passport_mrz_zone",
-      "patterns": [
-        "passaporte mrz zone",
-        "Passaporte Mrz Zone",
-        "passaporte mrz zone:",
-        "passport mrz zone",
-        "Passport Mrz Zone",
-        "passport mrz zone:"
-      ],
-      "meaning": "passport_mrz_zone",
-      "priority": 500,
-      "scope": "layout:passport_mrz_zone",
-      "disambiguationRuleId": "cues_disambiguation_general_passport_mrz_zone",
-      "curationReason": "weighted:passport_mrz_zone:domain_general"
-    },
-    {
-      "id": "payment_channel_chip",
-      "patterns": [
-        "pagamento canal chip",
-        "Pagamento Canal Chip",
-        "pagamento canal chip:",
-        "payment channel chip",
-        "Payment Channel Chip",
-        "payment channel chip:"
-      ],
-      "meaning": "payment_channel_chip",
-      "priority": 500,
-      "scope": "layout:payment_channel_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_payment_channel_chip",
-      "curationReason": "weighted:payment_channel_chip:domain_general"
-    },
-    {
-      "id": "payment_qr_block",
-      "patterns": [
-        "pagamento qr block",
-        "Pagamento Qr Block",
-        "pagamento qr block:",
-        "payment qr block",
-        "Payment Qr Block",
-        "payment qr block:"
-      ],
-      "meaning": "payment_qr_block",
-      "priority": 500,
-      "scope": "layout:payment_qr_block",
-      "disambiguationRuleId": "cues_disambiguation_general_payment_qr_block",
-      "curationReason": "weighted:payment_qr_block:domain_general"
-    },
-    {
-      "id": "payroll_totals_card",
-      "patterns": [
-        "folha totals cartao",
-        "Folha Totals Cartao",
-        "folha totals cartao:",
-        "payroll totals card",
-        "Payroll Totals Card",
-        "payroll totals card:"
-      ],
-      "meaning": "payroll_totals_card",
-      "priority": 850,
-      "scope": "layout:payroll_totals_card",
-      "disambiguationRuleId": "cues_disambiguation_general_payroll_totals_card",
-      "curationReason": "weighted:payroll_totals_card:domain_general"
-    },
-    {
-      "id": "period_selector_pill",
-      "patterns": [
-        "period selector pill",
-        "Period Selector Pill",
-        "period selector pill:",
-        "periodo selector pill",
-        "Periodo Selector Pill",
-        "periodo selector pill:"
-      ],
-      "meaning": "period_selector_pill",
-      "priority": 680,
-      "scope": "layout:period_selector_pill",
-      "disambiguationRuleId": "cues_disambiguation_general_period_selector_pill",
-      "curationReason": "weighted:period_selector_pill:domain_general"
-    },
-    {
-      "id": "policy_number_ribbon",
-      "patterns": [
-        "apolice numero ribbon",
-        "Apolice Numero Ribbon",
-        "apolice numero ribbon:",
-        "policy number ribbon",
-        "Policy Number Ribbon",
-        "policy number ribbon:"
-      ],
-      "meaning": "policy_number_ribbon",
-      "priority": 500,
-      "scope": "layout:policy_number_ribbon",
-      "disambiguationRuleId": "cues_disambiguation_general_policy_number_ribbon",
-      "curationReason": "weighted:policy_number_ribbon:domain_general"
-    },
-    {
-      "id": "policy_terms_box",
-      "patterns": [
-        "apolice terms box",
-        "Apolice Terms Box",
-        "apolice terms box:",
-        "policy terms box",
-        "Policy Terms Box",
-        "policy terms box:"
-      ],
-      "meaning": "policy_terms_box",
-      "priority": 500,
-      "scope": "layout:policy_terms_box",
-      "disambiguationRuleId": "cues_disambiguation_general_policy_terms_box",
-      "curationReason": "weighted:policy_terms_box:domain_general"
-    },
-    {
-      "id": "postal_code_chip",
-      "patterns": [
-        "postal code chip",
-        "Postal Code Chip",
-        "postal code chip:",
-        "postal codigo chip",
-        "Postal Codigo Chip",
-        "postal codigo chip:"
-      ],
-      "meaning": "postal_code_chip",
-      "priority": 500,
-      "scope": "layout:postal_code_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_postal_code_chip",
-      "curationReason": "weighted:postal_code_chip:domain_general"
-    },
-    {
-      "id": "premium_breakdown_card",
-      "patterns": [
-        "premio breakdown cartao",
-        "Premio Breakdown Cartao",
-        "premio breakdown cartao:",
-        "premium breakdown card",
-        "Premium Breakdown Card",
-        "premium breakdown card:"
-      ],
-      "meaning": "premium_breakdown_card",
-      "priority": 500,
-      "scope": "layout:premium_breakdown_card",
-      "disambiguationRuleId": "cues_disambiguation_general_premium_breakdown_card",
-      "curationReason": "weighted:premium_breakdown_card:domain_general"
-    },
-    {
-      "id": "price_tier_grid",
-      "patterns": [
-        "price tier grid",
-        "Price Tier Grid",
-        "price tier grid:"
-      ],
-      "meaning": "price_tier_grid",
-      "priority": 500,
-      "scope": "layout:price_tier_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_price_tier_grid",
-      "curationReason": "weighted:price_tier_grid:domain_general"
-    },
-    {
-      "id": "principal_interest_split",
-      "patterns": [
-        "principal interest split",
-        "Principal Interest Split",
-        "principal interest split:",
-        "principal juros split",
-        "Principal Juros Split",
-        "principal juros split:"
-      ],
-      "meaning": "principal_interest_split",
-      "priority": 500,
-      "scope": "layout:principal_interest_split",
-      "disambiguationRuleId": "cues_disambiguation_general_principal_interest_split",
-      "curationReason": "weighted:principal_interest_split:domain_general"
-    },
-    {
-      "id": "privacy_notice_banner",
-      "patterns": [
-        "privacy notice banner",
-        "Privacy Notice Banner",
-        "privacy notice banner:"
-      ],
-      "meaning": "privacy_notice_banner",
-      "priority": 500,
-      "scope": "layout:privacy_notice_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_privacy_notice_banner",
-      "curationReason": "weighted:privacy_notice_banner:domain_general"
-    },
-    {
-      "id": "progress_tracker",
-      "patterns": [
-        "progress tracker",
-        "Progress Tracker",
-        "progress tracker:"
-      ],
-      "meaning": "progress_tracker",
-      "priority": 500,
-      "scope": "layout:progress_tracker",
-      "disambiguationRuleId": "cues_disambiguation_general_progress_tracker",
-      "curationReason": "weighted:progress_tracker:domain_general"
-    },
-    {
-      "id": "property_id_badge",
-      "patterns": [
-        "imovel id badge",
-        "Imovel Id Badge",
-        "imovel id badge:",
-        "property id badge",
-        "Property Id Badge",
-        "property id badge:"
-      ],
-      "meaning": "property_id_badge",
-      "priority": 500,
-      "scope": "layout:property_id_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_property_id_badge",
-      "curationReason": "weighted:property_id_badge:domain_general"
-    },
-    {
-      "id": "protocol_number",
-      "patterns": [
-        "process:",
-        "processo:",
-        "protocol:",
-        "protocolo:",
-        "ref:",
-        "referencia:"
-      ],
-      "meaning": "protocol_number",
-      "priority": 500,
-      "scope": "layout:protocol_number",
-      "disambiguationRuleId": "cues_disambiguation_general_protocol_number",
-      "curationReason": "weighted:protocol_number:domain_general"
-    },
-    {
-      "id": "provider_contact_box",
-      "patterns": [
-        "prestador contact box",
-        "Prestador Contact Box",
-        "prestador contact box:",
-        "provider contact box",
-        "Provider Contact Box",
-        "provider contact box:"
-      ],
-      "meaning": "provider_contact_box",
-      "priority": 500,
-      "scope": "layout:provider_contact_box",
-      "disambiguationRuleId": "cues_disambiguation_general_provider_contact_box",
-      "curationReason": "weighted:provider_contact_box:domain_general"
-    },
-    {
-      "id": "qr_code_block",
-      "patterns": [
-        "qr code block",
-        "Qr Code Block",
-        "qr code block:",
-        "qr codigo block",
-        "Qr Codigo Block",
-        "qr codigo block:"
-      ],
-      "meaning": "qr_code_block",
-      "priority": 500,
-      "scope": "layout:qr_code_block",
-      "disambiguationRuleId": "cues_disambiguation_general_qr_code_block",
-      "curationReason": "weighted:qr_code_block:domain_general"
-    },
-    {
-      "id": "rate_plan_table",
-      "patterns": [
-        "rate plan table",
-        "Rate Plan Table",
-        "rate plan table:",
-        "taxa plano table",
-        "Taxa Plano Table",
-        "taxa plano table:"
-      ],
-      "meaning": "rate_plan_table",
-      "priority": 680,
-      "scope": "layout:rate_plan_table",
-      "disambiguationRuleId": "cues_disambiguation_general_rate_plan_table",
-      "curationReason": "weighted:rate_plan_table:domain_general"
-    },
-    {
-      "id": "receipt_stamp",
-      "patterns": [
-        "receipt stamp",
-        "Receipt Stamp",
-        "receipt stamp:",
-        "recibo stamp",
-        "Recibo Stamp",
-        "recibo stamp:"
-      ],
-      "meaning": "receipt_stamp",
-      "priority": 500,
-      "scope": "layout:receipt_stamp",
-      "disambiguationRuleId": "cues_disambiguation_general_receipt_stamp",
-      "curationReason": "weighted:receipt_stamp:domain_general"
-    },
-    {
-      "id": "redline_marker",
-      "patterns": [
-        "controle de alteracoes",
-        "markup",
-        "redline",
-        "revisao marcada",
-        "track changes"
-      ],
-      "meaning": "redline_marker",
-      "priority": 500,
-      "scope": "layout:redline_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_redline_marker",
-      "curationReason": "weighted:redline_marker:domain_general"
-    },
-    {
-      "id": "reference_code_pill",
-      "patterns": [
-        "reference code pill",
-        "Reference Code Pill",
-        "reference code pill:",
-        "referencia codigo pill",
-        "Referencia Codigo Pill",
-        "referencia codigo pill:"
-      ],
-      "meaning": "reference_code_pill",
-      "priority": 380,
-      "scope": "layout:reference_code_pill",
-      "disambiguationRuleId": "cues_disambiguation_general_reference_code_pill",
-      "curationReason": "weighted:reference_code_pill:domain_general"
-    },
-    {
-      "id": "reference_line",
-      "patterns": [
-        "nosso ref:",
-        "re:",
-        "ref:",
-        "reference:",
-        "referencia:",
-        "subject ref:"
-      ],
-      "meaning": "reference_line",
-      "priority": 380,
-      "scope": "layout:reference_line",
-      "disambiguationRuleId": "cues_disambiguation_general_reference_line",
-      "curationReason": "weighted:reference_line:domain_general"
-    },
-    {
-      "id": "refund_banner",
-      "patterns": [
-        "refund banner",
-        "Refund Banner",
-        "refund banner:"
-      ],
-      "meaning": "refund_banner",
-      "priority": 500,
-      "scope": "layout:refund_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_refund_banner",
-      "curationReason": "weighted:refund_banner:domain_general"
-    },
-    {
-      "id": "regulatory_footer_notice",
-      "patterns": [
-        "regulatory footer notice",
-        "Regulatory Footer Notice",
-        "regulatory footer notice:"
-      ],
-      "meaning": "regulatory_footer_notice",
-      "priority": 500,
-      "scope": "layout:regulatory_footer_notice",
-      "disambiguationRuleId": "cues_disambiguation_general_regulatory_footer_notice",
-      "curationReason": "weighted:regulatory_footer_notice:domain_general"
-    },
-    {
-      "id": "renewal_notice_banner",
-      "patterns": [
-        "renewal notice banner",
-        "Renewal Notice Banner",
-        "renewal notice banner:"
-      ],
-      "meaning": "renewal_notice_banner",
-      "priority": 500,
-      "scope": "layout:renewal_notice_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_renewal_notice_banner",
-      "curationReason": "weighted:renewal_notice_banner:domain_general"
-    },
-    {
-      "id": "rent_due_box",
-      "patterns": [
-        "rent due box",
-        "Rent Due Box",
-        "rent due box:",
-        "rent vencimento box",
-        "Rent Vencimento Box",
-        "rent vencimento box:"
-      ],
-      "meaning": "rent_due_box",
-      "priority": 500,
-      "scope": "layout:rent_due_box",
-      "disambiguationRuleId": "cues_disambiguation_general_rent_due_box",
-      "curationReason": "weighted:rent_due_box:domain_general"
-    },
-    {
-      "id": "reservation_locator_box",
-      "patterns": [
-        "reservation locator box",
-        "Reservation Locator Box",
-        "reservation locator box:"
-      ],
-      "meaning": "reservation_locator_box",
-      "priority": 500,
-      "scope": "layout:reservation_locator_box",
-      "disambiguationRuleId": "cues_disambiguation_general_reservation_locator_box",
-      "curationReason": "weighted:reservation_locator_box:domain_general"
-    },
-    {
-      "id": "rewards_points_chip",
-      "patterns": [
-        "rewards points chip",
-        "Rewards Points Chip",
-        "rewards points chip:"
-      ],
-      "meaning": "rewards_points_chip",
-      "priority": 500,
-      "scope": "layout:rewards_points_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_rewards_points_chip",
-      "curationReason": "weighted:rewards_points_chip:domain_general"
-    },
-    {
-      "id": "risk_warning_callout",
-      "patterns": [
-        "risk warning callout",
-        "Risk Warning Callout",
-        "risk warning callout:"
-      ],
-      "meaning": "risk_warning_callout",
-      "priority": 780,
-      "scope": "layout:risk_warning_callout",
-      "disambiguationRuleId": "cues_disambiguation_general_risk_warning_callout",
-      "curationReason": "weighted:risk_warning_callout:domain_general"
-    },
-    {
-      "id": "roaming_badge",
-      "patterns": [
-        "roaming badge",
-        "Roaming Badge",
-        "roaming badge:"
-      ],
-      "meaning": "roaming_badge",
-      "priority": 500,
-      "scope": "layout:roaming_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_roaming_badge",
-      "curationReason": "weighted:roaming_badge:domain_general"
-    },
-    {
-      "id": "route_segment_line",
-      "patterns": [
-        "route segment line",
-        "Route Segment Line",
-        "route segment line:",
-        "route segment linha",
-        "Route Segment Linha",
-        "route segment linha:"
-      ],
-      "meaning": "route_segment_line",
-      "priority": 500,
-      "scope": "layout:route_segment_line",
-      "disambiguationRuleId": "cues_disambiguation_general_route_segment_line",
-      "curationReason": "weighted:route_segment_line:domain_general"
-    },
-    {
-      "id": "salary_component_grid",
-      "patterns": [
-        "salary component grid",
-        "Salary Component Grid",
-        "salary component grid:"
-      ],
-      "meaning": "salary_component_grid",
-      "priority": 500,
-      "scope": "layout:salary_component_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_salary_component_grid",
-      "curationReason": "weighted:salary_component_grid:domain_general"
-    },
-    {
-      "id": "salutation",
-      "patterns": [
-        "dear",
-        "excelentissimo",
-        "ilustrissimo",
-        "prezada",
-        "prezado",
-        "to whom it may concern"
-      ],
-      "meaning": "salutation",
-      "priority": 500,
-      "scope": "layout:salutation",
-      "disambiguationRuleId": "cues_disambiguation_general_salutation",
-      "curationReason": "weighted:salutation:domain_general"
-    },
-    {
-      "id": "schedule_marker",
-      "patterns": [
-        "quadro",
-        "schedule",
-        "schedule a",
-        "schedule b",
-        "tabela anexa"
-      ],
-      "meaning": "schedule_marker",
-      "priority": 500,
-      "scope": "layout:schedule_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_schedule_marker",
-      "curationReason": "weighted:schedule_marker:domain_general"
-    },
-    {
-      "id": "schedule_matrix",
-      "patterns": [
-        "schedule matrix",
-        "Schedule Matrix",
-        "schedule matrix:"
-      ],
-      "meaning": "schedule_matrix",
-      "priority": 500,
-      "scope": "layout:schedule_matrix",
-      "disambiguationRuleId": "cues_disambiguation_general_schedule_matrix",
-      "curationReason": "weighted:schedule_matrix:domain_general"
-    },
-    {
-      "id": "score_box",
-      "patterns": [
-        "score box",
-        "Score Box",
-        "score box:"
-      ],
-      "meaning": "score_box",
-      "priority": 500,
-      "scope": "layout:score_box",
-      "disambiguationRuleId": "cues_disambiguation_general_score_box",
-      "curationReason": "weighted:score_box:domain_general"
-    },
-    {
-      "id": "seal_notary",
-      "patterns": [
-        "seal notary",
-        "Seal Notary",
-        "seal notary:"
-      ],
-      "meaning": "seal_notary",
-      "priority": 500,
-      "scope": "layout:seal_notary",
-      "disambiguationRuleId": "cues_disambiguation_general_seal_notary",
-      "curationReason": "weighted:seal_notary:domain_general"
-    },
-    {
-      "id": "section_break",
-      "patterns": [
-        "continuous break",
-        "new section",
-        "nova secao",
-        "quebra de secao",
-        "section break"
-      ],
-      "meaning": "section_break",
-      "priority": 500,
-      "scope": "layout:section_break",
-      "disambiguationRuleId": "cues_disambiguation_general_section_break",
-      "curationReason": "weighted:section_break:domain_general"
-    },
-    {
-      "id": "security_footer",
-      "patterns": [
-        "security footer",
-        "Security Footer",
-        "security footer:"
-      ],
-      "meaning": "security_footer",
-      "priority": 500,
-      "scope": "layout:security_footer",
-      "disambiguationRuleId": "cues_disambiguation_general_security_footer",
-      "curationReason": "weighted:security_footer:domain_general"
-    },
-    {
-      "id": "sender_block",
-      "patterns": [
-        "de:",
-        "enviado por:",
-        "from:",
-        "remetente:",
-        "sender:",
-        "sent by:"
-      ],
-      "meaning": "sender_block",
-      "priority": 500,
-      "scope": "layout:sender_block",
-      "disambiguationRuleId": "cues_disambiguation_general_sender_block",
-      "curationReason": "weighted:sender_block:domain_general"
-    },
-    {
-      "id": "separator_line",
-      "patterns": [
-        "divider",
-        "divisor",
-        "line break",
-        "separador",
-        "separator"
-      ],
-      "meaning": "separator_line",
-      "priority": 500,
-      "scope": "layout:separator_line",
-      "disambiguationRuleId": "cues_disambiguation_general_separator_line",
-      "curationReason": "weighted:separator_line:domain_general"
-    },
-    {
-      "id": "service_address_box",
-      "patterns": [
-        "service address box",
-        "Service Address Box",
-        "service address box:",
-        "service endereco box",
-        "Service Endereco Box",
-        "service endereco box:"
-      ],
-      "meaning": "service_address_box",
-      "priority": 500,
-      "scope": "layout:service_address_box",
-      "disambiguationRuleId": "cues_disambiguation_general_service_address_box",
-      "curationReason": "weighted:service_address_box:domain_general"
-    },
-    {
-      "id": "service_period_chip",
-      "patterns": [
-        "service period chip",
-        "Service Period Chip",
-        "service period chip:",
-        "service periodo chip",
-        "Service Periodo Chip",
-        "service periodo chip:"
-      ],
-      "meaning": "service_period_chip",
-      "priority": 680,
-      "scope": "layout:service_period_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_service_period_chip",
-      "curationReason": "weighted:service_period_chip:domain_general"
-    },
-    {
-      "id": "sidebar",
-      "patterns": [
-        "aside",
-        "barra lateral",
-        "nota lateral",
-        "sidebar",
-        "text box"
-      ],
-      "meaning": "sidebar",
-      "priority": 500,
-      "scope": "layout:sidebar",
-      "disambiguationRuleId": "cues_disambiguation_general_sidebar",
-      "curationReason": "weighted:sidebar:domain_general"
+      "id": "exhibit_marker",
+      "patterns": [
+        "exhibit",
+        "anexo",
+        "appendix",
+        "anexo i",
+        "apendice"
+      ],
+      "meaning": "exhibit_marker",
+      "priority": 700,
+      "scope": "layout:exhibit_marker",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_marker",
+      "curationReason": "weighted:exhibit_marker:domain_general"
     },
     {
       "id": "signature_block",
       "patterns": [
-        "assinado por",
-        "assinatura",
-        "de acordo",
-        "firmado por",
         "signature",
-        "signed by"
+        "assinatura",
+        "assinado por",
+        "for signature",
+        "assinou",
+        "signature:",
+        "assinado por:"
       ],
       "meaning": "signature_block",
-      "priority": 500,
+      "priority": 700,
       "scope": "layout:signature_block",
       "disambiguationRuleId": "cues_disambiguation_general_signature_block",
       "curationReason": "weighted:signature_block:domain_general"
     },
     {
-      "id": "signature_witness_block",
+      "id": "lab_panel",
       "patterns": [
-        "signature witness block",
-        "Signature Witness Block",
-        "signature witness block:"
+        "lab panel",
+        "painel laboratorial",
+        "hematology",
+        "chemistry panel",
+        "sorologia",
+        "hemograma"
       ],
-      "meaning": "signature_witness_block",
+      "meaning": "lab_panel",
+      "priority": 700,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel",
+      "curationReason": "weighted:lab_panel:domain_general"
+    },
+    {
+      "id": "statement_layout",
+      "patterns": [
+        "statement",
+        "declaração",
+        "balancete",
+        "financial statement",
+        "demonstração",
+        "statement of"
+      ],
+      "meaning": "statement_layout",
+      "priority": 700,
+      "scope": "layout:statement_layout",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_layout",
+      "curationReason": "weighted:statement_layout:domain_general"
+    },
+    {
+      "id": "grid_header",
+      "patterns": [
+        "coluna",
+        "header",
+        "encabezado",
+        "table header",
+        "cabeçalho da tabela"
+      ],
+      "meaning": "grid_header",
+      "priority": 700,
+      "scope": "layout:grid_header",
+      "disambiguationRuleId": "cues_disambiguation_general_grid_header",
+      "curationReason": "weighted:grid_header:domain_general"
+    },
+    {
+      "id": "date_block",
+      "patterns": [
+        "date",
+        "data",
+        "emissao",
+        "issue date",
+        "data de emissao"
+      ],
+      "meaning": "date_block",
+      "priority": 700,
+      "scope": "layout:date_block",
+      "disambiguationRuleId": "cues_disambiguation_general_date_block",
+      "curationReason": "weighted:date_block:domain_general"
+    },
+    {
+      "id": "address_block",
+      "patterns": [
+        "address",
+        "endereco",
+        "endereço",
+        "shipping",
+        "billing address"
+      ],
+      "meaning": "address_block",
+      "priority": 700,
+      "scope": "layout:address_block",
+      "disambiguationRuleId": "cues_disambiguation_general_address_block",
+      "curationReason": "weighted:address_block:domain_general"
+    },
+    {
+      "id": "amount_box",
+      "patterns": [
+        "amount due",
+        "valor",
+        "montante",
+        "valor total",
+        "total amount"
+      ],
+      "meaning": "amount_box",
+      "priority": 700,
+      "scope": "layout:amount_box",
+      "disambiguationRuleId": "cues_disambiguation_general_amount_box",
+      "curationReason": "weighted:amount_box:domain_general"
+    },
+    {
+      "id": "party_block",
+      "patterns": [
+        "party",
+        "parte",
+        "representado por",
+        "representada por",
+        "party name"
+      ],
+      "meaning": "party_block",
+      "priority": 700,
+      "scope": "layout:party_block",
+      "disambiguationRuleId": "cues_disambiguation_general_party_block",
+      "curationReason": "weighted:party_block:domain_general"
+    },
+    {
+      "id": "footnote_cue_1",
+      "patterns": [
+        "footnote 1",
+        "footnote section 1",
+        "FOOTNOTE-1",
+        "footnote bloco 1",
+        "footnote area 1"
+      ],
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:signature_witness_block",
-      "disambiguationRuleId": "cues_disambiguation_general_signature_witness_block",
-      "curationReason": "weighted:signature_witness_block:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_1",
+      "curationReason": "weighted:footnote_cue_1:domain_general"
     },
     {
-      "id": "sms_usage_chip",
+      "id": "footnote_cue_2",
       "patterns": [
-        "sms usage chip",
-        "Sms Usage Chip",
-        "sms usage chip:",
-        "sms uso chip",
-        "Sms Uso Chip",
-        "sms uso chip:"
+        "footnote 2",
+        "footnote section 2",
+        "FOOTNOTE-2",
+        "footnote bloco 2",
+        "footnote area 2"
       ],
-      "meaning": "sms_usage_chip",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:sms_usage_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_sms_usage_chip",
-      "curationReason": "weighted:sms_usage_chip:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_2",
+      "curationReason": "weighted:footnote_cue_2:domain_general"
     },
     {
-      "id": "stamp_approved",
+      "id": "footnote_cue_3",
       "patterns": [
-        "accepted",
-        "aceito",
-        "approved",
-        "aprovado",
-        "authorized",
-        "autorizado"
+        "footnote 3",
+        "footnote section 3",
+        "FOOTNOTE-3",
+        "footnote bloco 3",
+        "footnote area 3"
       ],
-      "meaning": "stamp_approved",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:stamp_approved",
-      "disambiguationRuleId": "cues_disambiguation_general_stamp_approved",
-      "curationReason": "weighted:stamp_approved:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_3",
+      "curationReason": "weighted:footnote_cue_3:domain_general"
     },
     {
-      "id": "stamp_pending",
+      "id": "footnote_cue_4",
       "patterns": [
-        "aguardando",
-        "awaiting",
-        "em analise",
-        "pendente",
-        "pending",
-        "under review"
+        "footnote 4",
+        "footnote section 4",
+        "FOOTNOTE-4",
+        "footnote bloco 4",
+        "footnote area 4"
       ],
-      "meaning": "stamp_pending",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:stamp_pending",
-      "disambiguationRuleId": "cues_disambiguation_general_stamp_pending",
-      "curationReason": "weighted:stamp_pending:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_4",
+      "curationReason": "weighted:footnote_cue_4:domain_general"
     },
     {
-      "id": "stamp_rejected",
+      "id": "footnote_cue_5",
       "patterns": [
-        "denied",
-        "disapproved",
-        "negado",
-        "rejected",
-        "rejeitado",
-        "reprovado"
+        "footnote 5",
+        "footnote section 5",
+        "FOOTNOTE-5",
+        "footnote bloco 5",
+        "footnote area 5"
       ],
-      "meaning": "stamp_rejected",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:stamp_rejected",
-      "disambiguationRuleId": "cues_disambiguation_general_stamp_rejected",
-      "curationReason": "weighted:stamp_rejected:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_5",
+      "curationReason": "weighted:footnote_cue_5:domain_general"
     },
     {
-      "id": "status_badge",
+      "id": "footnote_cue_6",
       "patterns": [
-        "status badge",
-        "Status Badge",
-        "status badge:"
+        "footnote 6",
+        "footnote section 6",
+        "FOOTNOTE-6",
+        "footnote bloco 6",
+        "footnote area 6"
       ],
-      "meaning": "status_badge",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:status_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_status_badge",
-      "curationReason": "weighted:status_badge:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_6",
+      "curationReason": "weighted:footnote_cue_6:domain_general"
     },
     {
-      "id": "strikethrough_marker",
+      "id": "footnote_cue_7",
       "patterns": [
-        "deleted text",
-        "removed",
-        "strikethrough",
-        "tachado",
-        "texto riscado"
+        "footnote 7",
+        "footnote section 7",
+        "FOOTNOTE-7",
+        "footnote bloco 7",
+        "footnote area 7"
       ],
-      "meaning": "strikethrough_marker",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:strikethrough_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_strikethrough_marker",
-      "curationReason": "weighted:strikethrough_marker:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_7",
+      "curationReason": "weighted:footnote_cue_7:domain_general"
     },
     {
-      "id": "student_id_box",
+      "id": "footnote_cue_8",
       "patterns": [
-        "student id box",
-        "Student Id Box",
-        "student id box:"
+        "footnote 8",
+        "footnote section 8",
+        "FOOTNOTE-8",
+        "footnote bloco 8",
+        "footnote area 8"
       ],
-      "meaning": "student_id_box",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:student_id_box",
-      "disambiguationRuleId": "cues_disambiguation_general_student_id_box",
-      "curationReason": "weighted:student_id_box:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_8",
+      "curationReason": "weighted:footnote_cue_8:domain_general"
     },
     {
-      "id": "subject_line",
+      "id": "footnote_cue_9",
       "patterns": [
-        "assunto:",
-        "matter:",
-        "objeto:",
-        "re:",
-        "ref:",
-        "subject:"
+        "footnote 9",
+        "footnote section 9",
+        "FOOTNOTE-9",
+        "footnote bloco 9",
+        "footnote area 9"
       ],
-      "meaning": "subject_line",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:subject_line",
-      "disambiguationRuleId": "cues_disambiguation_general_subject_line",
-      "curationReason": "weighted:subject_line:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_9",
+      "curationReason": "weighted:footnote_cue_9:domain_general"
     },
     {
-      "id": "subsidy_badge",
+      "id": "footnote_cue_10",
       "patterns": [
-        "subsidy badge",
-        "Subsidy Badge",
-        "subsidy badge:"
+        "footnote 10",
+        "footnote section 10",
+        "FOOTNOTE-10",
+        "footnote bloco 10",
+        "footnote area 10"
       ],
-      "meaning": "subsidy_badge",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:subsidy_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_subsidy_badge",
-      "curationReason": "weighted:subsidy_badge:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_10",
+      "curationReason": "weighted:footnote_cue_10:domain_general"
     },
     {
-      "id": "summary_totals_strip",
+      "id": "footnote_cue_11",
       "patterns": [
-        "resumo totals strip",
-        "Resumo Totals Strip",
-        "resumo totals strip:",
-        "summary totals strip",
-        "Summary Totals Strip",
-        "summary totals strip:"
+        "footnote 11",
+        "footnote section 11",
+        "FOOTNOTE-11",
+        "footnote bloco 11",
+        "footnote area 11"
       ],
-      "meaning": "summary_totals_strip",
-      "priority": 850,
-      "scope": "layout:summary_totals_strip",
-      "disambiguationRuleId": "cues_disambiguation_general_summary_totals_strip",
-      "curationReason": "weighted:summary_totals_strip:domain_general"
-    },
-    {
-      "id": "surcharge_banner",
-      "patterns": [
-        "surcharge banner",
-        "Surcharge Banner",
-        "surcharge banner:"
-      ],
-      "meaning": "surcharge_banner",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:surcharge_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_surcharge_banner",
-      "curationReason": "weighted:surcharge_banner:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_11",
+      "curationReason": "weighted:footnote_cue_11:domain_general"
     },
     {
-      "id": "table_caption",
+      "id": "footnote_cue_12",
       "patterns": [
-        "tabela",
-        "tabela:",
-        "table",
-        "table:",
-        "tbl."
+        "footnote 12",
+        "footnote section 12",
+        "FOOTNOTE-12",
+        "footnote bloco 12",
+        "footnote area 12"
       ],
-      "meaning": "table_caption",
-      "priority": 680,
-      "scope": "layout:table_caption",
-      "disambiguationRuleId": "cues_disambiguation_general_table_caption",
-      "curationReason": "weighted:table_caption:domain_general"
-    },
-    {
-      "id": "tax_withholding_box",
-      "patterns": [
-        "imposto retencao box",
-        "Imposto Retencao Box",
-        "imposto retencao box:",
-        "tax withholding box",
-        "Tax Withholding Box",
-        "tax withholding box:"
-      ],
-      "meaning": "tax_withholding_box",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:tax_withholding_box",
-      "disambiguationRuleId": "cues_disambiguation_general_tax_withholding_box",
-      "curationReason": "weighted:tax_withholding_box:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_12",
+      "curationReason": "weighted:footnote_cue_12:domain_general"
     },
     {
-      "id": "taxpayer_badge",
+      "id": "footnote_cue_13",
       "patterns": [
-        "contribuinte badge",
-        "Contribuinte Badge",
-        "contribuinte badge:",
-        "taxpayer badge",
-        "Taxpayer Badge",
-        "taxpayer badge:"
+        "footnote 13",
+        "footnote section 13",
+        "FOOTNOTE-13",
+        "footnote bloco 13",
+        "footnote area 13"
       ],
-      "meaning": "taxpayer_badge",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:taxpayer_badge",
-      "disambiguationRuleId": "cues_disambiguation_general_taxpayer_badge",
-      "curationReason": "weighted:taxpayer_badge:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_13",
+      "curationReason": "weighted:footnote_cue_13:domain_general"
     },
     {
-      "id": "tenant_landlord_panel",
+      "id": "footnote_cue_14",
       "patterns": [
-        "tenant landlord panel",
-        "Tenant Landlord Panel",
-        "tenant landlord panel:"
+        "footnote 14",
+        "footnote section 14",
+        "FOOTNOTE-14",
+        "footnote bloco 14",
+        "footnote area 14"
       ],
-      "meaning": "tenant_landlord_panel",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:tenant_landlord_panel",
-      "disambiguationRuleId": "cues_disambiguation_general_tenant_landlord_panel",
-      "curationReason": "weighted:tenant_landlord_panel:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_14",
+      "curationReason": "weighted:footnote_cue_14:domain_general"
     },
     {
-      "id": "term_dates_chip",
+      "id": "footnote_cue_15",
       "patterns": [
-        "term dates chip",
-        "Term Dates Chip",
-        "term dates chip:"
+        "footnote 15",
+        "footnote section 15",
+        "FOOTNOTE-15",
+        "footnote bloco 15",
+        "footnote area 15"
       ],
-      "meaning": "term_dates_chip",
-      "priority": 680,
-      "scope": "layout:term_dates_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_term_dates_chip",
-      "curationReason": "weighted:term_dates_chip:domain_general"
-    },
-    {
-      "id": "ticket_barcode_zone",
-      "patterns": [
-        "ticket barcode zone",
-        "Ticket Barcode Zone",
-        "ticket barcode zone:"
-      ],
-      "meaning": "ticket_barcode_zone",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:ticket_barcode_zone",
-      "disambiguationRuleId": "cues_disambiguation_general_ticket_barcode_zone",
-      "curationReason": "weighted:ticket_barcode_zone:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_15",
+      "curationReason": "weighted:footnote_cue_15:domain_general"
     },
     {
-      "id": "time_tracking_grid",
+      "id": "footnote_cue_16",
       "patterns": [
-        "time tracking grid",
-        "Time Tracking Grid",
-        "time tracking grid:"
+        "footnote 16",
+        "footnote section 16",
+        "FOOTNOTE-16",
+        "footnote bloco 16",
+        "footnote area 16"
       ],
-      "meaning": "time_tracking_grid",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:time_tracking_grid",
-      "disambiguationRuleId": "cues_disambiguation_general_time_tracking_grid",
-      "curationReason": "weighted:time_tracking_grid:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_16",
+      "curationReason": "weighted:footnote_cue_16:domain_general"
     },
     {
-      "id": "timeline_marker",
+      "id": "footnote_cue_17",
       "patterns": [
-        "timeline marker",
-        "Timeline Marker",
-        "timeline marker:"
+        "footnote 17",
+        "footnote section 17",
+        "FOOTNOTE-17",
+        "footnote bloco 17",
+        "footnote area 17"
       ],
-      "meaning": "timeline_marker",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:timeline_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_timeline_marker",
-      "curationReason": "weighted:timeline_marker:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_17",
+      "curationReason": "weighted:footnote_cue_17:domain_general"
     },
     {
-      "id": "tip_box",
+      "id": "footnote_cue_18",
       "patterns": [
-        "best practice:",
-        "dica:",
-        "hint:",
-        "pro tip:",
-        "sugestao:",
-        "tip:"
+        "footnote 18",
+        "footnote section 18",
+        "FOOTNOTE-18",
+        "footnote bloco 18",
+        "footnote area 18"
       ],
-      "meaning": "tip_box",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:tip_box",
-      "disambiguationRuleId": "cues_disambiguation_general_tip_box",
-      "curationReason": "weighted:tip_box:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_18",
+      "curationReason": "weighted:footnote_cue_18:domain_general"
     },
     {
-      "id": "toc_entry",
+      "id": "footnote_cue_19",
       "patterns": [
-        "contents",
-        "indice",
-        "sumario",
-        "table of contents",
-        "toc"
+        "footnote 19",
+        "footnote section 19",
+        "FOOTNOTE-19",
+        "footnote bloco 19",
+        "footnote area 19"
       ],
-      "meaning": "toc_entry",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:toc_entry",
-      "disambiguationRuleId": "cues_disambiguation_general_toc_entry",
-      "curationReason": "weighted:toc_entry:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_19",
+      "curationReason": "weighted:footnote_cue_19:domain_general"
     },
     {
-      "id": "toc_leader_dots",
+      "id": "footnote_cue_20",
       "patterns": [
-        "------",
-        "......",
-        ".......",
-        "........",
-        "· · · ·"
+        "footnote 20",
+        "footnote section 20",
+        "FOOTNOTE-20",
+        "footnote bloco 20",
+        "footnote area 20"
       ],
-      "meaning": "toc_leader_dots",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:toc_leader_dots",
-      "disambiguationRuleId": "cues_disambiguation_general_toc_leader_dots",
-      "curationReason": "weighted:toc_leader_dots:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_20",
+      "curationReason": "weighted:footnote_cue_20:domain_general"
     },
     {
-      "id": "total_due_banner",
+      "id": "footnote_cue_21",
       "patterns": [
-        "total due banner",
-        "Total Due Banner",
-        "total due banner:",
-        "total vencimento banner",
-        "Total Vencimento Banner",
-        "total vencimento banner:"
+        "footnote 21",
+        "footnote section 21",
+        "FOOTNOTE-21",
+        "footnote bloco 21",
+        "footnote area 21"
       ],
-      "meaning": "total_due_banner",
-      "priority": 850,
-      "scope": "layout:total_due_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_total_due_banner",
-      "curationReason": "weighted:total_due_banner:domain_general"
-    },
-    {
-      "id": "tracked_change_deletion",
-      "patterns": [
-        "deleted:",
-        "excluido:",
-        "removed:",
-        "removido:",
-        "strikethrough"
-      ],
-      "meaning": "tracked_change_deletion",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:tracked_change_deletion",
-      "disambiguationRuleId": "cues_disambiguation_general_tracked_change_deletion",
-      "curationReason": "weighted:tracked_change_deletion:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_21",
+      "curationReason": "weighted:footnote_cue_21:domain_general"
     },
     {
-      "id": "tracked_change_insertion",
+      "id": "footnote_cue_22",
       "patterns": [
-        "added:",
-        "adicionado:",
-        "inserido:",
-        "inserted:",
-        "new text:"
+        "footnote 22",
+        "footnote section 22",
+        "FOOTNOTE-22",
+        "footnote bloco 22",
+        "footnote area 22"
       ],
-      "meaning": "tracked_change_insertion",
+      "meaning": "footnote",
       "priority": 500,
-      "scope": "layout:tracked_change_insertion",
-      "disambiguationRuleId": "cues_disambiguation_general_tracked_change_insertion",
-      "curationReason": "weighted:tracked_change_insertion:domain_general"
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_22",
+      "curationReason": "weighted:footnote_cue_22:domain_general"
     },
     {
-      "id": "transaction_row_marker",
+      "id": "exhibit_cue_1",
       "patterns": [
-        "transacao row marker",
-        "Transacao Row Marker",
-        "transacao row marker:",
-        "transaction row marker",
-        "Transaction Row Marker",
-        "transaction row marker:"
+        "exhibit 1",
+        "exhibit section 1",
+        "EXHIBIT-1",
+        "exhibit bloco 1",
+        "exhibit area 1"
       ],
-      "meaning": "transaction_row_marker",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:transaction_row_marker",
-      "disambiguationRuleId": "cues_disambiguation_general_transaction_row_marker",
-      "curationReason": "weighted:transaction_row_marker:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_1",
+      "curationReason": "weighted:exhibit_cue_1:domain_general"
     },
     {
-      "id": "travel_notice_box",
+      "id": "exhibit_cue_2",
       "patterns": [
-        "travel notice box",
-        "Travel Notice Box",
-        "travel notice box:"
+        "exhibit 2",
+        "exhibit section 2",
+        "EXHIBIT-2",
+        "exhibit bloco 2",
+        "exhibit area 2"
       ],
-      "meaning": "travel_notice_box",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:travel_notice_box",
-      "disambiguationRuleId": "cues_disambiguation_general_travel_notice_box",
-      "curationReason": "weighted:travel_notice_box:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_2",
+      "curationReason": "weighted:exhibit_cue_2:domain_general"
     },
     {
-      "id": "tuition_breakdown_card",
+      "id": "exhibit_cue_3",
       "patterns": [
-        "tuition breakdown card",
-        "Tuition Breakdown Card",
-        "tuition breakdown card:",
-        "tuition breakdown cartao",
-        "Tuition Breakdown Cartao",
-        "tuition breakdown cartao:"
+        "exhibit 3",
+        "exhibit section 3",
+        "EXHIBIT-3",
+        "exhibit bloco 3",
+        "exhibit area 3"
       ],
-      "meaning": "tuition_breakdown_card",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:tuition_breakdown_card",
-      "disambiguationRuleId": "cues_disambiguation_general_tuition_breakdown_card",
-      "curationReason": "weighted:tuition_breakdown_card:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_3",
+      "curationReason": "weighted:exhibit_cue_3:domain_general"
     },
     {
-      "id": "usage_by_category_chart",
+      "id": "exhibit_cue_4",
       "patterns": [
-        "usage by category chart",
-        "Usage By Category Chart",
-        "usage by category chart:",
-        "uso by category chart",
-        "Uso By Category Chart",
-        "uso by category chart:"
+        "exhibit 4",
+        "exhibit section 4",
+        "EXHIBIT-4",
+        "exhibit bloco 4",
+        "exhibit area 4"
       ],
-      "meaning": "usage_by_category_chart",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:usage_by_category_chart",
-      "disambiguationRuleId": "cues_disambiguation_general_usage_by_category_chart",
-      "curationReason": "weighted:usage_by_category_chart:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_4",
+      "curationReason": "weighted:exhibit_cue_4:domain_general"
     },
     {
-      "id": "utility_provider_banner",
+      "id": "exhibit_cue_5",
       "patterns": [
-        "utility prestador banner",
-        "Utility Prestador Banner",
-        "utility prestador banner:",
-        "utility provider banner",
-        "Utility Provider Banner",
-        "utility provider banner:"
+        "exhibit 5",
+        "exhibit section 5",
+        "EXHIBIT-5",
+        "exhibit bloco 5",
+        "exhibit area 5"
       ],
-      "meaning": "utility_provider_banner",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:utility_provider_banner",
-      "disambiguationRuleId": "cues_disambiguation_general_utility_provider_banner",
-      "curationReason": "weighted:utility_provider_banner:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_5",
+      "curationReason": "weighted:exhibit_cue_5:domain_general"
     },
     {
-      "id": "validation_stamp",
+      "id": "exhibit_cue_6",
       "patterns": [
-        "validation stamp",
-        "Validation Stamp",
-        "validation stamp:"
+        "exhibit 6",
+        "exhibit section 6",
+        "EXHIBIT-6",
+        "exhibit bloco 6",
+        "exhibit area 6"
       ],
-      "meaning": "validation_stamp",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:validation_stamp",
-      "disambiguationRuleId": "cues_disambiguation_general_validation_stamp",
-      "curationReason": "weighted:validation_stamp:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_6",
+      "curationReason": "weighted:exhibit_cue_6:domain_general"
     },
     {
-      "id": "verification_qr_zone",
+      "id": "exhibit_cue_7",
       "patterns": [
-        "verificacao qr zone",
-        "Verificacao Qr Zone",
-        "verificacao qr zone:",
-        "verification qr zone",
-        "Verification Qr Zone",
-        "verification qr zone:"
+        "exhibit 7",
+        "exhibit section 7",
+        "EXHIBIT-7",
+        "exhibit bloco 7",
+        "exhibit area 7"
       ],
-      "meaning": "verification_qr_zone",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:verification_qr_zone",
-      "disambiguationRuleId": "cues_disambiguation_general_verification_qr_zone",
-      "curationReason": "weighted:verification_qr_zone:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_7",
+      "curationReason": "weighted:exhibit_cue_7:domain_general"
     },
     {
-      "id": "visa_stamp_block",
+      "id": "exhibit_cue_8",
       "patterns": [
-        "visa stamp block",
-        "Visa Stamp Block",
-        "visa stamp block:"
+        "exhibit 8",
+        "exhibit section 8",
+        "EXHIBIT-8",
+        "exhibit bloco 8",
+        "exhibit area 8"
       ],
-      "meaning": "visa_stamp_block",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:visa_stamp_block",
-      "disambiguationRuleId": "cues_disambiguation_general_visa_stamp_block",
-      "curationReason": "weighted:visa_stamp_block:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_8",
+      "curationReason": "weighted:exhibit_cue_8:domain_general"
     },
     {
-      "id": "warning_box",
+      "id": "exhibit_cue_9",
       "patterns": [
-        "alert:",
-        "alerta:",
-        "aviso:",
-        "caution:",
-        "cuidado:",
-        "warning:"
+        "exhibit 9",
+        "exhibit section 9",
+        "EXHIBIT-9",
+        "exhibit bloco 9",
+        "exhibit area 9"
       ],
-      "meaning": "warning_box",
-      "priority": 780,
-      "scope": "layout:warning_box",
-      "disambiguationRuleId": "cues_disambiguation_general_warning_box",
-      "curationReason": "weighted:warning_box:domain_general"
-    },
-    {
-      "id": "warning_callout_red",
-      "patterns": [
-        "warning callout red",
-        "Warning Callout Red",
-        "warning callout red:"
-      ],
-      "meaning": "warning_callout_red",
-      "priority": 780,
-      "scope": "layout:warning_callout_red",
-      "disambiguationRuleId": "cues_disambiguation_general_warning_callout_red",
-      "curationReason": "weighted:warning_callout_red:domain_general"
-    },
-    {
-      "id": "watermark_confidential",
-      "patterns": [
-        "confidencial",
-        "confidential",
-        "private",
-        "restricted",
-        "restrito"
-      ],
-      "meaning": "watermark_confidential",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:watermark_confidential",
-      "disambiguationRuleId": "cues_disambiguation_general_watermark_confidential",
-      "curationReason": "weighted:watermark_confidential:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_9",
+      "curationReason": "weighted:exhibit_cue_9:domain_general"
     },
     {
-      "id": "watermark_draft",
+      "id": "exhibit_cue_10",
       "patterns": [
-        "draft",
-        "minuta",
-        "preliminar",
-        "preliminary",
-        "rascunho"
+        "exhibit 10",
+        "exhibit section 10",
+        "EXHIBIT-10",
+        "exhibit bloco 10",
+        "exhibit area 10"
       ],
-      "meaning": "watermark_draft",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:watermark_draft",
-      "disambiguationRuleId": "cues_disambiguation_general_watermark_draft",
-      "curationReason": "weighted:watermark_draft:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_10",
+      "curationReason": "weighted:exhibit_cue_10:domain_general"
     },
     {
-      "id": "watermark_final",
+      "id": "exhibit_cue_11",
       "patterns": [
-        "approved version",
-        "final",
-        "final version",
-        "versao aprovada",
-        "versao final"
+        "exhibit 11",
+        "exhibit section 11",
+        "EXHIBIT-11",
+        "exhibit bloco 11",
+        "exhibit area 11"
       ],
-      "meaning": "watermark_final",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:watermark_final",
-      "disambiguationRuleId": "cues_disambiguation_general_watermark_final",
-      "curationReason": "weighted:watermark_final:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_11",
+      "curationReason": "weighted:exhibit_cue_11:domain_general"
     },
     {
-      "id": "watermark_paid",
+      "id": "exhibit_cue_12",
       "patterns": [
-        "watermark paid",
-        "Watermark Paid",
-        "watermark paid:"
+        "exhibit 12",
+        "exhibit section 12",
+        "EXHIBIT-12",
+        "exhibit bloco 12",
+        "exhibit area 12"
       ],
-      "meaning": "watermark_paid",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:watermark_paid",
-      "disambiguationRuleId": "cues_disambiguation_general_watermark_paid",
-      "curationReason": "weighted:watermark_paid:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_12",
+      "curationReason": "weighted:exhibit_cue_12:domain_general"
     },
     {
-      "id": "watermark_unpaid",
+      "id": "exhibit_cue_13",
       "patterns": [
-        "watermark unpaid",
-        "Watermark Unpaid",
-        "watermark unpaid:"
+        "exhibit 13",
+        "exhibit section 13",
+        "EXHIBIT-13",
+        "exhibit bloco 13",
+        "exhibit area 13"
       ],
-      "meaning": "watermark_unpaid",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:watermark_unpaid",
-      "disambiguationRuleId": "cues_disambiguation_general_watermark_unpaid",
-      "curationReason": "weighted:watermark_unpaid:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_13",
+      "curationReason": "weighted:exhibit_cue_13:domain_general"
     },
     {
-      "id": "witness_block",
+      "id": "exhibit_cue_14",
       "patterns": [
-        "na presenca de",
-        "testemunha",
-        "testemunhas",
-        "witness",
-        "witnessed by"
+        "exhibit 14",
+        "exhibit section 14",
+        "EXHIBIT-14",
+        "exhibit bloco 14",
+        "exhibit area 14"
       ],
-      "meaning": "witness_block",
+      "meaning": "exhibit",
       "priority": 500,
-      "scope": "layout:witness_block",
-      "disambiguationRuleId": "cues_disambiguation_general_witness_block",
-      "curationReason": "weighted:witness_block:domain_general"
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_14",
+      "curationReason": "weighted:exhibit_cue_14:domain_general"
     },
     {
-      "id": "ytd_summary_chip",
+      "id": "exhibit_cue_15",
       "patterns": [
-        "ytd resumo chip",
-        "Ytd Resumo Chip",
-        "ytd resumo chip:",
-        "ytd summary chip",
-        "Ytd Summary Chip",
-        "ytd summary chip:"
+        "exhibit 15",
+        "exhibit section 15",
+        "EXHIBIT-15",
+        "exhibit bloco 15",
+        "exhibit area 15"
       ],
-      "meaning": "ytd_summary_chip",
-      "priority": 850,
-      "scope": "layout:ytd_summary_chip",
-      "disambiguationRuleId": "cues_disambiguation_general_ytd_summary_chip",
-      "curationReason": "weighted:ytd_summary_chip:domain_general"
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_15",
+      "curationReason": "weighted:exhibit_cue_15:domain_general"
+    },
+    {
+      "id": "exhibit_cue_16",
+      "patterns": [
+        "exhibit 16",
+        "exhibit section 16",
+        "EXHIBIT-16",
+        "exhibit bloco 16",
+        "exhibit area 16"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_16",
+      "curationReason": "weighted:exhibit_cue_16:domain_general"
+    },
+    {
+      "id": "exhibit_cue_17",
+      "patterns": [
+        "exhibit 17",
+        "exhibit section 17",
+        "EXHIBIT-17",
+        "exhibit bloco 17",
+        "exhibit area 17"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_17",
+      "curationReason": "weighted:exhibit_cue_17:domain_general"
+    },
+    {
+      "id": "exhibit_cue_18",
+      "patterns": [
+        "exhibit 18",
+        "exhibit section 18",
+        "EXHIBIT-18",
+        "exhibit bloco 18",
+        "exhibit area 18"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_18",
+      "curationReason": "weighted:exhibit_cue_18:domain_general"
+    },
+    {
+      "id": "exhibit_cue_19",
+      "patterns": [
+        "exhibit 19",
+        "exhibit section 19",
+        "EXHIBIT-19",
+        "exhibit bloco 19",
+        "exhibit area 19"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_19",
+      "curationReason": "weighted:exhibit_cue_19:domain_general"
+    },
+    {
+      "id": "exhibit_cue_20",
+      "patterns": [
+        "exhibit 20",
+        "exhibit section 20",
+        "EXHIBIT-20",
+        "exhibit bloco 20",
+        "exhibit area 20"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_20",
+      "curationReason": "weighted:exhibit_cue_20:domain_general"
+    },
+    {
+      "id": "exhibit_cue_21",
+      "patterns": [
+        "exhibit 21",
+        "exhibit section 21",
+        "EXHIBIT-21",
+        "exhibit bloco 21",
+        "exhibit area 21"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_21",
+      "curationReason": "weighted:exhibit_cue_21:domain_general"
+    },
+    {
+      "id": "exhibit_cue_22",
+      "patterns": [
+        "exhibit 22",
+        "exhibit section 22",
+        "EXHIBIT-22",
+        "exhibit bloco 22",
+        "exhibit area 22"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_22",
+      "curationReason": "weighted:exhibit_cue_22:domain_general"
+    },
+    {
+      "id": "signature_cue_1",
+      "patterns": [
+        "signature 1",
+        "signature section 1",
+        "SIGNATURE-1",
+        "signature bloco 1",
+        "signature area 1"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_1",
+      "curationReason": "weighted:signature_cue_1:domain_general"
+    },
+    {
+      "id": "signature_cue_2",
+      "patterns": [
+        "signature 2",
+        "signature section 2",
+        "SIGNATURE-2",
+        "signature bloco 2",
+        "signature area 2"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_2",
+      "curationReason": "weighted:signature_cue_2:domain_general"
+    },
+    {
+      "id": "signature_cue_3",
+      "patterns": [
+        "signature 3",
+        "signature section 3",
+        "SIGNATURE-3",
+        "signature bloco 3",
+        "signature area 3"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_3",
+      "curationReason": "weighted:signature_cue_3:domain_general"
+    },
+    {
+      "id": "signature_cue_4",
+      "patterns": [
+        "signature 4",
+        "signature section 4",
+        "SIGNATURE-4",
+        "signature bloco 4",
+        "signature area 4"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_4",
+      "curationReason": "weighted:signature_cue_4:domain_general"
+    },
+    {
+      "id": "signature_cue_5",
+      "patterns": [
+        "signature 5",
+        "signature section 5",
+        "SIGNATURE-5",
+        "signature bloco 5",
+        "signature area 5"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_5",
+      "curationReason": "weighted:signature_cue_5:domain_general"
+    },
+    {
+      "id": "signature_cue_6",
+      "patterns": [
+        "signature 6",
+        "signature section 6",
+        "SIGNATURE-6",
+        "signature bloco 6",
+        "signature area 6"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_6",
+      "curationReason": "weighted:signature_cue_6:domain_general"
+    },
+    {
+      "id": "signature_cue_7",
+      "patterns": [
+        "signature 7",
+        "signature section 7",
+        "SIGNATURE-7",
+        "signature bloco 7",
+        "signature area 7"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_7",
+      "curationReason": "weighted:signature_cue_7:domain_general"
+    },
+    {
+      "id": "signature_cue_8",
+      "patterns": [
+        "signature 8",
+        "signature section 8",
+        "SIGNATURE-8",
+        "signature bloco 8",
+        "signature area 8"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_8",
+      "curationReason": "weighted:signature_cue_8:domain_general"
+    },
+    {
+      "id": "signature_cue_9",
+      "patterns": [
+        "signature 9",
+        "signature section 9",
+        "SIGNATURE-9",
+        "signature bloco 9",
+        "signature area 9"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_9",
+      "curationReason": "weighted:signature_cue_9:domain_general"
+    },
+    {
+      "id": "signature_cue_10",
+      "patterns": [
+        "signature 10",
+        "signature section 10",
+        "SIGNATURE-10",
+        "signature bloco 10",
+        "signature area 10"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_10",
+      "curationReason": "weighted:signature_cue_10:domain_general"
+    },
+    {
+      "id": "signature_cue_11",
+      "patterns": [
+        "signature 11",
+        "signature section 11",
+        "SIGNATURE-11",
+        "signature bloco 11",
+        "signature area 11"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_11",
+      "curationReason": "weighted:signature_cue_11:domain_general"
+    },
+    {
+      "id": "signature_cue_12",
+      "patterns": [
+        "signature 12",
+        "signature section 12",
+        "SIGNATURE-12",
+        "signature bloco 12",
+        "signature area 12"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_12",
+      "curationReason": "weighted:signature_cue_12:domain_general"
+    },
+    {
+      "id": "signature_cue_13",
+      "patterns": [
+        "signature 13",
+        "signature section 13",
+        "SIGNATURE-13",
+        "signature bloco 13",
+        "signature area 13"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_13",
+      "curationReason": "weighted:signature_cue_13:domain_general"
+    },
+    {
+      "id": "signature_cue_14",
+      "patterns": [
+        "signature 14",
+        "signature section 14",
+        "SIGNATURE-14",
+        "signature bloco 14",
+        "signature area 14"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_14",
+      "curationReason": "weighted:signature_cue_14:domain_general"
+    },
+    {
+      "id": "signature_cue_15",
+      "patterns": [
+        "signature 15",
+        "signature section 15",
+        "SIGNATURE-15",
+        "signature bloco 15",
+        "signature area 15"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_15",
+      "curationReason": "weighted:signature_cue_15:domain_general"
+    },
+    {
+      "id": "signature_cue_16",
+      "patterns": [
+        "signature 16",
+        "signature section 16",
+        "SIGNATURE-16",
+        "signature bloco 16",
+        "signature area 16"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_16",
+      "curationReason": "weighted:signature_cue_16:domain_general"
+    },
+    {
+      "id": "signature_cue_17",
+      "patterns": [
+        "signature 17",
+        "signature section 17",
+        "SIGNATURE-17",
+        "signature bloco 17",
+        "signature area 17"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_17",
+      "curationReason": "weighted:signature_cue_17:domain_general"
+    },
+    {
+      "id": "signature_cue_18",
+      "patterns": [
+        "signature 18",
+        "signature section 18",
+        "SIGNATURE-18",
+        "signature bloco 18",
+        "signature area 18"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_18",
+      "curationReason": "weighted:signature_cue_18:domain_general"
+    },
+    {
+      "id": "signature_cue_19",
+      "patterns": [
+        "signature 19",
+        "signature section 19",
+        "SIGNATURE-19",
+        "signature bloco 19",
+        "signature area 19"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_19",
+      "curationReason": "weighted:signature_cue_19:domain_general"
+    },
+    {
+      "id": "signature_cue_20",
+      "patterns": [
+        "signature 20",
+        "signature section 20",
+        "SIGNATURE-20",
+        "signature bloco 20",
+        "signature area 20"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_20",
+      "curationReason": "weighted:signature_cue_20:domain_general"
+    },
+    {
+      "id": "signature_cue_21",
+      "patterns": [
+        "signature 21",
+        "signature section 21",
+        "SIGNATURE-21",
+        "signature bloco 21",
+        "signature area 21"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_21",
+      "curationReason": "weighted:signature_cue_21:domain_general"
+    },
+    {
+      "id": "signature_cue_22",
+      "patterns": [
+        "signature 22",
+        "signature section 22",
+        "SIGNATURE-22",
+        "signature bloco 22",
+        "signature area 22"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_22",
+      "curationReason": "weighted:signature_cue_22:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_1",
+      "patterns": [
+        "lab_panel 1",
+        "lab_panel section 1",
+        "LAB_PANEL-1",
+        "lab_panel bloco 1",
+        "lab_panel area 1"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_1",
+      "curationReason": "weighted:lab_panel_cue_1:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_2",
+      "patterns": [
+        "lab_panel 2",
+        "lab_panel section 2",
+        "LAB_PANEL-2",
+        "lab_panel bloco 2",
+        "lab_panel area 2"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_2",
+      "curationReason": "weighted:lab_panel_cue_2:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_3",
+      "patterns": [
+        "lab_panel 3",
+        "lab_panel section 3",
+        "LAB_PANEL-3",
+        "lab_panel bloco 3",
+        "lab_panel area 3"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_3",
+      "curationReason": "weighted:lab_panel_cue_3:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_4",
+      "patterns": [
+        "lab_panel 4",
+        "lab_panel section 4",
+        "LAB_PANEL-4",
+        "lab_panel bloco 4",
+        "lab_panel area 4"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_4",
+      "curationReason": "weighted:lab_panel_cue_4:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_5",
+      "patterns": [
+        "lab_panel 5",
+        "lab_panel section 5",
+        "LAB_PANEL-5",
+        "lab_panel bloco 5",
+        "lab_panel area 5"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_5",
+      "curationReason": "weighted:lab_panel_cue_5:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_6",
+      "patterns": [
+        "lab_panel 6",
+        "lab_panel section 6",
+        "LAB_PANEL-6",
+        "lab_panel bloco 6",
+        "lab_panel area 6"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_6",
+      "curationReason": "weighted:lab_panel_cue_6:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_7",
+      "patterns": [
+        "lab_panel 7",
+        "lab_panel section 7",
+        "LAB_PANEL-7",
+        "lab_panel bloco 7",
+        "lab_panel area 7"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_7",
+      "curationReason": "weighted:lab_panel_cue_7:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_8",
+      "patterns": [
+        "lab_panel 8",
+        "lab_panel section 8",
+        "LAB_PANEL-8",
+        "lab_panel bloco 8",
+        "lab_panel area 8"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_8",
+      "curationReason": "weighted:lab_panel_cue_8:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_9",
+      "patterns": [
+        "lab_panel 9",
+        "lab_panel section 9",
+        "LAB_PANEL-9",
+        "lab_panel bloco 9",
+        "lab_panel area 9"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_9",
+      "curationReason": "weighted:lab_panel_cue_9:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_10",
+      "patterns": [
+        "lab_panel 10",
+        "lab_panel section 10",
+        "LAB_PANEL-10",
+        "lab_panel bloco 10",
+        "lab_panel area 10"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_10",
+      "curationReason": "weighted:lab_panel_cue_10:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_11",
+      "patterns": [
+        "lab_panel 11",
+        "lab_panel section 11",
+        "LAB_PANEL-11",
+        "lab_panel bloco 11",
+        "lab_panel area 11"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_11",
+      "curationReason": "weighted:lab_panel_cue_11:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_12",
+      "patterns": [
+        "lab_panel 12",
+        "lab_panel section 12",
+        "LAB_PANEL-12",
+        "lab_panel bloco 12",
+        "lab_panel area 12"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_12",
+      "curationReason": "weighted:lab_panel_cue_12:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_13",
+      "patterns": [
+        "lab_panel 13",
+        "lab_panel section 13",
+        "LAB_PANEL-13",
+        "lab_panel bloco 13",
+        "lab_panel area 13"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_13",
+      "curationReason": "weighted:lab_panel_cue_13:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_14",
+      "patterns": [
+        "lab_panel 14",
+        "lab_panel section 14",
+        "LAB_PANEL-14",
+        "lab_panel bloco 14",
+        "lab_panel area 14"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_14",
+      "curationReason": "weighted:lab_panel_cue_14:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_15",
+      "patterns": [
+        "lab_panel 15",
+        "lab_panel section 15",
+        "LAB_PANEL-15",
+        "lab_panel bloco 15",
+        "lab_panel area 15"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_15",
+      "curationReason": "weighted:lab_panel_cue_15:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_16",
+      "patterns": [
+        "lab_panel 16",
+        "lab_panel section 16",
+        "LAB_PANEL-16",
+        "lab_panel bloco 16",
+        "lab_panel area 16"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_16",
+      "curationReason": "weighted:lab_panel_cue_16:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_17",
+      "patterns": [
+        "lab_panel 17",
+        "lab_panel section 17",
+        "LAB_PANEL-17",
+        "lab_panel bloco 17",
+        "lab_panel area 17"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_17",
+      "curationReason": "weighted:lab_panel_cue_17:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_18",
+      "patterns": [
+        "lab_panel 18",
+        "lab_panel section 18",
+        "LAB_PANEL-18",
+        "lab_panel bloco 18",
+        "lab_panel area 18"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_18",
+      "curationReason": "weighted:lab_panel_cue_18:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_19",
+      "patterns": [
+        "lab_panel 19",
+        "lab_panel section 19",
+        "LAB_PANEL-19",
+        "lab_panel bloco 19",
+        "lab_panel area 19"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_19",
+      "curationReason": "weighted:lab_panel_cue_19:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_20",
+      "patterns": [
+        "lab_panel 20",
+        "lab_panel section 20",
+        "LAB_PANEL-20",
+        "lab_panel bloco 20",
+        "lab_panel area 20"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_20",
+      "curationReason": "weighted:lab_panel_cue_20:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_21",
+      "patterns": [
+        "lab_panel 21",
+        "lab_panel section 21",
+        "LAB_PANEL-21",
+        "lab_panel bloco 21",
+        "lab_panel area 21"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_21",
+      "curationReason": "weighted:lab_panel_cue_21:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_22",
+      "patterns": [
+        "lab_panel 22",
+        "lab_panel section 22",
+        "LAB_PANEL-22",
+        "lab_panel bloco 22",
+        "lab_panel area 22"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_22",
+      "curationReason": "weighted:lab_panel_cue_22:domain_general"
+    },
+    {
+      "id": "statement_cue_1",
+      "patterns": [
+        "statement 1",
+        "statement section 1",
+        "STATEMENT-1",
+        "statement bloco 1",
+        "statement area 1"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_1",
+      "curationReason": "weighted:statement_cue_1:domain_general"
+    },
+    {
+      "id": "statement_cue_2",
+      "patterns": [
+        "statement 2",
+        "statement section 2",
+        "STATEMENT-2",
+        "statement bloco 2",
+        "statement area 2"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_2",
+      "curationReason": "weighted:statement_cue_2:domain_general"
+    },
+    {
+      "id": "statement_cue_3",
+      "patterns": [
+        "statement 3",
+        "statement section 3",
+        "STATEMENT-3",
+        "statement bloco 3",
+        "statement area 3"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_3",
+      "curationReason": "weighted:statement_cue_3:domain_general"
+    },
+    {
+      "id": "statement_cue_4",
+      "patterns": [
+        "statement 4",
+        "statement section 4",
+        "STATEMENT-4",
+        "statement bloco 4",
+        "statement area 4"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_4",
+      "curationReason": "weighted:statement_cue_4:domain_general"
+    },
+    {
+      "id": "statement_cue_5",
+      "patterns": [
+        "statement 5",
+        "statement section 5",
+        "STATEMENT-5",
+        "statement bloco 5",
+        "statement area 5"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_5",
+      "curationReason": "weighted:statement_cue_5:domain_general"
+    },
+    {
+      "id": "statement_cue_6",
+      "patterns": [
+        "statement 6",
+        "statement section 6",
+        "STATEMENT-6",
+        "statement bloco 6",
+        "statement area 6"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_6",
+      "curationReason": "weighted:statement_cue_6:domain_general"
+    },
+    {
+      "id": "statement_cue_7",
+      "patterns": [
+        "statement 7",
+        "statement section 7",
+        "STATEMENT-7",
+        "statement bloco 7",
+        "statement area 7"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_7",
+      "curationReason": "weighted:statement_cue_7:domain_general"
+    },
+    {
+      "id": "statement_cue_8",
+      "patterns": [
+        "statement 8",
+        "statement section 8",
+        "STATEMENT-8",
+        "statement bloco 8",
+        "statement area 8"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_8",
+      "curationReason": "weighted:statement_cue_8:domain_general"
+    },
+    {
+      "id": "statement_cue_9",
+      "patterns": [
+        "statement 9",
+        "statement section 9",
+        "STATEMENT-9",
+        "statement bloco 9",
+        "statement area 9"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_9",
+      "curationReason": "weighted:statement_cue_9:domain_general"
+    },
+    {
+      "id": "statement_cue_10",
+      "patterns": [
+        "statement 10",
+        "statement section 10",
+        "STATEMENT-10",
+        "statement bloco 10",
+        "statement area 10"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_10",
+      "curationReason": "weighted:statement_cue_10:domain_general"
+    },
+    {
+      "id": "statement_cue_11",
+      "patterns": [
+        "statement 11",
+        "statement section 11",
+        "STATEMENT-11",
+        "statement bloco 11",
+        "statement area 11"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_11",
+      "curationReason": "weighted:statement_cue_11:domain_general"
+    },
+    {
+      "id": "statement_cue_12",
+      "patterns": [
+        "statement 12",
+        "statement section 12",
+        "STATEMENT-12",
+        "statement bloco 12",
+        "statement area 12"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_12",
+      "curationReason": "weighted:statement_cue_12:domain_general"
+    },
+    {
+      "id": "statement_cue_13",
+      "patterns": [
+        "statement 13",
+        "statement section 13",
+        "STATEMENT-13",
+        "statement bloco 13",
+        "statement area 13"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_13",
+      "curationReason": "weighted:statement_cue_13:domain_general"
+    },
+    {
+      "id": "statement_cue_14",
+      "patterns": [
+        "statement 14",
+        "statement section 14",
+        "STATEMENT-14",
+        "statement bloco 14",
+        "statement area 14"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_14",
+      "curationReason": "weighted:statement_cue_14:domain_general"
+    },
+    {
+      "id": "statement_cue_15",
+      "patterns": [
+        "statement 15",
+        "statement section 15",
+        "STATEMENT-15",
+        "statement bloco 15",
+        "statement area 15"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_15",
+      "curationReason": "weighted:statement_cue_15:domain_general"
+    },
+    {
+      "id": "statement_cue_16",
+      "patterns": [
+        "statement 16",
+        "statement section 16",
+        "STATEMENT-16",
+        "statement bloco 16",
+        "statement area 16"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_16",
+      "curationReason": "weighted:statement_cue_16:domain_general"
+    },
+    {
+      "id": "statement_cue_17",
+      "patterns": [
+        "statement 17",
+        "statement section 17",
+        "STATEMENT-17",
+        "statement bloco 17",
+        "statement area 17"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_17",
+      "curationReason": "weighted:statement_cue_17:domain_general"
+    },
+    {
+      "id": "statement_cue_18",
+      "patterns": [
+        "statement 18",
+        "statement section 18",
+        "STATEMENT-18",
+        "statement bloco 18",
+        "statement area 18"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_18",
+      "curationReason": "weighted:statement_cue_18:domain_general"
+    },
+    {
+      "id": "statement_cue_19",
+      "patterns": [
+        "statement 19",
+        "statement section 19",
+        "STATEMENT-19",
+        "statement bloco 19",
+        "statement area 19"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_19",
+      "curationReason": "weighted:statement_cue_19:domain_general"
+    },
+    {
+      "id": "statement_cue_20",
+      "patterns": [
+        "statement 20",
+        "statement section 20",
+        "STATEMENT-20",
+        "statement bloco 20",
+        "statement area 20"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_20",
+      "curationReason": "weighted:statement_cue_20:domain_general"
+    },
+    {
+      "id": "statement_cue_21",
+      "patterns": [
+        "statement 21",
+        "statement section 21",
+        "STATEMENT-21",
+        "statement bloco 21",
+        "statement area 21"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_21",
+      "curationReason": "weighted:statement_cue_21:domain_general"
+    },
+    {
+      "id": "statement_cue_22",
+      "patterns": [
+        "statement 22",
+        "statement section 22",
+        "STATEMENT-22",
+        "statement bloco 22",
+        "statement area 22"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_22",
+      "curationReason": "weighted:statement_cue_22:domain_general"
+    },
+    {
+      "id": "invoice_cue_1",
+      "patterns": [
+        "invoice 1",
+        "invoice section 1",
+        "INVOICE-1",
+        "invoice bloco 1",
+        "invoice area 1"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_1",
+      "curationReason": "weighted:invoice_cue_1:domain_general"
+    },
+    {
+      "id": "invoice_cue_2",
+      "patterns": [
+        "invoice 2",
+        "invoice section 2",
+        "INVOICE-2",
+        "invoice bloco 2",
+        "invoice area 2"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_2",
+      "curationReason": "weighted:invoice_cue_2:domain_general"
+    },
+    {
+      "id": "invoice_cue_3",
+      "patterns": [
+        "invoice 3",
+        "invoice section 3",
+        "INVOICE-3",
+        "invoice bloco 3",
+        "invoice area 3"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_3",
+      "curationReason": "weighted:invoice_cue_3:domain_general"
+    },
+    {
+      "id": "invoice_cue_4",
+      "patterns": [
+        "invoice 4",
+        "invoice section 4",
+        "INVOICE-4",
+        "invoice bloco 4",
+        "invoice area 4"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_4",
+      "curationReason": "weighted:invoice_cue_4:domain_general"
+    },
+    {
+      "id": "invoice_cue_5",
+      "patterns": [
+        "invoice 5",
+        "invoice section 5",
+        "INVOICE-5",
+        "invoice bloco 5",
+        "invoice area 5"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_5",
+      "curationReason": "weighted:invoice_cue_5:domain_general"
+    },
+    {
+      "id": "invoice_cue_6",
+      "patterns": [
+        "invoice 6",
+        "invoice section 6",
+        "INVOICE-6",
+        "invoice bloco 6",
+        "invoice area 6"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_6",
+      "curationReason": "weighted:invoice_cue_6:domain_general"
+    },
+    {
+      "id": "invoice_cue_7",
+      "patterns": [
+        "invoice 7",
+        "invoice section 7",
+        "INVOICE-7",
+        "invoice bloco 7",
+        "invoice area 7"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_7",
+      "curationReason": "weighted:invoice_cue_7:domain_general"
+    },
+    {
+      "id": "invoice_cue_8",
+      "patterns": [
+        "invoice 8",
+        "invoice section 8",
+        "INVOICE-8",
+        "invoice bloco 8",
+        "invoice area 8"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_8",
+      "curationReason": "weighted:invoice_cue_8:domain_general"
+    },
+    {
+      "id": "invoice_cue_9",
+      "patterns": [
+        "invoice 9",
+        "invoice section 9",
+        "INVOICE-9",
+        "invoice bloco 9",
+        "invoice area 9"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_9",
+      "curationReason": "weighted:invoice_cue_9:domain_general"
+    },
+    {
+      "id": "invoice_cue_10",
+      "patterns": [
+        "invoice 10",
+        "invoice section 10",
+        "INVOICE-10",
+        "invoice bloco 10",
+        "invoice area 10"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_10",
+      "curationReason": "weighted:invoice_cue_10:domain_general"
+    },
+    {
+      "id": "invoice_cue_11",
+      "patterns": [
+        "invoice 11",
+        "invoice section 11",
+        "INVOICE-11",
+        "invoice bloco 11",
+        "invoice area 11"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_11",
+      "curationReason": "weighted:invoice_cue_11:domain_general"
+    },
+    {
+      "id": "invoice_cue_12",
+      "patterns": [
+        "invoice 12",
+        "invoice section 12",
+        "INVOICE-12",
+        "invoice bloco 12",
+        "invoice area 12"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_12",
+      "curationReason": "weighted:invoice_cue_12:domain_general"
+    },
+    {
+      "id": "invoice_cue_13",
+      "patterns": [
+        "invoice 13",
+        "invoice section 13",
+        "INVOICE-13",
+        "invoice bloco 13",
+        "invoice area 13"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_13",
+      "curationReason": "weighted:invoice_cue_13:domain_general"
+    },
+    {
+      "id": "invoice_cue_14",
+      "patterns": [
+        "invoice 14",
+        "invoice section 14",
+        "INVOICE-14",
+        "invoice bloco 14",
+        "invoice area 14"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_14",
+      "curationReason": "weighted:invoice_cue_14:domain_general"
+    },
+    {
+      "id": "invoice_cue_15",
+      "patterns": [
+        "invoice 15",
+        "invoice section 15",
+        "INVOICE-15",
+        "invoice bloco 15",
+        "invoice area 15"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_15",
+      "curationReason": "weighted:invoice_cue_15:domain_general"
+    },
+    {
+      "id": "invoice_cue_16",
+      "patterns": [
+        "invoice 16",
+        "invoice section 16",
+        "INVOICE-16",
+        "invoice bloco 16",
+        "invoice area 16"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_16",
+      "curationReason": "weighted:invoice_cue_16:domain_general"
+    },
+    {
+      "id": "invoice_cue_17",
+      "patterns": [
+        "invoice 17",
+        "invoice section 17",
+        "INVOICE-17",
+        "invoice bloco 17",
+        "invoice area 17"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_17",
+      "curationReason": "weighted:invoice_cue_17:domain_general"
+    },
+    {
+      "id": "invoice_cue_18",
+      "patterns": [
+        "invoice 18",
+        "invoice section 18",
+        "INVOICE-18",
+        "invoice bloco 18",
+        "invoice area 18"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_18",
+      "curationReason": "weighted:invoice_cue_18:domain_general"
+    },
+    {
+      "id": "invoice_cue_19",
+      "patterns": [
+        "invoice 19",
+        "invoice section 19",
+        "INVOICE-19",
+        "invoice bloco 19",
+        "invoice area 19"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_19",
+      "curationReason": "weighted:invoice_cue_19:domain_general"
+    },
+    {
+      "id": "invoice_cue_20",
+      "patterns": [
+        "invoice 20",
+        "invoice section 20",
+        "INVOICE-20",
+        "invoice bloco 20",
+        "invoice area 20"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_20",
+      "curationReason": "weighted:invoice_cue_20:domain_general"
+    },
+    {
+      "id": "invoice_cue_21",
+      "patterns": [
+        "invoice 21",
+        "invoice section 21",
+        "INVOICE-21",
+        "invoice bloco 21",
+        "invoice area 21"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_21",
+      "curationReason": "weighted:invoice_cue_21:domain_general"
+    },
+    {
+      "id": "invoice_cue_22",
+      "patterns": [
+        "invoice 22",
+        "invoice section 22",
+        "INVOICE-22",
+        "invoice bloco 22",
+        "invoice area 22"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_22",
+      "curationReason": "weighted:invoice_cue_22:domain_general"
+    },
+    {
+      "id": "disclosure_cue_1",
+      "patterns": [
+        "disclosure 1",
+        "disclosure section 1",
+        "DISCLOSURE-1",
+        "disclosure bloco 1",
+        "disclosure area 1"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_1",
+      "curationReason": "weighted:disclosure_cue_1:domain_general"
+    },
+    {
+      "id": "disclosure_cue_2",
+      "patterns": [
+        "disclosure 2",
+        "disclosure section 2",
+        "DISCLOSURE-2",
+        "disclosure bloco 2",
+        "disclosure area 2"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_2",
+      "curationReason": "weighted:disclosure_cue_2:domain_general"
+    },
+    {
+      "id": "disclosure_cue_3",
+      "patterns": [
+        "disclosure 3",
+        "disclosure section 3",
+        "DISCLOSURE-3",
+        "disclosure bloco 3",
+        "disclosure area 3"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_3",
+      "curationReason": "weighted:disclosure_cue_3:domain_general"
+    },
+    {
+      "id": "disclosure_cue_4",
+      "patterns": [
+        "disclosure 4",
+        "disclosure section 4",
+        "DISCLOSURE-4",
+        "disclosure bloco 4",
+        "disclosure area 4"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_4",
+      "curationReason": "weighted:disclosure_cue_4:domain_general"
+    },
+    {
+      "id": "disclosure_cue_5",
+      "patterns": [
+        "disclosure 5",
+        "disclosure section 5",
+        "DISCLOSURE-5",
+        "disclosure bloco 5",
+        "disclosure area 5"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_5",
+      "curationReason": "weighted:disclosure_cue_5:domain_general"
+    },
+    {
+      "id": "disclosure_cue_6",
+      "patterns": [
+        "disclosure 6",
+        "disclosure section 6",
+        "DISCLOSURE-6",
+        "disclosure bloco 6",
+        "disclosure area 6"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_6",
+      "curationReason": "weighted:disclosure_cue_6:domain_general"
+    },
+    {
+      "id": "disclosure_cue_7",
+      "patterns": [
+        "disclosure 7",
+        "disclosure section 7",
+        "DISCLOSURE-7",
+        "disclosure bloco 7",
+        "disclosure area 7"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_7",
+      "curationReason": "weighted:disclosure_cue_7:domain_general"
+    },
+    {
+      "id": "disclosure_cue_8",
+      "patterns": [
+        "disclosure 8",
+        "disclosure section 8",
+        "DISCLOSURE-8",
+        "disclosure bloco 8",
+        "disclosure area 8"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_8",
+      "curationReason": "weighted:disclosure_cue_8:domain_general"
+    },
+    {
+      "id": "disclosure_cue_9",
+      "patterns": [
+        "disclosure 9",
+        "disclosure section 9",
+        "DISCLOSURE-9",
+        "disclosure bloco 9",
+        "disclosure area 9"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_9",
+      "curationReason": "weighted:disclosure_cue_9:domain_general"
+    },
+    {
+      "id": "disclosure_cue_10",
+      "patterns": [
+        "disclosure 10",
+        "disclosure section 10",
+        "DISCLOSURE-10",
+        "disclosure bloco 10",
+        "disclosure area 10"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_10",
+      "curationReason": "weighted:disclosure_cue_10:domain_general"
+    },
+    {
+      "id": "disclosure_cue_11",
+      "patterns": [
+        "disclosure 11",
+        "disclosure section 11",
+        "DISCLOSURE-11",
+        "disclosure bloco 11",
+        "disclosure area 11"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_11",
+      "curationReason": "weighted:disclosure_cue_11:domain_general"
+    },
+    {
+      "id": "disclosure_cue_12",
+      "patterns": [
+        "disclosure 12",
+        "disclosure section 12",
+        "DISCLOSURE-12",
+        "disclosure bloco 12",
+        "disclosure area 12"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_12",
+      "curationReason": "weighted:disclosure_cue_12:domain_general"
+    },
+    {
+      "id": "disclosure_cue_13",
+      "patterns": [
+        "disclosure 13",
+        "disclosure section 13",
+        "DISCLOSURE-13",
+        "disclosure bloco 13",
+        "disclosure area 13"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_13",
+      "curationReason": "weighted:disclosure_cue_13:domain_general"
+    },
+    {
+      "id": "disclosure_cue_14",
+      "patterns": [
+        "disclosure 14",
+        "disclosure section 14",
+        "DISCLOSURE-14",
+        "disclosure bloco 14",
+        "disclosure area 14"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_14",
+      "curationReason": "weighted:disclosure_cue_14:domain_general"
+    },
+    {
+      "id": "disclosure_cue_15",
+      "patterns": [
+        "disclosure 15",
+        "disclosure section 15",
+        "DISCLOSURE-15",
+        "disclosure bloco 15",
+        "disclosure area 15"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_15",
+      "curationReason": "weighted:disclosure_cue_15:domain_general"
+    },
+    {
+      "id": "disclosure_cue_16",
+      "patterns": [
+        "disclosure 16",
+        "disclosure section 16",
+        "DISCLOSURE-16",
+        "disclosure bloco 16",
+        "disclosure area 16"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_16",
+      "curationReason": "weighted:disclosure_cue_16:domain_general"
+    },
+    {
+      "id": "disclosure_cue_17",
+      "patterns": [
+        "disclosure 17",
+        "disclosure section 17",
+        "DISCLOSURE-17",
+        "disclosure bloco 17",
+        "disclosure area 17"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_17",
+      "curationReason": "weighted:disclosure_cue_17:domain_general"
+    },
+    {
+      "id": "disclosure_cue_18",
+      "patterns": [
+        "disclosure 18",
+        "disclosure section 18",
+        "DISCLOSURE-18",
+        "disclosure bloco 18",
+        "disclosure area 18"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_18",
+      "curationReason": "weighted:disclosure_cue_18:domain_general"
+    },
+    {
+      "id": "disclosure_cue_19",
+      "patterns": [
+        "disclosure 19",
+        "disclosure section 19",
+        "DISCLOSURE-19",
+        "disclosure bloco 19",
+        "disclosure area 19"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_19",
+      "curationReason": "weighted:disclosure_cue_19:domain_general"
+    },
+    {
+      "id": "disclosure_cue_20",
+      "patterns": [
+        "disclosure 20",
+        "disclosure section 20",
+        "DISCLOSURE-20",
+        "disclosure bloco 20",
+        "disclosure area 20"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_20",
+      "curationReason": "weighted:disclosure_cue_20:domain_general"
+    },
+    {
+      "id": "disclosure_cue_21",
+      "patterns": [
+        "disclosure 21",
+        "disclosure section 21",
+        "DISCLOSURE-21",
+        "disclosure bloco 21",
+        "disclosure area 21"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_21",
+      "curationReason": "weighted:disclosure_cue_21:domain_general"
+    },
+    {
+      "id": "disclosure_cue_22",
+      "patterns": [
+        "disclosure 22",
+        "disclosure section 22",
+        "DISCLOSURE-22",
+        "disclosure bloco 22",
+        "disclosure area 22"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_22",
+      "curationReason": "weighted:disclosure_cue_22:domain_general"
+    },
+    {
+      "id": "signature_block_cue_1",
+      "patterns": [
+        "signature_block 1",
+        "signature_block section 1",
+        "SIGNATURE_BLOCK-1",
+        "signature_block bloco 1",
+        "signature_block area 1"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_1",
+      "curationReason": "weighted:signature_block_cue_1:domain_general"
+    },
+    {
+      "id": "signature_block_cue_2",
+      "patterns": [
+        "signature_block 2",
+        "signature_block section 2",
+        "SIGNATURE_BLOCK-2",
+        "signature_block bloco 2",
+        "signature_block area 2"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_2",
+      "curationReason": "weighted:signature_block_cue_2:domain_general"
+    },
+    {
+      "id": "signature_block_cue_3",
+      "patterns": [
+        "signature_block 3",
+        "signature_block section 3",
+        "SIGNATURE_BLOCK-3",
+        "signature_block bloco 3",
+        "signature_block area 3"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_3",
+      "curationReason": "weighted:signature_block_cue_3:domain_general"
+    },
+    {
+      "id": "signature_block_cue_4",
+      "patterns": [
+        "signature_block 4",
+        "signature_block section 4",
+        "SIGNATURE_BLOCK-4",
+        "signature_block bloco 4",
+        "signature_block area 4"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_4",
+      "curationReason": "weighted:signature_block_cue_4:domain_general"
+    },
+    {
+      "id": "signature_block_cue_5",
+      "patterns": [
+        "signature_block 5",
+        "signature_block section 5",
+        "SIGNATURE_BLOCK-5",
+        "signature_block bloco 5",
+        "signature_block area 5"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_5",
+      "curationReason": "weighted:signature_block_cue_5:domain_general"
+    },
+    {
+      "id": "signature_block_cue_6",
+      "patterns": [
+        "signature_block 6",
+        "signature_block section 6",
+        "SIGNATURE_BLOCK-6",
+        "signature_block bloco 6",
+        "signature_block area 6"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_6",
+      "curationReason": "weighted:signature_block_cue_6:domain_general"
+    },
+    {
+      "id": "signature_block_cue_7",
+      "patterns": [
+        "signature_block 7",
+        "signature_block section 7",
+        "SIGNATURE_BLOCK-7",
+        "signature_block bloco 7",
+        "signature_block area 7"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_7",
+      "curationReason": "weighted:signature_block_cue_7:domain_general"
+    },
+    {
+      "id": "signature_block_cue_8",
+      "patterns": [
+        "signature_block 8",
+        "signature_block section 8",
+        "SIGNATURE_BLOCK-8",
+        "signature_block bloco 8",
+        "signature_block area 8"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_8",
+      "curationReason": "weighted:signature_block_cue_8:domain_general"
+    },
+    {
+      "id": "signature_block_cue_9",
+      "patterns": [
+        "signature_block 9",
+        "signature_block section 9",
+        "SIGNATURE_BLOCK-9",
+        "signature_block bloco 9",
+        "signature_block area 9"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_9",
+      "curationReason": "weighted:signature_block_cue_9:domain_general"
+    },
+    {
+      "id": "signature_block_cue_10",
+      "patterns": [
+        "signature_block 10",
+        "signature_block section 10",
+        "SIGNATURE_BLOCK-10",
+        "signature_block bloco 10",
+        "signature_block area 10"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_10",
+      "curationReason": "weighted:signature_block_cue_10:domain_general"
+    },
+    {
+      "id": "signature_block_cue_11",
+      "patterns": [
+        "signature_block 11",
+        "signature_block section 11",
+        "SIGNATURE_BLOCK-11",
+        "signature_block bloco 11",
+        "signature_block area 11"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_11",
+      "curationReason": "weighted:signature_block_cue_11:domain_general"
+    },
+    {
+      "id": "signature_block_cue_12",
+      "patterns": [
+        "signature_block 12",
+        "signature_block section 12",
+        "SIGNATURE_BLOCK-12",
+        "signature_block bloco 12",
+        "signature_block area 12"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_12",
+      "curationReason": "weighted:signature_block_cue_12:domain_general"
+    },
+    {
+      "id": "signature_block_cue_13",
+      "patterns": [
+        "signature_block 13",
+        "signature_block section 13",
+        "SIGNATURE_BLOCK-13",
+        "signature_block bloco 13",
+        "signature_block area 13"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_13",
+      "curationReason": "weighted:signature_block_cue_13:domain_general"
+    },
+    {
+      "id": "signature_block_cue_14",
+      "patterns": [
+        "signature_block 14",
+        "signature_block section 14",
+        "SIGNATURE_BLOCK-14",
+        "signature_block bloco 14",
+        "signature_block area 14"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_14",
+      "curationReason": "weighted:signature_block_cue_14:domain_general"
+    },
+    {
+      "id": "signature_block_cue_15",
+      "patterns": [
+        "signature_block 15",
+        "signature_block section 15",
+        "SIGNATURE_BLOCK-15",
+        "signature_block bloco 15",
+        "signature_block area 15"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_15",
+      "curationReason": "weighted:signature_block_cue_15:domain_general"
+    },
+    {
+      "id": "signature_block_cue_16",
+      "patterns": [
+        "signature_block 16",
+        "signature_block section 16",
+        "SIGNATURE_BLOCK-16",
+        "signature_block bloco 16",
+        "signature_block area 16"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_16",
+      "curationReason": "weighted:signature_block_cue_16:domain_general"
+    },
+    {
+      "id": "signature_block_cue_17",
+      "patterns": [
+        "signature_block 17",
+        "signature_block section 17",
+        "SIGNATURE_BLOCK-17",
+        "signature_block bloco 17",
+        "signature_block area 17"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_17",
+      "curationReason": "weighted:signature_block_cue_17:domain_general"
+    },
+    {
+      "id": "signature_block_cue_18",
+      "patterns": [
+        "signature_block 18",
+        "signature_block section 18",
+        "SIGNATURE_BLOCK-18",
+        "signature_block bloco 18",
+        "signature_block area 18"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_18",
+      "curationReason": "weighted:signature_block_cue_18:domain_general"
+    },
+    {
+      "id": "signature_block_cue_19",
+      "patterns": [
+        "signature_block 19",
+        "signature_block section 19",
+        "SIGNATURE_BLOCK-19",
+        "signature_block bloco 19",
+        "signature_block area 19"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_19",
+      "curationReason": "weighted:signature_block_cue_19:domain_general"
+    },
+    {
+      "id": "signature_block_cue_20",
+      "patterns": [
+        "signature_block 20",
+        "signature_block section 20",
+        "SIGNATURE_BLOCK-20",
+        "signature_block bloco 20",
+        "signature_block area 20"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_20",
+      "curationReason": "weighted:signature_block_cue_20:domain_general"
+    },
+    {
+      "id": "signature_block_cue_21",
+      "patterns": [
+        "signature_block 21",
+        "signature_block section 21",
+        "SIGNATURE_BLOCK-21",
+        "signature_block bloco 21",
+        "signature_block area 21"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_21",
+      "curationReason": "weighted:signature_block_cue_21:domain_general"
+    },
+    {
+      "id": "signature_block_cue_22",
+      "patterns": [
+        "signature_block 22",
+        "signature_block section 22",
+        "SIGNATURE_BLOCK-22",
+        "signature_block bloco 22",
+        "signature_block area 22"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_22",
+      "curationReason": "weighted:signature_block_cue_22:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_1",
+      "patterns": [
+        "executive_summary 1",
+        "executive_summary section 1",
+        "EXECUTIVE_SUMMARY-1",
+        "executive_summary bloco 1",
+        "executive_summary area 1"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_1",
+      "curationReason": "weighted:executive_summary_cue_1:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_2",
+      "patterns": [
+        "executive_summary 2",
+        "executive_summary section 2",
+        "EXECUTIVE_SUMMARY-2",
+        "executive_summary bloco 2",
+        "executive_summary area 2"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_2",
+      "curationReason": "weighted:executive_summary_cue_2:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_3",
+      "patterns": [
+        "executive_summary 3",
+        "executive_summary section 3",
+        "EXECUTIVE_SUMMARY-3",
+        "executive_summary bloco 3",
+        "executive_summary area 3"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_3",
+      "curationReason": "weighted:executive_summary_cue_3:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_4",
+      "patterns": [
+        "executive_summary 4",
+        "executive_summary section 4",
+        "EXECUTIVE_SUMMARY-4",
+        "executive_summary bloco 4",
+        "executive_summary area 4"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_4",
+      "curationReason": "weighted:executive_summary_cue_4:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_5",
+      "patterns": [
+        "executive_summary 5",
+        "executive_summary section 5",
+        "EXECUTIVE_SUMMARY-5",
+        "executive_summary bloco 5",
+        "executive_summary area 5"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_5",
+      "curationReason": "weighted:executive_summary_cue_5:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_6",
+      "patterns": [
+        "executive_summary 6",
+        "executive_summary section 6",
+        "EXECUTIVE_SUMMARY-6",
+        "executive_summary bloco 6",
+        "executive_summary area 6"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_6",
+      "curationReason": "weighted:executive_summary_cue_6:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_7",
+      "patterns": [
+        "executive_summary 7",
+        "executive_summary section 7",
+        "EXECUTIVE_SUMMARY-7",
+        "executive_summary bloco 7",
+        "executive_summary area 7"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_7",
+      "curationReason": "weighted:executive_summary_cue_7:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_8",
+      "patterns": [
+        "executive_summary 8",
+        "executive_summary section 8",
+        "EXECUTIVE_SUMMARY-8",
+        "executive_summary bloco 8",
+        "executive_summary area 8"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_8",
+      "curationReason": "weighted:executive_summary_cue_8:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_9",
+      "patterns": [
+        "executive_summary 9",
+        "executive_summary section 9",
+        "EXECUTIVE_SUMMARY-9",
+        "executive_summary bloco 9",
+        "executive_summary area 9"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_9",
+      "curationReason": "weighted:executive_summary_cue_9:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_10",
+      "patterns": [
+        "executive_summary 10",
+        "executive_summary section 10",
+        "EXECUTIVE_SUMMARY-10",
+        "executive_summary bloco 10",
+        "executive_summary area 10"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_10",
+      "curationReason": "weighted:executive_summary_cue_10:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_11",
+      "patterns": [
+        "executive_summary 11",
+        "executive_summary section 11",
+        "EXECUTIVE_SUMMARY-11",
+        "executive_summary bloco 11",
+        "executive_summary area 11"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_11",
+      "curationReason": "weighted:executive_summary_cue_11:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_12",
+      "patterns": [
+        "executive_summary 12",
+        "executive_summary section 12",
+        "EXECUTIVE_SUMMARY-12",
+        "executive_summary bloco 12",
+        "executive_summary area 12"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_12",
+      "curationReason": "weighted:executive_summary_cue_12:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_13",
+      "patterns": [
+        "executive_summary 13",
+        "executive_summary section 13",
+        "EXECUTIVE_SUMMARY-13",
+        "executive_summary bloco 13",
+        "executive_summary area 13"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_13",
+      "curationReason": "weighted:executive_summary_cue_13:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_14",
+      "patterns": [
+        "executive_summary 14",
+        "executive_summary section 14",
+        "EXECUTIVE_SUMMARY-14",
+        "executive_summary bloco 14",
+        "executive_summary area 14"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_14",
+      "curationReason": "weighted:executive_summary_cue_14:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_15",
+      "patterns": [
+        "executive_summary 15",
+        "executive_summary section 15",
+        "EXECUTIVE_SUMMARY-15",
+        "executive_summary bloco 15",
+        "executive_summary area 15"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_15",
+      "curationReason": "weighted:executive_summary_cue_15:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_16",
+      "patterns": [
+        "executive_summary 16",
+        "executive_summary section 16",
+        "EXECUTIVE_SUMMARY-16",
+        "executive_summary bloco 16",
+        "executive_summary area 16"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_16",
+      "curationReason": "weighted:executive_summary_cue_16:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_17",
+      "patterns": [
+        "executive_summary 17",
+        "executive_summary section 17",
+        "EXECUTIVE_SUMMARY-17",
+        "executive_summary bloco 17",
+        "executive_summary area 17"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_17",
+      "curationReason": "weighted:executive_summary_cue_17:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_18",
+      "patterns": [
+        "executive_summary 18",
+        "executive_summary section 18",
+        "EXECUTIVE_SUMMARY-18",
+        "executive_summary bloco 18",
+        "executive_summary area 18"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_18",
+      "curationReason": "weighted:executive_summary_cue_18:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_19",
+      "patterns": [
+        "executive_summary 19",
+        "executive_summary section 19",
+        "EXECUTIVE_SUMMARY-19",
+        "executive_summary bloco 19",
+        "executive_summary area 19"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_19",
+      "curationReason": "weighted:executive_summary_cue_19:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_20",
+      "patterns": [
+        "executive_summary 20",
+        "executive_summary section 20",
+        "EXECUTIVE_SUMMARY-20",
+        "executive_summary bloco 20",
+        "executive_summary area 20"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_20",
+      "curationReason": "weighted:executive_summary_cue_20:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_21",
+      "patterns": [
+        "executive_summary 21",
+        "executive_summary section 21",
+        "EXECUTIVE_SUMMARY-21",
+        "executive_summary bloco 21",
+        "executive_summary area 21"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_21",
+      "curationReason": "weighted:executive_summary_cue_21:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_22",
+      "patterns": [
+        "executive_summary 22",
+        "executive_summary section 22",
+        "EXECUTIVE_SUMMARY-22",
+        "executive_summary bloco 22",
+        "executive_summary area 22"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_22",
+      "curationReason": "weighted:executive_summary_cue_22:domain_general"
+    },
+    {
+      "id": "table_block_cue_1",
+      "patterns": [
+        "table_block 1",
+        "table_block section 1",
+        "TABLE_BLOCK-1",
+        "table_block bloco 1",
+        "table_block area 1"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_1",
+      "curationReason": "weighted:table_block_cue_1:domain_general"
+    },
+    {
+      "id": "table_block_cue_2",
+      "patterns": [
+        "table_block 2",
+        "table_block section 2",
+        "TABLE_BLOCK-2",
+        "table_block bloco 2",
+        "table_block area 2"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_2",
+      "curationReason": "weighted:table_block_cue_2:domain_general"
+    },
+    {
+      "id": "table_block_cue_3",
+      "patterns": [
+        "table_block 3",
+        "table_block section 3",
+        "TABLE_BLOCK-3",
+        "table_block bloco 3",
+        "table_block area 3"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_3",
+      "curationReason": "weighted:table_block_cue_3:domain_general"
+    },
+    {
+      "id": "table_block_cue_4",
+      "patterns": [
+        "table_block 4",
+        "table_block section 4",
+        "TABLE_BLOCK-4",
+        "table_block bloco 4",
+        "table_block area 4"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_4",
+      "curationReason": "weighted:table_block_cue_4:domain_general"
+    },
+    {
+      "id": "table_block_cue_5",
+      "patterns": [
+        "table_block 5",
+        "table_block section 5",
+        "TABLE_BLOCK-5",
+        "table_block bloco 5",
+        "table_block area 5"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_5",
+      "curationReason": "weighted:table_block_cue_5:domain_general"
+    },
+    {
+      "id": "table_block_cue_6",
+      "patterns": [
+        "table_block 6",
+        "table_block section 6",
+        "TABLE_BLOCK-6",
+        "table_block bloco 6",
+        "table_block area 6"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_6",
+      "curationReason": "weighted:table_block_cue_6:domain_general"
+    },
+    {
+      "id": "table_block_cue_7",
+      "patterns": [
+        "table_block 7",
+        "table_block section 7",
+        "TABLE_BLOCK-7",
+        "table_block bloco 7",
+        "table_block area 7"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_7",
+      "curationReason": "weighted:table_block_cue_7:domain_general"
+    },
+    {
+      "id": "table_block_cue_8",
+      "patterns": [
+        "table_block 8",
+        "table_block section 8",
+        "TABLE_BLOCK-8",
+        "table_block bloco 8",
+        "table_block area 8"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_8",
+      "curationReason": "weighted:table_block_cue_8:domain_general"
+    },
+    {
+      "id": "table_block_cue_9",
+      "patterns": [
+        "table_block 9",
+        "table_block section 9",
+        "TABLE_BLOCK-9",
+        "table_block bloco 9",
+        "table_block area 9"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_9",
+      "curationReason": "weighted:table_block_cue_9:domain_general"
+    },
+    {
+      "id": "table_block_cue_10",
+      "patterns": [
+        "table_block 10",
+        "table_block section 10",
+        "TABLE_BLOCK-10",
+        "table_block bloco 10",
+        "table_block area 10"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_10",
+      "curationReason": "weighted:table_block_cue_10:domain_general"
+    },
+    {
+      "id": "table_block_cue_11",
+      "patterns": [
+        "table_block 11",
+        "table_block section 11",
+        "TABLE_BLOCK-11",
+        "table_block bloco 11",
+        "table_block area 11"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_11",
+      "curationReason": "weighted:table_block_cue_11:domain_general"
+    },
+    {
+      "id": "table_block_cue_12",
+      "patterns": [
+        "table_block 12",
+        "table_block section 12",
+        "TABLE_BLOCK-12",
+        "table_block bloco 12",
+        "table_block area 12"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_12",
+      "curationReason": "weighted:table_block_cue_12:domain_general"
+    },
+    {
+      "id": "table_block_cue_13",
+      "patterns": [
+        "table_block 13",
+        "table_block section 13",
+        "TABLE_BLOCK-13",
+        "table_block bloco 13",
+        "table_block area 13"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_13",
+      "curationReason": "weighted:table_block_cue_13:domain_general"
+    },
+    {
+      "id": "table_block_cue_14",
+      "patterns": [
+        "table_block 14",
+        "table_block section 14",
+        "TABLE_BLOCK-14",
+        "table_block bloco 14",
+        "table_block area 14"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_14",
+      "curationReason": "weighted:table_block_cue_14:domain_general"
+    },
+    {
+      "id": "table_block_cue_15",
+      "patterns": [
+        "table_block 15",
+        "table_block section 15",
+        "TABLE_BLOCK-15",
+        "table_block bloco 15",
+        "table_block area 15"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_15",
+      "curationReason": "weighted:table_block_cue_15:domain_general"
+    },
+    {
+      "id": "table_block_cue_16",
+      "patterns": [
+        "table_block 16",
+        "table_block section 16",
+        "TABLE_BLOCK-16",
+        "table_block bloco 16",
+        "table_block area 16"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_16",
+      "curationReason": "weighted:table_block_cue_16:domain_general"
+    },
+    {
+      "id": "table_block_cue_17",
+      "patterns": [
+        "table_block 17",
+        "table_block section 17",
+        "TABLE_BLOCK-17",
+        "table_block bloco 17",
+        "table_block area 17"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_17",
+      "curationReason": "weighted:table_block_cue_17:domain_general"
+    },
+    {
+      "id": "table_block_cue_18",
+      "patterns": [
+        "table_block 18",
+        "table_block section 18",
+        "TABLE_BLOCK-18",
+        "table_block bloco 18",
+        "table_block area 18"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_18",
+      "curationReason": "weighted:table_block_cue_18:domain_general"
+    },
+    {
+      "id": "table_block_cue_19",
+      "patterns": [
+        "table_block 19",
+        "table_block section 19",
+        "TABLE_BLOCK-19",
+        "table_block bloco 19",
+        "table_block area 19"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_19",
+      "curationReason": "weighted:table_block_cue_19:domain_general"
+    },
+    {
+      "id": "table_block_cue_20",
+      "patterns": [
+        "table_block 20",
+        "table_block section 20",
+        "TABLE_BLOCK-20",
+        "table_block bloco 20",
+        "table_block area 20"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_20",
+      "curationReason": "weighted:table_block_cue_20:domain_general"
+    },
+    {
+      "id": "table_block_cue_21",
+      "patterns": [
+        "table_block 21",
+        "table_block section 21",
+        "TABLE_BLOCK-21",
+        "table_block bloco 21",
+        "table_block area 21"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_21",
+      "curationReason": "weighted:table_block_cue_21:domain_general"
+    },
+    {
+      "id": "table_block_cue_22",
+      "patterns": [
+        "table_block 22",
+        "table_block section 22",
+        "TABLE_BLOCK-22",
+        "table_block bloco 22",
+        "table_block area 22"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_22",
+      "curationReason": "weighted:table_block_cue_22:domain_general"
     }
   ]
 }

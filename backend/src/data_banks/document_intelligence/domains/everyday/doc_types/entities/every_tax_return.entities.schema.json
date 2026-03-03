@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_tax_return",
+    "version": "1.0.0",
+    "description": "Entity schema for every_tax_return.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_return"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "taxpayer_name",
+      "type": "string",
+      "required": true,
+      "description": "Taxpayer legal name.",
+      "section": "taxpayer_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["taxpayer", "contribuinte", "nome"],
+        "disallowInference": true,
+        "preferredSources": ["document_header", "taxpayer_profile"]
+      }
+    },
+    {
+      "id": "taxpayer_id",
+      "type": "string",
+      "required": true,
+      "description": "Taxpayer identifier such as CPF/CNPJ/TIN.",
+      "section": "taxpayer_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["cpf", "cnpj", "tin", "taxpayer id"],
+        "disallowInference": true,
+        "preferredSources": ["document_header", "taxpayer_profile"]
+      }
+    },
+    {
+      "id": "tax_year",
+      "type": "date",
+      "required": true,
+      "description": "Tax filing year or reference period.",
+      "section": "filing_section",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["tax year", "fiscal year", "periodo fiscal"],
+        "disallowInference": true,
+        "preferredSources": ["filing_section"]
+      }
+    },
+    {
+      "id": "return_type",
+      "type": "string",
+      "required": false,
+      "description": "Return type.",
+      "section": "filing_section",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["return type", "tipo de declaracao"],
+        "disallowInference": false,
+        "preferredSources": ["filing_section"]
+      }
+    },
+    {
+      "id": "gross_income",
+      "type": "currency",
+      "required": true,
+      "description": "Total gross income.",
+      "section": "income_section",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["gross income", "rendimento bruto", "income"],
+        "disallowInference": true,
+        "preferredSources": ["income_section", "line_items"]
+      }
+    },
+    {
+      "id": "total_deductions",
+      "type": "currency",
+      "required": false,
+      "description": "Total deductions.",
+      "section": "deductions",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["deductions", "total deductions", "total deduzido"],
+        "disallowInference": true,
+        "preferredSources": ["deductions"]
+      }
+    },
+    {
+      "id": "taxable_income",
+      "type": "currency",
+      "required": false,
+      "description": "Taxable income.",
+      "section": "tax_summary",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["taxable income", "base de calculo", "taxable"],
+        "disallowInference": true,
+        "preferredSources": ["tax_summary"]
+      }
+    },
+    {
+      "id": "total_tax",
+      "type": "currency",
+      "required": true,
+      "description": "Total tax calculated.",
+      "section": "tax_summary",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["total tax", "tax due", "imposto devido", "total a pagar"],
+        "disallowInference": true,
+        "preferredSources": ["tax_summary"]
+      }
+    },
+    {
+      "id": "refund_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Tax refund if applicable.",
+      "section": "payment_or_refund",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["refund", "reembolso", "credit"],
+        "disallowInference": true,
+        "preferredSources": ["payment_or_refund", "tax_summary"]
+      }
+    },
+    {
+      "id": "amount_due",
+      "type": "currency",
+      "required": false,
+      "description": "Tax amount due or payable.",
+      "section": "payment_or_refund",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["amount due", "due amount", "valor devido"],
+        "disallowInference": true,
+        "preferredSources": ["payment_or_refund", "tax_summary"]
+      }
+    },
+    {
+      "id": "document_currency",
+      "type": "string",
+      "required": true,
+      "description": "Document currency.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["currency", "moeda", "currency code"],
+        "disallowInference": false,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "issued_at",
+      "type": "date",
+      "required": false,
+      "description": "Issued date.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["issue date", "issued date", "data de emissao"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "source_system",
+      "type": "string",
+      "required": false,
+      "description": "Source system name if present.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["source", "system", "portal"],
+        "disallowInference": false,
+        "preferredSources": ["document_header"]
+      }
+    }
+  ]
+}

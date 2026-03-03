@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "id": "evidence_packaging_policy",
+    "version": "1.0.0",
+    "description": "Packaging policy that turns ranked candidates into compose-safe evidence blocks with strict provenance.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requireProvenance": true,
+    "requireDocTitle": true,
+    "requireLocation": true,
+    "groupByDoc": true,
+    "maxEvidenceItems": 24,
+    "maxEvidenceItemsNonCompare": 10,
+    "maxEvidenceItemsCompare": 24,
+    "maxPerDoc": 8,
+    "dedupeWindowChars": 260,
+    "numericIntegrityWarnings": true
+  },
+  "rules": [
+    {
+      "id": "PACK_001_hard_require_provenance",
+      "trigger": "Evidence candidate lacks required provenance fields",
+      "check": "candidate.docId == null OR candidate.filename == null OR candidate.location == null",
+      "failureAction": "DROP_CANDIDATE",
+      "severity": "error"
+    },
+    {
+      "id": "PACK_002_preserve_table_and_unit_context",
+      "trigger": "Evidence is a table with unit values",
+      "check": "candidate.type == 'table' AND candidate.unitsDetected == true",
+      "failureAction": "PRESERVE_HEADERS_AND_UNITS",
+      "severity": "high"
+    },
+    {
+      "id": "PACK_003_group_compare_by_doc",
+      "trigger": "Comparison intent is active",
+      "check": "context.intent == 'compare'",
+      "failureAction": "GROUP_AND_BALANCE_PER_DOC",
+      "severity": "high"
+    },
+    {
+      "id": "PACK_004_sort_by_doc_then_location",
+      "trigger": "Evidence list has mixed location types",
+      "check": "evidence.anyMixedLocations == true",
+      "failureAction": "SORT_EVIDENCE_BY_DOC_AND_LOCATION",
+      "severity": "medium"
+    },
+    {
+      "id": "PACK_005_dedupe_hard_near_duplicates",
+      "trigger": "Evidence contains near duplicate snippets",
+      "check": "evidence.nearDuplicateRatio > 0.14",
+      "failureAction": "DEDUPE_WITH_DISTANCE_WINDOW",
+      "severity": "warning"
+    },
+    {
+      "id": "PACK_006_no_invented_claims",
+      "trigger": "Evidence item has claims not in source span",
+      "check": "candidate.generatedClaimRatio > 0",
+      "failureAction": "DROP_AND_REGEN",
+      "severity": "error"
+    }
+  ],
+  "templates": [
+    {
+      "id": "EVIDENCE_PACKAGING_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in evidence_packaging_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "id": "crossdoc_alignment_rules",
+    "version": "1.0.0",
+    "description": "Alignment and conflict rules for cross-document comparisons and syntheses.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requireExplicitComparisonScope": true,
+    "allowImplicitDiscoveryOnly": false,
+    "minDocsForCompare": 2
+  },
+  "rules": [
+    {
+      "id": "XDOC_001_guard_single_doc_compare",
+      "trigger": "Compare intent is used with only one explicit doc in scope",
+      "check": "context.intent == 'compare' AND context.scope.explicitDocIds.count < 2",
+      "failureAction": "ASK_FOR_SECOND_DOC",
+      "severity": "error",
+      "notes": "Prevent fabricated cross-document synthesis."
+    },
+    {
+      "id": "XDOC_002_align_periods",
+      "trigger": "Comparison mixes periods across candidate documents",
+      "check": "context.compareMode == true AND context.periods.normalized == false",
+      "failureAction": "REQUIRE_PERIOD_ALIGNMENT",
+      "severity": "warning",
+      "notes": "Ask follow-up when fiscal/calenar period mismatch is detected."
+    },
+    {
+      "id": "XDOC_003_align_currency",
+      "trigger": "Cross-doc comparison mixes currency units",
+      "check": "context.compareMode == true AND context.compareContext.currencySet.count > 1",
+      "failureAction": "REQUEST_CURRENCY_HARMONIZATION",
+      "severity": "error",
+      "notes": "Do not silently normalize currencies."
+    },
+    {
+      "id": "XDOC_004_require_doc_disclosure_per_fact",
+      "trigger": "Comparison output lists assertions from specific docs",
+      "check": "context.compareMode == true AND output.claimsPerDocTagging == false",
+      "failureAction": "REGEN_WITH_DOC_ATTESTATION",
+      "severity": "error"
+    },
+    {
+      "id": "XDOC_005_deny_crossdoc_when_not_explicit",
+      "trigger": "User asks a single-doc question but multiple docs are blended",
+      "check": "context.explicitDocScope == 'single' AND output.usesMultipleDocs == true",
+      "failureAction": "FALLBACK_DOC_LOCK_REQUIRED",
+      "severity": "error"
+    },
+    {
+      "id": "XDOC_006_enforce_compare_evidence_minimum",
+      "trigger": "Comparison output uses too few evidence items for each side",
+      "check": "context.compareMode == true AND (output.leftEvidence < 2 OR output.rightEvidence < 2)",
+      "failureAction": "RETRIEVE_MORE_EVIDENCE",
+      "severity": "warning"
+    }
+  ],
+  "templates": [
+    {
+      "id": "CROSSDOC_ALIGNMENT_RULES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in crossdoc_alignment_rules.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

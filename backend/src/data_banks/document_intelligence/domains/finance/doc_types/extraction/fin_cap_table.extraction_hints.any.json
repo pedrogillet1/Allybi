@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_extraction_fin_cap_table",
-    "version": "2.0.0",
-    "description": "Extraction hints for fin_cap_table.",
+    "version": "2.1.0",
+    "description": "Extraction heuristics for Cap Table.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,92 +15,2048 @@
   },
   "hints": [
     {
-      "id": "hint_1_period",
-      "entity": "kpi_ownership_percent",
-      "anchors": [
-        "period",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_001",
+      "entity": "legal_entity",
+      "primarySignals": [
+        "share_classes",
+        "\\bholder_matrix\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "heading_proximity"
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_2_currency",
-      "entity": "kpi_fully_diluted_shares",
-      "anchors": [
-        "currency",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_002",
+      "entity": "valuation_date",
+      "primarySignals": [
+        "rounds_and_investments",
+        "\\brounds_table\\b",
+        "\\bperiod\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "table_header_row_context"
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_3_unit",
-      "entity": "kpi_option_pool",
-      "anchors": [
-        "unit",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_003",
+      "entity": "currency",
+      "primarySignals": [
+        "vesting_schedule",
+        "\\boption_grants\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "heading_proximity"
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_4_total",
-      "entity": "kpi_share_class",
-      "anchors": [
-        "total",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_004",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "option_pool",
+        "\\bwarrant_terms\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_5_variance",
-      "entity": "variance",
-      "anchors": [
-        "variance",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_005",
+      "entity": "common_shares",
+      "primarySignals": [
+        "conversion_terms",
+        "\\bownership_chart\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "heading_proximity"
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_6_guidance",
-      "entity": "guidance",
-      "anchors": [
-        "guidance",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_006",
+      "entity": "preferred_shares",
+      "primarySignals": [
+        "warrants",
+        "\\bscenario_dilution\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_7_assumption",
-      "entity": "assumption",
-      "anchors": [
-        "assumption",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_007",
+      "entity": "option_shares",
+      "primarySignals": [
+        "rights_restrictions",
+        "\\bconversion_table\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "heading_proximity"
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     },
     {
-      "id": "hint_8_notes",
-      "entity": "notes",
-      "anchors": [
-        "notes",
-        "cap table",
-        "tabela de capitalizacao"
+      "id": "fin_cap_table_hint_008",
+      "entity": "warrants",
+      "primarySignals": [
+        "preferred_terms",
+        "\\bvoting_rights\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_009",
+      "entity": "convertible_debt_shares",
+      "primarySignals": [
+        "conversion_conversion",
+        "\\bliquidation_preference\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_010",
+      "entity": "fully_diluted_shares",
+      "primarySignals": [
+        "dilution_impact",
+        "\\banti_dilution\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_011",
+      "entity": "pre_money_valuation",
+      "primarySignals": [
+        "scenario_analysis",
+        "\\bshare_class_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_012",
+      "entity": "post_money_valuation",
+      "primarySignals": [
+        "approval_signoff",
+        "\\bholder_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_013",
+      "entity": "strike_price",
+      "primarySignals": [
+        "cap_table_header",
+        "\\brounds_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_014",
+      "entity": "average_dilution",
+      "primarySignals": [
+        "share_classes",
+        "\\boption_grants\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_015",
+      "entity": "founder_ownership",
+      "primarySignals": [
+        "rounds_and_investments",
+        "\\bwarrant_terms\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_016",
+      "entity": "investor_ownership",
+      "primarySignals": [
+        "vesting_schedule",
+        "\\bownership_chart\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_017",
+      "entity": "vesting_rate",
+      "primarySignals": [
+        "option_pool",
+        "\\bscenario_dilution\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_018",
+      "entity": "cliff_period",
+      "primarySignals": [
+        "conversion_terms",
+        "\\bconversion_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_019",
+      "entity": "granted_options",
+      "primarySignals": [
+        "warrants",
+        "\\bvoting_rights\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_020",
+      "entity": "exercised_options",
+      "primarySignals": [
+        "rights_restrictions",
+        "\\bliquidation_preference\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_021",
+      "entity": "unexercised_options",
+      "primarySignals": [
+        "preferred_terms",
+        "\\banti_dilution\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_022",
+      "entity": "liquidity_preference",
+      "primarySignals": [
+        "conversion_conversion",
+        "\\bshare_class_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_023",
+      "entity": "company_name",
+      "primarySignals": [
+        "dilution_impact",
+        "\\bholder_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_024",
+      "entity": "legal_entity",
+      "primarySignals": [
+        "scenario_analysis",
+        "\\brounds_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_025",
+      "entity": "valuation_date",
+      "primarySignals": [
+        "approval_signoff",
+        "\\boption_grants\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_026",
+      "entity": "currency",
+      "primarySignals": [
+        "cap_table_header",
+        "\\bwarrant_terms\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_027",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "share_classes",
+        "\\bownership_chart\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_028",
+      "entity": "common_shares",
+      "primarySignals": [
+        "rounds_and_investments",
+        "\\bscenario_dilution\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_029",
+      "entity": "preferred_shares",
+      "primarySignals": [
+        "vesting_schedule",
+        "\\bconversion_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_030",
+      "entity": "option_shares",
+      "primarySignals": [
+        "option_pool",
+        "\\bvoting_rights\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_031",
+      "entity": "warrants",
+      "primarySignals": [
+        "conversion_terms",
+        "\\bliquidation_preference\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_032",
+      "entity": "convertible_debt_shares",
+      "primarySignals": [
+        "warrants",
+        "\\banti_dilution\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_033",
+      "entity": "fully_diluted_shares",
+      "primarySignals": [
+        "rights_restrictions",
+        "\\bshare_class_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_034",
+      "entity": "pre_money_valuation",
+      "primarySignals": [
+        "preferred_terms",
+        "\\bholder_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_035",
+      "entity": "post_money_valuation",
+      "primarySignals": [
+        "conversion_conversion",
+        "\\brounds_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_036",
+      "entity": "strike_price",
+      "primarySignals": [
+        "dilution_impact",
+        "\\boption_grants\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_037",
+      "entity": "average_dilution",
+      "primarySignals": [
+        "scenario_analysis",
+        "\\bwarrant_terms\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_038",
+      "entity": "founder_ownership",
+      "primarySignals": [
+        "approval_signoff",
+        "\\bownership_chart\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_039",
+      "entity": "investor_ownership",
+      "primarySignals": [
+        "cap_table_header",
+        "\\bscenario_dilution\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_040",
+      "entity": "vesting_rate",
+      "primarySignals": [
+        "share_classes",
+        "\\bconversion_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_041",
+      "entity": "cliff_period",
+      "primarySignals": [
+        "rounds_and_investments",
+        "\\bvoting_rights\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_042",
+      "entity": "granted_options",
+      "primarySignals": [
+        "vesting_schedule",
+        "\\bliquidation_preference\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_043",
+      "entity": "exercised_options",
+      "primarySignals": [
+        "option_pool",
+        "\\banti_dilution\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_044",
+      "entity": "unexercised_options",
+      "primarySignals": [
+        "conversion_terms",
+        "\\bshare_class_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_045",
+      "entity": "liquidity_preference",
+      "primarySignals": [
+        "warrants",
+        "\\bholder_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_046",
+      "entity": "company_name",
+      "primarySignals": [
+        "rights_restrictions",
+        "\\brounds_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_047",
+      "entity": "legal_entity",
+      "primarySignals": [
+        "preferred_terms",
+        "\\boption_grants\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_048",
+      "entity": "valuation_date",
+      "primarySignals": [
+        "conversion_conversion",
+        "\\bwarrant_terms\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_049",
+      "entity": "currency",
+      "primarySignals": [
+        "dilution_impact",
+        "\\bownership_chart\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_050",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "scenario_analysis",
+        "\\bscenario_dilution\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_051",
+      "entity": "common_shares",
+      "primarySignals": [
+        "approval_signoff",
+        "\\bconversion_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_052",
+      "entity": "preferred_shares",
+      "primarySignals": [
+        "cap_table_header",
+        "\\bvoting_rights\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_053",
+      "entity": "option_shares",
+      "primarySignals": [
+        "share_classes",
+        "\\bliquidation_preference\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_054",
+      "entity": "warrants",
+      "primarySignals": [
+        "rounds_and_investments",
+        "\\banti_dilution\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_055",
+      "entity": "convertible_debt_shares",
+      "primarySignals": [
+        "vesting_schedule",
+        "\\bshare_class_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_056",
+      "entity": "fully_diluted_shares",
+      "primarySignals": [
+        "option_pool",
+        "\\bholder_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_057",
+      "entity": "pre_money_valuation",
+      "primarySignals": [
+        "conversion_terms",
+        "\\brounds_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_058",
+      "entity": "post_money_valuation",
+      "primarySignals": [
+        "warrants",
+        "\\boption_grants\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_059",
+      "entity": "strike_price",
+      "primarySignals": [
+        "rights_restrictions",
+        "\\bwarrant_terms\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_060",
+      "entity": "average_dilution",
+      "primarySignals": [
+        "preferred_terms",
+        "\\bownership_chart\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_061",
+      "entity": "founder_ownership",
+      "primarySignals": [
+        "conversion_conversion",
+        "\\bscenario_dilution\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_062",
+      "entity": "investor_ownership",
+      "primarySignals": [
+        "dilution_impact",
+        "\\bconversion_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_063",
+      "entity": "vesting_rate",
+      "primarySignals": [
+        "scenario_analysis",
+        "\\bvoting_rights\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_064",
+      "entity": "cliff_period",
+      "primarySignals": [
+        "approval_signoff",
+        "\\bliquidation_preference\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_065",
+      "entity": "granted_options",
+      "primarySignals": [
+        "cap_table_header",
+        "\\banti_dilution\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_066",
+      "entity": "exercised_options",
+      "primarySignals": [
+        "share_classes",
+        "\\bshare_class_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_067",
+      "entity": "unexercised_options",
+      "primarySignals": [
+        "rounds_and_investments",
+        "\\bholder_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
+    },
+    {
+      "id": "fin_cap_table_hint_068",
+      "entity": "liquidity_preference",
+      "primarySignals": [
+        "vesting_schedule",
+        "\\brounds_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_cap_table."
     }
+  ],
+  "notes": [
+    "Numeric extraction requires table header context, unit, and period.",
+    "Priority for fin_cap_table: table continuity across pdf pages/slides."
   ]
 }

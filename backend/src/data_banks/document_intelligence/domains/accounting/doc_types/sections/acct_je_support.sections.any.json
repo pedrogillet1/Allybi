@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_accounting_sections_acct_je_support",
+    "version": "1.1.0",
     "description": "Section map for journal entry support documents.",
-    "version": "1.0.0",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -16,25 +16,24 @@
   "sections": [
     {
       "id": "header",
-      "ontologySectionId": "accounting.je.header",
       "name": {
-        "en": "JE Header",
-        "pt": "Cabecalho do Lancamento"
+        "en": "Header",
+        "pt": "Cabecalho"
       },
       "required": true,
       "order": 1,
       "headingAnchors": [
         "Journal Entry",
         "JE Support",
-        "Lancamento Contabil"
+        "Lancamento Contabil",
+        "Entry ID"
       ]
     },
     {
       "id": "entry_lines",
-      "ontologySectionId": "accounting.je.lines",
       "name": {
         "en": "Entry Lines",
-        "pt": "Linhas do Lancamento"
+        "pt": "Linhas da Lancamento"
       },
       "required": true,
       "order": 2,
@@ -47,12 +46,11 @@
     },
     {
       "id": "supporting_calculation",
-      "ontologySectionId": "accounting.je.supporting_calc",
       "name": {
         "en": "Supporting Calculation",
         "pt": "Calculo de Suporte"
       },
-      "required": true,
+      "required": false,
       "order": 3,
       "headingAnchors": [
         "Calculation",
@@ -62,22 +60,21 @@
     },
     {
       "id": "supporting_evidence",
-      "ontologySectionId": "accounting.je.supporting_evidence",
       "name": {
         "en": "Supporting Evidence",
         "pt": "Evidencias de Suporte"
       },
-      "required": true,
+      "required": false,
       "order": 4,
       "headingAnchors": [
         "Attachment",
         "Evidence",
-        "Support Documents"
+        "Support Documents",
+        "Anexo"
       ]
     },
     {
       "id": "approval_workflow",
-      "ontologySectionId": "accounting.je.approval",
       "name": {
         "en": "Approval Workflow",
         "pt": "Fluxo de Aprovacao"
@@ -92,7 +89,6 @@
     },
     {
       "id": "posting_confirmation",
-      "ontologySectionId": "accounting.je.posting_confirmation",
       "name": {
         "en": "Posting Confirmation",
         "pt": "Confirmacao de Postagem"

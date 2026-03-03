@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "id": "di_everyday_extraction_every_insurance_policy",
+    "version": "1.0.0",
+    "description": "Extraction hints for every_insurance_policy.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_insurance_policy"
+  },
+  "hints": [
+    {
+      "id": "every_insurance_policy_hint_01",
+      "entity": "policy_number",
+      "anchors": ["policy", "policy number", "apolice", "numero de apolice"],
+      "location": "header",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["header top", "document watermark"]
+    },
+    {
+      "id": "every_insurance_policy_hint_02",
+      "entity": "insurer_name",
+      "anchors": ["insurer", "seguros", "seguradora", "insurance company"],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["logo block", "company header"]
+    },
+    {
+      "id": "every_insurance_policy_hint_03",
+      "entity": "policy_holder_name",
+      "anchors": ["holder", "tomador", "insured", "cliente"],
+      "location": "policy_holder",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["holder profile", "insured details"]
+    },
+    {
+      "id": "every_insurance_policy_hint_04",
+      "entity": "coverage_start_date",
+      "anchors": ["coverage start", "effective", "inicio", "vigencia"],
+      "location": "coverage_details",
+      "extractionMethod": "date_range_parse",
+      "whereItHides": ["coverage table", "policy body"]
+    },
+    {
+      "id": "every_insurance_policy_hint_05",
+      "entity": "coverage_end_date",
+      "anchors": ["coverage end", "expiration", "fim", "termino"],
+      "location": "coverage_details",
+      "extractionMethod": "date_range_parse",
+      "whereItHides": ["coverage table", "policy body"]
+    },
+    {
+      "id": "every_insurance_policy_hint_06",
+      "entity": "premium_amount",
+      "anchors": ["premium", "premio", "monthly payment", "premio"],
+      "location": "premium_schedule",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["installment lines", "payment schedule"]
+    },
+    {
+      "id": "every_insurance_policy_hint_07",
+      "entity": "coverage_limit",
+      "anchors": ["coverage limit", "sum insured", "soma segurada", "limite"],
+      "location": "coverage_details",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["coverage table", "limits section"]
+    },
+    {
+      "id": "every_insurance_policy_hint_08",
+      "entity": "policy_status",
+      "anchors": ["status", "active", "cancelled", "renewed", "in force"],
+      "location": "renewal_terms",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["renewal section", "status line"]
+    },
+    {
+      "id": "every_insurance_policy_hint_09",
+      "entity": "next_renewal_date",
+      "anchors": ["renewal", "renew", "proxima renovacao", "renewal date"],
+      "location": "renewal_terms",
+      "extractionMethod": "date_parse",
+      "whereItHides": ["renewal block", "schedule footer"]
+    },
+    {
+      "id": "every_insurance_policy_hint_10",
+      "entity": "exclusions_summary",
+      "anchors": ["exclusions", "not covered", "exclusoes", "not included"],
+      "location": "exclusions",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["long exclusion section", "multi-page terms"]
+    }
+  ]
+}

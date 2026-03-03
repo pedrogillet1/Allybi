@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -19,135 +19,210 @@
       "debits",
       "dr",
       "dr.",
-      "debit amount",
-      "debit amt",
-      "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
-      "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "debit amount"
     ],
     "credit": [
       "credit",
       "credits",
       "cr",
       "cr.",
-      "credit amount",
-      "credit amt",
-      "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
-      "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
+      "credit amount"
     ],
-    "balance": [
-      "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
-      "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
+    "control": [
+      "control",
+      "control id",
+      "control number"
     ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+    "owner": [
+      "owner",
+      "control owner",
+      "responsavel",
+      "responsible"
     ]
   },
   "tables": [
     {
-      "id": "acct_controls_narrative_main_table",
+      "id": "acct_controls_narrative_matrix_table",
       "name": {
-        "en": "Controls Narrative Main",
-        "pt": "Narrativa de Controles Principal"
+        "en": "Control Matrix",
+        "pt": "Matriz de Controles"
       },
-      "section": "line_items",
+      "section": "control_matrix",
       "expectedColumns": [
         "control_id",
         "control_description",
+        "process_area",
         "control_owner",
         "frequency",
-        "evidence",
         "status"
       ],
       "keyRows": [
+        "total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "frequency"
+          ],
+          "scale": 1
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "frequency"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Handle merged header rows where control_id and control_description are split",
+        "Accept tables where status column is placed before frequency or ownership columns"
+      ]
+    },
+    {
+      "id": "acct_controls_narrative_testing_table",
+      "name": {
+        "en": "Control Testing Execution",
+        "pt": "Execucao de Testes"
+      },
+      "section": "control_testing",
+      "expectedColumns": [
+        "test_id",
+        "control_id",
+        "sample_size",
+        "debit",
+        "credit",
+        "status",
+        "test_date"
+      ],
+      "keyRows": [
+        "subtotal",
         "grand_total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "sample_size"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "notes": "Some exports use effect columns instead of explicit debit/credit names"
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Handle control testing tables that drop a header row in CSV exports",
+        "Handle shifted sample columns where sample_size appears after test status"
+      ]
+    },
+    {
+      "id": "acct_controls_narrative_deficiency_table",
+      "name": {
+        "en": "Control Deficiencies",
+        "pt": "Deficiencias de Controle"
+      },
+      "section": "deficiencies",
+      "expectedColumns": [
+        "finding_id",
+        "control_id",
+        "description",
+        "severity",
+        "debit",
+        "credit",
+        "remediation_due"
+      ],
+      "keyRows": [
+        "open",
+        "closed"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$",
+        "R$"
       ]
     },
     {
       "id": "acct_controls_narrative_summary_table",
       "name": {
-        "en": "Controls Narrative Summary",
-        "pt": "Narrativa de Controles Resumo"
+        "en": "Controls Summary",
+        "pt": "Resumo de Controles"
       },
       "section": "summary",
       "expectedColumns": [
@@ -156,8 +231,35 @@
       ],
       "keyRows": [
         "total",
-        "subtotal",
         "difference"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "metric"
+          ],
+          "scale": 1
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "valueColumns": [
+          "value"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Accept summary key-value rows in any order",
+        "Accept locale decimals and currency prefixes"
       ]
     }
   ]

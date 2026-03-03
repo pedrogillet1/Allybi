@@ -1,10 +1,2062 @@
 {
-  "_meta": { "id": "di_finance_extraction_fin_variance", "version": "1.0.0", "description": "Extraction hints for variance analysis reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
-  "config": { "enabled": true, "domain": "finance", "docType": "fin_variance" },
+  "_meta": {
+    "id": "di_finance_extraction_fin_variance",
+    "version": "2.1.0",
+    "description": "Extraction heuristics for Variance Analysis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_variance"
+  },
   "hints": [
-    { "id": "hint_actual_revenue", "entity": "actual_revenue", "anchors": ["actual", "revenue"], "location": "variance_summary", "extractionMethod": "table_cell_match" },
-    { "id": "hint_budget_revenue", "entity": "budget_revenue", "anchors": ["budget", "plan", "revenue"], "location": "variance_summary", "extractionMethod": "table_cell_match" },
-    { "id": "hint_period", "entity": "period", "anchors": ["Period", "Month", "Quarter", "YTD"], "location": "executive_summary", "extractionMethod": "heading_proximity" },
-    { "id": "hint_variance_pct", "entity": "revenue_variance_pct", "anchors": ["variance %", "var %", "% variance"], "location": "variance_summary", "extractionMethod": "table_cell_match" }
+    {
+      "id": "fin_variance_hint_001",
+      "entity": "reporting_period",
+      "primarySignals": [
+        "plan_vs_actual_summary",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_002",
+      "entity": "currency",
+      "primarySignals": [
+        "variance_by_category",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_003",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "materiality_rationale",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_004",
+      "entity": "plan_revenue",
+      "primarySignals": [
+        "root_cause_analysis",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_005",
+      "entity": "actual_revenue",
+      "primarySignals": [
+        "driver_drilldown",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_006",
+      "entity": "plan_ebitda",
+      "primarySignals": [
+        "periodic_trends",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_007",
+      "entity": "actual_ebitda",
+      "primarySignals": [
+        "forecast_impacts",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_008",
+      "entity": "plan_cash",
+      "primarySignals": [
+        "remediation_actions",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_009",
+      "entity": "actual_cash",
+      "primarySignals": [
+        "approval_notes",
+        "\\bvariance_reconciliation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_010",
+      "entity": "variance_revenue_abs",
+      "primarySignals": [
+        "appendix_detail",
+        "\\bvariance_summary\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_011",
+      "entity": "variance_revenue_pct",
+      "primarySignals": [
+        "controls",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_012",
+      "entity": "variance_ebitda_abs",
+      "primarySignals": [
+        "variance_objective",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_013",
+      "entity": "variance_ebitda_pct",
+      "primarySignals": [
+        "plan_vs_actual_summary",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_014",
+      "entity": "variance_capex_abs",
+      "primarySignals": [
+        "variance_by_category",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_015",
+      "entity": "variance_capex_pct",
+      "primarySignals": [
+        "materiality_rationale",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_016",
+      "entity": "variance_headcount",
+      "primarySignals": [
+        "root_cause_analysis",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_017",
+      "entity": "variance_g_a",
+      "primarySignals": [
+        "driver_drilldown",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_018",
+      "entity": "materiality_flag",
+      "primarySignals": [
+        "periodic_trends",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_019",
+      "entity": "root_cause",
+      "primarySignals": [
+        "forecast_impacts",
+        "\\bvariance_reconciliation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_020",
+      "entity": "owner",
+      "primarySignals": [
+        "remediation_actions",
+        "\\bvariance_summary\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_021",
+      "entity": "owner_department",
+      "primarySignals": [
+        "approval_notes",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_022",
+      "entity": "corrective_action",
+      "primarySignals": [
+        "appendix_detail",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_023",
+      "entity": "target_resolution_date",
+      "primarySignals": [
+        "controls",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_024",
+      "entity": "confidence",
+      "primarySignals": [
+        "variance_objective",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_025",
+      "entity": "evidence_table",
+      "primarySignals": [
+        "plan_vs_actual_summary",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_026",
+      "entity": "company_name",
+      "primarySignals": [
+        "variance_by_category",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_027",
+      "entity": "reporting_period",
+      "primarySignals": [
+        "materiality_rationale",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_028",
+      "entity": "currency",
+      "primarySignals": [
+        "root_cause_analysis",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_029",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "driver_drilldown",
+        "\\bvariance_reconciliation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_030",
+      "entity": "plan_revenue",
+      "primarySignals": [
+        "periodic_trends",
+        "\\bvariance_summary\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_031",
+      "entity": "actual_revenue",
+      "primarySignals": [
+        "forecast_impacts",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_032",
+      "entity": "plan_ebitda",
+      "primarySignals": [
+        "remediation_actions",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_033",
+      "entity": "actual_ebitda",
+      "primarySignals": [
+        "approval_notes",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_034",
+      "entity": "plan_cash",
+      "primarySignals": [
+        "appendix_detail",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_035",
+      "entity": "actual_cash",
+      "primarySignals": [
+        "controls",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_036",
+      "entity": "variance_revenue_abs",
+      "primarySignals": [
+        "variance_objective",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_037",
+      "entity": "variance_revenue_pct",
+      "primarySignals": [
+        "plan_vs_actual_summary",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_038",
+      "entity": "variance_ebitda_abs",
+      "primarySignals": [
+        "variance_by_category",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_039",
+      "entity": "variance_ebitda_pct",
+      "primarySignals": [
+        "materiality_rationale",
+        "\\bvariance_reconciliation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_040",
+      "entity": "variance_capex_abs",
+      "primarySignals": [
+        "root_cause_analysis",
+        "\\bvariance_summary\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_041",
+      "entity": "variance_capex_pct",
+      "primarySignals": [
+        "driver_drilldown",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_042",
+      "entity": "variance_headcount",
+      "primarySignals": [
+        "periodic_trends",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_043",
+      "entity": "variance_g_a",
+      "primarySignals": [
+        "forecast_impacts",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_044",
+      "entity": "materiality_flag",
+      "primarySignals": [
+        "remediation_actions",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_045",
+      "entity": "root_cause",
+      "primarySignals": [
+        "approval_notes",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_046",
+      "entity": "owner",
+      "primarySignals": [
+        "appendix_detail",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_047",
+      "entity": "owner_department",
+      "primarySignals": [
+        "controls",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_048",
+      "entity": "corrective_action",
+      "primarySignals": [
+        "variance_objective",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_049",
+      "entity": "target_resolution_date",
+      "primarySignals": [
+        "plan_vs_actual_summary",
+        "\\bvariance_reconciliation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_050",
+      "entity": "confidence",
+      "primarySignals": [
+        "variance_by_category",
+        "\\bvariance_summary\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_051",
+      "entity": "evidence_table",
+      "primarySignals": [
+        "materiality_rationale",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_052",
+      "entity": "company_name",
+      "primarySignals": [
+        "root_cause_analysis",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_053",
+      "entity": "reporting_period",
+      "primarySignals": [
+        "driver_drilldown",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_054",
+      "entity": "currency",
+      "primarySignals": [
+        "periodic_trends",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_055",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "forecast_impacts",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_056",
+      "entity": "plan_revenue",
+      "primarySignals": [
+        "remediation_actions",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_057",
+      "entity": "actual_revenue",
+      "primarySignals": [
+        "approval_notes",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_058",
+      "entity": "plan_ebitda",
+      "primarySignals": [
+        "appendix_detail",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_059",
+      "entity": "actual_ebitda",
+      "primarySignals": [
+        "controls",
+        "\\bvariance_reconciliation\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_060",
+      "entity": "plan_cash",
+      "primarySignals": [
+        "variance_objective",
+        "\\bvariance_summary\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_061",
+      "entity": "actual_cash",
+      "primarySignals": [
+        "plan_vs_actual_summary",
+        "\\bvariance_detail\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_062",
+      "entity": "variance_revenue_abs",
+      "primarySignals": [
+        "variance_by_category",
+        "\\bvariance_by_month\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_063",
+      "entity": "variance_revenue_pct",
+      "primarySignals": [
+        "materiality_rationale",
+        "\\bvariance_by_department\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_064",
+      "entity": "variance_ebitda_abs",
+      "primarySignals": [
+        "root_cause_analysis",
+        "\\bmateriality_grid\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_065",
+      "entity": "variance_ebitda_pct",
+      "primarySignals": [
+        "driver_drilldown",
+        "\\bdriver_summary\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_066",
+      "entity": "variance_capex_abs",
+      "primarySignals": [
+        "periodic_trends",
+        "\\bexception_log\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_067",
+      "entity": "variance_capex_pct",
+      "primarySignals": [
+        "forecast_impacts",
+        "\\bcorrective_plan\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    },
+    {
+      "id": "fin_variance_hint_068",
+      "entity": "variance_headcount",
+      "primarySignals": [
+        "remediation_actions",
+        "\\btrend_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_variance."
+    }
+  ],
+  "notes": [
+    "Numeric extraction requires table header context, unit, and period.",
+    "Priority for fin_variance: table continuity across pdf pages/slides."
   ]
 }

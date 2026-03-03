@@ -1,41 +1,154 @@
 {
   "_meta": {
-    "id": "di_accounting_domain_profile",
-    "version": "1.0.0",
-    "description": "Accounting domain profile — defines scope, detection signals, and capabilities for bookkeeping, general ledger, reconciliation, and audit documents.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "id": "di_accounting_domain_profile_v2",
+    "version": "2.0.0",
+    "description": "Accounting domain profile for books-of-record review: ledgers, reconciliations, subledgers, and control testing.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
-    "domain": "accounting"
+    "domain": "accounting",
+    "scopeMode": "document_intelligence",
+    "confidenceFloor": 0.62
   },
   "domain": "accounting",
-  "displayName": { "en": "Accounting", "pt": "Contabilidade" },
-  "scope": "General ledger, trial balance, journal entries, reconciliation, accounts receivable/payable aging, audit workpapers, internal controls, and compliance documentation.",
+  "displayName": {
+    "en": "Accounting",
+    "pt": "Contabilidade"
+  },
+  "scope": "General ledger, trial balance, journal entries, bank and account reconciliations, aging schedules, revenue/expense rollforwards, audit workpapers, and tie-out evidence.",
   "coreConcepts": [
-    "chart_of_accounts", "double_entry", "debit_credit", "general_ledger",
-    "trial_balance", "journal_entry", "accrual_basis", "cash_basis",
-    "bank_reconciliation", "aging_schedule", "audit_evidence",
-    "internal_controls", "materiality", "segregation_of_duties",
-    "closing_entries", "adjusting_entries", "reversing_entries",
-    "subsidiary_ledger"
+    "chart_of_accounts",
+    "general_ledger",
+    "trial_balance",
+    "journal_entry",
+    "accrual_basis",
+    "cash_basis",
+    "bank_reconciliation",
+    "statement_of_cash_flows",
+    "subledger_support",
+    "closing_entries",
+    "reversing_entries",
+    "adjusting_entries",
+    "aging_schedule",
+    "allocations",
+    "depreciation_schedule",
+    "variance_analysis",
+    "variance_explanation",
+    "materiality",
+    "audit_trail",
+    "internal_controls",
+    "segregation_of_duties",
+    "reconciliation_tieout",
+    "cutoff",
+    "authorization"
   ],
   "supportedOperators": [
-    "advise", "calculate", "compare", "evaluate", "extract",
-    "locate", "monitor", "navigate", "open", "summarize", "validate"
+    "advise",
+    "calculate",
+    "compare",
+    "evaluate",
+    "extract",
+    "locate",
+    "monitor",
+    "navigate",
+    "open",
+    "summarize",
+    "validate"
   ],
-  "detectionSignals": {
-    "highConfidence": [
-      "trial balance", "general ledger", "journal entry", "chart of accounts",
-      "bank reconciliation", "aging report", "audit workpaper",
-      "debit", "credit", "GL account"
+  "aliases": {
+    "en": [
+      "accounting",
+      "accountancy",
+      "bookkeeping",
+      "financial accounting",
+      "management accounting"
     ],
-    "mediumConfidence": [
-      "ledger", "posting", "accrual", "adjusting entry", "closing entry",
-      "subsidiary ledger", "reconciling items", "internal controls"
+    "pt": [
+      "contabilidade",
+      "contabil",
+      "escrituração",
+      "fechamento contábil",
+      "contas",
+      "tesouraria"
     ]
   },
-  "relatedDomains": ["finance"],
+  "semanticPriorities": {
+    "highest": [
+      "trial balance",
+      "balancete",
+      "general ledger",
+      "razão geral",
+      "journal entry",
+      "lançamento",
+      "bank reconciliation",
+      "conciliação bancária"
+    ],
+    "high": [
+      "aging",
+      "subledger",
+      "aging schedule",
+      "depreciação",
+      "reconciliação"
+    ],
+    "medium": [
+      "controls",
+      "workpaper",
+      "audit",
+      "management"
+    ]
+  },
+  "detectionSignals": {
+    "highConfidence": {
+      "en": [
+        "trial balance",
+        "general ledger",
+        "journal entry",
+        "bank reconciliation",
+        "aging",
+        "chart of accounts",
+        "control account"
+      ],
+      "pt": [
+        "balancete",
+        "razão",
+        "lançamento contábil",
+        "conciliação bancária",
+        "plano de contas",
+        "conta de controle"
+      ]
+    },
+    "mediumConfidence": {
+      "en": [
+        "ledger",
+        "debit credit",
+        "reconciling item",
+        "accrual",
+        "adjusting entry",
+        "workpaper",
+        "bookkeeping"
+      ],
+      "pt": [
+        "livro razão",
+        "débito crédito",
+        "item de conciliação",
+        "provisão",
+        "lançamento de ajuste",
+        "papel de trabalho"
+      ]
+    }
+  },
+  "outputRequirements": {
+    "mustCite": true,
+    "mustAnchorNumericClaims": true,
+    "mustFlagPeriod": true,
+    "mustSurfaceAccountContext": true,
+    "mustDetectBasis": true
+  },
+  "relatedDomains": [
+    "finance",
+    "legal"
+  ],
   "ontologyPrefix": "acct"
 }

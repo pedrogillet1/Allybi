@@ -2,7 +2,7 @@
   "_meta": {
     "id": "di_accounting_sections_acct_ap_aging",
     "version": "1.1.0",
-    "description": "Section map for ap aging documents.",
+    "description": "Section map for AP aging documents.",
     "languages": [
       "any"
     ],
@@ -25,6 +25,7 @@
       "headingAnchors": [
         "AP Aging",
         "Envelhecimento de Contas a Pagar",
+        "Aging",
         "Period",
         "Entity"
       ]
@@ -32,16 +33,31 @@
     {
       "id": "line_items",
       "name": {
-        "en": "Line Items",
-        "pt": "Itens"
+        "en": "Aging Lines",
+        "pt": "Itens de Envelhecimento"
       },
       "required": true,
       "order": 2,
       "headingAnchors": [
         "Detail",
-        "Transactions",
+        "Invoices",
         "Lines",
         "Detalhes"
+      ]
+    },
+    {
+      "id": "buckets",
+      "name": {
+        "en": "Aging Buckets",
+        "pt": "Faixas de Vencimento"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Buckets",
+        "Aging buckets",
+        "Faixas",
+        "Resumo de faixa"
       ]
     },
     {
@@ -51,7 +67,7 @@
         "pt": "Resumo"
       },
       "required": true,
-      "order": 3,
+      "order": 4,
       "headingAnchors": [
         "Summary",
         "Totals",
@@ -66,11 +82,10 @@
         "pt": "Aprovacao"
       },
       "required": false,
-      "order": 4,
+      "order": 5,
       "headingAnchors": [
-        "Approval",
-        "Reviewed by",
         "Approved by",
+        "Reviewed by",
         "Aprovado por"
       ]
     }

@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "id": "redaction_actions",
+    "version": "1.0.0",
+    "description": "Actions to redact/mask sensitive tokens detected by pii_patterns.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultAction": "MASK",
+    "appendAudit": true
+  },
+  "actions": [
+    {
+      "id": "RED_001_mask_email",
+      "patternId": "PII_EMAIL",
+      "trigger": "Output contains email-like data",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_EMAIL]"
+    },
+    {
+      "id": "RED_002_mask_phone",
+      "patternId": "PII_PHONE",
+      "trigger": "Output contains phone-like data",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_PHONE]"
+    },
+    {
+      "id": "RED_003_mask_tax_identifiers",
+      "patternId": "PII_TAX_ID_GENERIC",
+      "trigger": "Output contains CPF/CNPJ/TIN/NIF/EIN style identifiers",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_IDENTIFIER]"
+    },
+    {
+      "id": "RED_004_mask_passport",
+      "patternId": "PII_PASSPORT",
+      "trigger": "Output contains passport-like token",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_PASSPORT]"
+    },
+    {
+      "id": "RED_005_mask_ssn",
+      "patternId": "PII_SSN",
+      "trigger": "Output contains US SSN-like value",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_SSN]"
+    },
+    {
+      "id": "RED_006_mask_credit_card",
+      "patternId": "PII_CREDIT_CARD",
+      "trigger": "Output contains credit card number",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_CARD]"
+    },
+    {
+      "id": "RED_007_mask_routing_number",
+      "patternId": "PII_BANK_ROUTING",
+      "trigger": "Output contains routing or bank account identifier",
+      "failureAction": "MASK_VALUE",
+      "replacement": "[REDACTED_ROUTING]"
+    }
+  ],
+  "rules": [
+    {
+      "id": "RA_001_action_exists_for_detected_pattern",
+      "trigger": "detected pii pattern has no configured redaction action",
+      "check": "detected.patternId != null AND actions.missing(patternId == detected.patternId)",
+      "failureAction": "RAISE_REDACTION_GAP"
+    },
+    {
+      "id": "RA_002_missing_replacement_guard",
+      "trigger": "action configured without replacement while masking",
+      "check": "actions.any(a => a.failureAction == 'MASK_VALUE' AND (a.replacement == null OR a.replacement == ''))",
+      "failureAction": "INVALID_REDIRECTION_CONFIG"
+    },
+    {
+      "id": "RA_003_multi_pass_masking",
+      "trigger": "output contains multiple high severity pii fields",
+      "check": "output.highSeverityPIIFieldCount > 1",
+      "failureAction": "REPEAT_MASK_FOR_ALL_MATCHES"
+    },
+    {
+      "id": "RA_004_escalate_unknown_pattern_type",
+      "trigger": "pattern type is medium but exposed in high-risk channel",
+      "check": "detected.severity == 'medium' AND context.outputChannel == 'external'",
+      "failureAction": "ENFORCE_MASK_AND_AUDIT"
+    },
+    {
+      "id": "RA_005_preserve_audit_metadata",
+      "trigger": "redaction action executes",
+      "check": "config.appendAudit == true AND output.redacted == true",
+      "failureAction": "WRITE_REDACTION_AUDIT"
+    }
+  ],
+  "templates": [
+    {
+      "id": "REDACTION_ACTIONS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in redaction_actions.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

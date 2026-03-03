@@ -2,7 +2,7 @@
   "_meta": {
     "id": "di_accounting_tables_acct_ar_aging",
     "version": "1.1.0",
-    "description": "Expected table patterns for ar aging documents.",
+    "description": "Expected table patterns for AR aging documents.",
     "languages": [
       "any"
     ],
@@ -16,138 +16,128 @@
   "tableHeaderSynonyms": {
     "debit": [
       "debit",
-      "debits",
       "dr",
-      "dr.",
       "debit amount",
-      "debit amt",
-      "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
-      "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "debito"
     ],
     "credit": [
       "credit",
-      "credits",
       "cr",
-      "cr.",
       "credit amount",
-      "credit amt",
-      "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
-      "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
-    ],
-    "balance": [
-      "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
-      "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
-    ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+      "credito"
     ]
   },
   "tables": [
     {
-      "id": "acct_ar_aging_main_table",
+      "id": "acct_ar_aging_detail_table",
       "name": {
-        "en": "AR Aging Main",
-        "pt": "Envelhecimento de Contas a Receber Principal"
+        "en": "AR Aging Detail",
+        "pt": "Detalhe de Envelhecimento AR"
       },
       "section": "line_items",
       "expectedColumns": [
         "customer_id",
         "customer_name",
         "invoice_no",
+        "invoice_date",
         "due_date",
+        "days_outstanding",
         "bucket",
         "amount"
       ],
       "keyRows": [
+        "subtotal"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "amount"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "amount"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "notes": "AR aging amounts usually represent receivable balances and are usually debit-balance signed positive"
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL"
+      ]
+    },
+    {
+      "id": "acct_ar_aging_bucket_table",
+      "name": {
+        "en": "AR Aging Buckets",
+        "pt": "Faixas de Envelhecimento AR"
+      },
+      "section": "buckets",
+      "expectedColumns": [
+        "bucket",
+        "bucket_amount"
+      ],
+      "keyRows": [
+        "current",
+        "bucket_1_30",
+        "bucket_31_60",
+        "bucket_61_90",
+        "bucket_over_90",
         "grand_total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "bucket_amount"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "bucket_amount"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "valueColumns": [
+          "bucket_amount"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "R$"
       ]
     },
     {
       "id": "acct_ar_aging_summary_table",
       "name": {
         "en": "AR Aging Summary",
-        "pt": "Envelhecimento de Contas a Receber Resumo"
+        "pt": "Resumo de Envelhecimento AR"
       },
       "section": "summary",
       "expectedColumns": [
@@ -155,9 +145,53 @@
         "value"
       ],
       "keyRows": [
-        "total",
-        "subtotal",
-        "difference"
+        "total_ar_balance",
+        "customer_count",
+        "max_days"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "debitColumns": [
+          "total_ar_balance"
+        ],
+        "creditColumns": [
+          "max_days"
+        ],
+        "notes": "Normalize AR summary metrics where needed; treat total_ar_balance as debit-side exposure and remaining metrics as metadata."
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "€",
+        "£",
+        "R$"
       ]
     }
   ]

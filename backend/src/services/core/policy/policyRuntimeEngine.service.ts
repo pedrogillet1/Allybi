@@ -25,9 +25,20 @@ export type PolicyRule = {
   ruleId?: string;
   priority?: number;
   terminal?: boolean;
+  severity?: "critical" | "high" | "medium" | "low" | "info";
   when?: PolicyWhen | Record<string, unknown>;
   then?: Record<string, unknown>;
   reasonCode?: string;
+};
+
+export type PolicyBankLike = {
+  config?: {
+    defaultAction?: string | Record<string, unknown>;
+  };
+  rules?: PolicyRule[];
+  policies?: {
+    rules?: PolicyRule[];
+  };
 };
 
 export type PolicyMatch = {
@@ -36,6 +47,7 @@ export type PolicyMatch = {
   then: Record<string, unknown>;
   priority: number;
   terminal: boolean;
+  severity: "critical" | "high" | "medium" | "low" | "info";
 };
 
 function asObject(value: unknown): Record<string, unknown> {
@@ -98,6 +110,7 @@ function evalPredicate(
 
 function evalWhen(when: PolicyWhen | Record<string, unknown>, runtime: Record<string, unknown>): boolean {
   const normalized = asObject(when);
+  if (normalized.all === true || normalized.any === true) return true;
 
   if (Array.isArray(normalized.all) && normalized.all.length > 0) {
     const ok = normalized.all.every((entry) =>
@@ -131,12 +144,51 @@ function evalWhen(when: PolicyWhen | Record<string, unknown>, runtime: Record<st
   return true;
 }
 
+function normalizeSeverity(value: unknown): "critical" | "high" | "medium" | "low" | "info" {
+  const raw = String(value || "")
+    .trim()
+    .toLowerCase();
+  if (raw === "critical") return "critical";
+  if (raw === "high") return "high";
+  if (raw === "low") return "low";
+  if (raw === "info") return "info";
+  return "medium";
+}
+
+function normalizeDefaultAction(
+  input: string | Record<string, unknown> | null | undefined,
+): Record<string, unknown> | null {
+  if (!input) return null;
+  if (typeof input === "string") {
+    const action = input.trim();
+    if (!action) return null;
+    return { action };
+  }
+  if (typeof input === "object" && !Array.isArray(input)) {
+    return input as Record<string, unknown>;
+  }
+  return null;
+}
+
+export function extractPolicyRules(policy: unknown): PolicyRule[] {
+  const bank = asObject(policy) as PolicyBankLike;
+  const topRules = Array.isArray(bank.rules) ? bank.rules : [];
+  const nestedRules = Array.isArray(bank.policies?.rules)
+    ? (bank.policies?.rules as PolicyRule[])
+    : [];
+  return [...topRules, ...nestedRules];
+}
+
 export class PolicyRuntimeEngine {
   firstMatch(input: {
-    rules: PolicyRule[];
+    rules?: PolicyRule[];
+    policyBank?: PolicyBankLike | Record<string, unknown> | null;
     runtime: Record<string, unknown>;
+    defaultAction?: string | Record<string, unknown> | null;
   }): PolicyMatch | null {
-    const sorted = [...(input.rules || [])].sort((a, b) => {
+    const bankRules = input.policyBank ? extractPolicyRules(input.policyBank) : [];
+    const rules = [...(input.rules || []), ...bankRules];
+    const sorted = [...rules].sort((a, b) => {
       const pa = Number(a.priority || 0);
       const pb = Number(b.priority || 0);
       if (pb !== pa) return pb - pa;
@@ -156,6 +208,26 @@ export class PolicyRuntimeEngine {
         then: asObject(rule.then),
         priority: Number(rule.priority || 0),
         terminal: Boolean(rule.terminal),
+        severity: normalizeSeverity(rule.severity),
+      };
+    }
+
+    const policyConfig = asObject(asObject(input.policyBank).config);
+    const defaultAction =
+      normalizeDefaultAction(input.defaultAction) ||
+      normalizeDefaultAction(policyConfig.defaultAction as
+        | string
+        | Record<string, unknown>
+        | null
+        | undefined);
+    if (defaultAction) {
+      return {
+        ruleId: "__default__",
+        reasonCode: null,
+        then: defaultAction,
+        priority: -1,
+        terminal: false,
+        severity: "info",
       };
     }
 

@@ -25,6 +25,7 @@
       "headingAnchors": [
         "General Ledger Export",
         "Exportacao do Razao Geral",
+        "GL Export",
         "Period",
         "Entity"
       ]
@@ -32,23 +33,23 @@
     {
       "id": "line_items",
       "name": {
-        "en": "Line Items",
-        "pt": "Itens"
+        "en": "Journal Lines",
+        "pt": "Linhas do Livro"
       },
       "required": true,
       "order": 2,
       "headingAnchors": [
         "Detail",
         "Transactions",
-        "Lines",
+        "Journal Entries",
         "Detalhes"
       ]
     },
     {
-      "id": "summary",
+      "id": "totals",
       "name": {
-        "en": "Summary",
-        "pt": "Resumo"
+        "en": "Totals",
+        "pt": "Totais"
       },
       "required": true,
       "order": 3,
@@ -60,13 +61,28 @@
       ]
     },
     {
+      "id": "currency_breakout",
+      "name": {
+        "en": "Currency Breakout",
+        "pt": "Detalhe de Moeda"
+      },
+      "required": false,
+      "order": 4,
+      "headingAnchors": [
+        "Currency",
+        "Moeda",
+        "Exchange",
+        "Multicurrency"
+      ]
+    },
+    {
       "id": "signoff",
       "name": {
         "en": "Sign-off",
         "pt": "Aprovacao"
       },
       "required": false,
-      "order": 4,
+      "order": 5,
       "headingAnchors": [
         "Approval",
         "Reviewed by",

@@ -1,0 +1,252 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_insurance_claim",
+    "version": "1.0.0",
+    "description": "Entity schema for every_insurance_claim.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_insurance_claim"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "claim_number",
+      "type": "string",
+      "required": true,
+      "description": "Unique claim identifier.",
+      "section": "claim_identity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["claim", "claim number", "sinistro", "id"],
+        "disallowInference": true,
+        "preferredSources": ["claim_identity"]
+      }
+    },
+    {
+      "id": "policy_number",
+      "type": "string",
+      "required": true,
+      "description": "Referenced insurance policy number.",
+      "section": "claim_identity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["policy", "policy number", "apolice"],
+        "disallowInference": true,
+        "preferredSources": ["claim_identity"]
+      }
+    },
+    {
+      "id": "claim_type",
+      "type": "string",
+      "required": true,
+      "description": "Type of claim.",
+      "section": "claim_identity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["claim type", "type", "classe", "tipo de sinistro"],
+        "disallowInference": false,
+        "preferredSources": ["claim_identity", "incident"]
+      }
+    },
+    {
+      "id": "claimant_name",
+      "type": "string",
+      "required": true,
+      "description": "Name of the claimant.",
+      "section": "claim_identity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["claimant", "solicitante", "requerente", "nome"],
+        "disallowInference": true,
+        "preferredSources": ["claim_identity"]
+      }
+    },
+    {
+      "id": "insured_name",
+      "type": "string",
+      "required": false,
+      "description": "Insured person or entity on file.",
+      "section": "claim_identity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["insured", "segurado", "beneficiary"],
+        "disallowInference": true,
+        "preferredSources": ["claim_identity"]
+      }
+    },
+    {
+      "id": "incident_date",
+      "type": "date",
+      "required": true,
+      "description": "Date of incident/claim event.",
+      "section": "incident",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["incident date", "occurrence", "data do evento", "date"],
+        "disallowInference": true,
+        "preferredSources": ["incident"]
+      }
+    },
+    {
+      "id": "reported_date",
+      "type": "date",
+      "required": false,
+      "description": "Date claim was reported.",
+      "section": "incident",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["reported", "reported date", "reported on", "comunicado em"],
+        "disallowInference": true,
+        "preferredSources": ["incident"]
+      }
+    },
+    {
+      "id": "loss_location",
+      "type": "string",
+      "required": false,
+      "description": "Location where loss occurred.",
+      "section": "incident",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["location", "local", "place", "where"],
+        "disallowInference": true,
+        "preferredSources": ["incident"]
+      }
+    },
+    {
+      "id": "incident_description",
+      "type": "string",
+      "required": false,
+      "description": "Narrative of incident.",
+      "section": "incident",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["description", "description of loss", "ocorrencia", "facts"],
+        "disallowInference": false,
+        "preferredSources": ["incident"]
+      }
+    },
+    {
+      "id": "estimated_loss_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Estimated loss amount.",
+      "section": "coverage_check",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["estimated loss", "estimated", "estimated amount", "estimativa"],
+        "disallowInference": true,
+        "preferredSources": ["coverage_check", "damages_and_documents"]
+      }
+    },
+    {
+      "id": "approved_loss_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Approved amount for settlement.",
+      "section": "payments_and_status",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["approved", "approved amount", "valor aprovado"],
+        "disallowInference": true,
+        "preferredSources": ["payments_and_status"]
+      }
+    },
+    {
+      "id": "reserve_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Reserved amount for this claim.",
+      "section": "payments_and_status",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["reserve", "reserved amount", "reserva"],
+        "disallowInference": true,
+        "preferredSources": ["payments_and_status"]
+      }
+    },
+    {
+      "id": "paid_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Amount paid to date.",
+      "section": "payments_and_status",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["paid", "payment", "valor pago", "pago"],
+        "disallowInference": true,
+        "preferredSources": ["payments_and_status"]
+      }
+    },
+    {
+      "id": "outstanding_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Amount still outstanding.",
+      "section": "payments_and_status",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["outstanding", "balance", "saldo", "remaining"],
+        "disallowInference": true,
+        "preferredSources": ["payments_and_status"]
+      }
+    },
+    {
+      "id": "deductible_applied",
+      "type": "currency",
+      "required": false,
+      "description": "Deductible applied to the claim.",
+      "section": "coverage_check",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["deductible", "franquia", "deduct", "deduction"],
+        "disallowInference": true,
+        "preferredSources": ["coverage_check"]
+      }
+    },
+    {
+      "id": "claim_status",
+      "type": "enum",
+      "values": ["opened", "under_review", "approved", "partially_approved", "denied", "closed", "paid", "pending", "unknown"],
+      "required": true,
+      "description": "Current claim status.",
+      "section": "payments_and_status",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["status", "estado", "approved", "denied", "closed"],
+        "disallowInference": false,
+        "preferredSources": ["payments_and_status", "disposition"]
+      }
+    },
+    {
+      "id": "adjustment_notes",
+      "type": "string",
+      "required": false,
+      "description": "Adjustment notes from reviewer.",
+      "section": "adjustment_history",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["adjustment", "revision", "history", "notes"],
+        "disallowInference": false,
+        "preferredSources": ["adjustment_history"]
+      }
+    },
+    {
+      "id": "denial_reason",
+      "type": "string",
+      "required": false,
+      "description": "Reason for denial or rejection.",
+      "section": "disposition",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["denial", "rejected", "reason", "motivo", "nao autorizado"],
+        "disallowInference": false,
+        "preferredSources": ["disposition"]
+      }
+    }
+  ]
+}

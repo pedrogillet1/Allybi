@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "di_everyday_sections_every_rent_receipt",
+    "version": "1.0.0",
+    "description": "Section map for every_rent_receipt.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_rent_receipt"
+  },
+  "sections": [
+    { "id": "document_header", "name": { "en": "Document Header", "pt": "Cabecalho do Documento" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["rent", "receipt", "aluguel"] },
+    { "id": "property_and_parties", "name": { "en": "Parties and Property", "pt": "Partes e Imovel" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["landlord", "tenant", "property", "locador", "locatario"] },
+    { "id": "lease_info", "name": { "en": "Lease Information", "pt": "Informacoes de Contrato" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["lease", "contract", "locacao"] },
+    { "id": "payment_period", "name": { "en": "Payment Period", "pt": "Periodo de Pagamento" }, "order": 4, "required": true, "mustHave": true, "headingAnchors": ["period", "referencia", "from", "to"] },
+    { "id": "charges_breakdown", "name": { "en": "Charges Breakdown", "pt": "Detalhamento de Custos" }, "order": 5, "required": true, "mustHave": true, "headingAnchors": ["charges", "rent amount", "despesas"] },
+    { "id": "utilities_or_services", "name": { "en": "Utilities and Services", "pt": "Servicos e Utilidades" }, "order": 6, "required": false, "mustHave": false, "headingAnchors": ["utilities", "agua", "condominio", "service"] },
+    { "id": "payment_confirmation", "name": { "en": "Payment Confirmation", "pt": "Confirmacao de Pagamento" }, "order": 7, "required": true, "mustHave": true, "headingAnchors": ["payment", "paid", "confirmation", "recibo"] },
+    { "id": "late_fees", "name": { "en": "Late Fees", "pt": "Multas e Atraso" }, "order": 8, "required": false, "mustHave": false, "headingAnchors": ["late fee", "multa", "atraso"] },
+    { "id": "signatures_or_stamp", "name": { "en": "Signatures", "pt": "Assinaturas" }, "order": 9, "required": false, "mustHave": false, "headingAnchors": ["signature", "assinatura", "seal"] }
+  ]
+}

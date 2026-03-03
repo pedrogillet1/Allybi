@@ -4,6 +4,20 @@ import SourcePill from '../attachments/pills/SourcePill';
 import InlineNavPill from '../attachments/pills/InlineNavPill';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 
+const buildSourceKey = (source, index) => {
+  const docKey = source.docId || source.documentId || source.id || 'source';
+  const locationKey =
+    source.locationKey ||
+    source.location ||
+    source.page ||
+    source.sheet ||
+    source.slide ||
+    source.cell ||
+    source.section ||
+    '';
+  return `${docKey}:${locationKey}:${index}`;
+};
+
 const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) => {
   if (!sources || sources.length === 0) {
     return null;
@@ -19,7 +33,7 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {sources.map((source, index) => (
             <SourcePill
-              key={`${source.docId || source.documentId || index}`}
+              key={buildSourceKey(source, index)}
               source={source}
               onOpen={onSelect}
             />
@@ -39,7 +53,7 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {sources.map((source, index) => (
             <SourcePill
-              key={`${source.docId || source.documentId || index}`}
+              key={buildSourceKey(source, index)}
               source={source}
               onOpen={onSelect}
             />
@@ -77,7 +91,7 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
         {sources.map((source, index) => {
           const card = (
             <div
-              key={`${source.docId || source.documentId || index}`}
+              key={buildSourceKey(source, index)}
               className={`bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-colors${onSelect ? ' cursor-pointer' : ''}`}
               onClick={onSelect ? () => onSelect(source) : undefined}
               role={onSelect ? 'button' : undefined}

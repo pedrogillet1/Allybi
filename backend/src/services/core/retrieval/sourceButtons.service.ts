@@ -384,6 +384,13 @@ export class SourceButtonsService {
    * Convert raw source to SourceButton.
    */
   private rawToButton(source: RawSource): SourceButton {
+    const fallbackLocation = this.parseLocationKeyFallback(source.locationKey);
+    const pageNumber = source.pageNumber ?? fallbackLocation.pageNumber ?? undefined;
+    const sectionTitle =
+      source.sectionTitle ||
+      (fallbackLocation.chunkIndex !== null
+        ? `chunk_${fallbackLocation.chunkIndex}`
+        : undefined);
     const button: SourceButton = {
       documentId: source.documentId,
       title: source.filename,
@@ -395,11 +402,11 @@ export class SourceButtonsService {
     };
 
     // Add location if available
-    if (source.pageNumber) {
+    if (pageNumber) {
       button.location = {
         type: "page",
-        value: source.pageNumber,
-        label: source.locationLabel || `Page ${source.pageNumber}`,
+        value: pageNumber,
+        label: source.locationLabel || `Page ${pageNumber}`,
       };
     } else if (source.slideNumber) {
       button.location = {
@@ -419,11 +426,11 @@ export class SourceButtonsService {
         value: source.sheetName,
         label: source.locationLabel || source.sheetName,
       };
-    } else if (source.sectionTitle) {
+    } else if (sectionTitle) {
       button.location = {
         type: "section",
-        value: source.sectionTitle,
-        label: source.locationLabel || source.sectionTitle,
+        value: sectionTitle,
+        label: source.locationLabel || sectionTitle,
       };
     }
 
@@ -435,6 +442,23 @@ export class SourceButtonsService {
     const normalized = Math.floor(value);
     if (normalized <= 0) return null;
     return normalized;
+  }
+
+  private parseLocationKeyFallback(
+    rawLocationKey: unknown,
+  ): { pageNumber: number | null; chunkIndex: number | null } {
+    const locationKey = String(rawLocationKey || "").trim();
+    if (!locationKey) return { pageNumber: null, chunkIndex: null };
+
+    const pageMatch = locationKey.match(/\|p:(-?\d+)/i);
+    const chunkMatch = locationKey.match(/\|c:(-?\d+)/i);
+    const page = pageMatch ? Number(pageMatch[1] || Number.NaN) : Number.NaN;
+    const chunk = chunkMatch ? Number(chunkMatch[1] || Number.NaN) : Number.NaN;
+
+    return {
+      pageNumber: Number.isFinite(page) && page > 0 ? page : null,
+      chunkIndex: Number.isFinite(chunk) && chunk >= 0 ? chunk : null,
+    };
   }
 }
 

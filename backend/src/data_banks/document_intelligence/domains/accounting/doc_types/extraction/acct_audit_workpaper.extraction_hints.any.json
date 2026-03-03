@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -19,9 +19,10 @@
       "entity": "period",
       "anchors": [
         "period",
-        "reporting period",
+        "audit period",
         "competencia",
-        "periodo"
+        "periodo",
+        "as of"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -45,7 +46,7 @@
         "currency",
         "moeda",
         "curr",
-        "reporting currency"
+        "presentation currency"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -79,8 +80,8 @@
       "entity": "workpaperRef",
       "anchors": [
         "workpaper ref",
-        "workpaper Ref",
-        "workpaperRef"
+        "paper id",
+        "audit id"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -90,10 +91,10 @@
       "entity": "preparedBy",
       "anchors": [
         "prepared by",
-        "prepared By",
-        "preparedBy"
+        "preparado por",
+        "prepared"
       ],
-      "location": "header",
+      "location": "signoff",
       "extractionMethod": "heading_proximity"
     },
     {
@@ -101,21 +102,70 @@
       "entity": "reviewedBy",
       "anchors": [
         "reviewed by",
-        "reviewed By",
-        "reviewedBy"
+        "revisado por",
+        "reviewer"
+      ],
+      "location": "signoff",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_issueCount",
+      "entity": "issueCount",
+      "anchors": [
+        "issues",
+        "exceptions",
+        "finding count",
+        "total issues"
       ],
       "location": "summary",
       "extractionMethod": "table_row_match"
     },
     {
-      "id": "hint_conclusion",
-      "entity": "conclusion",
+      "id": "hint_sampleSize",
+      "entity": "sampleSize",
       "anchors": [
-        "conclusion",
-        "conclusion",
-        "conclusion"
+        "sample size",
+        "samples",
+        "items tested"
       ],
-      "location": "summary",
+      "location": "testing_steps",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_sampleSize_shifted_columns",
+      "entity": "sampleSize",
+      "anchors": [
+        "sample size",
+        "sample",
+        "rows",
+        "column shift",
+        "reordered"
+      ],
+      "location": "testing_steps",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_issueCount_csv_export",
+      "entity": "issueCount",
+      "anchors": [
+        "csv export",
+        "excel export",
+        "export",
+        "column alignment",
+        "messy layout"
+      ],
+      "location": "findings",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_bookAmount_total",
+      "entity": "outOfBalanceAmount",
+      "anchors": [
+        "total",
+        "difference",
+        "out of balance"
+      ],
+      "location": "tie_outs",
       "extractionMethod": "table_row_match"
     }
   ]

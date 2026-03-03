@@ -2,9 +2,17 @@
   "_meta": {
     "id": "fallback_policy",
     "version": "1.0.0",
-    "description": "ChatGPT-like conversation memory policy for Koda. Governs what conversational state is stored (doc lock/time/metric/domain), how long it persists, how it decays, and how it is reused without causing silent doc drift. Policy-only: does not define user-facing copy.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-26"
+    "description": "Fallback governance policy for no-docs, low-confidence retrieval, extraction failures, and user-facing recovery behavior.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-runtime",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -63,7 +71,10 @@
       "disambiguation_choice",
       "user_lock_request"
     ],
-    "softLockSources": ["single_source_inference", "followup_reuse"],
+    "softLockSources": [
+      "single_source_inference",
+      "followup_reuse"
+    ],
     "neverOverwriteHardLockWithoutExplicitSwitch": true,
     "explicitSwitchSignals": [
       "signals.hasExplicitDocRef",
@@ -146,27 +157,64 @@
       {
         "id": "MP_0001_explicit_docref_overwrites_hard_lock",
         "input": {
-          "state": { "activeDocRef": { "docId": "doc:old", "lockType": "hard" } },
-          "signals": { "hasExplicitDocRef": true },
-          "query": { "hints": { "docRefs": { "filenames": ["NewFile.pdf"] } } }
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:old",
+              "lockType": "hard"
+            }
+          },
+          "signals": {
+            "hasExplicitDocRef": true
+          },
+          "query": {
+            "hints": {
+              "docRefs": {
+                "filenames": [
+                  "NewFile.pdf"
+                ]
+              }
+            }
+          }
         },
-        "expect": { "shouldAllowHardLockOverwrite": true }
+        "expect": {
+          "shouldAllowHardLockOverwrite": true
+        }
       },
       {
         "id": "MP_0002_followup_refreshes_ttl_not_switch_docs",
         "input": {
-          "signals": { "isFollowup": true },
-          "state": { "activeDocRef": { "docId": "doc:x", "lockType": "hard", "ttlTurns": 3 } }
+          "signals": {
+            "isFollowup": true
+          },
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:x",
+              "lockType": "hard",
+              "ttlTurns": 3
+            }
+          }
         },
-        "expect": { "refreshTtl": true, "shouldNotSwitchDoc": true }
+        "expect": {
+          "refreshTtl": true,
+          "shouldNotSwitchDoc": true
+        }
       },
       {
         "id": "MP_0003_unlock_allows_corpus_search",
         "input": {
-          "signals": { "searchAllDocsRequested": true },
-          "state": { "activeDocRef": { "docId": "doc:x", "lockType": "hard" } }
+          "signals": {
+            "searchAllDocsRequested": true
+          },
+          "state": {
+            "activeDocRef": {
+              "docId": "doc:x",
+              "lockType": "hard"
+            }
+          }
         },
-        "expect": { "shouldClearActiveDocRef": true }
+        "expect": {
+          "shouldClearActiveDocRef": true
+        }
       }
     ]
   }

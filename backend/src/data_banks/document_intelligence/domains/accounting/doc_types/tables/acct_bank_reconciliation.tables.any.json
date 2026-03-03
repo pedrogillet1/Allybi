@@ -16,147 +16,234 @@
   "tableHeaderSynonyms": {
     "debit": [
       "debit",
-      "debits",
       "dr",
-      "dr.",
       "debit amount",
-      "debit amt",
-      "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
-      "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "debito"
     ],
     "credit": [
       "credit",
-      "credits",
       "cr",
-      "cr.",
       "credit amount",
-      "credit amt",
-      "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
-      "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
+      "credito"
     ],
     "balance": [
       "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
       "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
-    ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+      "ending balance"
     ]
   },
   "tables": [
     {
       "id": "acct_bank_reconciliation_main_table",
       "name": {
-        "en": "Bank Reconciliation Main",
-        "pt": "Conciliacao Bancaria Principal"
+        "en": "Bank Reconciliation Line Items",
+        "pt": "Itens de Conciliacao Bancaria"
       },
       "section": "line_items",
       "expectedColumns": [
-        "item",
+        "item_type",
+        "reference",
         "description",
         "book_amount",
         "bank_amount",
         "difference"
       ],
       "keyRows": [
-        "grand_total"
+        "outstanding_deposits",
+        "outstanding_cheques",
+        "total"
+      ],
+      "headerSynonyms": {
+        "item_type": [
+          "type",
+          "item",
+          "entry type"
+        ],
+        "reference": [
+          "reference",
+          "doc",
+          "document"
+        ],
+        "description": [
+          "description",
+          "descricao"
+        ],
+        "book_amount": [
+          "book amount",
+          "book balance",
+          "amount in books"
+        ],
+        "bank_amount": [
+          "bank amount",
+          "statement amount",
+          "bank balance"
+        ],
+        "difference": [
+          "difference",
+          "delta",
+          "adjustment"
+        ]
+      },
+      "debitCreditConventions": {
+        "debitColumns": [
+          "book_amount"
+        ],
+        "creditColumns": [
+          "bank_amount"
+        ],
+        "notes": "book and bank columns may invert based on export convention"
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "book_amount",
+            "bank_amount",
+            "difference"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "book_amount",
+            "bank_amount",
+            "difference"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "R$"
       ]
     },
     {
-      "id": "acct_bank_reconciliation_summary_table",
+      "id": "acct_bank_reconciliation_balance_table",
       "name": {
-        "en": "Bank Reconciliation Summary",
-        "pt": "Conciliacao Bancaria Resumo"
+        "en": "Bank Reconciliation Balance Summary",
+        "pt": "Resumo de Saldos da Conciliacao"
       },
-      "section": "summary",
+      "section": "reconciliation_summary",
       "expectedColumns": [
         "metric",
         "value"
       ],
       "keyRows": [
-        "total",
-        "subtotal",
-        "difference"
+        "book_balance",
+        "bank_balance",
+        "adjusted_book_balance",
+        "adjusted_bank_balance",
+        "unreconciled_difference"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "valueColumns": [
+          "value"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$"
+      ]
+    },
+    {
+      "id": "acct_bank_reconciliation_currency_table",
+      "name": {
+        "en": "Currency Adjustments",
+        "pt": "Ajustes de Moeda"
+      },
+      "section": "currency_adjustments",
+      "expectedColumns": [
+        "currency_code",
+        "book_amount",
+        "bank_amount",
+        "currency_drift"
+      ],
+      "keyRows": [
+        "grand_total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "book_amount",
+            "bank_amount",
+            "currency_drift"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "book_amount",
+            "bank_amount",
+            "currency_drift"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "BRL"
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "book_amount"
+        ],
+        "creditColumns": [
+          "bank_amount"
+        ],
+        "notes": "Book and bank side adjustments can be inverted depending on export template."
+      },
+      "extractionNotes": [
+        "Handle repeated currency blocks in large exports",
+        "Capture rows where book/bank values are in different order"
       ]
     }
   ]

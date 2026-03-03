@@ -1,0 +1,79 @@
+{
+  "_meta": {
+    "id": "followup_policy",
+    "version": "1.0.0",
+    "description": "Rules for when the system should emit follow-up suggestions and clarification prompts. ",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxSuggestions": 3,
+    "maxClarifications": 2,
+    "minConfidenceForAutoFollowup": 0.55,
+    "requireDocumentEvidence": true,
+    "suppressForHelpOrGeneral": true
+  },
+  "rules": [
+    {
+      "id": "FUP_001_generate_followups_on_doc_grounded",
+      "trigger": "Document-grounded answer with clear extracted evidence",
+      "check": "answer.mode.startsWith('doc_grounded') == true AND context.hasSources == true AND context.answerLength >= 180",
+      "failureAction": "EMIT_FOLLOWUP_SUGGESTIONS",
+      "severity": "low",
+      "maxCount": 3,
+      "notes": "Attach followups aligned to intent and doc type."
+    },
+    {
+      "id": "FUP_002_omit_followups_when_hard_warning",
+      "trigger": "Answer blocks or safety gate is active",
+      "check": "context.hardGateTriggered == true OR context.shouldWarnOnlyMode == true",
+      "failureAction": "SUPPRESS_FOLLOWUPS",
+      "severity": "medium"
+    },
+    {
+      "id": "FUP_003_clarification_if_scope_ambiguous",
+      "trigger": "Follow-up needed because scope is ambiguous",
+      "check": "context.scopeConfidence < 0.45 AND context.docAnchorCandidates > 1",
+      "failureAction": "EMIT_ASK_ONE_QUESTION",
+      "severity": "high"
+    },
+    {
+      "id": "FUP_004_no_followup_for_nav_pills",
+      "trigger": "Answer mode is nav_pills",
+      "check": "answer.mode.in(['nav_pills','nav_pill']) == true",
+      "failureAction": "SUPPRESS_FOLLOWUPS",
+      "severity": "low"
+    },
+    {
+      "id": "FUP_005_followup_for_compare",
+      "trigger": "Compare intent answered with multiple source documents",
+      "check": "context.intent == 'compare' AND context.sourceDocs.count >= 2",
+      "failureAction": "EMIT_COMPARE_FOLLOWUPS",
+      "severity": "medium",
+      "maxCount": 2
+    },
+    {
+      "id": "FUP_006_clarification_for_period_gaps",
+      "trigger": "Time-sensitive question lacks a single period in context",
+      "check": "context.queryNeedsPeriod == true AND context.periodRef == null",
+      "failureAction": "EMIT_PERIOD_QUESTION",
+      "severity": "medium"
+    }
+  ],
+  "templates": [
+    {
+      "id": "FOLLOWUP_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in followup_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

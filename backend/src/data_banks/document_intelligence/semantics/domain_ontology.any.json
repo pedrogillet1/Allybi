@@ -1,399 +1,310 @@
 {
   "_meta": {
     "id": "di_domain_ontology",
-    "version": "1.1.0",
+    "bankId": "di_domain_ontology",
+    "version": "2.0.0",
     "owner": "document_intelligence",
     "languages": [
       "en",
       "pt"
     ],
-    "dependsOn": [],
-    "usedBy": [
-      "di_doc_type_ontology",
-      "di_entity_ontology",
-      "di_metric_ontology"
-    ],
-    "tests": [
-      "SSOT_DOMAIN_001"
-    ],
-    "lastUpdated": "2026-03-01",
-    "description": "di_domain_ontology (document_intelligence) configuration bank."
+    "lastUpdated": "2026-03-03",
+    "description": "Universal domain ontology for document intelligence (expanded)."
   },
   "config": {
     "enabled": true,
     "canonicalDomainIds": [
-      "accounting",
-      "banking",
-      "billing",
-      "education",
       "finance",
-      "housing",
-      "hr_payroll",
-      "identity",
-      "insurance",
       "legal",
       "medical",
-      "ops",
+      "accounting",
       "tax",
-      "travel"
+      "billing",
+      "banking",
+      "insurance",
+      "ops",
+      "hr_payroll",
+      "identity",
+      "education",
+      "everyday",
+      "housing",
+      "travel",
+      "education_research",
+      "procurement",
+      "compliance"
     ],
     "domainAliases": {
-      "operations": "ops"
+      "fin": "finance",
+      "financeiro": "finance",
+      "law": "legal",
+      "jurídico": "legal",
+      "health": "medical",
+      "saúde": "medical",
+      "acct": "accounting",
+      "contábil": "accounting",
+      "taxation": "tax",
+      "imposto": "tax",
+      "bills": "billing",
+      "cobrança": "billing",
+      "bank": "banking",
+      "bancário": "banking",
+      "assurance": "insurance",
+      "seguro": "insurance",
+      "everyday": "everyday",
+      "daily": "everyday",
+      "operations": "ops",
+      "operação": "ops",
+      "hr": "hr_payroll",
+      "folha": "hr_payroll",
+      "identificação": "identity",
+      "identity": "identity",
+      "education": "education",
+      "educação": "education",
+      "housing": "housing",
+      "residência": "housing",
+      "travel": "travel",
+      "viagem": "travel",
+      "research": "education_research",
+      "pesquisa": "education_research",
+      "procurement": "procurement",
+      "suprimentos": "procurement",
+      "compliance": "compliance",
+      "conformidade": "compliance"
     }
   },
   "domains": [
     {
-      "id": "accounting",
-      "label": "Accounting",
-      "labelPt": "Contabilidade",
-      "description": "General ledger, trial balance, journal entries, reconciliation, accounts receivable/payable aging, audit workpapers, internal controls, and compliance documentation.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de contabilidade.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "finance"
-      ]
-    },
-    {
-      "id": "banking",
-      "label": "Banking",
-      "labelPt": "Bancario",
-      "description": "Retail and commercial banking records including account statements, card statements, loan statements, and payment receipts.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de bancario.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "billing",
-        "finance",
-        "accounting"
-      ]
-    },
-    {
-      "id": "billing",
-      "label": "Billing",
-      "labelPt": "Cobranca",
-      "description": "Consumer and business billing documents including telecom, utilities, receipts, and invoices with due dates, balances, and charge components.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de cobranca.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "banking",
-        "accounting",
-        "finance"
-      ]
-    },
-    {
-      "id": "education",
-      "label": "Education",
-      "labelPt": "Educacao",
-      "description": "Academic records and school administration documents used to verify enrollment, performance, schedules, and aid awards.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de educacao.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "finance",
-        "hr_payroll",
-        "identity"
-      ]
-    },
-    {
       "id": "finance",
       "label": "Finance",
       "labelPt": "Finanças",
-      "description": "Financial reporting, accounting, budgeting, treasury, and capital markets documentation.",
-      "descriptionPt": "Documentação de relatórios financeiros, contabilidade, orçamento, tesouraria e mercados de capitais.",
-      "subdomains": [
-        {
-          "id": "fin_accounting",
-          "label": "Accounting",
-          "labelPt": "Contabilidade"
-        },
-        {
-          "id": "fin_audit",
-          "label": "Audit & Assurance",
-          "labelPt": "Auditoria e Asseguração"
-        },
-        {
-          "id": "fin_budgeting",
-          "label": "Budgeting & Forecasting",
-          "labelPt": "Orçamento e Previsão"
-        },
-        {
-          "id": "fin_capex",
-          "label": "Capital Expenditure",
-          "labelPt": "Despesas de Capital"
-        },
-        {
-          "id": "fin_corporate_finance",
-          "label": "Corporate Finance",
-          "labelPt": "Finanças Corporativas"
-        },
-        {
-          "id": "fin_payroll",
-          "label": "Payroll & Compensation",
-          "labelPt": "Folha de Pagamento e Remuneração"
-        },
-        {
-          "id": "fin_procurement",
-          "label": "Procurement & Spend",
-          "labelPt": "Compras e Gastos"
-        },
-        {
-          "id": "fin_tax",
-          "label": "Tax & Compliance",
-          "labelPt": "Tributação e Conformidade"
-        },
-        {
-          "id": "fin_treasury",
-          "label": "Treasury & Cash Management",
-          "labelPt": "Tesouraria e Gestão de Caixa"
-        }
-      ],
-      "crossDomainLinks": [
-        "legal",
-        "ops"
-      ]
-    },
-    {
-      "id": "housing",
-      "label": "Housing",
-      "labelPt": "Moradia",
-      "description": "Housing and property documents including lease summaries, rent receipts, mortgage statements, property tax bills, HOA statements, and inspection reports.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de moradia.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "banking",
-        "billing",
-        "insurance"
-      ]
-    },
-    {
-      "id": "hr_payroll",
-      "label": "HR and Payroll",
-      "labelPt": "RH e Folha",
-      "description": "Employment and payroll documents including pay stubs, timesheets, benefits enrollment, expense reports, and verification letters.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de rh e folha.",
+      "description": "Financial plans, statements, invoices, and accounting evidence.",
+      "descriptionPt": "Planos financeiros, demonstrações, faturas e evidências contábeis.",
       "subdomains": [],
       "crossDomainLinks": [
         "accounting",
-        "finance",
-        "identity"
+        "legal",
+        "billing"
       ]
-    },
-    {
-      "id": "identity",
-      "label": "Identity",
-      "labelPt": "Identidade",
-      "description": "Identity verification documents including personal IDs, passports, proof-of-address, and business registration certificates.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de identidade.",
-      "subdomains": [],
-      "crossDomainLinks": []
-    },
-    {
-      "id": "insurance",
-      "label": "Insurance",
-      "labelPt": "Seguros",
-      "description": "Insurance policy interpretation, claims processing, benefits explanations, and premium billing extraction.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de seguros.",
-      "subdomains": [],
-      "crossDomainLinks": []
     },
     {
       "id": "legal",
       "label": "Legal",
       "labelPt": "Jurídico",
-      "description": "Contracts, agreements, litigation, regulatory compliance, and corporate governance documentation.",
-      "descriptionPt": "Documentação de contratos, acordos, litígios, conformidade regulatória e governança corporativa.",
-      "subdomains": [
-        {
-          "id": "leg_compliance",
-          "label": "Compliance & Regulatory",
-          "labelPt": "Conformidade e Regulatório"
-        },
-        {
-          "id": "leg_contracts",
-          "label": "Contracts & Agreements",
-          "labelPt": "Contratos e Acordos"
-        },
-        {
-          "id": "leg_corporate_governance",
-          "label": "Corporate Governance",
-          "labelPt": "Governança Corporativa"
-        },
-        {
-          "id": "leg_data_privacy",
-          "label": "Data Privacy",
-          "labelPt": "Privacidade de Dados"
-        },
-        {
-          "id": "leg_dispute_resolution",
-          "label": "Dispute Resolution",
-          "labelPt": "Resolução de Disputas"
-        },
-        {
-          "id": "leg_employment",
-          "label": "Employment Law",
-          "labelPt": "Direito do Trabalho"
-        },
-        {
-          "id": "leg_intellectual_property",
-          "label": "Intellectual Property",
-          "labelPt": "Propriedade Intelectual"
-        },
-        {
-          "id": "leg_litigation",
-          "label": "Litigation",
-          "labelPt": "Litígio"
-        },
-        {
-          "id": "leg_mergers_acquisitions",
-          "label": "Mergers & Acquisitions",
-          "labelPt": "Fusões e Aquisições"
-        },
-        {
-          "id": "leg_real_estate",
-          "label": "Real Estate",
-          "labelPt": "Imobiliário"
-        }
-      ],
+      "description": "Contracts, regulations, litigation records, and compliance evidence.",
+      "descriptionPt": "Contratos, regulamentos, registros de litígios e evidências de conformidade.",
+      "subdomains": [],
       "crossDomainLinks": [
         "finance",
-        "medical",
-        "ops"
+        "insurance",
+        "identity"
       ]
     },
     {
       "id": "medical",
       "label": "Medical",
       "labelPt": "Médico",
-      "description": "Clinical records, patient care documentation, diagnostic reports, and healthcare administration.",
-      "descriptionPt": "Registros clínicos, documentação de cuidados ao paciente, laudos diagnósticos e administração de saúde.",
-      "subdomains": [
-        {
-          "id": "med_clinical_records",
-          "label": "Clinical Records",
-          "labelPt": "Registros Clínicos"
-        },
-        {
-          "id": "med_diagnostics",
-          "label": "Diagnostics & Imaging",
-          "labelPt": "Diagnóstico e Imagem"
-        },
-        {
-          "id": "med_emergency",
-          "label": "Emergency Medicine",
-          "labelPt": "Medicina de Emergência"
-        },
-        {
-          "id": "med_insurance",
-          "label": "Insurance & Authorization",
-          "labelPt": "Seguro e Autorização"
-        },
-        {
-          "id": "med_medication",
-          "label": "Medication Management",
-          "labelPt": "Gestão de Medicamentos"
-        },
-        {
-          "id": "med_patient_admin",
-          "label": "Patient Administration",
-          "labelPt": "Administração do Paciente"
-        },
-        {
-          "id": "med_rehab",
-          "label": "Rehabilitation & Therapy",
-          "labelPt": "Reabilitação e Terapia"
-        },
-        {
-          "id": "med_research",
-          "label": "Research & Trials",
-          "labelPt": "Pesquisa e Ensaios Clínicos"
-        },
-        {
-          "id": "med_surgery",
-          "label": "Surgical Services",
-          "labelPt": "Serviços Cirúrgicos"
-        }
-      ],
+      "description": "Clinical reports, lab outcomes, plans, and treatment notes.",
+      "descriptionPt": "Relatórios clínicos, resultados laboratoriais, planos e notas de tratamento.",
+      "subdomains": [],
       "crossDomainLinks": [
+        "insurance",
         "legal",
-        "ops"
+        "identity"
+      ]
+    },
+    {
+      "id": "accounting",
+      "label": "Accounting",
+      "labelPt": "Contabilidade",
+      "description": "Journals, ledgers, reconciliations, and audit evidence.",
+      "descriptionPt": "Diários, livros razão, reconciliações e evidências de auditoria.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "ops",
+        "tax"
+      ]
+    },
+    {
+      "id": "tax",
+      "label": "Tax",
+      "labelPt": "Tributário",
+      "description": "Tax returns, notices, and tax schedule artifacts.",
+      "descriptionPt": "Declarações, avisos e cronogramas tributários.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "legal",
+        "accounting"
+      ]
+    },
+    {
+      "id": "billing",
+      "label": "Billing",
+      "labelPt": "Cobrança",
+      "description": "Receipts, service bills, charge breakdowns, and payment notices.",
+      "descriptionPt": "Recibos, faturas, detalhamento de cobranças e avisos de pagamento.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "banking",
+        "insurance"
+      ]
+    },
+    {
+      "id": "banking",
+      "label": "Banking",
+      "labelPt": "Bancário",
+      "description": "Account statements, payment rails, and account relationship documentation.",
+      "descriptionPt": "Extratos, trilhas de pagamento e documentação de relacionamento bancário.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "billing",
+        "identity"
+      ]
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "labelPt": "Seguros",
+      "description": "Policies, claims, premiums, and coverage proof documents.",
+      "descriptionPt": "Apólices, sinistros, prêmios e documentos de comprovação de cobertura.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "medical",
+        "legal",
+        "identity"
       ]
     },
     {
       "id": "ops",
       "label": "Operations",
       "labelPt": "Operações",
-      "description": "Business processes, IT infrastructure, project management, quality assurance, and operational governance.",
-      "descriptionPt": "Processos de negócios, infraestrutura de TI, gestão de projetos, garantia de qualidade e governança operacional.",
-      "subdomains": [
-        {
-          "id": "ops_business_continuity",
-          "label": "Business Continuity",
-          "labelPt": "Continuidade de Negócios"
-        },
-        {
-          "id": "ops_compliance",
-          "label": "Operational Compliance",
-          "labelPt": "Conformidade Operacional"
-        },
-        {
-          "id": "ops_hr",
-          "label": "Human Resources",
-          "labelPt": "Recursos Humanos"
-        },
-        {
-          "id": "ops_incident_management",
-          "label": "Incident Management",
-          "labelPt": "Gestão de Incidentes"
-        },
-        {
-          "id": "ops_it_infrastructure",
-          "label": "IT Infrastructure",
-          "labelPt": "Infraestrutura de TI"
-        },
-        {
-          "id": "ops_procurement",
-          "label": "Procurement & Vendor Management",
-          "labelPt": "Compras e Gestão de Fornecedores"
-        },
-        {
-          "id": "ops_project_management",
-          "label": "Project Management",
-          "labelPt": "Gestão de Projetos"
-        },
-        {
-          "id": "ops_quality_assurance",
-          "label": "Quality Assurance",
-          "labelPt": "Garantia de Qualidade"
-        },
-        {
-          "id": "ops_risk_management",
-          "label": "Risk Management",
-          "labelPt": "Gestão de Riscos"
-        }
-      ],
+      "description": "Workflows, playbooks, KPIs, and operational process artifacts.",
+      "descriptionPt": "Fluxos, playbooks, KPIs e artefatos de processos operacionais.",
+      "subdomains": [],
       "crossDomainLinks": [
+        "finance",
+        "legal",
+        "identity"
+      ]
+    },
+    {
+      "id": "hr_payroll",
+      "label": "HR and Payroll",
+      "labelPt": "RH e Folha",
+      "description": "Payroll, employment records, benefits, and workforce certifications.",
+      "descriptionPt": "Folha de pagamento, registros trabalhistas, benefícios e certificações de pessoal.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "identity",
         "finance",
         "legal"
       ]
     },
     {
-      "id": "tax",
-      "label": "Tax",
-      "labelPt": "Tributario",
-      "description": "Tax compliance, return filing, tax notices, payment slips, and property tax billing interpretation.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de tributario.",
+      "id": "identity",
+      "label": "Identity",
+      "labelPt": "Identidade",
+      "description": "Personal and organization identity, signatures, and verification records.",
+      "descriptionPt": "Identidade pessoal e organizacional, assinaturas e registros de verificação.",
       "subdomains": [],
-      "crossDomainLinks": []
+      "crossDomainLinks": [
+        "legal",
+        "finance",
+        "medical"
+      ]
+    },
+    {
+      "id": "education",
+      "label": "Education",
+      "labelPt": "Educação",
+      "description": "Student records, certifications, schedules, and transcripts.",
+      "descriptionPt": "Registros de alunos, certificações, cronogramas e históricos.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "hr_payroll",
+        "identity",
+        "finance"
+      ]
+    },
+    {
+      "id": "housing",
+      "label": "Housing",
+      "labelPt": "Moradia",
+      "description": "Property, tenancy, mortgages, and home service documentation.",
+      "descriptionPt": "Documentos de imóvel, locação, hipoteca e serviços residenciais.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "legal",
+        "finance",
+        "insurance"
+      ]
     },
     {
       "id": "travel",
       "label": "Travel",
-      "labelPt": "Viagem",
-      "description": "Travel booking and transport documents including itinerary, boarding pass, reservations, insurance, rentals, and visa receipts.",
-      "descriptionPt": "Perfil de dominio para interpretacao de documentos de viagem.",
+      "labelPt": "Viagens",
+      "description": "Travel receipts, itineraries, reimbursements, and mobility records.",
+      "descriptionPt": "Recibos de viagem, itinerários, reembolsos e registros de deslocamento.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "insurance",
+        "hr_payroll"
+      ]
+    },
+    {
+      "id": "everyday",
+      "label": "Everyday",
+      "labelPt": "Cotidiano",
+      "description": "Miscellaneous consumer documents such as receipts, utility bills, identity documents, and personal proofs.",
+      "descriptionPt": "Documentos cotidianos diversos, como recibos, contas de serviços, documentos de identidade e comprovantes pessoais.",
       "subdomains": [],
       "crossDomainLinks": [
         "billing",
-        "identity",
-        "insurance"
+        "legal",
+        "finance"
+      ]
+    },
+    {
+      "id": "education_research",
+      "label": "Research",
+      "labelPt": "Pesquisa",
+      "description": "Research project plans, study cohorts, and methodology sections.",
+      "descriptionPt": "Planos de pesquisa, coortes de estudo e seções metodológicas.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "education",
+        "medical",
+        "legal"
+      ]
+    },
+    {
+      "id": "procurement",
+      "label": "Procurement",
+      "labelPt": "Aquisições",
+      "description": "Requests, quotations, vendor contracts, and spend analysis.",
+      "descriptionPt": "Solicitações, cotações, contratos de fornecedores e análise de gastos.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "finance",
+        "ops",
+        "legal"
+      ]
+    },
+    {
+      "id": "compliance",
+      "label": "Compliance",
+      "labelPt": "Conformidade",
+      "description": "Policy evidence, control matrices, and audit remediation evidence.",
+      "descriptionPt": "Evidências de política, matrizes de controle e evidências de remediação.",
+      "subdomains": [],
+      "crossDomainLinks": [
+        "legal",
+        "finance",
+        "ops"
       ]
     }
   ]

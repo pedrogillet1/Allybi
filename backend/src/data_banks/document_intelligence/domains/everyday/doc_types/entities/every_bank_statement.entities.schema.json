@@ -1,0 +1,238 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_bank_statement",
+    "version": "1.0.0",
+    "description": "Entity schema for every_bank_statement.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_bank_statement"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "statement_number",
+      "type": "string",
+      "required": true,
+      "description": "Statement identifier.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["statement", "extrato", "statement number", "extrato numero"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "bank_name",
+      "type": "string",
+      "required": true,
+      "description": "Issuing bank name.",
+      "section": "account_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["bank", "banco", "bank name"],
+        "disallowInference": true,
+        "preferredSources": ["account_profile", "document_header"]
+      }
+    },
+    {
+      "id": "agency_number",
+      "type": "string",
+      "required": false,
+      "description": "Agency/branch number.",
+      "section": "account_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["agency", "agencia", "branch"],
+        "disallowInference": true,
+        "preferredSources": ["account_profile"]
+      }
+    },
+    {
+      "id": "account_number",
+      "type": "string",
+      "required": true,
+      "description": "Bank account number.",
+      "section": "account_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["account", "conta", "account number"],
+        "disallowInference": true,
+        "preferredSources": ["account_profile"]
+      }
+    },
+    {
+      "id": "account_holder_name",
+      "type": "string",
+      "required": true,
+      "description": "Name on account.",
+      "section": "account_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["account holder", "holder", "titular"],
+        "disallowInference": true,
+        "preferredSources": ["account_profile"]
+      }
+    },
+    {
+      "id": "statement_period_start",
+      "type": "date",
+      "required": true,
+      "description": "Start date of statement period.",
+      "section": "statement_period",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["period start", "from", "de", "inicio"],
+        "disallowInference": true,
+        "preferredSources": ["statement_period"]
+      }
+    },
+    {
+      "id": "statement_period_end",
+      "type": "date",
+      "required": true,
+      "description": "End date of statement period.",
+      "section": "statement_period",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["period end", "to", "a", "fim"],
+        "disallowInference": true,
+        "preferredSources": ["statement_period"]
+      }
+    },
+    {
+      "id": "statement_generated_date",
+      "type": "date",
+      "required": false,
+      "description": "Date the statement was generated.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["generated", "emitido", "data de emissao"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Statement currency.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["currency", "moeda", "currency code"],
+        "disallowInference": false,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "opening_balance",
+      "type": "currency",
+      "required": true,
+      "description": "Opening balance at period start.",
+      "section": "opening_and_closing",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["opening balance", "saldo inicial", "saldo anterior"],
+        "disallowInference": true,
+        "preferredSources": ["opening_and_closing"]
+      }
+    },
+    {
+      "id": "closing_balance",
+      "type": "currency",
+      "required": true,
+      "description": "Closing balance at period end.",
+      "section": "opening_and_closing",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["closing balance", "saldo final", "saldo atual"],
+        "disallowInference": true,
+        "preferredSources": ["opening_and_closing"]
+      }
+    },
+    {
+      "id": "total_debits",
+      "type": "currency",
+      "required": false,
+      "description": "Sum of debits in period.",
+      "section": "cash_flow_summary",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["total debits", "saidas", "debit", "despesas"],
+        "disallowInference": true,
+        "preferredSources": ["cash_flow_summary", "transactions"]
+      }
+    },
+    {
+      "id": "total_credits",
+      "type": "currency",
+      "required": false,
+      "description": "Sum of credits in period.",
+      "section": "cash_flow_summary",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["total credits", "entradas", "credit", "receitas"],
+        "disallowInference": true,
+        "preferredSources": ["cash_flow_summary", "transactions"]
+      }
+    },
+    {
+      "id": "net_change",
+      "type": "currency",
+      "required": false,
+      "description": "Net period change.",
+      "section": "cash_flow_summary",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["net change", "variation", "delta", "mudanca"],
+        "disallowInference": true,
+        "preferredSources": ["cash_flow_summary"]
+      }
+    },
+    {
+      "id": "fees_total",
+      "type": "currency",
+      "required": false,
+      "description": "Total fees and charges in statement.",
+      "section": "charges_and_interest",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["fees", "charges", "tarifas", "custos"],
+        "disallowInference": true,
+        "preferredSources": ["charges_and_interest"]
+      }
+    },
+    {
+      "id": "interest_earned",
+      "type": "currency",
+      "required": false,
+      "description": "Interest earned/credited in period.",
+      "section": "charges_and_interest",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["interest", "juros", "earnings"],
+        "disallowInference": true,
+        "preferredSources": ["charges_and_interest"]
+      }
+    },
+    {
+      "id": "transaction_count",
+      "type": "number",
+      "required": false,
+      "description": "Number of transaction rows.",
+      "section": "transactions",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["transactions", "lancamentos", "entries", "movimentacoes"],
+        "disallowInference": false,
+        "preferredSources": ["transactions"]
+      }
+    }
+  ]
+}

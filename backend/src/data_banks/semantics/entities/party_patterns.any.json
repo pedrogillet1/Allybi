@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "party_patterns",
-    "version": "1.2.0",
-    "description": "Entity-role extraction patterns for counterparties, signatories, providers, and vendors.",
+    "version": "1.3.0",
+    "description": "Party and counterpart extraction with EN/PT variants and role-aware normalization.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -21,1415 +21,3362 @@
   "rules": [
     {
       "id": "party_001",
-      "name": "corp_suffix_inc",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Inc|INC)\\.?\\b",
+      "name": "party_rule_1",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "Acme Inc.",
-        "Global Solutions INC"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "organization",
-      "role": "corporation",
-      "notes": "US corporation with Inc suffix",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 1.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_002",
-      "name": "corp_suffix_corp",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Corp|CORP)\\.?\\b",
+      "name": "party_rule_2",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "Tech Corp.",
-        "National CORP"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
       "entityType": "organization",
-      "role": "corporation",
-      "notes": "US corporation with Corp suffix",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 2.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_003",
-      "name": "corp_suffix_llc",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LLC|L\\.L\\.C\\.?)\\b",
+      "name": "party_rule_3",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "Smith & Associates LLC",
-        "Ventures L.L.C."
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
       "entityType": "organization",
-      "role": "limited_liability_company",
-      "notes": "US limited liability company",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 3.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_004",
-      "name": "corp_suffix_ltd",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Ltd|LTD)\\.?\\b",
+      "name": "party_rule_4",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "Global Solutions Ltd.",
-        "Trading LTD"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
       "entityType": "organization",
-      "role": "limited_company",
-      "notes": "UK/international limited company",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 4.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_005",
-      "name": "corp_suffix_co",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Co|CO)\\.\\b",
+      "name": "party_rule_5",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "Smith & Co.",
-        "Manufacturing CO."
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
       "entityType": "organization",
-      "role": "company",
-      "notes": "Company with Co. suffix",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 5.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_006",
-      "name": "corp_suffix_lp",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LP|L\\.P\\.?)\\b",
+      "name": "party_rule_6",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "Capital Partners LP",
-        "Investments L.P."
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
       "entityType": "organization",
-      "role": "limited_partnership",
-      "notes": "Limited partnership",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 6.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_007",
-      "name": "corp_suffix_llp",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:LLP|L\\.L\\.P\\.?)\\b",
+      "name": "party_rule_7",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "Baker McKenzie LLP",
-        "Attorneys L.L.P."
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
       "entityType": "organization",
-      "role": "limited_liability_partnership",
-      "notes": "Limited liability partnership",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 7.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_008",
-      "name": "corp_suffix_plc",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:PLC|plc|Plc)\\b",
+      "name": "party_rule_8",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "British Petroleum PLC",
-        "Barclays plc"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
       "entityType": "organization",
-      "role": "public_limited_company",
-      "notes": "UK public limited company",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 8.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_009",
-      "name": "corp_suffix_na",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:N\\.?A\\.?)\\b",
+      "name": "party_rule_9",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "JPMorgan Chase N.A.",
-        "Bank of America NA"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "organization",
-      "role": "national_association",
-      "notes": "National association (banking)",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 9.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_010",
-      "name": "corp_suffix_gmbh",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:GmbH|GMBH)\\b",
+      "name": "party_rule_10",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "Siemens GmbH",
-        "Deutsche Tech GMBH"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
       "entityType": "organization",
-      "role": "limited_company_de",
-      "notes": "German limited liability company",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 10.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_011",
-      "name": "corp_suffix_ag",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:AG|A\\.G\\.)\\b",
+      "name": "party_rule_11",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "Deutsche Bank AG",
-        "Novartis A.G."
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
       "entityType": "organization",
-      "role": "stock_corporation_de",
-      "notes": "German/Swiss stock corporation",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 11.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_012",
-      "name": "corp_suffix_se",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\sSE\\b",
+      "name": "party_rule_12",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "SAP SE",
-        "Airbus SE"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
       "entityType": "organization",
-      "role": "european_company",
-      "notes": "European company (Societas Europaea)",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 12.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_013",
-      "name": "corp_suffix_bv",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:B\\.?V\\.?)\\b",
+      "name": "party_rule_13",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "Shell B.V.",
-        "Philips BV"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
       "entityType": "organization",
-      "role": "limited_company_nl",
-      "notes": "Dutch private limited company",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 13.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_014",
-      "name": "corp_suffix_nv",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:N\\.?V\\.?)\\b",
+      "name": "party_rule_14",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "ING N.V.",
-        "Heineken NV"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
       "entityType": "organization",
-      "role": "public_company_nl",
-      "notes": "Dutch public company",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 14.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_015",
-      "name": "corp_suffix_srl",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:S\\.?R\\.?L\\.?)\\b",
+      "name": "party_rule_15",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "Fiat S.R.L.",
-        "Tech Solutions SRL"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
       "entityType": "organization",
-      "role": "limited_company_it",
-      "notes": "Italian/Romanian limited company",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 15.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_016",
-      "name": "corp_br_sa",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:S\\.?A\\.?|S/A)\\b",
+      "name": "party_rule_16",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "Petrobras S.A.",
-        "Vale S/A",
-        "Itau Unibanco SA"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
       "entityType": "organization",
-      "role": "corporation_br",
-      "notes": "Brazilian/Portuguese corporation (Sociedade Anonima)",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 16.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_017",
-      "name": "corp_br_ltda",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:Ltda|LTDA)\\.?\\b",
+      "name": "party_rule_17",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "Comercio Silva Ltda.",
-        "Servicos ABC LTDA"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "organization",
-      "role": "limited_company_br",
-      "notes": "Brazilian limited company",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 17.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_018",
-      "name": "corp_br_eireli",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:EIRELI|Eireli)\\b",
+      "name": "party_rule_18",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "Consultoria XYZ EIRELI",
-        "Tech Eireli"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
       "entityType": "organization",
-      "role": "sole_proprietor_br",
-      "notes": "Brazilian individual limited liability entity",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 18.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_019",
-      "name": "corp_br_me",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:ME|M\\.E\\.)\\b",
+      "name": "party_rule_19",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "Joao Silva ME",
-        "Comercio ABC M.E."
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
       "entityType": "organization",
-      "role": "micro_enterprise_br",
-      "notes": "Brazilian micro enterprise",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 19.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_020",
-      "name": "corp_br_mei",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\s(?:MEI)\\b",
+      "name": "party_rule_20",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "Maria Santos MEI"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
       "entityType": "organization",
-      "role": "individual_entrepreneur_br",
-      "notes": "Brazilian individual micro entrepreneur",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 20.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_021",
-      "name": "corp_mx_sa_cv",
-      "pattern": "\\b[A-Z][\\w\\s&.,'-]+\\sS\\.?A\\.?\\sde\\sC\\.?V\\.?\\b",
+      "name": "party_rule_21",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "Cemex S.A. de C.V.",
-        "Grupo Bimbo SA de CV"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
       "entityType": "organization",
-      "role": "corporation_mx",
-      "notes": "Mexican variable capital corporation",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 21.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_022",
-      "name": "role_buyer_en",
-      "pattern": "(?:the\\s)?(?:Buyer|BUYER|buyer)",
+      "name": "party_rule_22",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "the Buyer",
-        "Buyer",
-        "BUYER"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
-      "entityType": "role",
-      "role": "buyer",
-      "notes": "English buyer role label",
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 22.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_023",
-      "name": "role_seller_en",
-      "pattern": "(?:the\\s)?(?:Seller|SELLER|seller)",
+      "name": "party_rule_23",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "the Seller",
-        "Seller",
-        "SELLER"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
-      "entityType": "role",
-      "role": "seller",
-      "notes": "English seller role label",
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 23.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_024",
-      "name": "role_landlord_en",
-      "pattern": "(?:the\\s)?(?:Landlord|LANDLORD|Lessor|LESSOR)",
+      "name": "party_rule_24",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "the Landlord",
-        "Lessor",
-        "LANDLORD"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
-      "entityType": "role",
-      "role": "landlord",
-      "notes": "English landlord/lessor role",
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 24.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_025",
-      "name": "role_tenant_en",
-      "pattern": "(?:the\\s)?(?:Tenant|TENANT|Lessee|LESSEE)",
+      "name": "party_rule_25",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "the Tenant",
-        "Lessee",
-        "TENANT"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "role",
-      "role": "tenant",
-      "notes": "English tenant/lessee role",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 25.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_026",
-      "name": "role_licensor_en",
-      "pattern": "(?:the\\s)?(?:Licensor|LICENSOR)",
+      "name": "party_rule_26",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "the Licensor",
-        "LICENSOR"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
-      "entityType": "role",
-      "role": "licensor",
-      "notes": "English licensor role",
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 26.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_027",
-      "name": "role_licensee_en",
-      "pattern": "(?:the\\s)?(?:Licensee|LICENSEE)",
+      "name": "party_rule_27",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "the Licensee",
-        "LICENSEE"
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
-      "entityType": "role",
-      "role": "licensee",
-      "notes": "English licensee role",
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 27.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_028",
-      "name": "role_employer_en",
-      "pattern": "(?:the\\s)?(?:Employer|EMPLOYER|Company)",
+      "name": "party_rule_28",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "the Employer",
-        "EMPLOYER",
-        "the Company"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
-      "entityType": "role",
-      "role": "employer",
-      "notes": "English employer role",
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 28.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_029",
-      "name": "role_employee_en",
-      "pattern": "(?:the\\s)?(?:Employee|EMPLOYEE|Worker)",
+      "name": "party_rule_29",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "the Employee",
-        "EMPLOYEE",
-        "the Worker"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
-      "entityType": "role",
-      "role": "employee",
-      "notes": "English employee role",
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 29.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_030",
-      "name": "role_lender_en",
-      "pattern": "(?:the\\s)?(?:Lender|LENDER|Creditor)",
+      "name": "party_rule_30",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "the Lender",
-        "LENDER",
-        "the Creditor"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
-      "entityType": "role",
-      "role": "lender",
-      "notes": "English lender/creditor role",
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 30.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_031",
-      "name": "role_borrower_en",
-      "pattern": "(?:the\\s)?(?:Borrower|BORROWER|Debtor)",
+      "name": "party_rule_31",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "the Borrower",
-        "BORROWER",
-        "the Debtor"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
-      "entityType": "role",
-      "role": "borrower",
-      "notes": "English borrower/debtor role",
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 31.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_032",
-      "name": "role_guarantor_en",
-      "pattern": "(?:the\\s)?(?:Guarantor|GUARANTOR|Surety)",
+      "name": "party_rule_32",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "the Guarantor",
-        "GUARANTOR",
-        "the Surety"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
-      "entityType": "role",
-      "role": "guarantor",
-      "notes": "English guarantor role",
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 32.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_033",
-      "name": "role_contractor_en",
-      "pattern": "(?:the\\s)?(?:Contractor|CONTRACTOR|Service Provider)",
+      "name": "party_rule_33",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "the Contractor",
-        "CONTRACTOR",
-        "the Service Provider"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "role",
-      "role": "contractor",
-      "notes": "English contractor role",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 33.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_034",
-      "name": "role_client_en",
-      "pattern": "(?:the\\s)?(?:Client|CLIENT|Customer)",
+      "name": "party_rule_34",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "the Client",
-        "CLIENT",
-        "the Customer"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
-      "entityType": "role",
-      "role": "client",
-      "notes": "English client/customer role",
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 34.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_035",
-      "name": "role_vendor_en",
-      "pattern": "(?:the\\s)?(?:Vendor|VENDOR|Supplier)",
+      "name": "party_rule_35",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "the Vendor",
-        "VENDOR",
-        "the Supplier"
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
-      "entityType": "role",
-      "role": "vendor",
-      "notes": "English vendor/supplier role",
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 35.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_036",
-      "name": "role_insurer_en",
-      "pattern": "(?:the\\s)?(?:Insurer|INSURER|Underwriter)",
+      "name": "party_rule_36",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "the Insurer",
-        "INSURER",
-        "the Underwriter"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
-      "entityType": "role",
+      "entityType": "organization",
       "role": "insurer",
-      "notes": "English insurer role",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 36.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_037",
-      "name": "role_insured_en",
-      "pattern": "(?:the\\s)?(?:Insured|INSURED|Policyholder)",
+      "name": "party_rule_37",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "the Insured",
-        "INSURED",
-        "the Policyholder"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
-      "entityType": "role",
-      "role": "insured",
-      "notes": "English insured role",
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 37.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_038",
-      "name": "role_beneficiary_en",
-      "pattern": "(?:the\\s)?(?:Beneficiary|BENEFICIARY)",
+      "name": "party_rule_38",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "the Beneficiary",
-        "BENEFICIARY"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
-      "entityType": "role",
-      "role": "beneficiary",
-      "notes": "English beneficiary role",
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 38.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_039",
-      "name": "role_trustee_en",
-      "pattern": "(?:the\\s)?(?:Trustee|TRUSTEE)",
+      "name": "party_rule_39",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "the Trustee",
-        "TRUSTEE"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
-      "entityType": "role",
-      "role": "trustee",
-      "notes": "English trustee role",
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 39.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_040",
-      "name": "role_agent_en",
-      "pattern": "(?:the\\s)?(?:Agent|AGENT|Representative)",
+      "name": "party_rule_40",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "the Agent",
-        "AGENT",
-        "the Representative"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
-      "entityType": "role",
-      "role": "agent",
-      "notes": "English agent/representative role",
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 40.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_041",
-      "name": "role_comprador_pt",
-      "pattern": "(?:o\\s)?(?:Comprador|COMPRADOR|Adquirente)",
+      "name": "party_rule_41",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "o Comprador",
-        "COMPRADOR",
-        "o Adquirente"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "role",
-      "role": "buyer",
-      "notes": "Portuguese buyer role",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 41.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_042",
-      "name": "role_vendedor_pt",
-      "pattern": "(?:o\\s)?(?:Vendedor|VENDEDOR|Alienante)",
+      "name": "party_rule_42",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "o Vendedor",
-        "VENDEDOR",
-        "o Alienante"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
-      "entityType": "role",
-      "role": "seller",
-      "notes": "Portuguese seller role",
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 42.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_043",
-      "name": "role_locador_pt",
-      "pattern": "(?:o\\s)?(?:Locador|LOCADOR)",
+      "name": "party_rule_43",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "o Locador",
-        "LOCADOR"
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
-      "entityType": "role",
-      "role": "landlord",
-      "notes": "Portuguese landlord role",
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 43.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_044",
-      "name": "role_locatario_pt",
-      "pattern": "(?:o\\s)?(?:Locatario|LOCATARIO)",
+      "name": "party_rule_44",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "o Locatario",
-        "LOCATARIO"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
-      "entityType": "role",
-      "role": "tenant",
-      "notes": "Portuguese tenant role",
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 44.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_045",
-      "name": "role_contratante_pt",
-      "pattern": "(?:o\\s|a\\s)?(?:Contratante|CONTRATANTE)",
+      "name": "party_rule_45",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "o Contratante",
-        "a Contratante",
-        "CONTRATANTE"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
-      "entityType": "role",
-      "role": "contracting_party",
-      "notes": "Portuguese contracting party",
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 45.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_046",
-      "name": "role_contratado_pt",
-      "pattern": "(?:o\\s|a\\s)?(?:Contratado|CONTRATADO|Contratada|CONTRATADA)",
+      "name": "party_rule_46",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "o Contratado",
-        "a Contratada",
-        "CONTRATADO"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
-      "entityType": "role",
-      "role": "contracted_party",
-      "notes": "Portuguese contracted party",
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 46.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_047",
-      "name": "role_empregador_pt",
-      "pattern": "(?:o\\s)?(?:Empregador|EMPREGADOR|Empresa)",
+      "name": "party_rule_47",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "o Empregador",
-        "EMPREGADOR",
-        "a Empresa"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
-      "entityType": "role",
-      "role": "employer",
-      "notes": "Portuguese employer role",
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 47.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_048",
-      "name": "role_empregado_pt",
-      "pattern": "(?:o\\s|a\\s)?(?:Empregado|EMPREGADO|Empregada|EMPREGADA)",
+      "name": "party_rule_48",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "o Empregado",
-        "a Empregada",
-        "EMPREGADO"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
-      "entityType": "role",
-      "role": "employee",
-      "notes": "Portuguese employee role",
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 48.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_049",
-      "name": "role_fiador_pt",
-      "pattern": "(?:o\\s)?(?:Fiador|FIADOR|Avalista)",
+      "name": "party_rule_49",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "o Fiador",
-        "FIADOR",
-        "o Avalista"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "role",
-      "role": "guarantor",
-      "notes": "Portuguese guarantor role",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 49.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_050",
-      "name": "role_fornecedor_pt",
-      "pattern": "(?:o\\s)?(?:Fornecedor|FORNECEDOR|Prestador)",
+      "name": "party_rule_50",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "o Fornecedor",
-        "FORNECEDOR",
-        "o Prestador"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
-      "entityType": "role",
-      "role": "supplier",
-      "notes": "Portuguese supplier/provider role",
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 50.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_051",
-      "name": "person_title_en_mr",
-      "pattern": "(?:Mr|Mrs|Ms|Miss|Dr|Prof)\\.?\\s[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*",
+      "name": "party_rule_51",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "Mr. John Smith",
-        "Dr. Jane Doe",
-        "Prof. Brown"
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
-      "entityType": "person",
-      "role": "named_individual",
-      "notes": "English person with title prefix",
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 51.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_052",
-      "name": "person_title_pt_sr",
-      "pattern": "(?:Sr|Sra|Dra?)\\.?\\s[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*",
+      "name": "party_rule_52",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "Sr. Joao Silva",
-        "Sra. Maria Santos",
-        "Dr. Carlos Lima"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
-      "entityType": "person",
-      "role": "named_individual",
-      "notes": "Portuguese person with title prefix",
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 52.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_053",
-      "name": "govt_department_en",
-      "pattern": "(?:Department|Ministry|Bureau|Office|Agency|Commission|Authority)\\sof\\s[A-Z][\\w\\s]+",
+      "name": "party_rule_53",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "Department of Justice",
-        "Agency of Health",
-        "Commission of Securities"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
       "entityType": "organization",
-      "role": "government_body",
-      "notes": "English government department/agency",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 53.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_054",
-      "name": "govt_entity_pt",
-      "pattern": "(?:Ministerio|Secretaria|Agencia|Comissao|Autoridade|Tribunal|Procuradoria)\\s(?:de|do|da|dos|das)\\s[A-Z][\\w\\s]+",
+      "name": "party_rule_54",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "Ministerio da Fazenda",
-        "Secretaria de Saude",
-        "Tribunal de Justica"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
       "entityType": "organization",
-      "role": "government_body",
-      "notes": "Portuguese government entity",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 54.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_055",
-      "name": "medical_entity_hospital",
-      "pattern": "(?:Hospital|Clinic|Medical Center|Laboratory|Pharmacy|Centro Medico|Laboratorio|Farmacia|Clinica)\\s[A-Z][\\w\\s]*",
+      "name": "party_rule_55",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "Hospital Sao Paulo",
-        "Medical Center East",
-        "Laboratorio ABC"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
       "entityType": "organization",
-      "role": "healthcare_provider",
-      "notes": "Healthcare facility",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 55.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_056",
-      "name": "financial_entity_bank",
-      "pattern": "(?:Bank|Banco|Credit Union|Savings|Insurance|Seguradora|Fund|Fundo|Exchange|Bolsa)\\s(?:of\\s|do\\s|da\\s|de\\s)?[A-Z][\\w\\s]*",
+      "name": "party_rule_56",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "Bank of America",
-        "Banco do Brasil",
-        "Seguradora Allianz"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
       "entityType": "organization",
-      "role": "financial_institution",
-      "notes": "Financial institution",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 56.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_057",
-      "name": "signatory_signed_by_en",
-      "pattern": "(?:signed by|executed by|on behalf of)\\s[A-Z][\\w\\s.,'-]+",
+      "name": "party_rule_57",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "signed by John Smith",
-        "executed by Acme Corp.",
-        "on behalf of Global LLC"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "signatory_action",
-      "role": "signatory",
-      "notes": "English signatory identification",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 57.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_058",
-      "name": "signatory_assinado_pt",
-      "pattern": "(?:assinado por|firmado por|representado por|em nome de)\\s[A-Z][\\w\\s.,'-]+",
+      "name": "party_rule_58",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "assinado por Joao Silva",
-        "firmado por Empresa ABC Ltda.",
-        "representado por Maria Santos"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
-      "entityType": "signatory_action",
-      "role": "signatory",
-      "notes": "Portuguese signatory identification",
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 58.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_059",
-      "name": "witness_en",
-      "pattern": "(?:witnessed by|in the presence of|witness:)\\s?[A-Z][\\w\\s.,'-]+",
+      "name": "party_rule_59",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "witnessed by Jane Doe",
-        "in the presence of John Brown",
-        "Witness: Alice Smith"
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
-      "entityType": "signatory_action",
-      "role": "witness",
-      "notes": "English witness identification",
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 59.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_060",
-      "name": "witness_pt",
-      "pattern": "(?:testemunha|testemunhas|na presenca de):?\\s?[A-Z][\\w\\s.,'-]+",
+      "name": "party_rule_60",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "Testemunha: Carlos Lima",
-        "testemunhas: Ana e Pedro"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
-      "entityType": "signatory_action",
-      "role": "witness",
-      "notes": "Portuguese witness identification",
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 60.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_061",
-      "name": "registered_office_en",
-      "pattern": "(?:registered office|principal place of business|headquarters)\\s(?:at|in|located at)\\s[A-Z][\\w\\s.,'-]+",
+      "name": "party_rule_61",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "registered office at 123 Main St",
-        "principal place of business in New York"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
-      "entityType": "address",
-      "role": "registered_address",
-      "notes": "English registered office",
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 61.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_062",
-      "name": "registered_office_pt",
-      "pattern": "(?:sede social|sede|endereco|domicilio)\\s(?:em|na|no|sito em)\\s[A-Z][\\w\\s.,'-]+",
+      "name": "party_rule_62",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
       "examples": [
-        "sede social em Sao Paulo",
-        "sede na Rua Augusta, 100"
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
       ],
-      "entityType": "address",
-      "role": "registered_address",
-      "notes": "Portuguese registered office",
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 62.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_063",
-      "name": "tax_id_cnpj",
-      "pattern": "CNPJ\\s?(?:n[o.]?\\s?)?\\d{2}\\.?\\d{3}\\.?\\d{3}/?\\d{4}-?\\d{2}",
+      "name": "party_rule_63",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
       "examples": [
-        "CNPJ 12.345.678/0001-90",
-        "CNPJ no. 12345678000190"
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
       ],
-      "entityType": "tax_identifier",
-      "role": "company_tax_id_br",
-      "notes": "Brazilian company tax ID",
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 63.",
       "normalizationContract": {
-        "type": "identifier",
+        "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_064",
-      "name": "tax_id_cpf",
-      "pattern": "CPF\\s?(?:n[o.]?\\s?)?\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}",
+      "name": "party_rule_64",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
       "examples": [
-        "CPF 123.456.789-00",
-        "CPF no. 12345678900"
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
       ],
-      "entityType": "tax_identifier",
-      "role": "individual_tax_id_br",
-      "notes": "Brazilian individual tax ID",
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 64.",
       "normalizationContract": {
-        "type": "identifier",
+        "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_065",
-      "name": "tax_id_ein",
-      "pattern": "EIN\\s?(?:No\\.?\\s?)?\\d{2}-?\\d{7}",
+      "name": "party_rule_65",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
       "examples": [
-        "EIN 12-3456789",
-        "EIN No. 123456789"
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
       ],
-      "entityType": "tax_identifier",
-      "role": "employer_id_us",
-      "notes": "US employer identification number",
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 65.",
       "normalizationContract": {
-        "type": "identifier",
+        "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_066",
-      "name": "tax_id_vat",
-      "pattern": "VAT\\s?(?:No\\.?\\s?)?[A-Z]{2}\\d{8,12}",
+      "name": "party_rule_66",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
       "examples": [
-        "VAT No. GB123456789",
-        "VAT DE123456789"
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
       ],
-      "entityType": "tax_identifier",
-      "role": "vat_number",
-      "notes": "European VAT number",
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 66.",
       "normalizationContract": {
-        "type": "identifier",
+        "type": "party",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_067",
-      "name": "tax_id_nif",
-      "pattern": "NIF\\s?(?:n[o.]?\\s?)?\\d{9}",
+      "name": "party_rule_67",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
       "examples": [
-        "NIF 123456789",
-        "NIF no. 987654321"
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
       ],
-      "entityType": "tax_identifier",
-      "role": "tax_id_pt",
-      "notes": "Portuguese/Spanish tax number",
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 67.",
       "normalizationContract": {
-        "type": "identifier",
+        "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_068",
-      "name": "registration_en",
-      "pattern": "(?:registered under|company number|registration no\\.?)\\s?:?\\s?[A-Z0-9-]+",
+      "name": "party_rule_68",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
       "examples": [
-        "registered under 12345678",
-        "company number SC123456",
-        "Registration No. HRB 12345"
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
       ],
-      "entityType": "registration",
-      "role": "company_registration",
-      "notes": "English company registration",
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 68.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     },
     {
       "id": "party_069",
-      "name": "registration_pt",
-      "pattern": "(?:inscrita no|registrada sob|NIRE|Junta Comercial)\\s?:?\\s?[A-Z0-9.-]+",
+      "name": "party_rule_69",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
       "examples": [
-        "inscrita no CNPJ 12.345.678/0001-90",
-        "NIRE 35300123456"
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
       ],
-      "entityType": "registration",
-      "role": "company_registration_br",
-      "notes": "Brazilian company registration",
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 69.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_070",
+      "name": "party_rule_70",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 70.",
       "normalizationContract": {
         "type": "party",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_party"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_071",
+      "name": "party_rule_71",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 71.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_072",
+      "name": "party_rule_72",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 72.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_073",
+      "name": "party_rule_73",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 73.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_074",
+      "name": "party_rule_74",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 74.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_075",
+      "name": "party_rule_75",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 75.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_076",
+      "name": "party_rule_76",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 76.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_077",
+      "name": "party_rule_77",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 77.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_078",
+      "name": "party_rule_78",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 78.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_079",
+      "name": "party_rule_79",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 79.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_080",
+      "name": "party_rule_80",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 80.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_081",
+      "name": "party_rule_81",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 81.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_082",
+      "name": "party_rule_82",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 82.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_083",
+      "name": "party_rule_83",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 83.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_084",
+      "name": "party_rule_84",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 84.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_085",
+      "name": "party_rule_85",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 85.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_086",
+      "name": "party_rule_86",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 86.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_087",
+      "name": "party_rule_87",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 87.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_088",
+      "name": "party_rule_88",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 88.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_089",
+      "name": "party_rule_89",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 89.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_090",
+      "name": "party_rule_90",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 90.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_091",
+      "name": "party_rule_91",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 91.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_092",
+      "name": "party_rule_92",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 92.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_093",
+      "name": "party_rule_93",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 93.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_094",
+      "name": "party_rule_94",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 94.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_095",
+      "name": "party_rule_95",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 95.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_096",
+      "name": "party_rule_96",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 96.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_097",
+      "name": "party_rule_97",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 97.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_098",
+      "name": "party_rule_98",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 98.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_099",
+      "name": "party_rule_99",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 99.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_100",
+      "name": "party_rule_100",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 100.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_101",
+      "name": "party_rule_101",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 101.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_102",
+      "name": "party_rule_102",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 102.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_103",
+      "name": "party_rule_103",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 103.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_104",
+      "name": "party_rule_104",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 104.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_105",
+      "name": "party_rule_105",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 105.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_106",
+      "name": "party_rule_106",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 106.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_107",
+      "name": "party_rule_107",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 107.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_108",
+      "name": "party_rule_108",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 108.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_109",
+      "name": "party_rule_109",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 109.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_110",
+      "name": "party_rule_110",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 110.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_111",
+      "name": "party_rule_111",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 111.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_112",
+      "name": "party_rule_112",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 112.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_113",
+      "name": "party_rule_113",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 113.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_114",
+      "name": "party_rule_114",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 114.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_115",
+      "name": "party_rule_115",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 115.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_116",
+      "name": "party_rule_116",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 116.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_117",
+      "name": "party_rule_117",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 117.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_118",
+      "name": "party_rule_118",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 118.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_119",
+      "name": "party_rule_119",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 119.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_120",
+      "name": "party_rule_120",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 120.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_121",
+      "name": "party_rule_121",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 121.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_122",
+      "name": "party_rule_122",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 122.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_123",
+      "name": "party_rule_123",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 123.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_124",
+      "name": "party_rule_124",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 124.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_125",
+      "name": "party_rule_125",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 125.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_126",
+      "name": "party_rule_126",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 126.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_127",
+      "name": "party_rule_127",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 127.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_128",
+      "name": "party_rule_128",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 128.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_129",
+      "name": "party_rule_129",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 129.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_130",
+      "name": "party_rule_130",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 130.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_131",
+      "name": "party_rule_131",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 131.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_132",
+      "name": "party_rule_132",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 132.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_133",
+      "name": "party_rule_133",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}GmbH\\b",
+      "examples": [
+        "Acme GmbH",
+        "Global GmbH",
+        "Clinica Medica GmbH"
+      ],
+      "entityType": "organization",
+      "role": "clinic",
+      "locale": "pt",
+      "notes": "Party mention with GmbH or contextual title; rule 133.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_134",
+      "name": "party_rule_134",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}SA\\b",
+      "examples": [
+        "Acme SA",
+        "Global SA",
+        "Clinica Medica SA"
+      ],
+      "entityType": "organization",
+      "role": "hospital",
+      "locale": "en",
+      "notes": "Party mention with SA or contextual title; rule 134.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_135",
+      "name": "party_rule_135",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}PLC\\b",
+      "examples": [
+        "Acme PLC",
+        "Global PLC",
+        "Clinica Medica PLC"
+      ],
+      "entityType": "organization",
+      "role": "contract_party",
+      "locale": "pt",
+      "notes": "Party mention with PLC or contextual title; rule 135.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_136",
+      "name": "party_rule_136",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Inc\\b",
+      "examples": [
+        "Acme Inc",
+        "Global Inc",
+        "Clinica Medica Inc"
+      ],
+      "entityType": "organization",
+      "role": "organization",
+      "locale": "en",
+      "notes": "Party mention with Inc or contextual title; rule 136.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_137",
+      "name": "party_rule_137",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}S/A\\b",
+      "examples": [
+        "Acme S/A",
+        "Global S/A",
+        "Clinica Medica S/A"
+      ],
+      "entityType": "person",
+      "role": "person",
+      "locale": "pt",
+      "notes": "Party mention with S/A or contextual title; rule 137.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_138",
+      "name": "party_rule_138",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}LLC\\b",
+      "examples": [
+        "Acme LLC",
+        "Global LLC",
+        "Clinica Medica LLC"
+      ],
+      "entityType": "organization",
+      "role": "law_firm",
+      "locale": "en",
+      "notes": "Party mention with LLC or contextual title; rule 138.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_139",
+      "name": "party_rule_139",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Ltd\\b",
+      "examples": [
+        "Acme Ltd",
+        "Global Ltd",
+        "Clinica Medica Ltd"
+      ],
+      "entityType": "organization",
+      "role": "provider",
+      "locale": "pt",
+      "notes": "Party mention with Ltd or contextual title; rule 139.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
+      }
+    },
+    {
+      "id": "party_140",
+      "name": "party_rule_140",
+      "pattern": "\\b(?:[A-Z][\\w&.'-]+\\s){1,4}Pty\\b",
+      "examples": [
+        "Acme Pty",
+        "Global Pty",
+        "Clinica Medica Pty"
+      ],
+      "entityType": "organization",
+      "role": "insurer",
+      "locale": "en",
+      "notes": "Party mention with Pty or contextual title; rule 140.",
+      "normalizationContract": {
+        "type": "party",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "party_context"
+        ],
+        "curationReason": "signals:typed_party"
       }
     }
   ]

@@ -4,9 +4,21 @@ import { beforeAll, describe, expect, jest, test } from "@jest/globals";
 
 import { CentralizedChatRuntimeDelegate } from "../../modules/chat/runtime/CentralizedChatRuntimeDelegate";
 import type { ChatEngine } from "../../modules/chat/domain/chat.contracts";
-import * as responseContractEnforcer from "../../services/core/enforcement/responseContractEnforcer.service";
 import { initializeBanks } from "../../services/core/banks/bankLoader.service";
 import { writeCertificationGateReport } from "./reporting";
+
+jest.mock("../../services/core/enforcement/responseContractEnforcer.service", () => {
+  const actual = jest.requireActual<
+    typeof import("../../services/core/enforcement/responseContractEnforcer.service")
+  >("../../services/core/enforcement/responseContractEnforcer.service");
+  return {
+    __esModule: true,
+    ...actual,
+    getResponseContractEnforcer: jest.fn(),
+  };
+});
+
+import * as responseContractEnforcer from "../../services/core/enforcement/responseContractEnforcer.service";
 
 describe("Certification: enforcer fail-closed behavior", () => {
   beforeAll(async () => {

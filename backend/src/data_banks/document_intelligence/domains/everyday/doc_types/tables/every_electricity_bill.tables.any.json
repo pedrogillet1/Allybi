@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_electricity_bill",
+    "version": "1.0.0",
+    "description": "Tables expected in every_electricity_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_electricity_bill"
+  },
+  "tables": [
+    {
+      "id": "electricity_meter_table",
+      "canonicalName": {
+        "en": "Meter Reading Table",
+        "pt": "Tabela de Leitura"
+      },
+      "section": "meter_readings",
+      "signaturePatterns": ["\\bmeter\\b", "\\breading\\b", "\\bmedidor\\b"],
+      "requiredHeaders": ["date", "description", "value", "unit"],
+      "headerAliases": [["date", "data"], ["description", "descricao"], ["value", "valor"], ["unit", "unidade"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "kwh"],
+        "requiresScaleEvidence": true
+      },
+      "footnotes": ["electricity_bill_fn_01", "electricity_bill_fn_02"],
+      "extractionNotes": "Meter readings can be split with subtotals."
+    },
+    {
+      "id": "electricity_charge_table",
+      "canonicalName": {
+        "en": "Charge Table",
+        "pt": "Tabela de Cobrado"
+      },
+      "section": "charges_by_component",
+      "signaturePatterns": ["\\bcharge\\b", "\\bcharge table\\b", "\\bcomponent\\b"],
+      "requiredHeaders": ["component", "rate", "quantity", "amount", "unit", "tax"],
+      "headerAliases": [["component", "componente"], ["rate", "tarifa"], ["quantity", "quantidade"], ["amount", "valor"], ["unit", "unidade"], ["tax", "impostos"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["electricity_bill_fn_03"],
+      "extractionNotes": "Extract tax lines and fees with unit context."
+    },
+    {
+      "id": "electricity_summary_table",
+      "canonicalName": {
+        "en": "Summary and Totals",
+        "pt": "Resumo e Totais"
+      },
+      "section": "totals_and_due",
+      "signaturePatterns": ["\\btotal\\b", "\\bamount due\\b"],
+      "requiredHeaders": ["description", "subtotal", "tax", "total", "due_date", "unit"],
+      "headerAliases": [["description", "descricao"], ["subtotal", "subtotal"], ["tax", "imposto"], ["total", "total"], ["due_date", "vencimento"], ["unit", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["electricity_bill_fn_04", "electricity_bill_fn_05"],
+      "extractionNotes": "Tie totals to due date and service period."
+    }
+  ]
+}

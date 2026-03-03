@@ -1,0 +1,43 @@
+name: Bank Staleness Weekly
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+jobs:
+  stale-report:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate usage audit baseline
+        run: node scripts/audit-databanks.mjs > /tmp/databank-audit.md
+
+      - name: Generate stale-content report
+        run: node scripts/report-bank-staleness.mjs
+
+      - name: Upload stale report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bank-staleness-weekly
+          path: |
+            /tmp/databank-audit.md
+            backend/notes/BANK_STALENESS_REPORT.json
+            backend/notes/BANK_STALENESS_REPORT.md
+          retention-days: 30
+

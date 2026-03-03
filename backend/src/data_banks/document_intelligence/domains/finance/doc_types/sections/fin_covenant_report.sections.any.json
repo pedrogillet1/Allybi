@@ -1,0 +1,1382 @@
+{
+  "_meta": {
+    "id": "di_finance_sections_fin_covenant_report",
+    "version": "2.1.0",
+    "description": "Sections mapping for Covenant Report.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_covenant_report"
+  },
+  "sections": [
+    {
+      "id": "facility_summary_1",
+      "name": {
+        "en": "Facility Summary Segment 1",
+        "pt": "Facility Summary segmento 1"
+      },
+      "mustHave": true,
+      "order": 1,
+      "headingAnchors": [
+        "Facility Summary 1",
+        "facility_summary 1",
+        "Facility Summary section",
+        "seção Facility Summary 1"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bfacility_summary\b",
+        "\bfacility_summary_1\b",
+        "\bfacility_summary section\b"
+      ],
+      "description": "Canonical section facility_summary for Covenant Report"
+    },
+    {
+      "id": "thresholds_2",
+      "name": {
+        "en": "Thresholds Segment 2",
+        "pt": "Thresholds segmento 2"
+      },
+      "mustHave": true,
+      "order": 2,
+      "headingAnchors": [
+        "Thresholds 2",
+        "thresholds 2",
+        "Thresholds section",
+        "seção Thresholds 2"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bthresholds\b",
+        "\bthresholds_2\b",
+        "\bthresholds section\b"
+      ],
+      "description": "Canonical section thresholds for Covenant Report"
+    },
+    {
+      "id": "calculation_walkthrough_3",
+      "name": {
+        "en": "Calculation Walkthrough Segment 3",
+        "pt": "Calculation Walkthrough segmento 3"
+      },
+      "mustHave": true,
+      "order": 3,
+      "headingAnchors": [
+        "Calculation Walkthrough 3",
+        "calculation_walkthrough 3",
+        "Calculation Walkthrough section",
+        "seção Calculation Walkthrough 3"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bcalculation_walkthrough\b",
+        "\bcalculation_walkthrough_3\b",
+        "\bcalculation_walkthrough section\b"
+      ],
+      "description": "Canonical section calculation_walkthrough for Covenant Report"
+    },
+    {
+      "id": "testing_period_4",
+      "name": {
+        "en": "Testing Period Segment 4",
+        "pt": "Testing Period segmento 4"
+      },
+      "mustHave": true,
+      "order": 4,
+      "headingAnchors": [
+        "Testing Period 4",
+        "testing_period 4",
+        "Testing Period section",
+        "seção Testing Period 4"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\btesting_period\b",
+        "\btesting_period_4\b",
+        "\btesting_period section\b"
+      ],
+      "description": "Canonical section testing_period for Covenant Report"
+    },
+    {
+      "id": "compliance_matrix_5",
+      "name": {
+        "en": "Compliance Matrix Segment 5",
+        "pt": "Compliance Matrix segmento 5"
+      },
+      "mustHave": true,
+      "order": 5,
+      "headingAnchors": [
+        "Compliance Matrix 5",
+        "compliance_matrix 5",
+        "Compliance Matrix section",
+        "seção Compliance Matrix 5"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bcompliance_matrix\b",
+        "\bcompliance_matrix_5\b",
+        "\bcompliance_matrix section\b"
+      ],
+      "description": "Canonical section compliance_matrix for Covenant Report"
+    },
+    {
+      "id": "waivers_6",
+      "name": {
+        "en": "Waivers Segment 6",
+        "pt": "Waivers segmento 6"
+      },
+      "mustHave": true,
+      "order": 6,
+      "headingAnchors": [
+        "Waivers 6",
+        "waivers 6",
+        "Waivers section",
+        "seção Waivers 6"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bwaivers\b",
+        "\bwaivers_6\b",
+        "\bwaivers section\b"
+      ],
+      "description": "Canonical section waivers for Covenant Report"
+    },
+    {
+      "id": "breach_analysis_7",
+      "name": {
+        "en": "Breach Analysis Segment 7",
+        "pt": "Breach Analysis segmento 7"
+      },
+      "mustHave": true,
+      "order": 7,
+      "headingAnchors": [
+        "Breach Analysis 7",
+        "breach_analysis 7",
+        "Breach Analysis section",
+        "seção Breach Analysis 7"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bbreach_analysis\b",
+        "\bbreach_analysis_7\b",
+        "\bbreach_analysis section\b"
+      ],
+      "description": "Canonical section breach_analysis for Covenant Report"
+    },
+    {
+      "id": "remedies_8",
+      "name": {
+        "en": "Remedies Segment 8",
+        "pt": "Remedies segmento 8"
+      },
+      "mustHave": true,
+      "order": 8,
+      "headingAnchors": [
+        "Remedies 8",
+        "remedies 8",
+        "Remedies section",
+        "seção Remedies 8"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bremedies\b",
+        "\bremedies_8\b",
+        "\bremedies section\b"
+      ],
+      "description": "Canonical section remedies for Covenant Report"
+    },
+    {
+      "id": "security_covenants_9",
+      "name": {
+        "en": "Security Covenants Segment 9",
+        "pt": "Security Covenants segmento 9"
+      },
+      "mustHave": true,
+      "order": 9,
+      "headingAnchors": [
+        "Security Covenants 9",
+        "security_covenants 9",
+        "Security Covenants section",
+        "seção Security Covenants 9"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bsecurity_covenants\b",
+        "\bsecurity_covenants_9\b",
+        "\bsecurity_covenants section\b"
+      ],
+      "description": "Canonical section security_covenants for Covenant Report"
+    },
+    {
+      "id": "financial_covenants_10",
+      "name": {
+        "en": "Financial Covenants Segment 10",
+        "pt": "Financial Covenants segmento 10"
+      },
+      "mustHave": true,
+      "order": 10,
+      "headingAnchors": [
+        "Financial Covenants 10",
+        "financial_covenants 10",
+        "Financial Covenants section",
+        "seção Financial Covenants 10"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bfinancial_covenants\b",
+        "\bfinancial_covenants_10\b",
+        "\bfinancial_covenants section\b"
+      ],
+      "description": "Canonical section financial_covenants for Covenant Report"
+    },
+    {
+      "id": "reporting_requirements_11",
+      "name": {
+        "en": "Reporting Requirements Segment 11",
+        "pt": "Reporting Requirements segmento 11"
+      },
+      "mustHave": false,
+      "order": 11,
+      "headingAnchors": [
+        "Reporting Requirements 11",
+        "reporting_requirements 11",
+        "Reporting Requirements section",
+        "seção Reporting Requirements 11"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\breporting_requirements\b",
+        "\breporting_requirements_11\b",
+        "\breporting_requirements section\b"
+      ],
+      "description": "Canonical section reporting_requirements for Covenant Report"
+    },
+    {
+      "id": "borrower_certification_12",
+      "name": {
+        "en": "Borrower Certification Segment 12",
+        "pt": "Borrower Certification segmento 12"
+      },
+      "mustHave": false,
+      "order": 12,
+      "headingAnchors": [
+        "Borrower Certification 12",
+        "borrower_certification 12",
+        "Borrower Certification section",
+        "seção Borrower Certification 12"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bborrower_certification\b",
+        "\bborrower_certification_12\b",
+        "\bborrower_certification section\b"
+      ],
+      "description": "Canonical section borrower_certification for Covenant Report"
+    },
+    {
+      "id": "auditor_attestation_13",
+      "name": {
+        "en": "Auditor Attestation Segment 13",
+        "pt": "Auditor Attestation segmento 13"
+      },
+      "mustHave": false,
+      "order": 13,
+      "headingAnchors": [
+        "Auditor Attestation 13",
+        "auditor_attestation 13",
+        "Auditor Attestation section",
+        "seção Auditor Attestation 13"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bauditor_attestation\b",
+        "\bauditor_attestation_13\b",
+        "\bauditor_attestation section\b"
+      ],
+      "description": "Canonical section auditor_attestation for Covenant Report"
+    },
+    {
+      "id": "compliance_history_14",
+      "name": {
+        "en": "Compliance History Segment 14",
+        "pt": "Compliance History segmento 14"
+      },
+      "mustHave": false,
+      "order": 14,
+      "headingAnchors": [
+        "Compliance History 14",
+        "compliance_history 14",
+        "Compliance History section",
+        "seção Compliance History 14"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bcompliance_history\b",
+        "\bcompliance_history_14\b",
+        "\bcompliance_history section\b"
+      ],
+      "description": "Canonical section compliance_history for Covenant Report"
+    },
+    {
+      "id": "appendix_disclosure_15",
+      "name": {
+        "en": "Appendix Disclosure Segment 15",
+        "pt": "Appendix Disclosure segmento 15"
+      },
+      "mustHave": false,
+      "order": 15,
+      "headingAnchors": [
+        "Appendix Disclosure 15",
+        "appendix_disclosure 15",
+        "Appendix Disclosure section",
+        "seção Appendix Disclosure 15"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bappendix_disclosure\b",
+        "\bappendix_disclosure_15\b",
+        "\bappendix_disclosure section\b"
+      ],
+      "description": "Canonical section appendix_disclosure for Covenant Report"
+    },
+    {
+      "id": "covenant_overview_16",
+      "name": {
+        "en": "Covenant Overview Segment 16",
+        "pt": "Covenant Overview segmento 16"
+      },
+      "mustHave": false,
+      "order": 16,
+      "headingAnchors": [
+        "Covenant Overview 16",
+        "covenant_overview 16",
+        "Covenant Overview section",
+        "seção Covenant Overview 16"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bcovenant_overview\b",
+        "\bcovenant_overview_16\b",
+        "\bcovenant_overview section\b"
+      ],
+      "description": "Canonical section covenant_overview for Covenant Report"
+    },
+    {
+      "id": "facility_summary_17",
+      "name": {
+        "en": "Facility Summary Segment 17",
+        "pt": "Facility Summary segmento 17"
+      },
+      "mustHave": false,
+      "order": 17,
+      "headingAnchors": [
+        "Facility Summary 17",
+        "facility_summary 17",
+        "Facility Summary section",
+        "seção Facility Summary 17"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bfacility_summary\b",
+        "\bfacility_summary_17\b",
+        "\bfacility_summary section\b"
+      ],
+      "description": "Canonical section facility_summary for Covenant Report"
+    },
+    {
+      "id": "thresholds_18",
+      "name": {
+        "en": "Thresholds Segment 18",
+        "pt": "Thresholds segmento 18"
+      },
+      "mustHave": false,
+      "order": 18,
+      "headingAnchors": [
+        "Thresholds 18",
+        "thresholds 18",
+        "Thresholds section",
+        "seção Thresholds 18"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bthresholds\b",
+        "\bthresholds_18\b",
+        "\bthresholds section\b"
+      ],
+      "description": "Canonical section thresholds for Covenant Report"
+    },
+    {
+      "id": "calculation_walkthrough_19",
+      "name": {
+        "en": "Calculation Walkthrough Segment 19",
+        "pt": "Calculation Walkthrough segmento 19"
+      },
+      "mustHave": false,
+      "order": 19,
+      "headingAnchors": [
+        "Calculation Walkthrough 19",
+        "calculation_walkthrough 19",
+        "Calculation Walkthrough section",
+        "seção Calculation Walkthrough 19"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bcalculation_walkthrough\b",
+        "\bcalculation_walkthrough_19\b",
+        "\bcalculation_walkthrough section\b"
+      ],
+      "description": "Canonical section calculation_walkthrough for Covenant Report"
+    },
+    {
+      "id": "testing_period_20",
+      "name": {
+        "en": "Testing Period Segment 20",
+        "pt": "Testing Period segmento 20"
+      },
+      "mustHave": false,
+      "order": 20,
+      "headingAnchors": [
+        "Testing Period 20",
+        "testing_period 20",
+        "Testing Period section",
+        "seção Testing Period 20"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\btesting_period\b",
+        "\btesting_period_20\b",
+        "\btesting_period section\b"
+      ],
+      "description": "Canonical section testing_period for Covenant Report"
+    },
+    {
+      "id": "compliance_matrix_21",
+      "name": {
+        "en": "Compliance Matrix Segment 21",
+        "pt": "Compliance Matrix segmento 21"
+      },
+      "mustHave": false,
+      "order": 21,
+      "headingAnchors": [
+        "Compliance Matrix 21",
+        "compliance_matrix 21",
+        "Compliance Matrix section",
+        "seção Compliance Matrix 21"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bcompliance_matrix\b",
+        "\bcompliance_matrix_21\b",
+        "\bcompliance_matrix section\b"
+      ],
+      "description": "Canonical section compliance_matrix for Covenant Report"
+    },
+    {
+      "id": "waivers_22",
+      "name": {
+        "en": "Waivers Segment 22",
+        "pt": "Waivers segmento 22"
+      },
+      "mustHave": false,
+      "order": 22,
+      "headingAnchors": [
+        "Waivers 22",
+        "waivers 22",
+        "Waivers section",
+        "seção Waivers 22"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bwaivers\b",
+        "\bwaivers_22\b",
+        "\bwaivers section\b"
+      ],
+      "description": "Canonical section waivers for Covenant Report"
+    },
+    {
+      "id": "breach_analysis_23",
+      "name": {
+        "en": "Breach Analysis Segment 23",
+        "pt": "Breach Analysis segmento 23"
+      },
+      "mustHave": false,
+      "order": 23,
+      "headingAnchors": [
+        "Breach Analysis 23",
+        "breach_analysis 23",
+        "Breach Analysis section",
+        "seção Breach Analysis 23"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bbreach_analysis\b",
+        "\bbreach_analysis_23\b",
+        "\bbreach_analysis section\b"
+      ],
+      "description": "Canonical section breach_analysis for Covenant Report"
+    },
+    {
+      "id": "remedies_24",
+      "name": {
+        "en": "Remedies Segment 24",
+        "pt": "Remedies segmento 24"
+      },
+      "mustHave": false,
+      "order": 24,
+      "headingAnchors": [
+        "Remedies 24",
+        "remedies 24",
+        "Remedies section",
+        "seção Remedies 24"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bremedies\b",
+        "\bremedies_24\b",
+        "\bremedies section\b"
+      ],
+      "description": "Canonical section remedies for Covenant Report"
+    },
+    {
+      "id": "security_covenants_25",
+      "name": {
+        "en": "Security Covenants Segment 25",
+        "pt": "Security Covenants segmento 25"
+      },
+      "mustHave": false,
+      "order": 25,
+      "headingAnchors": [
+        "Security Covenants 25",
+        "security_covenants 25",
+        "Security Covenants section",
+        "seção Security Covenants 25"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bsecurity_covenants\b",
+        "\bsecurity_covenants_25\b",
+        "\bsecurity_covenants section\b"
+      ],
+      "description": "Canonical section security_covenants for Covenant Report"
+    },
+    {
+      "id": "financial_covenants_26",
+      "name": {
+        "en": "Financial Covenants Segment 26",
+        "pt": "Financial Covenants segmento 26"
+      },
+      "mustHave": false,
+      "order": 26,
+      "headingAnchors": [
+        "Financial Covenants 26",
+        "financial_covenants 26",
+        "Financial Covenants section",
+        "seção Financial Covenants 26"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bfinancial_covenants\b",
+        "\bfinancial_covenants_26\b",
+        "\bfinancial_covenants section\b"
+      ],
+      "description": "Canonical section financial_covenants for Covenant Report"
+    },
+    {
+      "id": "reporting_requirements_27",
+      "name": {
+        "en": "Reporting Requirements Segment 27",
+        "pt": "Reporting Requirements segmento 27"
+      },
+      "mustHave": false,
+      "order": 27,
+      "headingAnchors": [
+        "Reporting Requirements 27",
+        "reporting_requirements 27",
+        "Reporting Requirements section",
+        "seção Reporting Requirements 27"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\breporting_requirements\b",
+        "\breporting_requirements_27\b",
+        "\breporting_requirements section\b"
+      ],
+      "description": "Canonical section reporting_requirements for Covenant Report"
+    },
+    {
+      "id": "borrower_certification_28",
+      "name": {
+        "en": "Borrower Certification Segment 28",
+        "pt": "Borrower Certification segmento 28"
+      },
+      "mustHave": false,
+      "order": 28,
+      "headingAnchors": [
+        "Borrower Certification 28",
+        "borrower_certification 28",
+        "Borrower Certification section",
+        "seção Borrower Certification 28"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bborrower_certification\b",
+        "\bborrower_certification_28\b",
+        "\bborrower_certification section\b"
+      ],
+      "description": "Canonical section borrower_certification for Covenant Report"
+    },
+    {
+      "id": "auditor_attestation_29",
+      "name": {
+        "en": "Auditor Attestation Segment 29",
+        "pt": "Auditor Attestation segmento 29"
+      },
+      "mustHave": false,
+      "order": 29,
+      "headingAnchors": [
+        "Auditor Attestation 29",
+        "auditor_attestation 29",
+        "Auditor Attestation section",
+        "seção Auditor Attestation 29"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bauditor_attestation\b",
+        "\bauditor_attestation_29\b",
+        "\bauditor_attestation section\b"
+      ],
+      "description": "Canonical section auditor_attestation for Covenant Report"
+    },
+    {
+      "id": "compliance_history_30",
+      "name": {
+        "en": "Compliance History Segment 30",
+        "pt": "Compliance History segmento 30"
+      },
+      "mustHave": false,
+      "order": 30,
+      "headingAnchors": [
+        "Compliance History 30",
+        "compliance_history 30",
+        "Compliance History section",
+        "seção Compliance History 30"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bcompliance_history\b",
+        "\bcompliance_history_30\b",
+        "\bcompliance_history section\b"
+      ],
+      "description": "Canonical section compliance_history for Covenant Report"
+    },
+    {
+      "id": "appendix_disclosure_31",
+      "name": {
+        "en": "Appendix Disclosure Segment 31",
+        "pt": "Appendix Disclosure segmento 31"
+      },
+      "mustHave": false,
+      "order": 31,
+      "headingAnchors": [
+        "Appendix Disclosure 31",
+        "appendix_disclosure 31",
+        "Appendix Disclosure section",
+        "seção Appendix Disclosure 31"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bappendix_disclosure\b",
+        "\bappendix_disclosure_31\b",
+        "\bappendix_disclosure section\b"
+      ],
+      "description": "Canonical section appendix_disclosure for Covenant Report"
+    },
+    {
+      "id": "covenant_overview_32",
+      "name": {
+        "en": "Covenant Overview Segment 32",
+        "pt": "Covenant Overview segmento 32"
+      },
+      "mustHave": false,
+      "order": 32,
+      "headingAnchors": [
+        "Covenant Overview 32",
+        "covenant_overview 32",
+        "Covenant Overview section",
+        "seção Covenant Overview 32"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bcovenant_overview\b",
+        "\bcovenant_overview_32\b",
+        "\bcovenant_overview section\b"
+      ],
+      "description": "Canonical section covenant_overview for Covenant Report"
+    },
+    {
+      "id": "facility_summary_33",
+      "name": {
+        "en": "Facility Summary Segment 33",
+        "pt": "Facility Summary segmento 33"
+      },
+      "mustHave": false,
+      "order": 33,
+      "headingAnchors": [
+        "Facility Summary 33",
+        "facility_summary 33",
+        "Facility Summary section",
+        "seção Facility Summary 33"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bfacility_summary\b",
+        "\bfacility_summary_33\b",
+        "\bfacility_summary section\b"
+      ],
+      "description": "Canonical section facility_summary for Covenant Report"
+    },
+    {
+      "id": "thresholds_34",
+      "name": {
+        "en": "Thresholds Segment 34",
+        "pt": "Thresholds segmento 34"
+      },
+      "mustHave": false,
+      "order": 34,
+      "headingAnchors": [
+        "Thresholds 34",
+        "thresholds 34",
+        "Thresholds section",
+        "seção Thresholds 34"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bthresholds\b",
+        "\bthresholds_34\b",
+        "\bthresholds section\b"
+      ],
+      "description": "Canonical section thresholds for Covenant Report"
+    },
+    {
+      "id": "calculation_walkthrough_35",
+      "name": {
+        "en": "Calculation Walkthrough Segment 35",
+        "pt": "Calculation Walkthrough segmento 35"
+      },
+      "mustHave": false,
+      "order": 35,
+      "headingAnchors": [
+        "Calculation Walkthrough 35",
+        "calculation_walkthrough 35",
+        "Calculation Walkthrough section",
+        "seção Calculation Walkthrough 35"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bcalculation_walkthrough\b",
+        "\bcalculation_walkthrough_35\b",
+        "\bcalculation_walkthrough section\b"
+      ],
+      "description": "Canonical section calculation_walkthrough for Covenant Report"
+    },
+    {
+      "id": "testing_period_36",
+      "name": {
+        "en": "Testing Period Segment 36",
+        "pt": "Testing Period segmento 36"
+      },
+      "mustHave": false,
+      "order": 36,
+      "headingAnchors": [
+        "Testing Period 36",
+        "testing_period 36",
+        "Testing Period section",
+        "seção Testing Period 36"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\btesting_period\b",
+        "\btesting_period_36\b",
+        "\btesting_period section\b"
+      ],
+      "description": "Canonical section testing_period for Covenant Report"
+    },
+    {
+      "id": "compliance_matrix_37",
+      "name": {
+        "en": "Compliance Matrix Segment 37",
+        "pt": "Compliance Matrix segmento 37"
+      },
+      "mustHave": false,
+      "order": 37,
+      "headingAnchors": [
+        "Compliance Matrix 37",
+        "compliance_matrix 37",
+        "Compliance Matrix section",
+        "seção Compliance Matrix 37"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bcompliance_matrix\b",
+        "\bcompliance_matrix_37\b",
+        "\bcompliance_matrix section\b"
+      ],
+      "description": "Canonical section compliance_matrix for Covenant Report"
+    },
+    {
+      "id": "waivers_38",
+      "name": {
+        "en": "Waivers Segment 38",
+        "pt": "Waivers segmento 38"
+      },
+      "mustHave": false,
+      "order": 38,
+      "headingAnchors": [
+        "Waivers 38",
+        "waivers 38",
+        "Waivers section",
+        "seção Waivers 38"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bwaivers\b",
+        "\bwaivers_38\b",
+        "\bwaivers section\b"
+      ],
+      "description": "Canonical section waivers for Covenant Report"
+    },
+    {
+      "id": "breach_analysis_39",
+      "name": {
+        "en": "Breach Analysis Segment 39",
+        "pt": "Breach Analysis segmento 39"
+      },
+      "mustHave": false,
+      "order": 39,
+      "headingAnchors": [
+        "Breach Analysis 39",
+        "breach_analysis 39",
+        "Breach Analysis section",
+        "seção Breach Analysis 39"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bbreach_analysis\b",
+        "\bbreach_analysis_39\b",
+        "\bbreach_analysis section\b"
+      ],
+      "description": "Canonical section breach_analysis for Covenant Report"
+    },
+    {
+      "id": "remedies_40",
+      "name": {
+        "en": "Remedies Segment 40",
+        "pt": "Remedies segmento 40"
+      },
+      "mustHave": false,
+      "order": 40,
+      "headingAnchors": [
+        "Remedies 40",
+        "remedies 40",
+        "Remedies section",
+        "seção Remedies 40"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bremedies\b",
+        "\bremedies_40\b",
+        "\bremedies section\b"
+      ],
+      "description": "Canonical section remedies for Covenant Report"
+    },
+    {
+      "id": "security_covenants_41",
+      "name": {
+        "en": "Security Covenants Segment 41",
+        "pt": "Security Covenants segmento 41"
+      },
+      "mustHave": false,
+      "order": 41,
+      "headingAnchors": [
+        "Security Covenants 41",
+        "security_covenants 41",
+        "Security Covenants section",
+        "seção Security Covenants 41"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bsecurity_covenants\b",
+        "\bsecurity_covenants_41\b",
+        "\bsecurity_covenants section\b"
+      ],
+      "description": "Canonical section security_covenants for Covenant Report"
+    },
+    {
+      "id": "financial_covenants_42",
+      "name": {
+        "en": "Financial Covenants Segment 42",
+        "pt": "Financial Covenants segmento 42"
+      },
+      "mustHave": false,
+      "order": 42,
+      "headingAnchors": [
+        "Financial Covenants 42",
+        "financial_covenants 42",
+        "Financial Covenants section",
+        "seção Financial Covenants 42"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bfinancial_covenants\b",
+        "\bfinancial_covenants_42\b",
+        "\bfinancial_covenants section\b"
+      ],
+      "description": "Canonical section financial_covenants for Covenant Report"
+    },
+    {
+      "id": "reporting_requirements_43",
+      "name": {
+        "en": "Reporting Requirements Segment 43",
+        "pt": "Reporting Requirements segmento 43"
+      },
+      "mustHave": false,
+      "order": 43,
+      "headingAnchors": [
+        "Reporting Requirements 43",
+        "reporting_requirements 43",
+        "Reporting Requirements section",
+        "seção Reporting Requirements 43"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\breporting_requirements\b",
+        "\breporting_requirements_43\b",
+        "\breporting_requirements section\b"
+      ],
+      "description": "Canonical section reporting_requirements for Covenant Report"
+    },
+    {
+      "id": "borrower_certification_44",
+      "name": {
+        "en": "Borrower Certification Segment 44",
+        "pt": "Borrower Certification segmento 44"
+      },
+      "mustHave": false,
+      "order": 44,
+      "headingAnchors": [
+        "Borrower Certification 44",
+        "borrower_certification 44",
+        "Borrower Certification section",
+        "seção Borrower Certification 44"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bborrower_certification\b",
+        "\bborrower_certification_44\b",
+        "\bborrower_certification section\b"
+      ],
+      "description": "Canonical section borrower_certification for Covenant Report"
+    },
+    {
+      "id": "auditor_attestation_45",
+      "name": {
+        "en": "Auditor Attestation Segment 45",
+        "pt": "Auditor Attestation segmento 45"
+      },
+      "mustHave": false,
+      "order": 45,
+      "headingAnchors": [
+        "Auditor Attestation 45",
+        "auditor_attestation 45",
+        "Auditor Attestation section",
+        "seção Auditor Attestation 45"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bauditor_attestation\b",
+        "\bauditor_attestation_45\b",
+        "\bauditor_attestation section\b"
+      ],
+      "description": "Canonical section auditor_attestation for Covenant Report"
+    },
+    {
+      "id": "compliance_history_46",
+      "name": {
+        "en": "Compliance History Segment 46",
+        "pt": "Compliance History segmento 46"
+      },
+      "mustHave": false,
+      "order": 46,
+      "headingAnchors": [
+        "Compliance History 46",
+        "compliance_history 46",
+        "Compliance History section",
+        "seção Compliance History 46"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bcompliance_history\b",
+        "\bcompliance_history_46\b",
+        "\bcompliance_history section\b"
+      ],
+      "description": "Canonical section compliance_history for Covenant Report"
+    },
+    {
+      "id": "appendix_disclosure_47",
+      "name": {
+        "en": "Appendix Disclosure Segment 47",
+        "pt": "Appendix Disclosure segmento 47"
+      },
+      "mustHave": false,
+      "order": 47,
+      "headingAnchors": [
+        "Appendix Disclosure 47",
+        "appendix_disclosure 47",
+        "Appendix Disclosure section",
+        "seção Appendix Disclosure 47"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bappendix_disclosure\b",
+        "\bappendix_disclosure_47\b",
+        "\bappendix_disclosure section\b"
+      ],
+      "description": "Canonical section appendix_disclosure for Covenant Report"
+    },
+    {
+      "id": "covenant_overview_48",
+      "name": {
+        "en": "Covenant Overview Segment 48",
+        "pt": "Covenant Overview segmento 48"
+      },
+      "mustHave": false,
+      "order": 48,
+      "headingAnchors": [
+        "Covenant Overview 48",
+        "covenant_overview 48",
+        "Covenant Overview section",
+        "seção Covenant Overview 48"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bcovenant_overview\b",
+        "\bcovenant_overview_48\b",
+        "\bcovenant_overview section\b"
+      ],
+      "description": "Canonical section covenant_overview for Covenant Report"
+    },
+    {
+      "id": "facility_summary_49",
+      "name": {
+        "en": "Facility Summary Segment 49",
+        "pt": "Facility Summary segmento 49"
+      },
+      "mustHave": false,
+      "order": 49,
+      "headingAnchors": [
+        "Facility Summary 49",
+        "facility_summary 49",
+        "Facility Summary section",
+        "seção Facility Summary 49"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bfacility_summary\b",
+        "\bfacility_summary_49\b",
+        "\bfacility_summary section\b"
+      ],
+      "description": "Canonical section facility_summary for Covenant Report"
+    },
+    {
+      "id": "thresholds_50",
+      "name": {
+        "en": "Thresholds Segment 50",
+        "pt": "Thresholds segmento 50"
+      },
+      "mustHave": false,
+      "order": 50,
+      "headingAnchors": [
+        "Thresholds 50",
+        "thresholds 50",
+        "Thresholds section",
+        "seção Thresholds 50"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bthresholds\b",
+        "\bthresholds_50\b",
+        "\bthresholds section\b"
+      ],
+      "description": "Canonical section thresholds for Covenant Report"
+    },
+    {
+      "id": "calculation_walkthrough_51",
+      "name": {
+        "en": "Calculation Walkthrough Segment 51",
+        "pt": "Calculation Walkthrough segmento 51"
+      },
+      "mustHave": false,
+      "order": 51,
+      "headingAnchors": [
+        "Calculation Walkthrough 51",
+        "calculation_walkthrough 51",
+        "Calculation Walkthrough section",
+        "seção Calculation Walkthrough 51"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bcalculation_walkthrough\b",
+        "\bcalculation_walkthrough_51\b",
+        "\bcalculation_walkthrough section\b"
+      ],
+      "description": "Canonical section calculation_walkthrough for Covenant Report"
+    },
+    {
+      "id": "testing_period_52",
+      "name": {
+        "en": "Testing Period Segment 52",
+        "pt": "Testing Period segmento 52"
+      },
+      "mustHave": false,
+      "order": 52,
+      "headingAnchors": [
+        "Testing Period 52",
+        "testing_period 52",
+        "Testing Period section",
+        "seção Testing Period 52"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\btesting_period\b",
+        "\btesting_period_52\b",
+        "\btesting_period section\b"
+      ],
+      "description": "Canonical section testing_period for Covenant Report"
+    },
+    {
+      "id": "compliance_matrix_53",
+      "name": {
+        "en": "Compliance Matrix Segment 53",
+        "pt": "Compliance Matrix segmento 53"
+      },
+      "mustHave": false,
+      "order": 53,
+      "headingAnchors": [
+        "Compliance Matrix 53",
+        "compliance_matrix 53",
+        "Compliance Matrix section",
+        "seção Compliance Matrix 53"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bcompliance_matrix\b",
+        "\bcompliance_matrix_53\b",
+        "\bcompliance_matrix section\b"
+      ],
+      "description": "Canonical section compliance_matrix for Covenant Report"
+    },
+    {
+      "id": "waivers_54",
+      "name": {
+        "en": "Waivers Segment 54",
+        "pt": "Waivers segmento 54"
+      },
+      "mustHave": false,
+      "order": 54,
+      "headingAnchors": [
+        "Waivers 54",
+        "waivers 54",
+        "Waivers section",
+        "seção Waivers 54"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bwaivers\b",
+        "\bwaivers_54\b",
+        "\bwaivers section\b"
+      ],
+      "description": "Canonical section waivers for Covenant Report"
+    },
+    {
+      "id": "breach_analysis_55",
+      "name": {
+        "en": "Breach Analysis Segment 55",
+        "pt": "Breach Analysis segmento 55"
+      },
+      "mustHave": false,
+      "order": 55,
+      "headingAnchors": [
+        "Breach Analysis 55",
+        "breach_analysis 55",
+        "Breach Analysis section",
+        "seção Breach Analysis 55"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bbreach_analysis\b",
+        "\bbreach_analysis_55\b",
+        "\bbreach_analysis section\b"
+      ],
+      "description": "Canonical section breach_analysis for Covenant Report"
+    },
+    {
+      "id": "remedies_56",
+      "name": {
+        "en": "Remedies Segment 56",
+        "pt": "Remedies segmento 56"
+      },
+      "mustHave": false,
+      "order": 56,
+      "headingAnchors": [
+        "Remedies 56",
+        "remedies 56",
+        "Remedies section",
+        "seção Remedies 56"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bremedies\b",
+        "\bremedies_56\b",
+        "\bremedies section\b"
+      ],
+      "description": "Canonical section remedies for Covenant Report"
+    },
+    {
+      "id": "security_covenants_57",
+      "name": {
+        "en": "Security Covenants Segment 57",
+        "pt": "Security Covenants segmento 57"
+      },
+      "mustHave": false,
+      "order": 57,
+      "headingAnchors": [
+        "Security Covenants 57",
+        "security_covenants 57",
+        "Security Covenants section",
+        "seção Security Covenants 57"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bsecurity_covenants\b",
+        "\bsecurity_covenants_57\b",
+        "\bsecurity_covenants section\b"
+      ],
+      "description": "Canonical section security_covenants for Covenant Report"
+    },
+    {
+      "id": "financial_covenants_58",
+      "name": {
+        "en": "Financial Covenants Segment 58",
+        "pt": "Financial Covenants segmento 58"
+      },
+      "mustHave": false,
+      "order": 58,
+      "headingAnchors": [
+        "Financial Covenants 58",
+        "financial_covenants 58",
+        "Financial Covenants section",
+        "seção Financial Covenants 58"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bfinancial_covenants\b",
+        "\bfinancial_covenants_58\b",
+        "\bfinancial_covenants section\b"
+      ],
+      "description": "Canonical section financial_covenants for Covenant Report"
+    },
+    {
+      "id": "reporting_requirements_59",
+      "name": {
+        "en": "Reporting Requirements Segment 59",
+        "pt": "Reporting Requirements segmento 59"
+      },
+      "mustHave": false,
+      "order": 59,
+      "headingAnchors": [
+        "Reporting Requirements 59",
+        "reporting_requirements 59",
+        "Reporting Requirements section",
+        "seção Reporting Requirements 59"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\breporting_requirements\b",
+        "\breporting_requirements_59\b",
+        "\breporting_requirements section\b"
+      ],
+      "description": "Canonical section reporting_requirements for Covenant Report"
+    },
+    {
+      "id": "borrower_certification_60",
+      "name": {
+        "en": "Borrower Certification Segment 60",
+        "pt": "Borrower Certification segmento 60"
+      },
+      "mustHave": false,
+      "order": 60,
+      "headingAnchors": [
+        "Borrower Certification 60",
+        "borrower_certification 60",
+        "Borrower Certification section",
+        "seção Borrower Certification 60"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bborrower_certification\b",
+        "\bborrower_certification_60\b",
+        "\bborrower_certification section\b"
+      ],
+      "description": "Canonical section borrower_certification for Covenant Report"
+    },
+    {
+      "id": "auditor_attestation_61",
+      "name": {
+        "en": "Auditor Attestation Segment 61",
+        "pt": "Auditor Attestation segmento 61"
+      },
+      "mustHave": false,
+      "order": 61,
+      "headingAnchors": [
+        "Auditor Attestation 61",
+        "auditor_attestation 61",
+        "Auditor Attestation section",
+        "seção Auditor Attestation 61"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bauditor_attestation\b",
+        "\bauditor_attestation_61\b",
+        "\bauditor_attestation section\b"
+      ],
+      "description": "Canonical section auditor_attestation for Covenant Report"
+    },
+    {
+      "id": "compliance_history_62",
+      "name": {
+        "en": "Compliance History Segment 62",
+        "pt": "Compliance History segmento 62"
+      },
+      "mustHave": false,
+      "order": 62,
+      "headingAnchors": [
+        "Compliance History 62",
+        "compliance_history 62",
+        "Compliance History section",
+        "seção Compliance History 62"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bcompliance_history\b",
+        "\bcompliance_history_62\b",
+        "\bcompliance_history section\b"
+      ],
+      "description": "Canonical section compliance_history for Covenant Report"
+    }
+  ]
+}

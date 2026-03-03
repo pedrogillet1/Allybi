@@ -22,15 +22,8 @@
       "debit amount",
       "debit amt",
       "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
       "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "valor debito"
     ],
     "credit": [
       "credit",
@@ -40,32 +33,18 @@
       "credit amount",
       "credit amt",
       "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
       "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
+      "valor credito"
     ],
     "balance": [
       "balance",
-      "ending balance",
+      "balance amount",
       "closing balance",
       "opening balance",
       "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
       "saldo",
       "saldo final",
       "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
       "balanco"
     ],
     "account": [
@@ -74,89 +53,314 @@
       "account number",
       "account code",
       "acct",
-      "acct no",
       "gl account",
       "ledger account",
-      "nominal account",
       "conta",
       "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+      "codigo da conta"
     ]
   },
   "tables": [
     {
       "id": "acct_trial_balance_main_table",
       "name": {
-        "en": "Trial Balance Main",
-        "pt": "Balancete de Verificacao Principal"
+        "en": "Trial Balance Detail",
+        "pt": "Detalhe do Balancete"
       },
       "section": "line_items",
       "expectedColumns": [
         "account_code",
         "account_name",
+        "currency_code",
         "debit",
         "credit",
-        "balance"
+        "ending_balance"
       ],
       "keyRows": [
-        "grand_total"
+        "grand_total",
+        "subtotal",
+        "total"
+      ],
+      "headerSynonyms": {
+        "account_code": [
+          "account code",
+          "account no",
+          "acct",
+          "conta",
+          "codigo conta",
+          "account id"
+        ],
+        "account_name": [
+          "account",
+          "account name",
+          "account description",
+          "description",
+          "conta"
+        ],
+        "currency_code": [
+          "currency",
+          "moeda",
+          "currency code",
+          "ccy"
+        ],
+        "debit": [
+          "debit",
+          "debits",
+          "dr",
+          "debit amount",
+          "valor debito"
+        ],
+        "credit": [
+          "credit",
+          "credits",
+          "cr",
+          "credit amount",
+          "valor credito"
+        ],
+        "ending_balance": [
+          "ending balance",
+          "final balance",
+          "balance"
+        ]
+      },
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "ending_balance"
+        ],
+        "notes": "debit/credit columns may be exported as positive numbers only; signs must still be interpreted by convention"
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "ending_balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "thousand",
+            "thousands"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "ending_balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m",
+            "million",
+            "millions"
+          ]
+        }
+      ],
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "BRL",
+        "CAD",
+        "AUD",
+        "CHF",
+        "CNY",
+        "R$",
+        "USD",
+        "EUR",
+        "$",
+        "€",
+        "£"
+      ],
+      "extractionNotes": [
+        "Accept tables where numeric columns are merged or reordered",
+        "Accept both debit/credit as separate columns or combined net amount with separate column order markers"
+      ]
+    },
+    {
+      "id": "acct_trial_balance_currency_detail_table",
+      "name": {
+        "en": "Trial Balance By Currency",
+        "pt": "Balancete por Moeda"
+      },
+      "section": "currency_validation",
+      "expectedColumns": [
+        "currency_code",
+        "row_count",
+        "debit",
+        "credit",
+        "ending_balance"
+      ],
+      "keyRows": [
+        "grand_total",
+        "subtotal"
+      ],
+      "headerSynonyms": {
+        "currency_code": [
+          "currency",
+          "currency code",
+          "currency_code",
+          "moeda"
+        ],
+        "row_count": [
+          "rows",
+          "record count",
+          "number of rows"
+        ],
+        "debit": [
+          "debit",
+          "dr"
+        ],
+        "credit": [
+          "credit",
+          "cr"
+        ],
+        "ending_balance": [
+          "ending balance",
+          "balance"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "row_count"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "ending_balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "ending_balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m",
+            "mm"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "ending_balance"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "R$",
+        "AED",
+        "CHF",
+        "CAD"
+      ],
+      "extractionNotes": [
+        "Look for repeated balance blocks where each block has its own heading currency",
+        "Accept export-style layouts where header row may repeat across pages"
       ]
     },
     {
       "id": "acct_trial_balance_summary_table",
       "name": {
         "en": "Trial Balance Summary",
-        "pt": "Balancete de Verificacao Resumo"
+        "pt": "Resumo do Balancete"
       },
-      "section": "summary",
+      "section": "totals",
       "expectedColumns": [
         "metric",
         "value"
       ],
       "keyRows": [
-        "total",
-        "subtotal",
+        "total_debits",
+        "total_credits",
+        "net_balance",
         "difference"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "metric"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "valueColumns": [
+          "value"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Allow summary metrics to appear in different row orders",
+        "Accept labels such as Net Debits and Net Credits"
       ]
     }
   ]

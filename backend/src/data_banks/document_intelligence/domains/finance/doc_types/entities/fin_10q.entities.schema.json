@@ -1,114 +1,1045 @@
 {
   "_meta": {
     "id": "di_finance_entities_fin_10q",
-    "version": "2.0.0",
-    "description": "Entity extraction schema for fin_10q.",
+    "version": "2.1.0",
+    "description": "Entity schema for 10-Q Quarterly Report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "docType": "fin_10q"
+    "docType": "fin_10q",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
   },
   "entities": [
     {
       "id": "document_id",
       "type": "string",
       "required": true,
-      "description": "Unique document identifier"
+      "evidenceRequirement": [
+        "header_id",
+        "source_table"
+      ],
+      "notes": "document-level evidence required"
     },
     {
-      "id": "reporting_entity",
+      "id": "source_file_name",
       "type": "string",
       "required": true,
-      "description": "Entity or BU covered"
+      "evidenceRequirement": [
+        "file_metadata"
+      ],
+      "notes": "source file provenance"
     },
     {
-      "id": "period_start",
-      "type": "date",
+      "id": "extraction_timestamp",
+      "type": "datetime",
       "required": true,
-      "description": "Period start date"
+      "evidenceRequirement": [
+        "ingestion_metadata"
+      ],
+      "notes": "must include parse timestamp"
     },
     {
-      "id": "period_end",
-      "type": "date",
-      "required": true,
-      "description": "Period end date"
-    },
-    {
-      "id": "currency",
+      "id": "ticker",
+      "canonical": "ticker",
       "type": "string",
       "required": true,
-      "description": "ISO currency code"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: ticker from table/header context."
+    },
+    {
+      "id": "company_name",
+      "canonical": "company_name",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: company_name from table/header context."
+    },
+    {
+      "id": "fiscal_quarter",
+      "canonical": "fiscal_quarter",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: fiscal_quarter from table/header context."
+    },
+    {
+      "id": "reporting_currency",
+      "canonical": "reporting_currency",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: reporting_currency from table/header context."
     },
     {
       "id": "unit_scale",
-      "type": "string",
+      "canonical": "unit_scale",
+      "type": "percentage",
       "required": true,
-      "description": "Unit scale (units, thousands, millions)"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: unit_scale from table/header context."
     },
     {
       "id": "revenue",
-      "type": "currency",
-      "required": false,
-      "description": "Revenue amount"
+      "canonical": "revenue",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: revenue from table/header context."
     },
     {
-      "id": "ebitda",
-      "type": "currency",
-      "required": false,
-      "description": "EBITDA amount"
+      "id": "operating_income",
+      "canonical": "operating_income",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: operating_income from table/header context."
     },
     {
       "id": "net_income",
-      "type": "currency",
-      "required": false,
-      "description": "Net income amount"
-    },
-    {
-      "id": "cash_position",
-      "type": "currency",
-      "required": false,
-      "description": "Cash balance"
-    },
-    {
-      "id": "variance_percent",
-      "type": "number",
-      "required": false,
-      "description": "Variance percentage"
-    },
-    {
-      "id": "source_table_ref",
+      "canonical": "net_income",
       "type": "string",
       "required": true,
-      "description": "Source table identifier"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: net_income from table/header context."
     },
     {
-      "id": "kpi_revenue",
+      "id": "total_assets",
+      "canonical": "total_assets",
       "type": "number",
-      "required": false,
-      "description": "KPI reference for revenue"
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: total_assets from table/header context."
     },
     {
-      "id": "kpi_gross_margin",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for gross_margin"
+      "id": "total_liabilities",
+      "canonical": "total_liabilities",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: total_liabilities from table/header context."
     },
     {
-      "id": "kpi_operating_income",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for operating_income"
+      "id": "cash",
+      "canonical": "cash",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: cash from table/header context."
     },
     {
-      "id": "kpi_eps",
+      "id": "accounts_receivable",
+      "canonical": "accounts_receivable",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: accounts_receivable from table/header context."
+    },
+    {
+      "id": "accounts_payable",
+      "canonical": "accounts_payable",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: accounts_payable from table/header context."
+    },
+    {
+      "id": "accrued_expenses",
+      "canonical": "accrued_expenses",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: accrued_expenses from table/header context."
+    },
+    {
+      "id": "working_capital",
+      "canonical": "working_capital",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: working_capital from table/header context."
+    },
+    {
+      "id": "guidance",
+      "canonical": "guidance",
       "type": "number",
       "required": false,
-      "description": "KPI reference for eps"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: guidance from table/header context."
+    },
+    {
+      "id": "burn_rate",
+      "canonical": "burn_rate",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: burn_rate from table/header context."
+    },
+    {
+      "id": "runway",
+      "canonical": "runway",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: runway from table/header context."
+    },
+    {
+      "id": "tax_provision",
+      "canonical": "tax_provision",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: tax_provision from table/header context."
+    },
+    {
+      "id": "stock_activity",
+      "canonical": "stock_activity",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: stock_activity from table/header context."
+    },
+    {
+      "id": "variance_vs_plan",
+      "canonical": "variance_vs_plan",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: variance_vs_plan from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_22",
+      "canonical": "10_q_quarterly_report_metric_22",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_22 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_23",
+      "canonical": "10_q_quarterly_report_metric_23",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_23 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_24",
+      "canonical": "10_q_quarterly_report_metric_24",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_24 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_25",
+      "canonical": "10_q_quarterly_report_metric_25",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_25 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_26",
+      "canonical": "10_q_quarterly_report_metric_26",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_26 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_27",
+      "canonical": "10_q_quarterly_report_metric_27",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_27 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_28",
+      "canonical": "10_q_quarterly_report_metric_28",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_28 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_29",
+      "canonical": "10_q_quarterly_report_metric_29",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_29 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_30",
+      "canonical": "10_q_quarterly_report_metric_30",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_30 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_31",
+      "canonical": "10_q_quarterly_report_metric_31",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_31 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_32",
+      "canonical": "10_q_quarterly_report_metric_32",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_32 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_33",
+      "canonical": "10_q_quarterly_report_metric_33",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_33 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_34",
+      "canonical": "10_q_quarterly_report_metric_34",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_34 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_35",
+      "canonical": "10_q_quarterly_report_metric_35",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_35 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_36",
+      "canonical": "10_q_quarterly_report_metric_36",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_36 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_37",
+      "canonical": "10_q_quarterly_report_metric_37",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_37 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_38",
+      "canonical": "10_q_quarterly_report_metric_38",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_38 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_39",
+      "canonical": "10_q_quarterly_report_metric_39",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_39 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_40",
+      "canonical": "10_q_quarterly_report_metric_40",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_40 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_41",
+      "canonical": "10_q_quarterly_report_metric_41",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_41 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_42",
+      "canonical": "10_q_quarterly_report_metric_42",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_42 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_43",
+      "canonical": "10_q_quarterly_report_metric_43",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_43 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_44",
+      "canonical": "10_q_quarterly_report_metric_44",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_44 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_45",
+      "canonical": "10_q_quarterly_report_metric_45",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_45 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_46",
+      "canonical": "10_q_quarterly_report_metric_46",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_46 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_47",
+      "canonical": "10_q_quarterly_report_metric_47",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_47 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_48",
+      "canonical": "10_q_quarterly_report_metric_48",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_48 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_49",
+      "canonical": "10_q_quarterly_report_metric_49",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_49 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_50",
+      "canonical": "10_q_quarterly_report_metric_50",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_50 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_51",
+      "canonical": "10_q_quarterly_report_metric_51",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_51 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_52",
+      "canonical": "10_q_quarterly_report_metric_52",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_52 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_53",
+      "canonical": "10_q_quarterly_report_metric_53",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_53 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_54",
+      "canonical": "10_q_quarterly_report_metric_54",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_54 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_55",
+      "canonical": "10_q_quarterly_report_metric_55",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_55 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_56",
+      "canonical": "10_q_quarterly_report_metric_56",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_56 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_57",
+      "canonical": "10_q_quarterly_report_metric_57",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_57 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_58",
+      "canonical": "10_q_quarterly_report_metric_58",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_58 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_59",
+      "canonical": "10_q_quarterly_report_metric_59",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_59 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_60",
+      "canonical": "10_q_quarterly_report_metric_60",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_60 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_61",
+      "canonical": "10_q_quarterly_report_metric_61",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_61 from table/header context."
+    },
+    {
+      "id": "10_q_quarterly_report_metric_62",
+      "canonical": "10_q_quarterly_report_metric_62",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for 10-Q Quarterly Report: 10_q_quarterly_report_metric_62 from table/header context."
     }
   ]
 }

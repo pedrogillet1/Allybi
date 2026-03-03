@@ -21,7 +21,9 @@
         "period",
         "reporting period",
         "competencia",
-        "periodo"
+        "periodo",
+        "from",
+        "to"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -45,7 +47,7 @@
         "currency",
         "moeda",
         "curr",
-        "reporting currency"
+        "presentation currency"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -68,8 +70,7 @@
       "anchors": [
         "source system",
         "erp",
-        "sistema origem",
-        "origem"
+        "sistema origem"
       ],
       "location": "header",
       "extractionMethod": "metadata_or_heading"
@@ -79,8 +80,9 @@
       "entity": "periodStart",
       "anchors": [
         "period start",
-        "period Start",
-        "periodStart"
+        "from date",
+        "start date",
+        "inicio"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -90,32 +92,94 @@
       "entity": "periodEnd",
       "anchors": [
         "period end",
-        "period End",
-        "periodEnd"
+        "to date",
+        "end date",
+        "fim"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
     },
     {
-      "id": "hint_totalDebits",
+      "id": "hint_totalDebits_summary",
       "entity": "totalDebits",
       "anchors": [
         "total debits",
-        "total Debits",
-        "totalDebits"
+        "debit total",
+        "sum debit",
+        "total debito"
       ],
-      "location": "summary",
+      "location": "totals",
       "extractionMethod": "table_row_match"
     },
     {
-      "id": "hint_totalCredits",
+      "id": "hint_totalDebits_row_shift",
+      "entity": "totalDebits",
+      "anchors": [
+        "total",
+        "dr",
+        "total row"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_totalCredits_summary",
       "entity": "totalCredits",
       "anchors": [
         "total credits",
-        "total Credits",
-        "totalCredits"
+        "credit total",
+        "sum credit",
+        "total credito"
       ],
-      "location": "summary",
+      "location": "totals",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_totalCredits_row_shift",
+      "entity": "totalCredits",
+      "anchors": [
+        "total",
+        "cr",
+        "total row"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_closingBalance",
+      "entity": "closingBalance",
+      "anchors": [
+        "closing balance",
+        "balance at end",
+        "saldo final",
+        "final balance"
+      ],
+      "location": "totals",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_journalCount",
+      "entity": "journalCount",
+      "anchors": [
+        "line count",
+        "journal count",
+        "total lines",
+        "number of entries"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_export_messy_layout",
+      "entity": "journalCount",
+      "anchors": [
+        "excel export",
+        "csv",
+        "messy export",
+        "column order",
+        "shifted columns"
+      ],
+      "location": "line_items",
       "extractionMethod": "table_row_match"
     }
   ]

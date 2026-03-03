@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "id": "di_everyday_extraction_every_bank_statement",
+    "version": "1.0.0",
+    "description": "Extraction hints for every_bank_statement.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_bank_statement"
+  },
+  "hints": [
+    {
+      "id": "every_bank_statement_hint_01",
+      "entity": "statement_number",
+      "anchors": ["statement", "extrato", "statement id"],
+      "location": "document_header",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["header", "cover page"]
+    },
+    {
+      "id": "every_bank_statement_hint_02",
+      "entity": "bank_name",
+      "anchors": ["bank", "banco", "financial institution"],
+      "location": "account_profile",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["logo block", "header"]
+    },
+    {
+      "id": "every_bank_statement_hint_03",
+      "entity": "account_holder_name",
+      "anchors": ["account holder", "titular", "account owner"],
+      "location": "account_profile",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["account box", "owner details"]
+    },
+    {
+      "id": "every_bank_statement_hint_04",
+      "entity": "account_number",
+      "anchors": ["account number", "conta", "account no"],
+      "location": "account_profile",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["header block", "account panel"]
+    },
+    {
+      "id": "every_bank_statement_hint_05",
+      "entity": "statement_period_start",
+      "anchors": ["period start", "from", "inicio", "de"],
+      "location": "statement_period",
+      "extractionMethod": "date_range_parse",
+      "whereItHides": ["date line", "top-right range"]
+    },
+    {
+      "id": "every_bank_statement_hint_06",
+      "entity": "statement_period_end",
+      "anchors": ["period end", "to", "fim", "a"],
+      "location": "statement_period",
+      "extractionMethod": "date_range_parse",
+      "whereItHides": ["date line", "top-right range"]
+    },
+    {
+      "id": "every_bank_statement_hint_07",
+      "entity": "opening_balance",
+      "anchors": ["opening balance", "saldo inicial"],
+      "location": "opening_and_closing",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["balance table", "first row"]
+    },
+    {
+      "id": "every_bank_statement_hint_08",
+      "entity": "closing_balance",
+      "anchors": ["closing balance", "saldo final"],
+      "location": "opening_and_closing",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["balance table", "last row"]
+    },
+    {
+      "id": "every_bank_statement_hint_09",
+      "entity": "total_debits",
+      "anchors": ["total debits", "total de debit", "saidas"],
+      "location": "cash_flow_summary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["summary row", "financial summary"]
+    },
+    {
+      "id": "every_bank_statement_hint_10",
+      "entity": "total_credits",
+      "anchors": ["total credits", "total credit", "entradas"],
+      "location": "cash_flow_summary",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["summary row", "financial summary"]
+    },
+    {
+      "id": "every_bank_statement_hint_11",
+      "entity": "fees_total",
+      "anchors": ["fees", "charges", "tarifas"],
+      "location": "charges_and_interest",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["fees block", "small table"]
+    },
+    {
+      "id": "every_bank_statement_hint_12",
+      "entity": "net_change",
+      "anchors": ["net change", "variation", "saldo liquido"],
+      "location": "cash_flow_summary",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["summary row", "calculation section"]
+    }
+  ]
+}

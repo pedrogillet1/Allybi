@@ -1,0 +1,442 @@
+{
+  "_meta": {
+    "id": "di_everyday_retrieval_strategies",
+    "version": "1.0.0",
+    "description": "Everyday retrieval ordering and query-dependent boosts.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "maxBoostRules": 80,
+    "maxQueryExpansionTerms": 100
+  },
+  "domain": "everyday",
+  "sectionPriority": [
+    {
+      "id": "every_retrieval_section_001",
+      "section": "document_header",
+      "weight": 3.2,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_002",
+      "section": "issuer_profile",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_003",
+      "section": "recipient_profile",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "locate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_004",
+      "section": "billing_lines",
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "calculate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_005",
+      "section": "line_items_or_transactions",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "compare",
+        "calculate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_006",
+      "section": "tax_summary",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_007",
+      "section": "totals_block",
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "compare",
+        "calculate",
+        "validate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_008",
+      "section": "payment_info",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_009",
+      "section": "coverage_terms",
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_010",
+      "section": "signatures_or_attestations",
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "validate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_011",
+      "section": "footnotes_notices",
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_012",
+      "section": "attachments_schedules",
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "locate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_013",
+      "section": "dispute_or_claims",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "evaluate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_014",
+      "section": "identity_fields",
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "validate"
+      ]
+    },
+    {
+      "id": "every_retrieval_section_015",
+      "section": "period_context",
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    }
+  ],
+  "boostRules": [
+    {
+      "id": "every_boost_001_tax_return",
+      "priority": 120,
+      "weight": 3.2,
+      "operators": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references tax return",
+      "boostSections": [
+        "filing_section",
+        "income_section",
+        "deductions",
+        "tax_summary"
+      ],
+      "docTypeId": "every_tax_return"
+    },
+    {
+      "id": "every_boost_002_tax_notice",
+      "priority": 119,
+      "weight": 3.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references tax notice",
+      "boostSections": [
+        "notice_reference",
+        "assessed_amounts",
+        "penalties",
+        "payment_instructions"
+      ],
+      "docTypeId": "every_tax_notice"
+    },
+    {
+      "id": "every_boost_003_phone_bill",
+      "priority": 118,
+      "weight": 3.1,
+      "operators": [
+        "extract",
+        "summarize",
+        "calculate"
+      ],
+      "condition": "query references phone bill",
+      "boostSections": [
+        "subscriber_profile",
+        "plan_and_usage",
+        "line_usage",
+        "charges_and_fees",
+        "totals_block"
+      ],
+      "docTypeId": "every_phone_bill"
+    },
+    {
+      "id": "every_boost_004_internet_bill",
+      "priority": 117,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "summarize",
+        "calculate"
+      ],
+      "condition": "query references internet bill",
+      "boostSections": [
+        "subscriber_profile",
+        "usage_summary",
+        "traffic_summary",
+        "charges_and_fees",
+        "totals_block"
+      ],
+      "docTypeId": "every_internet_bill"
+    },
+    {
+      "id": "every_boost_005_electricity_bill",
+      "priority": 116,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "condition": "query references electricity bill",
+      "boostSections": [
+        "service_address",
+        "meter_readings",
+        "consumption_summary",
+        "tariff_breakdown",
+        "charges_by_component"
+      ],
+      "docTypeId": "every_electricity_bill"
+    },
+    {
+      "id": "every_boost_006_rent_receipt",
+      "priority": 115,
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references rent",
+      "boostSections": [
+        "property_and_parties",
+        "payment_schedule",
+        "charges_breakdown",
+        "late_fees",
+        "signatures"
+      ],
+      "docTypeId": "every_rent_receipt"
+    },
+    {
+      "id": "every_boost_007_retail_receipt",
+      "priority": 114,
+      "weight": 2.8,
+      "operators": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references receipt",
+      "boostSections": [
+        "merchant_profile",
+        "transaction_lines",
+        "discount_tax_summary",
+        "totals_and_payment"
+      ],
+      "docTypeId": "every_retail_receipt"
+    },
+    {
+      "id": "every_boost_008_invoice",
+      "priority": 113,
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references invoice",
+      "boostSections": [
+        "issuer_profile",
+        "line_items",
+        "totals_block",
+        "payment_terms"
+      ],
+      "docTypeId": "every_invoice"
+    },
+    {
+      "id": "every_boost_009_bank_statement",
+      "priority": 112,
+      "weight": 3.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "condition": "query references bank statement",
+      "boostSections": [
+        "account_summary",
+        "transactions",
+        "cash_flow_lines",
+        "running_balance",
+        "fees_and_interest"
+      ],
+      "docTypeId": "every_bank_statement"
+    },
+    {
+      "id": "every_boost_010_insurance_policy",
+      "priority": 111,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "condition": "query references insurance policy",
+      "boostSections": [
+        "policy_identity",
+        "covered_items",
+        "premium_schedule",
+        "exclusions",
+        "renewal"
+      ],
+      "docTypeId": "every_insurance_policy"
+    },
+    {
+      "id": "every_boost_011_insurance_claim",
+      "priority": 110,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "condition": "query references insurance claim",
+      "boostSections": [
+        "claim_identity",
+        "incident_summary",
+        "damages_and_coverage",
+        "payment_history",
+        "claim_status"
+      ],
+      "docTypeId": "every_insurance_claim"
+    },
+    {
+      "id": "every_boost_012_identity_document",
+      "priority": 109,
+      "weight": 2.9,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query references identity",
+      "boostSections": [
+        "identity_fields",
+        "document_ids",
+        "issuer_authority",
+        "validity",
+        "security_features"
+      ],
+      "docTypeId": "every_identity_document"
+    },
+    {
+      "id": "every_boost_section_013_table_first",
+      "priority": 90,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "condition": "table row contains total or subtotal",
+      "boostSections": [
+        "totals_block",
+        "summary_block",
+        "table_summary"
+      ]
+    },
+    {
+      "id": "every_boost_section_014_identity_section",
+      "priority": 75,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "validate"
+      ],
+      "condition": "query references names, doc id, or expiry",
+      "boostSections": [
+        "document_header",
+        "identity_fields",
+        "document_ids",
+        "validity"
+      ]
+    },
+    {
+      "id": "every_boost_section_015_claim_resolver",
+      "priority": 68,
+      "weight": 1.5,
+      "operators": [
+        "evaluate",
+        "extract",
+        "validate"
+      ],
+      "condition": "query references claims, status, reserve, or payout",
+      "boostSections": [
+        "claim_status",
+        "payment_history",
+        "damages_and_coverage",
+        "adjustments"
+      ]
+    }
+  ]
+}

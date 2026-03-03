@@ -1,0 +1,123 @@
+{
+  "_meta": {
+    "id": "followup_suggestions",
+    "version": "1.0.0",
+    "description": "Deep follow-up suggestions for document intelligence flows.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxCount": 4,
+    "suppressInNav": true
+  },
+  "suggestions": [
+    {
+      "id": "FS_001_verify_amount",
+      "audiences": [
+        "any"
+      ],
+      "intent": "extract",
+      "language": "en",
+      "text": "Check whether the same amount appears in another section or period.",
+      "query": "Show the same amount in the adjacent period from {{document}}."
+    },
+    {
+      "id": "FS_002_verify_amount_pt",
+      "audiences": [
+        "any"
+      ],
+      "intent": "extract",
+      "language": "pt",
+      "text": "Verifique se o mesmo valor aparece em outro periodo.",
+      "query": "Mostre esse valor no periodo anterior em {{document}}."
+    },
+    {
+      "id": "FS_003_compare_doc_sides",
+      "audiences": [
+        "any"
+      ],
+      "intent": "compare",
+      "language": "en",
+      "text": "Compare this metric with a peer document and flag only material differences.",
+      "query": "Compare {{document}} with {{otherDocument}} for the same metric."
+    },
+    {
+      "id": "FS_004_compare_doc_sides_pt",
+      "audiences": [
+        "any"
+      ],
+      "intent": "compare",
+      "language": "pt",
+      "text": "Compare com outro documento e destaque apenas diferencias materiais.",
+      "query": "Compare {{document}} com {{otherDocument}} no mesmo indicador."
+    },
+    {
+      "id": "FS_005_expand_source_context",
+      "audiences": [
+        "any"
+      ],
+      "intent": "locate_content",
+      "language": "en",
+      "text": "Show context around this section to validate interpretation.",
+      "query": "Show 2 sections above and below where this appears in {{document}}."
+    },
+    {
+      "id": "FS_006_expand_source_context_pt",
+      "audiences": [
+        "any"
+      ],
+      "intent": "locate_content",
+      "language": "pt",
+      "text": "Mostre o contexto desta secao para validar a interpretacao.",
+      "query": "Mostre 2 secoes acima e abaixo da secao em {{document}}."
+    }
+  ],
+  "rules": [
+    {
+      "id": "FS_001_minimal_reuse",
+      "trigger": "no follow-up suggestions are generated after extraction answer",
+      "check": "context.intent == 'extract' AND output.followupSuggestions.count == 0",
+      "failureAction": "EMIT_DEFAULT_FOLLOWUPS"
+    },
+    {
+      "id": "FS_002_compare_followups_require_docs",
+      "trigger": "compare follow-up suggestion missing document context",
+      "check": "context.intent == 'compare' AND output.followupSuggestions.any(s => s.query.includes('{{otherDocument}}')) == false",
+      "failureAction": "PRIORITIZE_COMPARE_TEMPLATE"
+    },
+    {
+      "id": "FS_003_context_followups_for_single_doc",
+      "trigger": "single-doc extraction has no context expansion suggestion",
+      "check": "context.queryScope == 'singleDoc' AND output.followupSuggestions.any(s => s.id IN ['FS_005_expand_source_context','FS_006_expand_source_context_pt']) == false",
+      "failureAction": "ADD_CONTEXT_EXPANSION_SUGGESTION"
+    },
+    {
+      "id": "FS_004_localization_consistency",
+      "trigger": "query language mismatches follow-up suggestion language",
+      "check": "context.userLanguage == 'pt' AND output.followupSuggestions.any(s => s.language != 'pt')",
+      "failureAction": "LOCALIZE_FOLLOWUP_SUGGESTIONS"
+    },
+    {
+      "id": "FS_005_max_count_guard",
+      "trigger": "follow-up suggestion count exceeds policy limit",
+      "check": "output.followupSuggestions.count > config.maxCount",
+      "failureAction": "TRIM_LOW_UTILITY_FOLLOWUPS"
+    }
+  ],
+  "templates": [
+    {
+      "id": "FOLLOWUP_SUGGESTIONS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in followup_suggestions.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

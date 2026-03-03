@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import type { LLMClient, LLMMessage, LLMRequest } from "./llmClient.interface";
 import type { LLMProvider } from "./llmErrors.types";
 import type { LLMStreamingConfig, StreamSink } from "./llmStreaming.types";
@@ -14,6 +15,7 @@ import {
 } from "./llmRequestBuilder.service";
 import { getProductHelpService } from "../../chat/productHelp.service";
 import { getAnswerModeRouterService } from "../../config/answerModeRouter.service";
+import { BankRuntimeCache } from "../../core/cache/bankRuntimeCache.service";
 
 export type GatewayChatRole = "system" | "user" | "assistant";
 
@@ -50,6 +52,9 @@ interface PreparedGatewayRequest {
   request: LLMRequest;
   promptType: string;
   promptTrace: GatewayPromptTrace;
+  outputLanguage: LangCode;
+  promptMode: "compose" | "retrieval_plan";
+  userText: string;
 }
 
 type GatewayDisambiguation = {
@@ -82,6 +87,15 @@ function mapPurpose(promptType: string): LLMRequest["purpose"] {
   if (promptType === "tool") return "validation_pass";
   return "answer_compose";
 }
+
+const composedFragmentCache = new BankRuntimeCache<{
+  text: string;
+  telemetry?: Record<string, unknown>;
+  promptTrace: GatewayPromptTrace;
+}>({
+  maxEntries: Number(process.env.BANK_COMPOSE_CACHE_MAX || 600),
+  ttlMs: Number(process.env.BANK_COMPOSE_CACHE_TTL_MS || 5 * 60 * 1000),
+});
 
 function clampText(input: string, maxChars: number): string {
   const v = String(input || "").trim();
@@ -202,6 +216,27 @@ function isMachineJsonPromptTask(value: unknown): boolean {
   return getMachineJsonPromptTaskSet().has(taskId);
 }
 
+function hashString(value: string): string {
+  return createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+function hashEvidencePack(evidencePack: EvidencePackLike | null | undefined): string {
+  if (!evidencePack || !Array.isArray(evidencePack.evidence)) return "none";
+  const normalizedEvidence = evidencePack.evidence.map((item) => ({
+    docId: String(item?.docId || "").trim(),
+    locationKey: String(item?.locationKey || "").trim(),
+    evidenceType: String(item?.evidenceType || "text").trim(),
+    snippet: String(item?.snippet || "").trim(),
+  }));
+  const payload = {
+    queryNormalized: String(evidencePack.query?.normalized || "").trim(),
+    activeDocId: String(evidencePack.scope?.activeDocId || "").trim(),
+    explicitDocLock: Boolean(evidencePack.scope?.explicitDocLock),
+    evidence: normalizedEvidence,
+  };
+  return hashString(JSON.stringify(payload));
+}
+
 export class LlmGatewayService {
   constructor(
     private readonly llmClient: LLMClient,
@@ -217,20 +252,57 @@ export class LlmGatewayService {
     promptTrace: GatewayPromptTrace;
   }> {
     const prepared = this.prepareProviderRequest(params, false);
+    const composeCacheEnabled =
+      process.env.BANK_MULTI_LEVEL_CACHE_ENABLED === "true" &&
+      process.env.BANK_COMPOSE_CACHE_ENABLED !== "false";
+    const composeCacheKey =
+      composeCacheEnabled && prepared.promptMode === "compose"
+        ? this.buildComposeCacheKey(params, prepared)
+        : null;
+    if (composeCacheKey) {
+      const cached = composedFragmentCache.get(composeCacheKey);
+      if (cached) {
+        return {
+          text: cached.text,
+          telemetry: {
+            ...(cached.telemetry || {}),
+            provider: this.cfg.provider,
+            model: this.cfg.modelId,
+            finishReason: "cache_hit",
+            promptType: prepared.promptType,
+            requestedMaxOutputTokens:
+              prepared.request.sampling?.maxOutputTokens ?? null,
+            cacheHit: true,
+            ...cached.promptTrace,
+          },
+          promptTrace: cached.promptTrace,
+        };
+      }
+    }
     const response = await this.llmClient.complete(prepared.request);
+
+    const telemetry = {
+      provider: this.cfg.provider,
+      model: this.cfg.modelId,
+      finishReason: response.finishReason || "unknown",
+      usage: response.usage,
+      promptType: prepared.promptType,
+      requestedMaxOutputTokens:
+        prepared.request.sampling?.maxOutputTokens ?? null,
+      cacheHit: false,
+      ...prepared.promptTrace,
+    };
+    if (composeCacheKey) {
+      composedFragmentCache.set(composeCacheKey, {
+        text: response.content,
+        telemetry,
+        promptTrace: prepared.promptTrace,
+      });
+    }
 
     return {
       text: response.content,
-      telemetry: {
-        provider: this.cfg.provider,
-        model: this.cfg.modelId,
-        finishReason: response.finishReason || "unknown",
-        usage: response.usage,
-        promptType: prepared.promptType,
-        requestedMaxOutputTokens:
-          prepared.request.sampling?.maxOutputTokens ?? null,
-        ...prepared.promptTrace,
-      },
+      telemetry,
       promptTrace: prepared.promptTrace,
     };
   }
@@ -298,6 +370,42 @@ export class LlmGatewayService {
       },
       promptTrace: prepared.promptTrace,
     };
+  }
+
+  private buildComposeCacheKey(
+    params: LlmGatewayRequest,
+    prepared: PreparedGatewayRequest,
+  ): string | null {
+    const templateId = String(prepared.promptTrace.promptTemplateIds?.[0] || "")
+      .trim()
+      .toLowerCase();
+    if (!templateId) return null;
+
+    const locale = String(prepared.outputLanguage || "en")
+      .trim()
+      .toLowerCase();
+    const evidenceHash = hashEvidencePack(params.evidencePack || null);
+    const userTextHash = hashString(String(prepared.userText || "").trim());
+    const promptHashes = Array.from(
+      new Set(
+        (prepared.promptTrace.promptHashes || [])
+          .map((value) => String(value || "").trim())
+          .filter(Boolean),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+
+    const payload = {
+      evidenceHash,
+      templateId,
+      locale,
+      userTextHash,
+      promptMode: prepared.promptMode,
+      modelVersion: this.cfg.modelId,
+      provider: this.cfg.provider,
+      promptHashes,
+      composeCacheVersion: "v1",
+    };
+    return `compose:${hashString(JSON.stringify(payload))}`;
   }
 
   private prepareProviderRequest(
@@ -454,6 +562,9 @@ export class LlmGatewayService {
         kodaMeta?.promptType || "compose_answer",
       ),
       promptTrace,
+      outputLanguage: parsed.outputLanguage,
+      promptMode: parsed.promptMode ?? "compose",
+      userText: parsed.userText,
     };
   }
 

@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "id": "snippet_compression_policy",
+    "version": "1.0.0",
+    "description": "Policy for compressing retrieval snippets while preserving units, headings, and numeric integrity.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "preserveNumericUnits": true,
+    "preserveHeadings": true,
+    "preserveContextWindowChars": 240,
+    "maxSnippetChars": 2200,
+    "maxTablePreviewChars": 2600,
+    "fallbackMode": "expand_if_ambiguous"
+  },
+  "modes": {
+    "extract": {
+      "snippetRatio": 0.28,
+      "maxSentences": 5,
+      "allowParaphrase": false
+    },
+    "summarize": {
+      "snippetRatio": 0.4,
+      "maxSentences": 7,
+      "allowParaphrase": false
+    },
+    "compare": {
+      "snippetRatio": 0.32,
+      "maxSentences": 7,
+      "allowParaphrase": false
+    }
+  },
+  "rules": [
+    {
+      "id": "SCP_001_preserve_units_when_trimming",
+      "trigger": "Snippet truncation boundary cuts a unit token",
+      "check": "snippet.truncationBoundaryAtUnitSymbol == true OR snippet.truncatesNumberWithUnit == true",
+      "failureAction": "EXPAND_SNIPPET_TO_UNIT_BOUNDARY",
+      "severity": "error"
+    },
+    {
+      "id": "SCP_002_preserve_header_context",
+      "trigger": "Snippet starts or ends immediately before/after a heading boundary",
+      "check": "snippet.startedAtHeadingCut == true OR snippet.endedAtHeadingCut == true",
+      "failureAction": "EXTEND_TO_HEADING_CONTEXT",
+      "severity": "warning"
+    },
+    {
+      "id": "SCP_003_no_truncation_for_quote_queries",
+      "trigger": "User asks for direct quote or exact wording",
+      "check": "context.requiresExactQuote == true",
+      "failureAction": "PASS_FULL_MATCH_WINDOW",
+      "severity": "error"
+    },
+    {
+      "id": "SCP_004_expand_for_multistep_comparison",
+      "trigger": "Comparison query needs multiple supporting snippets from same document",
+      "check": "context.intent == 'compare' AND context.sectionCrossrefs > 1",
+      "failureAction": "PICK_STRATEGIC_SNIPPETS_PER_DOCUMENT",
+      "severity": "warning"
+    }
+  ],
+  "templates": [
+    {
+      "id": "SNIPPET_COMPRESSION_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in snippet_compression_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

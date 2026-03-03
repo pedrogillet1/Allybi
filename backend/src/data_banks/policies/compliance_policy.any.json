@@ -3,8 +3,16 @@
     "id": "compliance_policy",
     "version": "1.0.0",
     "description": "Compliance governance policy for consent gating, restricted export, and legal-hold safeguards.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "platform-compliance",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -17,8 +25,16 @@
       "priority": 900,
       "when": {
         "all": [
-          { "path": "signals.complianceRequired", "op": "eq", "value": true },
-          { "path": "signals.userConsent", "op": "neq", "value": true }
+          {
+            "path": "signals.complianceRequired",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.userConsent",
+            "op": "neq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -58,5 +74,21 @@
       "reasonCode": "compliance_legal_hold_active",
       "terminal": true
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "COMP_POL_T_001",
+        "runtime": {
+          "signals": {
+            "complianceRequired": true,
+            "userConsent": false
+          }
+        },
+        "expect": {
+          "action": "block"
+        }
+      }
+    ]
+  }
 }

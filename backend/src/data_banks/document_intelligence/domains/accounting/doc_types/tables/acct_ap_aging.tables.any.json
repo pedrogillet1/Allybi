@@ -2,7 +2,7 @@
   "_meta": {
     "id": "di_accounting_tables_acct_ap_aging",
     "version": "1.1.0",
-    "description": "Expected table patterns for ap aging documents.",
+    "description": "Expected table patterns for AP aging documents.",
     "languages": [
       "any"
     ],
@@ -16,138 +16,126 @@
   "tableHeaderSynonyms": {
     "debit": [
       "debit",
-      "debits",
       "dr",
-      "dr.",
-      "debit amount",
-      "debit amt",
-      "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
-      "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "debit amount"
     ],
     "credit": [
       "credit",
-      "credits",
       "cr",
-      "cr.",
-      "credit amount",
-      "credit amt",
-      "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
-      "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
-    ],
-    "balance": [
-      "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
-      "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
-    ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+      "credit amount"
     ]
   },
   "tables": [
     {
-      "id": "acct_ap_aging_main_table",
+      "id": "acct_ap_aging_detail_table",
       "name": {
-        "en": "AP Aging Main",
-        "pt": "Envelhecimento de Contas a Pagar Principal"
+        "en": "AP Aging Detail",
+        "pt": "Detalhe de Envelhecimento AP"
       },
       "section": "line_items",
       "expectedColumns": [
         "vendor_id",
         "vendor_name",
         "invoice_no",
+        "invoice_date",
         "due_date",
+        "days_outstanding",
         "bucket",
         "amount"
       ],
       "keyRows": [
+        "subtotal"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "amount"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "amount"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "notes": "AP aging amounts usually represent payable balances and can be treated as credit-side balances"
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL"
+      ]
+    },
+    {
+      "id": "acct_ap_aging_bucket_table",
+      "name": {
+        "en": "AP Aging Buckets",
+        "pt": "Faixas de Envelhecimento AP"
+      },
+      "section": "buckets",
+      "expectedColumns": [
+        "bucket",
+        "bucket_amount"
+      ],
+      "keyRows": [
+        "current",
+        "bucket_1_30",
+        "bucket_31_60",
+        "bucket_61_90",
+        "bucket_over_90",
         "grand_total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "bucket_amount"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "bucket_amount"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "valueColumns": [
+          "bucket_amount"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "R$"
       ]
     },
     {
       "id": "acct_ap_aging_summary_table",
       "name": {
         "en": "AP Aging Summary",
-        "pt": "Envelhecimento de Contas a Pagar Resumo"
+        "pt": "Resumo de Envelhecimento AP"
       },
       "section": "summary",
       "expectedColumns": [
@@ -155,9 +143,52 @@
         "value"
       ],
       "keyRows": [
-        "total",
-        "subtotal",
-        "difference"
+        "total_ap_balance",
+        "vendor_count"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "debitColumns": [
+          "total_ap_balance"
+        ],
+        "creditColumns": [
+          "vendor_count"
+        ],
+        "notes": "Normalize AP summary metrics where needed; treat total_ap_balance as credit-side payable exposure and remaining metrics as metadata."
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "€",
+        "£",
+        "R$"
       ]
     }
   ]

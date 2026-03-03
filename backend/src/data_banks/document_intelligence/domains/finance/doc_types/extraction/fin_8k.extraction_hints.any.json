@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_extraction_fin_8k",
-    "version": "2.0.0",
-    "description": "Extraction hints for fin_8k.",
+    "version": "2.1.0",
+    "description": "Extraction heuristics for 8-K Current Report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,92 +15,2048 @@
   },
   "hints": [
     {
-      "id": "hint_1_period",
-      "entity": "kpi_guidance_change",
-      "anchors": [
-        "period",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_001",
+      "entity": "ticker",
+      "primarySignals": [
+        "material_transactions",
+        "\\bcash_adjustment\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "heading_proximity"
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_2_currency",
-      "entity": "kpi_material_event",
-      "anchors": [
-        "currency",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_002",
+      "entity": "event_date",
+      "primarySignals": [
+        "financial_impact",
+        "\\bbalance_impact\\b",
+        "\\bperiod\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "table_header_row_context"
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_3_unit",
-      "entity": "kpi_debt",
-      "anchors": [
-        "unit",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_003",
+      "entity": "filer",
+      "primarySignals": [
+        "board_actions",
+        "\\bcommitments\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "heading_proximity"
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_4_total",
-      "entity": "kpi_liquidity",
-      "anchors": [
-        "total",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_004",
+      "entity": "event_type",
+      "primarySignals": [
+        "corporate_updates",
+        "\\btimeline\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_5_variance",
-      "entity": "variance",
-      "anchors": [
-        "variance",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_005",
+      "entity": "effective_date",
+      "primarySignals": [
+        "press_release_snapshot",
+        "\\bsignoff_ledger\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "heading_proximity"
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_6_guidance",
-      "entity": "guidance",
-      "anchors": [
-        "guidance",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_006",
+      "entity": "impact_amount",
+      "primarySignals": [
+        "risk_update",
+        "\\bdisclosure_matrix\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_7_assumption",
-      "entity": "assumption",
-      "anchors": [
-        "assumption",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_007",
+      "entity": "cash_impact",
+      "primarySignals": [
+        "guidance_revision",
+        "\\bevent_impact_table\\b",
+        "\\bcurrency\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "heading_proximity"
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     },
     {
-      "id": "hint_8_notes",
-      "entity": "notes",
-      "anchors": [
-        "notes",
-        "8-k current report",
-        "relatorio 8-k de evento relevante"
+      "id": "fin_8k_hint_008",
+      "entity": "liquidity_impact",
+      "primarySignals": [
+        "financial_tables",
+        "\\bcash_adjustment\\b",
+        "\\bperiod\\b"
       ],
-      "location": "tables_primary",
-      "extractionMethod": "table_header_row_context"
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_009",
+      "entity": "currency",
+      "primarySignals": [
+        "legal_updates",
+        "\\bbalance_impact\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_010",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "signatures",
+        "\\bcommitments\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_011",
+      "entity": "board_action",
+      "primarySignals": [
+        "annexes",
+        "\\btimeline\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_012",
+      "entity": "deal_value",
+      "primarySignals": [
+        "event_summary",
+        "\\bsignoff_ledger\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_013",
+      "entity": "acquired_assets",
+      "primarySignals": [
+        "material_transactions",
+        "\\bdisclosure_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_014",
+      "entity": "stockholder_impact",
+      "primarySignals": [
+        "financial_impact",
+        "\\bevent_impact_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_015",
+      "entity": "debt_commitment",
+      "primarySignals": [
+        "board_actions",
+        "\\bcash_adjustment\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_016",
+      "entity": "covenant_breach",
+      "primarySignals": [
+        "corporate_updates",
+        "\\bbalance_impact\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_017",
+      "entity": "related_party",
+      "primarySignals": [
+        "press_release_snapshot",
+        "\\bcommitments\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_018",
+      "entity": "proceeds",
+      "primarySignals": [
+        "risk_update",
+        "\\btimeline\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_019",
+      "entity": "company_name",
+      "primarySignals": [
+        "guidance_revision",
+        "\\bsignoff_ledger\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_020",
+      "entity": "ticker",
+      "primarySignals": [
+        "financial_tables",
+        "\\bdisclosure_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_021",
+      "entity": "event_date",
+      "primarySignals": [
+        "legal_updates",
+        "\\bevent_impact_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_022",
+      "entity": "filer",
+      "primarySignals": [
+        "signatures",
+        "\\bcash_adjustment\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_023",
+      "entity": "event_type",
+      "primarySignals": [
+        "annexes",
+        "\\bbalance_impact\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_024",
+      "entity": "effective_date",
+      "primarySignals": [
+        "event_summary",
+        "\\bcommitments\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_025",
+      "entity": "impact_amount",
+      "primarySignals": [
+        "material_transactions",
+        "\\btimeline\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_026",
+      "entity": "cash_impact",
+      "primarySignals": [
+        "financial_impact",
+        "\\bsignoff_ledger\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_027",
+      "entity": "liquidity_impact",
+      "primarySignals": [
+        "board_actions",
+        "\\bdisclosure_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_028",
+      "entity": "currency",
+      "primarySignals": [
+        "corporate_updates",
+        "\\bevent_impact_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_029",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "press_release_snapshot",
+        "\\bcash_adjustment\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_030",
+      "entity": "board_action",
+      "primarySignals": [
+        "risk_update",
+        "\\bbalance_impact\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_031",
+      "entity": "deal_value",
+      "primarySignals": [
+        "guidance_revision",
+        "\\bcommitments\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_032",
+      "entity": "acquired_assets",
+      "primarySignals": [
+        "financial_tables",
+        "\\btimeline\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_033",
+      "entity": "stockholder_impact",
+      "primarySignals": [
+        "legal_updates",
+        "\\bsignoff_ledger\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_034",
+      "entity": "debt_commitment",
+      "primarySignals": [
+        "signatures",
+        "\\bdisclosure_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_035",
+      "entity": "covenant_breach",
+      "primarySignals": [
+        "annexes",
+        "\\bevent_impact_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_036",
+      "entity": "related_party",
+      "primarySignals": [
+        "event_summary",
+        "\\bcash_adjustment\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_037",
+      "entity": "proceeds",
+      "primarySignals": [
+        "material_transactions",
+        "\\bbalance_impact\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_038",
+      "entity": "company_name",
+      "primarySignals": [
+        "financial_impact",
+        "\\bcommitments\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_039",
+      "entity": "ticker",
+      "primarySignals": [
+        "board_actions",
+        "\\btimeline\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_040",
+      "entity": "event_date",
+      "primarySignals": [
+        "corporate_updates",
+        "\\bsignoff_ledger\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_041",
+      "entity": "filer",
+      "primarySignals": [
+        "press_release_snapshot",
+        "\\bdisclosure_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_042",
+      "entity": "event_type",
+      "primarySignals": [
+        "risk_update",
+        "\\bevent_impact_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_043",
+      "entity": "effective_date",
+      "primarySignals": [
+        "guidance_revision",
+        "\\bcash_adjustment\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_044",
+      "entity": "impact_amount",
+      "primarySignals": [
+        "financial_tables",
+        "\\bbalance_impact\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_045",
+      "entity": "cash_impact",
+      "primarySignals": [
+        "legal_updates",
+        "\\bcommitments\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_046",
+      "entity": "liquidity_impact",
+      "primarySignals": [
+        "signatures",
+        "\\btimeline\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_047",
+      "entity": "currency",
+      "primarySignals": [
+        "annexes",
+        "\\bsignoff_ledger\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_048",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "event_summary",
+        "\\bdisclosure_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_049",
+      "entity": "board_action",
+      "primarySignals": [
+        "material_transactions",
+        "\\bevent_impact_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_050",
+      "entity": "deal_value",
+      "primarySignals": [
+        "financial_impact",
+        "\\bcash_adjustment\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_051",
+      "entity": "acquired_assets",
+      "primarySignals": [
+        "board_actions",
+        "\\bbalance_impact\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_052",
+      "entity": "stockholder_impact",
+      "primarySignals": [
+        "corporate_updates",
+        "\\bcommitments\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_053",
+      "entity": "debt_commitment",
+      "primarySignals": [
+        "press_release_snapshot",
+        "\\btimeline\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_054",
+      "entity": "covenant_breach",
+      "primarySignals": [
+        "risk_update",
+        "\\bsignoff_ledger\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_055",
+      "entity": "related_party",
+      "primarySignals": [
+        "guidance_revision",
+        "\\bdisclosure_matrix\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_056",
+      "entity": "proceeds",
+      "primarySignals": [
+        "financial_tables",
+        "\\bevent_impact_table\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_057",
+      "entity": "company_name",
+      "primarySignals": [
+        "legal_updates",
+        "\\bcash_adjustment\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.79,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_058",
+      "entity": "ticker",
+      "primarySignals": [
+        "signatures",
+        "\\bbalance_impact\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.8,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_059",
+      "entity": "event_date",
+      "primarySignals": [
+        "annexes",
+        "\\bcommitments\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_060",
+      "entity": "filer",
+      "primarySignals": [
+        "event_summary",
+        "\\btimeline\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.7,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_061",
+      "entity": "event_type",
+      "primarySignals": [
+        "material_transactions",
+        "\\bsignoff_ledger\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.71,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_062",
+      "entity": "effective_date",
+      "primarySignals": [
+        "financial_impact",
+        "\\bdisclosure_matrix\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.72,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_063",
+      "entity": "impact_amount",
+      "primarySignals": [
+        "board_actions",
+        "\\bevent_impact_table\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.73,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_064",
+      "entity": "cash_impact",
+      "primarySignals": [
+        "corporate_updates",
+        "\\bcash_adjustment\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.74,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_065",
+      "entity": "liquidity_impact",
+      "primarySignals": [
+        "press_release_snapshot",
+        "\\bbalance_impact\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.75,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_066",
+      "entity": "currency",
+      "primarySignals": [
+        "risk_update",
+        "\\bcommitments\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.76,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_067",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "guidance_revision",
+        "\\btimeline\\b",
+        "\\bcurrency\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.77,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
+    },
+    {
+      "id": "fin_8k_hint_068",
+      "entity": "board_action",
+      "primarySignals": [
+        "financial_tables",
+        "\\bsignoff_ledger\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.78,
+      "notes": "Prefer explicit table + section anchors for fin_8k."
     }
+  ],
+  "notes": [
+    "Numeric extraction requires table header context, unit, and period.",
+    "Priority for fin_8k: table continuity across pdf pages/slides."
   ]
 }

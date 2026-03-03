@@ -1,26 +1,16 @@
-import { createHash } from "crypto";
 import type {
   AnswerClass,
   AnswerMode,
   ChatProvenanceDTO,
 } from "../../domain/chat.contracts";
 import type { EvidencePack } from "../../../../services/core/retrieval/retrievalEngine.service";
+import {
+  hashSnippetForProvenance,
+  normalizeSnippetForProvenanceHash,
+} from "./provenanceHash";
 
 function normalizeText(input: string): string {
-  const normalized = String(input || "")
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "");
-  let compactNumbers = normalized;
-  let prev = "";
-  while (compactNumbers !== prev) {
-    prev = compactNumbers;
-    compactNumbers = compactNumbers.replace(/(\d)[,.](\d{3}\b)/g, "$1$2");
-  }
-  return compactNumbers
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return normalizeSnippetForProvenanceHash(input);
 }
 
 function tokenize(input: string): string[] {
@@ -68,10 +58,6 @@ function anchoredSnippetCoverage(
   return matched / anchors.length;
 }
 
-function hashSnippet(snippet: string): string {
-  return createHash("sha256").update(snippet).digest("hex").slice(0, 16);
-}
-
 function requiresProvenance(
   answerMode?: AnswerMode,
   answerClass?: AnswerClass,
@@ -115,6 +101,10 @@ function resolveMinSnippetCoverage(answerMode?: AnswerMode): number {
     default:
       return 0.16;
   }
+}
+
+function resolveMinSnippetRefs(answerMode?: AnswerMode): number {
+  return answerMode === "doc_grounded_multi" ? 2 : 1;
 }
 
 function isStrictProvenanceV2Enabled(): boolean {
@@ -189,7 +179,7 @@ export function buildChatProvenance(params: {
         evidenceId: `${docId}:${locationKey}`,
         documentId: docId,
         locationKey,
-        snippetHash: hashSnippet(normalizedSnippet),
+        snippetHash: hashSnippetForProvenance(snippet),
         coverageScore: round3(Math.min(1, legacyCoverageScore)),
         anchorCoverage: directMatch ? 1 : 0,
         semanticCoverage: round3(Math.min(1, lexicalCoverage)),
@@ -206,7 +196,7 @@ export function buildChatProvenance(params: {
           evidenceId: `${docId}:${locationKey}`,
           documentId: docId,
           locationKey,
-          snippetHash: hashSnippet(normalizeText(snippet)),
+          snippetHash: hashSnippetForProvenance(snippet),
           coverageScore: 0,
           anchorCoverage: 0,
           semanticCoverage: 0,
@@ -267,7 +257,7 @@ export function buildChatProvenance(params: {
       evidenceId: `${docId}:${locationKey}`,
       documentId: docId,
       locationKey,
-      snippetHash: hashSnippet(normalizedSnippet),
+      snippetHash: hashSnippetForProvenance(snippet),
       coverageScore: roundedCoverage,
       anchorCoverage: roundedAnchor,
       semanticCoverage: roundedSemantic,

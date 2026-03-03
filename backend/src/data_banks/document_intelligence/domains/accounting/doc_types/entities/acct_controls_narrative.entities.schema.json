@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -75,6 +75,18 @@
       "type": "number",
       "required": false,
       "description": "Number of identified deficiencies"
+    },
+    {
+      "id": "controlTestingCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of control tests executed"
+    },
+    {
+      "id": "controlFailureRate",
+      "type": "number",
+      "required": false,
+      "description": "Control failure percentage or ratio"
     },
     {
       "id": "lastTestDate",

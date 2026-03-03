@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_tax_notice",
+    "version": "1.0.0",
+    "description": "Tables expected in every_tax_notice.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_notice"
+  },
+  "tableHeaderSynonyms": {
+    "amount": ["amount", "valor", "total", "quantia"],
+    "date": ["date", "data", "vencimento", "due date"],
+    "type": ["type", "tipo", "class"],
+    "reference": ["reference", "referencia", "notice id", "protocolo"]
+  },
+  "tables": [
+    {
+      "id": "tax_notice_summary_table",
+      "canonicalName": {
+        "en": "Summary Table",
+        "pt": "Tabela de Resumo"
+      },
+      "section": "notice_summary",
+      "signaturePatterns": ["\\bnotice\\s+summary\\b", "\\bresumo\\b"],
+      "requiredHeaders": ["type", "base", "rate", "amount", "unit"],
+      "headerAliases": [["type", "tipo"], ["base", "base de calculo"], ["rate", "aliquota"], ["amount", "valor"], ["unit", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["tax_notice_note_a", "tax_notice_note_b"]
+    },
+    {
+      "id": "tax_notice_penalty_table",
+      "canonicalName": {
+        "en": "Penalty and Interest Table",
+        "pt": "Tabela de Multa e Juros"
+      },
+      "section": "penalties",
+      "signaturePatterns": ["\\bpenalty\\b", "\\binterest\\b", "\\bmulta\\b", "\\bjuros\\b"],
+      "requiredHeaders": ["description", "amount", "rate", "unit"],
+      "headerAliases": [["description", "descricao"], ["amount", "valor"], ["rate", "aliquota"], ["unit", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "percent"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["tax_notice_note_c"]
+    },
+    {
+      "id": "tax_notice_payment_table",
+      "canonicalName": {
+        "en": "Payment Instruction Table",
+        "pt": "Tabela de Pagamento"
+      },
+      "section": "payment_instructions",
+      "signaturePatterns": ["\\bpayment\\b", "\\bpay\\b", "\\bpagamento\\b"],
+      "requiredHeaders": ["method", "bank", "account", "due_date", "barcode"],
+      "headerAliases": [["method", "forma"], ["bank", "banco"], ["account", "conta"], ["due_date", "vencimento"], ["barcode", "linha digitavel"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["tax_notice_note_d"]
+    }
+  ]
+}

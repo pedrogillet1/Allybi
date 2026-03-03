@@ -44,6 +44,17 @@ type FileActionDetectionResult =
       kind: "none";
     };
 
+type PersistedIntentState = {
+  lastRoutingDecision?: {
+    intentId?: string;
+    operatorId?: string;
+    intentFamily?: string;
+    domainId?: string;
+    confidence?: number;
+  };
+  activeDomain?: string;
+};
+
 function resolveEnv(): "production" | "staging" | "dev" | "local" {
   const raw = String(process.env.NODE_ENV || "").toLowerCase();
   if (raw === "production") return "production";
@@ -127,6 +138,41 @@ function mapIntentFamilyToRoute(
     return docsAvailable ? "KNOWLEDGE" : "GENERAL";
   }
   return docsAvailable ? "KNOWLEDGE" : "GENERAL";
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return value as Record<string, unknown>;
+}
+
+function getContextRecord(ctx: TurnContext): Record<string, unknown> {
+  return asRecord(ctx.request.context);
+}
+
+function getContextSignals(ctx: TurnContext): Record<string, unknown> {
+  return asRecord(getContextRecord(ctx).signals);
+}
+
+function getPersistedIntentState(ctx: TurnContext): PersistedIntentState | undefined {
+  const state = asRecord(getContextRecord(ctx).intentState);
+  if (Object.keys(state).length === 0) return undefined;
+  const last = asRecord(state.lastRoutingDecision);
+  return {
+    lastRoutingDecision:
+      Object.keys(last).length > 0
+        ? {
+            intentId: String(last.intentId || "").trim() || undefined,
+            operatorId: String(last.operatorId || "").trim() || undefined,
+            intentFamily: String(last.intentFamily || "").trim() || undefined,
+            domainId: String(last.domainId || "").trim() || undefined,
+            confidence:
+              typeof last.confidence === "number"
+                ? last.confidence
+                : undefined,
+          }
+        : undefined,
+    activeDomain: String(state.activeDomain || "").trim() || undefined,
+  };
 }
 
 export class TurnRouterService {
@@ -432,13 +478,13 @@ export class TurnRouterService {
       };
     }
 
-    const contextSignals = (ctx.request.context as any)?.signals || {};
+    const contextSignals = getContextSignals(ctx);
     const runtimeSignals: Record<string, unknown> = {
       hasActiveDoc: Boolean(ctx.activeDocument || ctx.viewer?.documentId),
       explicitDocRef:
         contextSignals.explicitDocRef === true || hasExplicitDocRef,
       hasPriorTurn: Boolean(
-        (ctx.request.context as any)?.intentState?.lastRoutingDecision ||
+        getPersistedIntentState(ctx)?.lastRoutingDecision ||
         contextSignals.hasPriorTurn === true,
       ),
     };
@@ -485,7 +531,7 @@ export class TurnRouterService {
     query: string,
     hasExplicitDocRef: boolean,
   ): FollowupDetectionResult {
-    const contextSignals = (ctx.request.context as any)?.signals || {};
+    const contextSignals = getContextSignals(ctx);
     if (typeof contextSignals.isFollowup === "boolean") {
       return {
         isFollowup: contextSignals.isFollowup,
@@ -539,12 +585,11 @@ export class TurnRouterService {
     const hasLockedScope = Boolean(
       ctx.activeDocument ||
       ctx.viewer?.documentId ||
-      (ctx.request.context as any)?.signals?.explicitDocLock === true,
+      getContextSignals(ctx).explicitDocLock === true,
     );
     const lastIntentFamily = low(
       String(
-        (ctx.request.context as any)?.intentState?.lastRoutingDecision
-          ?.intentFamily || "",
+        getPersistedIntentState(ctx)?.lastRoutingDecision?.intentFamily || "",
       ),
     );
     const lockedScopeWeight = this.getTiebreakWeight("locked_scope_first");
@@ -673,7 +718,7 @@ export class TurnRouterService {
       if (!collisionEnabled || collisionRules.length === 0) return false;
       for (const rule of collisionRules) {
         if (!rule || typeof rule !== "object") continue;
-        const when = (rule as any).when || {};
+        const when = asRecord(asRecord(rule).when);
         const operators = Array.isArray(when?.operators)
           ? when.operators.map((value: unknown) =>
               String(value || "")
@@ -794,7 +839,7 @@ export class TurnRouterService {
     docsAvailable: boolean,
     candidates: RouterCandidate[],
   ): IntentSignals {
-    const contextSignals = (ctx.request.context as any)?.signals || {};
+    const contextSignals = getContextSignals(ctx);
     const query = String(ctx.messageText || "");
     const docRef = hasDocRefSignal(query);
     const followup = this.detectFollowupSignal(ctx, query, docRef);
@@ -843,7 +888,7 @@ export class TurnRouterService {
   private buildConnectorDecisionContext(
     ctx: TurnContext,
   ): ConnectorDecisionContext {
-    const contextSignals = (ctx.request.context as any)?.signals || {};
+    const contextSignals = getContextSignals(ctx);
     const activeProvider = String(ctx.connectors?.activeConnector || "")
       .trim()
       .toLowerCase();
@@ -876,19 +921,7 @@ export class TurnRouterService {
         queryText: String(ctx.messageText || ""),
         candidates,
         signals: this.buildSignals(ctx, docsAvailable, candidates),
-        state:
-          ((ctx.request.context as any)?.intentState as
-            | {
-                lastRoutingDecision?: {
-                  intentId?: string;
-                  operatorId?: string;
-                  intentFamily?: string;
-                  domainId?: string;
-                  confidence?: number;
-                };
-                activeDomain?: string;
-              }
-            | undefined) || undefined,
+        state: getPersistedIntentState(ctx),
       });
     } catch (error) {
       if (isStrictIntentConfigEnv()) {

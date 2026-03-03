@@ -135,4 +135,41 @@ describe("ClarificationPolicyService", () => {
     });
     expect(tooFew).toEqual([]);
   });
+
+  test("applies limit_options transform from clarification policy rules", () => {
+    mockedGetOptionalBank.mockImplementation((bankId: string) => {
+      if (bankId === "clarification_policy") {
+        return {
+          config: {
+            enabled: true,
+            actionsContract: {
+              thresholds: {
+                minOptions: 2,
+                maxOptions: 6,
+              },
+            },
+          },
+          policies: {
+            rules: [
+              {
+                ruleId: "limit_options_rule",
+                priority: 100,
+                when: { path: "metrics.candidateCount", op: "gt", value: 4 },
+                then: {
+                  transform: [{ type: "limit_options", min: 2, max: 4 }],
+                },
+              },
+            ],
+          },
+        } as any;
+      }
+      return null as any;
+    });
+
+    const service = new ClarificationPolicyService();
+    const options = service.enforceClarificationOptions({
+      options: ["A", "B", "C", "D", "E", "F"],
+    });
+    expect(options).toEqual(["A", "B", "C", "D"]);
+  });
 });

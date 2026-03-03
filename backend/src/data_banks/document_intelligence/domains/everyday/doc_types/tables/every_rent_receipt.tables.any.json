@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_rent_receipt",
+    "version": "1.0.0",
+    "description": "Tables expected in every_rent_receipt.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_rent_receipt"
+  },
+  "tableHeaderSynonyms": {
+    "date": ["date", "data", "period", "reference"],
+    "amount": ["amount", "valor", "total", "montante", "quantia"],
+    "description": ["description", "descricao", "item", "desdobramento"],
+    "party": ["landlord", "tenant", "locador", "locatario"]
+  },
+  "tables": [
+    {
+      "id": "rent_receipt_header_table",
+      "canonicalName": {
+        "en": "Receipt Header",
+        "pt": "Tabela de Cabecalho"
+      },
+      "section": "document_header",
+      "signaturePatterns": ["\\brent receipt\\b", "\\brent payment\\b", "\\brecibo\\b"],
+      "requiredHeaders": ["description", "value", "date", "receipt_number", "currency"],
+      "headerAliases": [["description", "descricao"], ["value", "valor"], ["date", "data"], ["receipt_number", "documento"], ["currency", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "receipt_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["rent_receipt_fn_01"]
+    },
+    {
+      "id": "rent_receipt_parties_table",
+      "canonicalName": {
+        "en": "Parties and Property",
+        "pt": "Tabela de Partes"
+      },
+      "section": "property_and_parties",
+      "signaturePatterns": ["\\blandlord\\b", "\\btenant\\b", "\\bproperty\\b"],
+      "requiredHeaders": ["party", "name", "tax_id", "address", "unit"],
+      "headerAliases": [["party", "parte"], ["name", "nome"], ["tax_id", "cpf/cnpj"], ["address", "endereco"], ["unit", "unidade"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["rent_receipt_fn_02"]
+    },
+    {
+      "id": "rent_receipt_payment_period_table",
+      "canonicalName": {
+        "en": "Payment Period",
+        "pt": "Tabela do Periodo"
+      },
+      "section": "payment_period",
+      "signaturePatterns": ["\\bperiod\\b", "\\bfrom\\b", "\\bto\\b", "\\bperiodo\\b"],
+      "requiredHeaders": ["period_start", "period_end", "days", "description"],
+      "headerAliases": [["period_start", "inicio"], ["period_end", "fim"], ["days", "dias"], ["description", "referencia"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["rent_receipt_fn_03"]
+    },
+    {
+      "id": "rent_receipt_charges_table",
+      "canonicalName": {
+        "en": "Charges Breakdown",
+        "pt": "Tabela de Custos"
+      },
+      "section": "charges_breakdown",
+      "signaturePatterns": ["\\brent\\b", "\\bcharge\\b", "\\bfee\\b", "\\baluguel\\b"],
+      "requiredHeaders": ["description", "amount", "currency", "period"],
+      "headerAliases": [["description", "descricao"], ["amount", "valor"], ["currency", "moeda"], ["period", "referencia"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "receipt_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["rent_receipt_fn_04"]
+    },
+    {
+      "id": "rent_receipt_utilities_table",
+      "canonicalName": {
+        "en": "Utilities and Services",
+        "pt": "Tabela de Utilidades"
+      },
+      "section": "utilities_or_services",
+      "signaturePatterns": ["\\butilities\\b", "\\bwater\\b", "\\belectric\\b", "\\bcondominio\\b"],
+      "requiredHeaders": ["description", "amount", "billing_reference", "currency"],
+      "headerAliases": [["description", "servico"], ["amount", "valor"], ["billing_reference", "fatura"], ["currency", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "receipt_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["rent_receipt_fn_05"]
+    }
+  ]
+}

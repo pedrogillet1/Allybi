@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_internet_bill",
+    "version": "1.0.0",
+    "description": "Entity schema for every_internet_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_internet_bill"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    { "id": "subscriber_name", "type": "string", "required": true, "description": "Subscriber name.", "section": "subscriber_profile", "evidence": {"minCitations": 1, "anchors": ["subscriber", "customer", "assinante"], "disallowInference": true, "preferredSources": ["subscriber_profile"]} },
+    { "id": "subscriber_id", "type": "string", "required": false, "description": "Account number.", "section": "subscriber_profile", "evidence": {"minCitations": 1, "anchors": ["account", "conta", "id"], "disallowInference": true, "preferredSources": ["subscriber_profile"]} },
+    { "id": "billing_period_start", "type": "date", "required": true, "description": "Service period start.", "section": "service_period", "evidence": {"minCitations": 1, "anchors": ["period from", "de"], "disallowInference": true, "preferredSources": ["service_period"]} },
+    { "id": "billing_period_end", "type": "date", "required": true, "description": "Service period end.", "section": "service_period", "evidence": {"minCitations": 1, "anchors": ["period to", "ate"], "disallowInference": true, "preferredSources": ["service_period"]} },
+    { "id": "plan_name", "type": "string", "required": true, "description": "Internet plan name.", "section": "plan_details", "evidence": {"minCitations": 1, "anchors": ["plan", "package", "velocidade"], "disallowInference": true, "preferredSources": ["plan_details"]} },
+    { "id": "download_gb", "type": "number", "required": false, "description": "Download usage in GB.", "section": "traffic_summary", "evidence": {"minCitations": 1, "anchors": ["download", "downloaded", "gb"], "disallowInference": false, "preferredSources": ["traffic_summary"]} },
+    { "id": "upload_gb", "type": "number", "required": false, "description": "Upload usage in GB.", "section": "traffic_summary", "evidence": {"minCitations": 1, "anchors": ["upload", "uploaded", "gb"], "disallowInference": false, "preferredSources": ["traffic_summary"]} },
+    { "id": "data_cap_gb", "type": "number", "required": false, "description": "Data cap from plan.", "section": "plan_details", "evidence": {"minCitations": 1, "anchors": ["data cap", "limite", "plano"], "disallowInference": false, "preferredSources": ["plan_details"]} },
+    { "id": "subtotal_amount", "type": "currency", "required": false, "description": "Subtotal charges.", "section": "charges_and_taxes", "evidence": {"minCitations": 1, "anchors": ["subtotal", "subtotal amount"], "disallowInference": true, "preferredSources": ["charges_and_taxes"]} },
+    { "id": "tax_amount", "type": "currency", "required": false, "description": "Tax amount.", "section": "charges_and_taxes", "evidence": {"minCitations": 1, "anchors": ["tax", "imposto"], "disallowInference": true, "preferredSources": ["charges_and_taxes"]} },
+    { "id": "total_amount", "type": "currency", "required": true, "description": "Total bill amount.", "section": "totals_and_due", "evidence": {"minCitations": 1, "anchors": ["total", "grand total", "valor total"], "disallowInference": true, "preferredSources": ["totals_and_due"]} },
+    { "id": "due_date", "type": "date", "required": true, "description": "Due date.", "section": "totals_and_due", "evidence": {"minCitations": 1, "anchors": ["due date", "vencimento"], "disallowInference": true, "preferredSources": ["totals_and_due"]} },
+    { "id": "discount_amount", "type": "currency", "required": false, "description": "Discount amount if any.", "section": "discounts_or_promotions", "evidence": {"minCitations": 1, "anchors": ["discount", "promocao", "desconto"], "disallowInference": false, "preferredSources": ["discounts_or_promotions"]} },
+    { "id": "payment_reference", "type": "string", "required": false, "description": "Payment reference/barcode line.", "section": "payment_options", "evidence": {"minCitations": 1, "anchors": ["barcode", "linha digitavel", "reference"], "disallowInference": true, "preferredSources": ["payment_options"]} }
+  ]
+}

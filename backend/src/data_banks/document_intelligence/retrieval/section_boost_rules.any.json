@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "id": "section_boost_rules",
+    "version": "1.0.0",
+    "description": "Section-level boost/penalty rules for document intelligence retrieval ranking.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxSectionBoost": 0.22,
+    "maxSectionPenalty": 0.12
+  },
+  "rules": [
+    {
+      "id": "SEC_001_clause_number_alignment",
+      "trigger": "Query references legal clause/article numbers",
+      "check": "query.patterns.includes('clause') || query.patterns.includes('article')",
+      "failureAction": "BOOST_SECTION_HEADER_MATCHES",
+      "severity": "high",
+      "boost": 0.12,
+      "target": "sectionHeaders",
+      "signals": [
+        "clause",
+        "article",
+        "sec",
+        "section"
+      ]
+    },
+    {
+      "id": "SEC_002_financial_statement_section",
+      "trigger": "Finance query asks for balance sheet/P&L/revenue section",
+      "check": "query.domain == 'finance' AND query.sectionHints.AnyOf(['balance', 'income', 'revenue', 'expenses'])",
+      "failureAction": "BOOST_SECTION_HEADER_MATCHES",
+      "severity": "high",
+      "boost": 0.1,
+      "target": "sectionHeaders",
+      "signals": [
+        "balance sheet",
+        "income statement",
+        "revenue",
+        "expense",
+        "cash flow"
+      ]
+    },
+    {
+      "id": "SEC_003_medical_result_section",
+      "trigger": "Medical query references findings, diagnosis, or lab test",
+      "check": "query.domain == 'medical' AND query.sectionHints.AnyOf(['findings', 'diagnosis', 'lab', 'result'])",
+      "failureAction": "BOOST_SECTION_HEADER_MATCHES",
+      "severity": "high",
+      "boost": 0.1,
+      "target": "sectionHeaders"
+    },
+    {
+      "id": "SEC_004_receipt_or_bill_header",
+      "trigger": "Everyday billing query targets bill date/total/amount",
+      "check": "query.domain == 'everyday' AND query.sectionHints.AnyOf(['bill', 'receipt', 'total', 'tax'])",
+      "failureAction": "BOOST_SECTION_HEADER_MATCHES",
+      "severity": "medium",
+      "boost": 0.08,
+      "target": "sectionHeaders"
+    },
+    {
+      "id": "SEC_005_penalize_footer_boilerplate",
+      "trigger": "Section is known boilerplate or signature footer",
+      "check": "section.kind == 'boilerplate' OR section.kind == 'disclaimer'",
+      "failureAction": "PENALIZE_SECTION_SCORE",
+      "severity": "medium",
+      "penalty": 0.06,
+      "target": "sectionContent"
+    }
+  ],
+  "templates": [
+    {
+      "id": "SECTION_BOOST_RULES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in section_boost_rules.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

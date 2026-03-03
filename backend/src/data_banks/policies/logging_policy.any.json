@@ -3,8 +3,16 @@
     "id": "logging_policy",
     "version": "1.0.0",
     "description": "Structured logging governance: sanitization, allowed channels, and raw-console restrictions for runtime paths.",
-    "languages": ["any"],
-    "lastUpdated": "2026-03-01"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-01",
+    "owner": "platform-observability",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -24,6 +32,20 @@
       "src/modules/chat/runtime/ChatRuntimeOrchestrator.ts",
       "src/services/core/retrieval/evidenceGate.service.ts",
       "src/services/llm/core/llmGateway.service.ts"
+    ],
+    "configModeOnly": true
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "LOG_POL_T_001",
+        "input": {
+          "password": "secret"
+        },
+        "expect": {
+          "redacted": true
+        }
+      }
     ]
   }
 }

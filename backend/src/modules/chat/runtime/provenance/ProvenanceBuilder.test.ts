@@ -16,7 +16,7 @@ describe("buildChatProvenance strict refs", () => {
     ],
   } as any;
 
-  test("does not seed provenance refs when lexical overlap is too weak", () => {
+  test("does not seed synthetic refs when strict overlap is too weak", () => {
     const provenance = buildChatProvenance({
       answerText: "Tabela comparativa consolidada por prioridade.",
       answerMode: "doc_grounded_table" as any,

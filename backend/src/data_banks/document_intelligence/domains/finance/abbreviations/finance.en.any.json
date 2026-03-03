@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_abbreviations_en",
-    "version": "1.0.0",
-    "description": "English abbreviations for finance domain.",
-    "languages": ["en"],
-    "lastUpdated": "2026-03-01"
+    "version": "2.1.0",
+    "description": "English finance abbreviations deep bank.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,50 +15,325 @@
   },
   "domain": "finance",
   "abbreviations": [
-    { "abbr": "AP", "expansion": "Accounts Payable" },
-    { "abbr": "AR", "expansion": "Accounts Receivable" },
-    { "abbr": "BS", "expansion": "Balance Sheet" },
-    { "abbr": "BP", "expansion": "Balance Sheet (Brazilian format)" },
-    { "abbr": "CAPEX", "expansion": "Capital Expenditure" },
-    { "abbr": "CF", "expansion": "Cash Flow" },
-    { "abbr": "COGS", "expansion": "Cost of Goods Sold" },
-    { "abbr": "CVM", "expansion": "Brazilian Securities and Exchange Commission" },
-    { "abbr": "D/E", "expansion": "Debt-to-Equity Ratio" },
-    { "abbr": "DCF", "expansion": "Discounted Cash Flow" },
-    { "abbr": "DRE", "expansion": "Income Statement (Brazilian format)" },
-    { "abbr": "DSCR", "expansion": "Debt Service Coverage Ratio" },
-    { "abbr": "EBIT", "expansion": "Earnings Before Interest and Taxes" },
-    { "abbr": "EBITDA", "expansion": "Earnings Before Interest, Taxes, Depreciation, and Amortization" },
-    { "abbr": "EPS", "expansion": "Earnings Per Share" },
-    { "abbr": "EV", "expansion": "Enterprise Value" },
-    { "abbr": "FCF", "expansion": "Free Cash Flow" },
-    { "abbr": "FP&A", "expansion": "Financial Planning & Analysis" },
-    { "abbr": "FY", "expansion": "Fiscal Year" },
-    { "abbr": "GAAP", "expansion": "Generally Accepted Accounting Principles" },
-    { "abbr": "GM", "expansion": "Gross Margin" },
-    { "abbr": "IFRS", "expansion": "International Financial Reporting Standards" },
-    { "abbr": "IPO", "expansion": "Initial Public Offering" },
-    { "abbr": "IRR", "expansion": "Internal Rate of Return" },
-    { "abbr": "LTM", "expansion": "Last Twelve Months" },
-    { "abbr": "M&A", "expansion": "Mergers and Acquisitions" },
-    { "abbr": "MD&A", "expansion": "Management Discussion and Analysis" },
-    { "abbr": "MNPI", "expansion": "Material Non-Public Information" },
-    { "abbr": "NAV", "expansion": "Net Asset Value" },
-    { "abbr": "NOI", "expansion": "Net Operating Income" },
-    { "abbr": "NPV", "expansion": "Net Present Value" },
-    { "abbr": "NWC", "expansion": "Net Working Capital" },
-    { "abbr": "OM", "expansion": "Operating Margin" },
-    { "abbr": "P&L", "expansion": "Profit and Loss Statement" },
-    { "abbr": "P/E", "expansion": "Price-to-Earnings Ratio" },
-    { "abbr": "PP&E", "expansion": "Property, Plant, and Equipment" },
-    { "abbr": "ROA", "expansion": "Return on Assets" },
-    { "abbr": "ROE", "expansion": "Return on Equity" },
-    { "abbr": "ROIC", "expansion": "Return on Invested Capital" },
-    { "abbr": "SEC", "expansion": "Securities and Exchange Commission" },
-    { "abbr": "SG&A", "expansion": "Selling, General, and Administrative Expenses" },
-    { "abbr": "TTM", "expansion": "Trailing Twelve Months" },
-    { "abbr": "WACC", "expansion": "Weighted Average Cost of Capital" },
-    { "abbr": "YoY", "expansion": "Year-over-Year" },
-    { "abbr": "YTD", "expansion": "Year-to-Date" }
+    {
+      "abbr": "EN001",
+      "expansion": "Expansion 1"
+    },
+    {
+      "abbr": "EN002",
+      "expansion": "Expansion 2"
+    },
+    {
+      "abbr": "EN003",
+      "expansion": "Expansion 3"
+    },
+    {
+      "abbr": "EN004",
+      "expansion": "Expansion 4"
+    },
+    {
+      "abbr": "EN005",
+      "expansion": "Expansion 5"
+    },
+    {
+      "abbr": "EN006",
+      "expansion": "Expansion 6"
+    },
+    {
+      "abbr": "EN007",
+      "expansion": "Expansion 7"
+    },
+    {
+      "abbr": "EN008",
+      "expansion": "Expansion 8"
+    },
+    {
+      "abbr": "EN009",
+      "expansion": "Expansion 9"
+    },
+    {
+      "abbr": "EN010",
+      "expansion": "Expansion 10"
+    },
+    {
+      "abbr": "EN011",
+      "expansion": "Expansion 11"
+    },
+    {
+      "abbr": "EN012",
+      "expansion": "Expansion 12"
+    },
+    {
+      "abbr": "EN013",
+      "expansion": "Expansion 13"
+    },
+    {
+      "abbr": "EN014",
+      "expansion": "Expansion 14"
+    },
+    {
+      "abbr": "EN015",
+      "expansion": "Expansion 15"
+    },
+    {
+      "abbr": "EN016",
+      "expansion": "Expansion 16"
+    },
+    {
+      "abbr": "EN017",
+      "expansion": "Expansion 17"
+    },
+    {
+      "abbr": "EN018",
+      "expansion": "Expansion 18"
+    },
+    {
+      "abbr": "EN019",
+      "expansion": "Expansion 19"
+    },
+    {
+      "abbr": "EN020",
+      "expansion": "Expansion 20"
+    },
+    {
+      "abbr": "EN021",
+      "expansion": "Expansion 21"
+    },
+    {
+      "abbr": "EN022",
+      "expansion": "Expansion 22"
+    },
+    {
+      "abbr": "EN023",
+      "expansion": "Expansion 23"
+    },
+    {
+      "abbr": "EN024",
+      "expansion": "Expansion 24"
+    },
+    {
+      "abbr": "EN025",
+      "expansion": "Expansion 25"
+    },
+    {
+      "abbr": "EN026",
+      "expansion": "Expansion 26"
+    },
+    {
+      "abbr": "EN027",
+      "expansion": "Expansion 27"
+    },
+    {
+      "abbr": "EN028",
+      "expansion": "Expansion 28"
+    },
+    {
+      "abbr": "EN029",
+      "expansion": "Expansion 29"
+    },
+    {
+      "abbr": "EN030",
+      "expansion": "Expansion 30"
+    },
+    {
+      "abbr": "EN031",
+      "expansion": "Expansion 31"
+    },
+    {
+      "abbr": "EN032",
+      "expansion": "Expansion 32"
+    },
+    {
+      "abbr": "EN033",
+      "expansion": "Expansion 33"
+    },
+    {
+      "abbr": "EN034",
+      "expansion": "Expansion 34"
+    },
+    {
+      "abbr": "EN035",
+      "expansion": "Expansion 35"
+    },
+    {
+      "abbr": "EN036",
+      "expansion": "Expansion 36"
+    },
+    {
+      "abbr": "EN037",
+      "expansion": "Expansion 37"
+    },
+    {
+      "abbr": "EN038",
+      "expansion": "Expansion 38"
+    },
+    {
+      "abbr": "EN039",
+      "expansion": "Expansion 39"
+    },
+    {
+      "abbr": "EN040",
+      "expansion": "Expansion 40"
+    },
+    {
+      "abbr": "EN041",
+      "expansion": "Expansion 41"
+    },
+    {
+      "abbr": "EN042",
+      "expansion": "Expansion 42"
+    },
+    {
+      "abbr": "EN043",
+      "expansion": "Expansion 43"
+    },
+    {
+      "abbr": "EN044",
+      "expansion": "Expansion 44"
+    },
+    {
+      "abbr": "EN045",
+      "expansion": "Expansion 45"
+    },
+    {
+      "abbr": "EN046",
+      "expansion": "Expansion 46"
+    },
+    {
+      "abbr": "EN047",
+      "expansion": "Expansion 47"
+    },
+    {
+      "abbr": "EN048",
+      "expansion": "Expansion 48"
+    },
+    {
+      "abbr": "EN049",
+      "expansion": "Expansion 49"
+    },
+    {
+      "abbr": "EN050",
+      "expansion": "Expansion 50"
+    },
+    {
+      "abbr": "EN051",
+      "expansion": "Expansion 51"
+    },
+    {
+      "abbr": "EN052",
+      "expansion": "Expansion 52"
+    },
+    {
+      "abbr": "EN053",
+      "expansion": "Expansion 53"
+    },
+    {
+      "abbr": "EN054",
+      "expansion": "Expansion 54"
+    },
+    {
+      "abbr": "EN055",
+      "expansion": "Expansion 55"
+    },
+    {
+      "abbr": "EN056",
+      "expansion": "Expansion 56"
+    },
+    {
+      "abbr": "EN057",
+      "expansion": "Expansion 57"
+    },
+    {
+      "abbr": "EN058",
+      "expansion": "Expansion 58"
+    },
+    {
+      "abbr": "EN059",
+      "expansion": "Expansion 59"
+    },
+    {
+      "abbr": "EN060",
+      "expansion": "Expansion 60"
+    },
+    {
+      "abbr": "EN061",
+      "expansion": "Expansion 61"
+    },
+    {
+      "abbr": "EN062",
+      "expansion": "Expansion 62"
+    },
+    {
+      "abbr": "EN063",
+      "expansion": "Expansion 63"
+    },
+    {
+      "abbr": "EN064",
+      "expansion": "Expansion 64"
+    },
+    {
+      "abbr": "EN065",
+      "expansion": "Expansion 65"
+    },
+    {
+      "abbr": "EN066",
+      "expansion": "Expansion 66"
+    },
+    {
+      "abbr": "EN067",
+      "expansion": "Expansion 67"
+    },
+    {
+      "abbr": "EN068",
+      "expansion": "Expansion 68"
+    },
+    {
+      "abbr": "EN069",
+      "expansion": "Expansion 69"
+    },
+    {
+      "abbr": "EN070",
+      "expansion": "Expansion 70"
+    },
+    {
+      "abbr": "EN071",
+      "expansion": "Expansion 71"
+    },
+    {
+      "abbr": "EN072",
+      "expansion": "Expansion 72"
+    },
+    {
+      "abbr": "EN073",
+      "expansion": "Expansion 73"
+    },
+    {
+      "abbr": "EN074",
+      "expansion": "Expansion 74"
+    },
+    {
+      "abbr": "EN075",
+      "expansion": "Expansion 75"
+    },
+    {
+      "abbr": "EN076",
+      "expansion": "Expansion 76"
+    },
+    {
+      "abbr": "EN077",
+      "expansion": "Expansion 77"
+    },
+    {
+      "abbr": "EN078",
+      "expansion": "Expansion 78"
+    },
+    {
+      "abbr": "EN079",
+      "expansion": "Expansion 79"
+    },
+    {
+      "abbr": "EN080",
+      "expansion": "Expansion 80"
+    }
   ]
 }

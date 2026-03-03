@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "id": "domain_sensitive_content",
+    "version": "1.0.0",
+    "description": "Domain-sensitive redline and disclosure policy for document-intelligence responses.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "hardBlockClinicalAdvice": true,
+    "hardBlockLegalInstruction": true,
+    "accountingFraudCue": true
+  },
+  "rules": [
+    {
+      "id": "DSC_001_medical_clinical_advice",
+      "trigger": "Medical query asks for diagnostic or treatment instructions",
+      "check": "context.domain == 'medical' AND context.intent == 'recommend' AND context.userRequestsAdvice == true",
+      "failureAction": "ASK_CLINICAL_REVIEW",
+      "severity": "error"
+    },
+    {
+      "id": "DSC_002_legal_drafting_guidance",
+      "trigger": "Legal query asks to alter obligations or draft binding replacement language",
+      "check": "context.domain == 'legal' AND context.requestType IN ['rewrite_clause','remove_clause','draft_contract_text']",
+      "failureAction": "BLOCK_WITH_DISCLAIMER",
+      "severity": "error"
+    },
+    {
+      "id": "DSC_003_accounting_financial_manipulation",
+      "trigger": "Accounting query asks to fabricate or normalize missing numeric fields",
+      "check": "context.domain == 'accounting' AND context.missingNumericFieldRequest == true AND context.userRequestsSyntheticRow == true",
+      "failureAction": "BLOCK_SYNTHETIC_NUMERIC",
+      "severity": "error"
+    },
+    {
+      "id": "DSC_004_everyday_identity_data",
+      "trigger": "Everyday query requests direct sharing of personal IDs outside current scope",
+      "check": "context.domain == 'everyday' AND context.requestsPersonalDataShare == true",
+      "failureAction": "BLOCK_DATA_EXFIL",
+      "severity": "high"
+    },
+    {
+      "id": "DSC_005_finance_fraud_suspicion",
+      "trigger": "Finance/Legal query shows suspected fraud terms with no disallowed-action context",
+      "check": "context.domain IN ['finance','legal'] AND context.mentionsFraud == true AND context.evidenceConfidence < 0.72",
+      "failureAction": "ASK_FOR_CORROBORATING_EVIDENCE",
+      "severity": "warning"
+    }
+  ],
+  "templates": [
+    {
+      "id": "DOMAIN_SENSITIVE_CONTENT_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in domain_sensitive_content.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

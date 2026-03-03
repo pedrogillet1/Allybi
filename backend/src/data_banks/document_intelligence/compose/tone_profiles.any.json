@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "id": "tone_profiles",
+    "version": "1.0.0",
+    "description": "Tone profiles for doc-grounded composition by domain, audience and risk.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultTone": "balanced",
+    "allowEmphasis": true
+  },
+  "profiles": [
+    {
+      "id": "tone_finance_auditor",
+      "domain": "finance",
+      "audience": "auditor",
+      "primaryTone": "precise",
+      "riskLevel": "high",
+      "wordingRules": [
+        "state assumptions",
+        "attach caveats",
+        "no casual claims"
+      ]
+    },
+    {
+      "id": "tone_finance_executive",
+      "domain": "finance",
+      "audience": "executive",
+      "primaryTone": "concise",
+      "riskLevel": "medium",
+      "wordingRules": [
+        "short summary",
+        "highlight risks",
+        "recommend next action"
+      ]
+    },
+    {
+      "id": "tone_legal_careful",
+      "domain": "legal",
+      "audience": "professional",
+      "primaryTone": "cautious",
+      "riskLevel": "high",
+      "wordingRules": [
+        "state source-based limits",
+        "avoid legal conclusions without text",
+        "define terminology"
+      ]
+    },
+    {
+      "id": "tone_medical_sensitive",
+      "domain": "medical",
+      "audience": "patient",
+      "primaryTone": "empathetic_precise",
+      "riskLevel": "high",
+      "wordingRules": [
+        "avoid diagnosis claims",
+        "suggest clinical follow-up",
+        "show uncertainty"
+      ]
+    },
+    {
+      "id": "tone_accounting_workflow",
+      "domain": "accounting",
+      "audience": "operator",
+      "primaryTone": "practical",
+      "riskLevel": "medium",
+      "wordingRules": [
+        "state controls",
+        "show reconciliation path",
+        "include numeric context"
+      ]
+    },
+    {
+      "id": "tone_everyday_helpful",
+      "domain": "everyday",
+      "audience": "consumer",
+      "primaryTone": "helpful",
+      "riskLevel": "low",
+      "wordingRules": [
+        "simple sentence structure",
+        "clarify assumptions",
+        "avoid over-technical"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "TP_001_legal_requires_precise_tone",
+      "trigger": "legal response drafted with non-cautious tone",
+      "check": "context.domain == 'legal' AND output.tone in ['concise','cheerful'] AND context.riskLevel == 'high'",
+      "failureAction": "UPGRADE_TONE_TO_CAUTIOUS"
+    },
+    {
+      "id": "TP_002_medical_requires_empathetic_precise",
+      "trigger": "medical response is missing empathetic framing",
+      "check": "context.domain == 'medical' AND output.toneProfile != 'medical_sensitive'",
+      "failureAction": "APPLY_MEDICAL_TONE_PROFILE"
+    },
+    {
+      "id": "TP_003_accounting_practical_controls",
+      "trigger": "high complexity accounting reply uses non-practical tone",
+      "check": "context.domain == 'accounting' AND context.queryComplexity == 'high' AND output.toneProfile != 'tone_accounting_workflow'",
+      "failureAction": "SWITCH_TO_ACCOUNTING_WORKFLOW_TONE"
+    },
+    {
+      "id": "TP_004_finance_auditor_detailing",
+      "trigger": "finance auditor audience receives low precision tone",
+      "check": "context.domain == 'finance' AND context.audience == 'auditor' AND output.precisionLevel < 0.9",
+      "failureAction": "INCREASE_PRECISION_BRACKETING"
+    },
+    {
+      "id": "TP_005_default_fallback_safeguard",
+      "trigger": "query domain is unknown and default tone is not balanced",
+      "check": "context.domain == 'any' AND context.derivedDomain == null AND output.primaryTone != 'balanced'",
+      "failureAction": "RESET_TO_BALANCED_TONE"
+    }
+  ],
+  "templates": [
+    {
+      "id": "TONE_PROFILES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in tone_profiles.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

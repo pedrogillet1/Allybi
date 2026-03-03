@@ -15,6 +15,7 @@ import {
   type DocumentIntelligenceBanksService,
 } from "../banks/documentIntelligenceBanks.service";
 import { getOptionalBank } from "../banks/bankLoader.service";
+import { evaluateRuleBooleanExpression } from "./qualityGateRunner.expression";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1532,59 +1533,29 @@ export class QualityGateRunnerService {
     if (!normalizedExpression) return { triggered: false };
 
     try {
-      // eslint-disable-next-line no-new-func
-      const evaluator = new Function(
-        "context",
-        "output",
-        "attachments",
-        "source",
-        "config",
-        "answerMode",
-        "diAny",
-        "diCount",
-        "diDistinctCount",
-        "diIn",
-        "diStartsWith",
-        "diMatchesPattern",
-        "diIncludes",
-        "diSum",
-        "diLog10",
-        `return Boolean(${normalizedExpression});`,
-      ) as (
-        context: Record<string, unknown>,
-        output: Record<string, unknown>,
-        attachments: Record<string, unknown>,
-        source: Record<string, unknown>,
-        config: Record<string, unknown>,
-        answerMode: string,
-        diAnyFn: typeof diAny,
-        diCountFn: typeof diCount,
-        diDistinctCountFn: typeof diDistinctCount,
-        diInFn: typeof diIn,
-        diStartsWithFn: typeof diStartsWith,
-        diMatchesPatternFn: typeof diMatchesPattern,
-        diIncludesFn: typeof diIncludes,
-        diSumFn: typeof diSum,
-        diLog10Fn: typeof diLog10,
-      ) => boolean;
       return {
-        triggered: evaluator(
-          scope.context,
-          scope.output,
-          scope.attachments,
-          scope.source,
-          scope.config,
-          scope.answerMode,
-          diAny,
-          diCount,
-          diDistinctCount,
-          diIn,
-          diStartsWith,
-          diMatchesPattern,
-          diIncludes,
-          diSum,
-          diLog10,
-        ),
+        triggered: evaluateRuleBooleanExpression({
+          normalizedExpression,
+          scope: {
+            context: scope.context,
+            output: scope.output,
+            attachments: scope.attachments,
+            source: scope.source,
+            config: scope.config,
+            answerMode: scope.answerMode,
+          },
+          helpers: {
+            diAny,
+            diCount,
+            diDistinctCount,
+            diIn,
+            diStartsWith,
+            diMatchesPattern,
+            diIncludes,
+            diSum,
+            diLog10,
+          },
+        }),
       };
     } catch (error) {
       return {

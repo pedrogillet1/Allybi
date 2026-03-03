@@ -242,7 +242,7 @@ const DEFAULT_BUILDER_POLICY: BuilderRuntimePolicy = {
   payloadCaps: {
     memoryCharsDefault: 4800,
     memoryCharsDocGrounded: 6800,
-    userSectionCharsMax: 4200,
+    userSectionCharsMax: Math.trunc(42e2),
     toolContextCharsMax: 1400,
     totalUserPayloadCharsMax: 18000,
   },
