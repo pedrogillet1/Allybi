@@ -1,0 +1,1028 @@
+{
+  "_meta": {
+    "id": "legal_doc_type_aliases",
+    "version": "2.1.0",
+    "description": "Alias mapping for legal doc type resolution used by legal document classification and lookup.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "legal",
+    "minAliasConfidence": 0.7,
+    "caseInsensitive": true
+  },
+  "domain": "legal",
+  "aliases": [
+    {
+      "phrase": "non-disclosure agreement",
+      "normalized": "non-disclosure agreement",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "contract_period",
+        "entityHint": "counterparty",
+        "formatHint": "agreement_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Show the non-disclosure agreement",
+        "Find non-disclosure agreement clauses"
+      ]
+    },
+    {
+      "phrase": "acordo de confidencialidade",
+      "normalized": "acordo de confidencialidade",
+      "docTypeIds": [
+        "legal_nda"
+      ],
+      "hints": {
+        "periodHint": "contract_period",
+        "entityHint": "counterparty",
+        "formatHint": "agreement_pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Mostre o acordo de confidencialidade",
+        "Encontre o acordo de confidencialidade"
+      ]
+    },
+    {
+      "phrase": "master services agreement",
+      "normalized": "master services agreement",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "multi_year",
+        "entityHint": "signer",
+        "formatHint": "contract_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Show master services agreement",
+        "Compare MSA obligations"
+      ]
+    },
+    {
+      "phrase": "acordo mestre de servicos",
+      "normalized": "acordo mestre de servicos",
+      "docTypeIds": [
+        "legal_msa"
+      ],
+      "hints": {
+        "periodHint": "multi_year",
+        "entityHint": "counterparty",
+        "formatHint": "contract_pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Mostre acordo mestre de servicos",
+        "Encontre o contrato mestre"
+      ]
+    },
+    {
+      "phrase": "statement of work",
+      "normalized": "statement of work",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "delivery_window",
+        "entityHint": "vendor",
+        "formatHint": "statement_of_work",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "Show statement of work",
+        "Find statement-of-work clauses"
+      ]
+    },
+    {
+      "phrase": "statement of work",
+      "normalized": "statement of work",
+      "docTypeIds": [
+        "sow"
+      ],
+      "hints": {
+        "periodHint": "delivery_window",
+        "entityHint": "vendor",
+        "formatHint": "statement_sheet",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Find SOW",
+        "Locate statement of work document"
+      ]
+    },
+    {
+      "phrase": "acordo de declaracao de trabalho",
+      "normalized": "acordo de declaracao de trabalho",
+      "docTypeIds": [
+        "legal_sow"
+      ],
+      "hints": {
+        "periodHint": "delivery_window",
+        "entityHint": "vendor",
+        "formatHint": "statement_of_work",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Mostre declaracao de trabalho",
+        "Encontre statement of work"
+      ]
+    },
+    {
+      "phrase": "data processing agreement",
+      "normalized": "data processing agreement",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "processor",
+        "formatHint": "privacy_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Show data processing agreement",
+        "Find processor obligations"
+      ]
+    },
+    {
+      "phrase": "dpa",
+      "normalized": "dpa",
+      "docTypeIds": [
+        "dpa"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "controller",
+        "formatHint": "privacy_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Show DPA",
+        "Find data processing agreement"
+      ]
+    },
+    {
+      "phrase": "acordo de processamento de dados",
+      "normalized": "acordo de processamento de dados",
+      "docTypeIds": [
+        "legal_dpa"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "controller",
+        "formatHint": "privacy_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Mostre acordo de processamento de dados",
+        "Encontre contrato de processamento"
+      ]
+    },
+    {
+      "phrase": "service level agreement",
+      "normalized": "service level agreement",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "quarterly",
+        "entityHint": "operator",
+        "formatHint": "sla_schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Show service level agreement",
+        "Locate SLA uptime clause"
+      ]
+    },
+    {
+      "phrase": "sla",
+      "normalized": "sla",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "quarterly",
+        "entityHint": "operator",
+        "formatHint": "sla_schedule",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Show SLA",
+        "Show service commitments"
+      ]
+    },
+    {
+      "phrase": "acordo de nivel de servico",
+      "normalized": "acordo de nivel de servico",
+      "docTypeIds": [
+        "legal_sla"
+      ],
+      "hints": {
+        "periodHint": "quarterly",
+        "entityHint": "operator",
+        "formatHint": "sla_schedule",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Mostre acordo de nivel de servico",
+        "Encontre SLA"
+      ]
+    },
+    {
+      "phrase": "employment agreement",
+      "normalized": "employment agreement",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "employment_period",
+        "entityHint": "employee",
+        "formatHint": "employment_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Show employment agreement",
+        "Find employee agreement"
+      ]
+    },
+    {
+      "phrase": "contrato de trabalho",
+      "normalized": "contrato de trabalho",
+      "docTypeIds": [
+        "legal_employment_agreement"
+      ],
+      "hints": {
+        "periodHint": "employment_period",
+        "entityHint": "employee",
+        "formatHint": "employment_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Mostre contrato de trabalho",
+        "Encontre contrato do empregado"
+      ]
+    },
+    {
+      "phrase": "offer letter",
+      "normalized": "offer letter",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "pre_hire",
+        "entityHint": "candidate",
+        "formatHint": "offer_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Find offer letter",
+        "Show candidate offer"
+      ]
+    },
+    {
+      "phrase": "carta de proposta",
+      "normalized": "carta de proposta",
+      "docTypeIds": [
+        "legal_offer_letter"
+      ],
+      "hints": {
+        "periodHint": "pre_hire",
+        "entityHint": "candidate",
+        "formatHint": "offer_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "Mostre carta de proposta",
+        "Encontre offer letter"
+      ]
+    },
+    {
+      "phrase": "settlement agreement",
+      "normalized": "settlement agreement",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "resolution_window",
+        "entityHint": "counterparty",
+        "formatHint": "court_settlement",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Find settlement agreement",
+        "Show release and payment terms"
+      ]
+    },
+    {
+      "phrase": "acordo de transacao",
+      "normalized": "acordo de transacao",
+      "docTypeIds": [
+        "legal_settlement_agreement"
+      ],
+      "hints": {
+        "periodHint": "resolution_window",
+        "entityHint": "counterparty",
+        "formatHint": "court_settlement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Mostre acordo de transacao",
+        "Encontre documento de transacao"
+      ]
+    },
+    {
+      "phrase": "court order",
+      "normalized": "court order",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "court",
+        "formatHint": "judicial_order",
+        "languageHint": "en"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Find court order",
+        "Show court mandate"
+      ]
+    },
+    {
+      "phrase": "order of the court",
+      "normalized": "order of the court",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "court",
+        "formatHint": "judicial_order",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Show order of the court",
+        "Locate judicial disposition"
+      ]
+    },
+    {
+      "phrase": "ordem judicial",
+      "normalized": "ordem judicial",
+      "docTypeIds": [
+        "legal_court_order"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "court",
+        "formatHint": "judicial_order",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Encontre ordem judicial",
+        "Mostre ordem do juizo"
+      ]
+    },
+    {
+      "phrase": "complaint",
+      "normalized": "complaint",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "plaintiff",
+        "formatHint": "litigation_file",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Find complaint",
+        "Show complaint filing"
+      ]
+    },
+    {
+      "phrase": "acao judicial",
+      "normalized": "acao judicial",
+      "docTypeIds": [
+        "legal_complaint"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "plaintiff",
+        "formatHint": "litigation_file",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "Mostre a acao judicial",
+        "Encontre acao judicial"
+      ]
+    },
+    {
+      "phrase": "privacy policy",
+      "normalized": "privacy policy",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "data_subject",
+        "formatHint": "policy_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "Find privacy policy",
+        "Show privacy practices"
+      ]
+    },
+    {
+      "phrase": "politica de privacidade",
+      "normalized": "politica de privacidade",
+      "docTypeIds": [
+        "legal_privacy_policy"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "data_subject",
+        "formatHint": "policy_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "Mostre politica de privacidade",
+        "Encontre documento de privacidade"
+      ]
+    },
+    {
+      "phrase": "terms of service",
+      "normalized": "terms of service",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "service_lifecycle",
+        "entityHint": "platform_operator",
+        "formatHint": "policy_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Show terms of service",
+        "Compare ToS obligations"
+      ]
+    },
+    {
+      "phrase": "termos de servico",
+      "normalized": "termos de servico",
+      "docTypeIds": [
+        "legal_terms_of_service"
+      ],
+      "hints": {
+        "periodHint": "service_lifecycle",
+        "entityHint": "platform_operator",
+        "formatHint": "policy_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Mostre termos de servico",
+        "Encontre termos de uso"
+      ]
+    },
+    {
+      "phrase": "cookie policy",
+      "normalized": "cookie policy",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "web_platform",
+        "formatHint": "privacy_policy",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Find cookie policy",
+        "Show cookie handling terms"
+      ]
+    },
+    {
+      "phrase": "politica de cookies",
+      "normalized": "politica de cookies",
+      "docTypeIds": [
+        "legal_cookie_policy"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "web_platform",
+        "formatHint": "privacy_policy",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Mostre politica de cookies",
+        "Encontre politica de cookies"
+      ]
+    },
+    {
+      "phrase": "lease agreement",
+      "normalized": "lease agreement",
+      "docTypeIds": [
+        "legal_lease_agreement"
+      ],
+      "hints": {
+        "periodHint": "occupancy_period",
+        "entityHint": "tenant",
+        "formatHint": "lease_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Show lease agreement",
+        "Find rent and premises clauses"
+      ]
+    },
+    {
+      "phrase": "contrato de locacao",
+      "normalized": "contrato de locacao",
+      "docTypeIds": [
+        "legal_lease_agreement"
+      ],
+      "hints": {
+        "periodHint": "occupancy_period",
+        "entityHint": "tenant",
+        "formatHint": "lease_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Mostre contrato de locacao",
+        "Encontre termos de locacao"
+      ]
+    },
+    {
+      "phrase": "litigation memo",
+      "normalized": "litigation memo",
+      "docTypeIds": [
+        "legal_litigation_memo"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "counsel",
+        "formatHint": "legal_memo",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Find litigation memo",
+        "Show litigation risk memo"
+      ]
+    },
+    {
+      "phrase": "memorial de litigio",
+      "normalized": "memorial de litigio",
+      "docTypeIds": [
+        "legal_litigation_memo"
+      ],
+      "hints": {
+        "periodHint": "litigation_window",
+        "entityHint": "counsel",
+        "formatHint": "legal_memo",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "Encontre memorial de litigio",
+        "Mostre minuta de litigio"
+      ]
+    },
+    {
+      "phrase": "license agreement",
+      "normalized": "license agreement",
+      "docTypeIds": [
+        "legal_license_agreement"
+      ],
+      "hints": {
+        "periodHint": "license_term",
+        "entityHint": "licensee",
+        "formatHint": "ip_agreement",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Show license agreement",
+        "Find license grant terms"
+      ]
+    },
+    {
+      "phrase": "business associate agreement",
+      "normalized": "business associate agreement",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "processor",
+        "formatHint": "privacy_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "Show business associate agreement",
+        "Find BAA obligations"
+      ]
+    },
+    {
+      "phrase": "acordo de associado comercial",
+      "normalized": "acordo de associado comercial",
+      "docTypeIds": [
+        "legal_baa"
+      ],
+      "hints": {
+        "periodHint": "ongoing",
+        "entityHint": "processor",
+        "formatHint": "privacy_contract",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "Mostre acordo de associado comercial",
+        "Encontre BAA"
+      ]
+    },
+    {
+      "phrase": "acceptable use policy",
+      "normalized": "acceptable use policy",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "policy_cycle",
+        "entityHint": "platform_operator",
+        "formatHint": "policy_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Show acceptable use policy",
+        "Find prohibited use terms"
+      ]
+    },
+    {
+      "phrase": "politica de uso aceitavel",
+      "normalized": "politica de uso aceitavel",
+      "docTypeIds": [
+        "legal_acceptable_use_policy"
+      ],
+      "hints": {
+        "periodHint": "policy_cycle",
+        "entityHint": "platform_operator",
+        "formatHint": "policy_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Mostre politica de uso aceitavel",
+        "Encontre regras de uso"
+      ]
+    },
+    {
+      "phrase": "eula",
+      "normalized": "eula",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "software_lifecycle",
+        "entityHint": "software_provider",
+        "formatHint": "license_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "Show EULA",
+        "Find end user license agreement"
+      ]
+    },
+    {
+      "phrase": "end user license agreement",
+      "normalized": "end user license agreement",
+      "docTypeIds": [
+        "legal_eula"
+      ],
+      "hints": {
+        "periodHint": "software_lifecycle",
+        "entityHint": "software_provider",
+        "formatHint": "license_contract",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "Show end user license agreement",
+        "Find EULA limitations"
+      ]
+    },
+    {
+      "phrase": "privacy and security policy",
+      "normalized": "privacy and security policy",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "incident_cycle",
+        "entityHint": "security_team",
+        "formatHint": "security_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "Find security policy",
+        "Show privacy and security policy"
+      ]
+    },
+    {
+      "phrase": "politica de seguranca",
+      "normalized": "politica de seguranca",
+      "docTypeIds": [
+        "legal_security_policy"
+      ],
+      "hints": {
+        "periodHint": "incident_cycle",
+        "entityHint": "security_team",
+        "formatHint": "security_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "Mostre politica de seguranca",
+        "Encontre politica de seguranca"
+      ]
+    },
+    {
+      "phrase": "code of conduct",
+      "normalized": "code of conduct",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "onboarding_cycle",
+        "entityHint": "employee",
+        "formatHint": "policy_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Show code of conduct",
+        "Find conduct standards"
+      ]
+    },
+    {
+      "phrase": "codigo de conduta",
+      "normalized": "codigo de conduta",
+      "docTypeIds": [
+        "legal_code_of_conduct"
+      ],
+      "hints": {
+        "periodHint": "onboarding_cycle",
+        "entityHint": "employee",
+        "formatHint": "policy_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Mostre codigo de conduta",
+        "Encontre codigo de etica"
+      ]
+    },
+    {
+      "phrase": "contract assignment",
+      "normalized": "contract assignment",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "governance_window",
+        "entityHint": "board",
+        "formatHint": "corporate_record",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "Find board resolution",
+        "Show assignment resolution"
+      ]
+    },
+    {
+      "phrase": "board resolution",
+      "normalized": "board resolution",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "governance_window",
+        "entityHint": "board",
+        "formatHint": "corporate_record",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Show board resolution",
+        "Find board minutes"
+      ]
+    },
+    {
+      "phrase": "resolução judicial",
+      "normalized": "resolução judicial",
+      "docTypeIds": [
+        "legal_board_resolution"
+      ],
+      "hints": {
+        "periodHint": "governance_window",
+        "entityHint": "board",
+        "formatHint": "corporate_record",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "Encontre resolução judicial",
+        "Mostre deliberação de conselho"
+      ]
+    },
+    {
+      "phrase": "board minutes",
+      "normalized": "board minutes",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "quarterly",
+        "entityHint": "director",
+        "formatHint": "corporate_record",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Show board minutes",
+        "Find board minute entries"
+      ]
+    },
+    {
+      "phrase": "atas de diretoria",
+      "normalized": "atas de diretoria",
+      "docTypeIds": [
+        "legal_board_minutes"
+      ],
+      "hints": {
+        "periodHint": "quarterly",
+        "entityHint": "director",
+        "formatHint": "corporate_record",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "Mostre atas de diretoria",
+        "Encontre ata de reuniao"
+      ]
+    },
+    {
+      "phrase": "consulting agreement",
+      "normalized": "consulting agreement",
+      "docTypeIds": [
+        "legal_contractor_agreement"
+      ],
+      "hints": {
+        "periodHint": "project_term",
+        "entityHint": "consultant",
+        "formatHint": "contract_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "Show consulting agreement",
+        "Find consulting scope clauses"
+      ]
+    },
+    {
+      "phrase": "consulting contract",
+      "normalized": "consulting contract",
+      "docTypeIds": [
+        "legal_consulting_agreement"
+      ],
+      "hints": {
+        "periodHint": "project_term",
+        "entityHint": "consultant",
+        "formatHint": "contract_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "Find consulting contract",
+        "Show consultant compensation"
+      ]
+    },
+    {
+      "phrase": "parceria jv",
+      "normalized": "parceria jv",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "strategic_cycle",
+        "entityHint": "partner",
+        "formatHint": "partnership_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "Mostre contrato de parceria jv",
+        "Encontre acordo de joint venture"
+      ]
+    },
+    {
+      "phrase": "joint venture agreement",
+      "normalized": "joint venture agreement",
+      "docTypeIds": [
+        "legal_partnership_jv"
+      ],
+      "hints": {
+        "periodHint": "strategic_cycle",
+        "entityHint": "partner",
+        "formatHint": "partnership_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "Find joint venture agreement",
+        "Show JV governance clause"
+      ]
+    },
+    {
+      "phrase": "byleaws charter",
+      "normalized": "bylaws charter",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "corporate_cycle",
+        "entityHint": "governance",
+        "formatHint": "charter_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "Find bylaws charter",
+        "Show corporate charter"
+      ]
+    },
+    {
+      "phrase": "estatuto social",
+      "normalized": "estatuto social",
+      "docTypeIds": [
+        "legal_bylaws_charter"
+      ],
+      "hints": {
+        "periodHint": "corporate_cycle",
+        "entityHint": "governance",
+        "formatHint": "charter_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "Mostre estatuto social",
+        "Encontre carta dos estatutos"
+      ]
+    }
+  ]
+}

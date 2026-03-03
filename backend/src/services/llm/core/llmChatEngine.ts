@@ -28,7 +28,7 @@ export class LLMChatEngine implements ChatEngine {
     config?: Partial<LLMChatEngineConfig>,
   ) {
     this.provider = config?.provider ?? "google";
-    this.modelId = config?.modelId ?? "gemini-2.0-flash";
+    this.modelId = config?.modelId ?? "gemini-2.5-flash";
   }
 
   async generate(params: {

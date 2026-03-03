@@ -1,0 +1,5794 @@
+{
+  "_meta": {
+    "id": "nav_intents_pt",
+    "version": "1.0.0",
+    "description": "Padrões de navegação em PT: abrir/listar/mostrar árvore/localizar documento e tratar duplicatas, com modo de navegação.",
+    "languages": [
+      "pt",
+      "any"
+    ],
+    "owner": "navigation-patterning",
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id"
+  },
+  "patterns": [
+    {
+      "id": "NAV_PT_0001",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir budget report #1",
+        "abrir budget report from current context",
+        "abrir budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir budget report 1",
+        "abrir budget report no contexto atual",
+        "abrir budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0002",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar árvore spreadsheet #1",
+        "mostrar árvore spreadsheet from current context",
+        "mostrar árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar árvore spreadsheet 1",
+        "mostrar árvore spreadsheet no contexto atual",
+        "mostrar árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0003",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar pasta audit file #1",
+        "listar pasta audit file from current context",
+        "listar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "listar pasta audit file 1",
+        "listar pasta audit file no contexto atual",
+        "listar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0004",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo budget report #1",
+        "localizar arquivo budget report from current context",
+        "localizar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo budget report 1",
+        "localizar arquivo budget report no contexto atual",
+        "localizar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0005",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas spreadsheet #1",
+        "encontrar duplicatas spreadsheet from current context",
+        "encontrar duplicatas spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas spreadsheet 1",
+        "encontrar duplicatas spreadsheet no contexto atual",
+        "encontrar duplicatas spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0006",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar audit file #2",
+        "mostrar audit file from current context",
+        "mostrar audit file with navigation pills"
+      ],
+      "pt": [
+        "mostrar audit file 2",
+        "mostrar audit file no contexto atual",
+        "mostrar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0007",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir árvore budget report #2",
+        "abrir árvore budget report from current context",
+        "abrir árvore budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir árvore budget report 2",
+        "abrir árvore budget report no contexto atual",
+        "abrir árvore budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0008",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar arquivos spreadsheet #2",
+        "listar arquivos spreadsheet from current context",
+        "listar arquivos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "listar arquivos spreadsheet 2",
+        "listar arquivos spreadsheet no contexto atual",
+        "listar arquivos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0009",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo audit file #2",
+        "encontrar arquivo audit file from current context",
+        "encontrar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo audit file 2",
+        "encontrar arquivo audit file no contexto atual",
+        "encontrar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0010",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado budget report #2",
+        "detectar duplicado budget report from current context",
+        "detectar duplicado budget report with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado budget report 2",
+        "detectar duplicado budget report no contexto atual",
+        "detectar duplicado budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0011",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir spreadsheet #3",
+        "exibir spreadsheet from current context",
+        "exibir spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "exibir spreadsheet 3",
+        "exibir spreadsheet no contexto atual",
+        "exibir spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0012",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir árvore audit file #3",
+        "exibir árvore audit file from current context",
+        "exibir árvore audit file with navigation pills"
+      ],
+      "pt": [
+        "exibir árvore audit file 3",
+        "exibir árvore audit file no contexto atual",
+        "exibir árvore audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0013",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar documentos budget report #3",
+        "listar documentos budget report from current context",
+        "listar documentos budget report with navigation pills"
+      ],
+      "pt": [
+        "listar documentos budget report 3",
+        "listar documentos budget report no contexto atual",
+        "listar documentos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0014",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "buscar arquivo spreadsheet #3",
+        "buscar arquivo spreadsheet from current context",
+        "buscar arquivo spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "buscar arquivo spreadsheet 3",
+        "buscar arquivo spreadsheet no contexto atual",
+        "buscar arquivo spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0015",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "identificar duplicado audit file #3",
+        "identificar duplicado audit file from current context",
+        "identificar duplicado audit file with navigation pills"
+      ],
+      "pt": [
+        "identificar duplicado audit file 3",
+        "identificar duplicado audit file no contexto atual",
+        "identificar duplicado audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0016",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "carregar budget report #4",
+        "carregar budget report from current context",
+        "carregar budget report with navigation pills"
+      ],
+      "pt": [
+        "carregar budget report 4",
+        "carregar budget report no contexto atual",
+        "carregar budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0017",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "expandir árvore spreadsheet #4",
+        "expandir árvore spreadsheet from current context",
+        "expandir árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "expandir árvore spreadsheet 4",
+        "expandir árvore spreadsheet no contexto atual",
+        "expandir árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0018",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "navegar pasta audit file #4",
+        "navegar pasta audit file from current context",
+        "navegar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "navegar pasta audit file 4",
+        "navegar pasta audit file no contexto atual",
+        "navegar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0019",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "onde está budget report #4",
+        "onde está budget report from current context",
+        "onde está budget report with navigation pills"
+      ],
+      "pt": [
+        "onde está budget report 4",
+        "onde está budget report no contexto atual",
+        "onde está budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0020",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "verificar repetidos spreadsheet #4",
+        "verificar repetidos spreadsheet from current context",
+        "verificar repetidos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "verificar repetidos spreadsheet 4",
+        "verificar repetidos spreadsheet no contexto atual",
+        "verificar repetidos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0021",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "acessar audit file #5",
+        "acessar audit file from current context",
+        "acessar audit file with navigation pills"
+      ],
+      "pt": [
+        "acessar audit file 5",
+        "acessar audit file no contexto atual",
+        "acessar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0022",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "inspecionar estrutura budget report #5",
+        "inspecionar estrutura budget report from current context",
+        "inspecionar estrutura budget report with navigation pills"
+      ],
+      "pt": [
+        "inspecionar estrutura budget report 5",
+        "inspecionar estrutura budget report no contexto atual",
+        "inspecionar estrutura budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0023",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar diretório spreadsheet #5",
+        "mostrar diretório spreadsheet from current context",
+        "mostrar diretório spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar diretório spreadsheet 5",
+        "mostrar diretório spreadsheet no contexto atual",
+        "mostrar diretório spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0024",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "achar documento audit file #5",
+        "achar documento audit file from current context",
+        "achar documento audit file with navigation pills"
+      ],
+      "pt": [
+        "achar documento audit file 5",
+        "achar documento audit file no contexto atual",
+        "achar documento audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0025",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "filtrar duplicados budget report #5",
+        "filtrar duplicados budget report from current context",
+        "filtrar duplicados budget report with navigation pills"
+      ],
+      "pt": [
+        "filtrar duplicados budget report 5",
+        "filtrar duplicados budget report no contexto atual",
+        "filtrar duplicados budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0026",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "visualizar spreadsheet #6",
+        "visualizar spreadsheet from current context",
+        "visualizar spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "visualizar spreadsheet 6",
+        "visualizar spreadsheet no contexto atual",
+        "visualizar spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0027",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "ver estrutura audit file #6",
+        "ver estrutura audit file from current context",
+        "ver estrutura audit file with navigation pills"
+      ],
+      "pt": [
+        "ver estrutura audit file 6",
+        "ver estrutura audit file no contexto atual",
+        "ver estrutura audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0028",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "escanear pasta budget report #6",
+        "escanear pasta budget report from current context",
+        "escanear pasta budget report with navigation pills"
+      ],
+      "pt": [
+        "escanear pasta budget report 6",
+        "escanear pasta budget report no contexto atual",
+        "escanear pasta budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0029",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo spreadsheet #6",
+        "localizar arquivo spreadsheet from current context",
+        "localizar arquivo spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo spreadsheet 6",
+        "localizar arquivo spreadsheet no contexto atual",
+        "localizar arquivo spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0030",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas audit file #6",
+        "encontrar duplicatas audit file from current context",
+        "encontrar duplicatas audit file with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas audit file 6",
+        "encontrar duplicatas audit file no contexto atual",
+        "encontrar duplicatas audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0031",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir budget report #7",
+        "abrir budget report from current context",
+        "abrir budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir budget report 7",
+        "abrir budget report no contexto atual",
+        "abrir budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0032",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar árvore spreadsheet #7",
+        "mostrar árvore spreadsheet from current context",
+        "mostrar árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar árvore spreadsheet 7",
+        "mostrar árvore spreadsheet no contexto atual",
+        "mostrar árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0033",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar pasta audit file #7",
+        "listar pasta audit file from current context",
+        "listar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "listar pasta audit file 7",
+        "listar pasta audit file no contexto atual",
+        "listar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0034",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo budget report #7",
+        "encontrar arquivo budget report from current context",
+        "encontrar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo budget report 7",
+        "encontrar arquivo budget report no contexto atual",
+        "encontrar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0035",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado spreadsheet #7",
+        "detectar duplicado spreadsheet from current context",
+        "detectar duplicado spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado spreadsheet 7",
+        "detectar duplicado spreadsheet no contexto atual",
+        "detectar duplicado spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0036",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar audit file #8",
+        "mostrar audit file from current context",
+        "mostrar audit file with navigation pills"
+      ],
+      "pt": [
+        "mostrar audit file 8",
+        "mostrar audit file no contexto atual",
+        "mostrar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0037",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir árvore budget report #8",
+        "abrir árvore budget report from current context",
+        "abrir árvore budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir árvore budget report 8",
+        "abrir árvore budget report no contexto atual",
+        "abrir árvore budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0038",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar arquivos spreadsheet #8",
+        "listar arquivos spreadsheet from current context",
+        "listar arquivos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "listar arquivos spreadsheet 8",
+        "listar arquivos spreadsheet no contexto atual",
+        "listar arquivos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0039",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "buscar arquivo audit file #8",
+        "buscar arquivo audit file from current context",
+        "buscar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "buscar arquivo audit file 8",
+        "buscar arquivo audit file no contexto atual",
+        "buscar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0040",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "identificar duplicado budget report #8",
+        "identificar duplicado budget report from current context",
+        "identificar duplicado budget report with navigation pills"
+      ],
+      "pt": [
+        "identificar duplicado budget report 8",
+        "identificar duplicado budget report no contexto atual",
+        "identificar duplicado budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0041",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir spreadsheet #9",
+        "exibir spreadsheet from current context",
+        "exibir spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "exibir spreadsheet 9",
+        "exibir spreadsheet no contexto atual",
+        "exibir spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0042",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir árvore audit file #9",
+        "exibir árvore audit file from current context",
+        "exibir árvore audit file with navigation pills"
+      ],
+      "pt": [
+        "exibir árvore audit file 9",
+        "exibir árvore audit file no contexto atual",
+        "exibir árvore audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0043",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar documentos budget report #9",
+        "listar documentos budget report from current context",
+        "listar documentos budget report with navigation pills"
+      ],
+      "pt": [
+        "listar documentos budget report 9",
+        "listar documentos budget report no contexto atual",
+        "listar documentos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0044",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "onde está spreadsheet #9",
+        "onde está spreadsheet from current context",
+        "onde está spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "onde está spreadsheet 9",
+        "onde está spreadsheet no contexto atual",
+        "onde está spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0045",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "verificar repetidos audit file #9",
+        "verificar repetidos audit file from current context",
+        "verificar repetidos audit file with navigation pills"
+      ],
+      "pt": [
+        "verificar repetidos audit file 9",
+        "verificar repetidos audit file no contexto atual",
+        "verificar repetidos audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0046",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "carregar budget report #10",
+        "carregar budget report from current context",
+        "carregar budget report with navigation pills"
+      ],
+      "pt": [
+        "carregar budget report 10",
+        "carregar budget report no contexto atual",
+        "carregar budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0047",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "expandir árvore spreadsheet #10",
+        "expandir árvore spreadsheet from current context",
+        "expandir árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "expandir árvore spreadsheet 10",
+        "expandir árvore spreadsheet no contexto atual",
+        "expandir árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0048",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "navegar pasta audit file #10",
+        "navegar pasta audit file from current context",
+        "navegar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "navegar pasta audit file 10",
+        "navegar pasta audit file no contexto atual",
+        "navegar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0049",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "achar documento budget report #10",
+        "achar documento budget report from current context",
+        "achar documento budget report with navigation pills"
+      ],
+      "pt": [
+        "achar documento budget report 10",
+        "achar documento budget report no contexto atual",
+        "achar documento budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0050",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "filtrar duplicados spreadsheet #10",
+        "filtrar duplicados spreadsheet from current context",
+        "filtrar duplicados spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "filtrar duplicados spreadsheet 10",
+        "filtrar duplicados spreadsheet no contexto atual",
+        "filtrar duplicados spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0051",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "acessar audit file #11",
+        "acessar audit file from current context",
+        "acessar audit file with navigation pills"
+      ],
+      "pt": [
+        "acessar audit file 11",
+        "acessar audit file no contexto atual",
+        "acessar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0052",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "inspecionar estrutura budget report #11",
+        "inspecionar estrutura budget report from current context",
+        "inspecionar estrutura budget report with navigation pills"
+      ],
+      "pt": [
+        "inspecionar estrutura budget report 11",
+        "inspecionar estrutura budget report no contexto atual",
+        "inspecionar estrutura budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0053",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar diretório spreadsheet #11",
+        "mostrar diretório spreadsheet from current context",
+        "mostrar diretório spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar diretório spreadsheet 11",
+        "mostrar diretório spreadsheet no contexto atual",
+        "mostrar diretório spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0054",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo audit file #11",
+        "localizar arquivo audit file from current context",
+        "localizar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo audit file 11",
+        "localizar arquivo audit file no contexto atual",
+        "localizar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0055",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas budget report #11",
+        "encontrar duplicatas budget report from current context",
+        "encontrar duplicatas budget report with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas budget report 11",
+        "encontrar duplicatas budget report no contexto atual",
+        "encontrar duplicatas budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0056",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "visualizar spreadsheet #12",
+        "visualizar spreadsheet from current context",
+        "visualizar spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "visualizar spreadsheet 12",
+        "visualizar spreadsheet no contexto atual",
+        "visualizar spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0057",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "ver estrutura audit file #12",
+        "ver estrutura audit file from current context",
+        "ver estrutura audit file with navigation pills"
+      ],
+      "pt": [
+        "ver estrutura audit file 12",
+        "ver estrutura audit file no contexto atual",
+        "ver estrutura audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0058",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "escanear pasta budget report #12",
+        "escanear pasta budget report from current context",
+        "escanear pasta budget report with navigation pills"
+      ],
+      "pt": [
+        "escanear pasta budget report 12",
+        "escanear pasta budget report no contexto atual",
+        "escanear pasta budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0059",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo spreadsheet #12",
+        "encontrar arquivo spreadsheet from current context",
+        "encontrar arquivo spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo spreadsheet 12",
+        "encontrar arquivo spreadsheet no contexto atual",
+        "encontrar arquivo spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0060",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado audit file #12",
+        "detectar duplicado audit file from current context",
+        "detectar duplicado audit file with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado audit file 12",
+        "detectar duplicado audit file no contexto atual",
+        "detectar duplicado audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0061",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir budget report #13",
+        "abrir budget report from current context",
+        "abrir budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir budget report 13",
+        "abrir budget report no contexto atual",
+        "abrir budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0062",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar árvore spreadsheet #13",
+        "mostrar árvore spreadsheet from current context",
+        "mostrar árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar árvore spreadsheet 13",
+        "mostrar árvore spreadsheet no contexto atual",
+        "mostrar árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0063",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar pasta audit file #13",
+        "listar pasta audit file from current context",
+        "listar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "listar pasta audit file 13",
+        "listar pasta audit file no contexto atual",
+        "listar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0064",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "buscar arquivo budget report #13",
+        "buscar arquivo budget report from current context",
+        "buscar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "buscar arquivo budget report 13",
+        "buscar arquivo budget report no contexto atual",
+        "buscar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0065",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "identificar duplicado spreadsheet #13",
+        "identificar duplicado spreadsheet from current context",
+        "identificar duplicado spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "identificar duplicado spreadsheet 13",
+        "identificar duplicado spreadsheet no contexto atual",
+        "identificar duplicado spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0066",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar audit file #14",
+        "mostrar audit file from current context",
+        "mostrar audit file with navigation pills"
+      ],
+      "pt": [
+        "mostrar audit file 14",
+        "mostrar audit file no contexto atual",
+        "mostrar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0067",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir árvore budget report #14",
+        "abrir árvore budget report from current context",
+        "abrir árvore budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir árvore budget report 14",
+        "abrir árvore budget report no contexto atual",
+        "abrir árvore budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0068",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar arquivos spreadsheet #14",
+        "listar arquivos spreadsheet from current context",
+        "listar arquivos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "listar arquivos spreadsheet 14",
+        "listar arquivos spreadsheet no contexto atual",
+        "listar arquivos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0069",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "onde está audit file #14",
+        "onde está audit file from current context",
+        "onde está audit file with navigation pills"
+      ],
+      "pt": [
+        "onde está audit file 14",
+        "onde está audit file no contexto atual",
+        "onde está audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0070",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "verificar repetidos budget report #14",
+        "verificar repetidos budget report from current context",
+        "verificar repetidos budget report with navigation pills"
+      ],
+      "pt": [
+        "verificar repetidos budget report 14",
+        "verificar repetidos budget report no contexto atual",
+        "verificar repetidos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0071",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir spreadsheet #15",
+        "exibir spreadsheet from current context",
+        "exibir spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "exibir spreadsheet 15",
+        "exibir spreadsheet no contexto atual",
+        "exibir spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0072",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir árvore audit file #15",
+        "exibir árvore audit file from current context",
+        "exibir árvore audit file with navigation pills"
+      ],
+      "pt": [
+        "exibir árvore audit file 15",
+        "exibir árvore audit file no contexto atual",
+        "exibir árvore audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0073",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar documentos budget report #15",
+        "listar documentos budget report from current context",
+        "listar documentos budget report with navigation pills"
+      ],
+      "pt": [
+        "listar documentos budget report 15",
+        "listar documentos budget report no contexto atual",
+        "listar documentos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0074",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "achar documento spreadsheet #15",
+        "achar documento spreadsheet from current context",
+        "achar documento spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "achar documento spreadsheet 15",
+        "achar documento spreadsheet no contexto atual",
+        "achar documento spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0075",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "filtrar duplicados audit file #15",
+        "filtrar duplicados audit file from current context",
+        "filtrar duplicados audit file with navigation pills"
+      ],
+      "pt": [
+        "filtrar duplicados audit file 15",
+        "filtrar duplicados audit file no contexto atual",
+        "filtrar duplicados audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0076",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "carregar budget report #16",
+        "carregar budget report from current context",
+        "carregar budget report with navigation pills"
+      ],
+      "pt": [
+        "carregar budget report 16",
+        "carregar budget report no contexto atual",
+        "carregar budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0077",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "expandir árvore spreadsheet #16",
+        "expandir árvore spreadsheet from current context",
+        "expandir árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "expandir árvore spreadsheet 16",
+        "expandir árvore spreadsheet no contexto atual",
+        "expandir árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0078",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "navegar pasta audit file #16",
+        "navegar pasta audit file from current context",
+        "navegar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "navegar pasta audit file 16",
+        "navegar pasta audit file no contexto atual",
+        "navegar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0079",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo budget report #16",
+        "localizar arquivo budget report from current context",
+        "localizar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo budget report 16",
+        "localizar arquivo budget report no contexto atual",
+        "localizar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0080",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas spreadsheet #16",
+        "encontrar duplicatas spreadsheet from current context",
+        "encontrar duplicatas spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas spreadsheet 16",
+        "encontrar duplicatas spreadsheet no contexto atual",
+        "encontrar duplicatas spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0081",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "acessar audit file #17",
+        "acessar audit file from current context",
+        "acessar audit file with navigation pills"
+      ],
+      "pt": [
+        "acessar audit file 17",
+        "acessar audit file no contexto atual",
+        "acessar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0082",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "inspecionar estrutura budget report #17",
+        "inspecionar estrutura budget report from current context",
+        "inspecionar estrutura budget report with navigation pills"
+      ],
+      "pt": [
+        "inspecionar estrutura budget report 17",
+        "inspecionar estrutura budget report no contexto atual",
+        "inspecionar estrutura budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0083",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar diretório spreadsheet #17",
+        "mostrar diretório spreadsheet from current context",
+        "mostrar diretório spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar diretório spreadsheet 17",
+        "mostrar diretório spreadsheet no contexto atual",
+        "mostrar diretório spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0084",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo audit file #17",
+        "encontrar arquivo audit file from current context",
+        "encontrar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo audit file 17",
+        "encontrar arquivo audit file no contexto atual",
+        "encontrar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0085",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado budget report #17",
+        "detectar duplicado budget report from current context",
+        "detectar duplicado budget report with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado budget report 17",
+        "detectar duplicado budget report no contexto atual",
+        "detectar duplicado budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0086",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "visualizar spreadsheet #18",
+        "visualizar spreadsheet from current context",
+        "visualizar spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "visualizar spreadsheet 18",
+        "visualizar spreadsheet no contexto atual",
+        "visualizar spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0087",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "ver estrutura audit file #18",
+        "ver estrutura audit file from current context",
+        "ver estrutura audit file with navigation pills"
+      ],
+      "pt": [
+        "ver estrutura audit file 18",
+        "ver estrutura audit file no contexto atual",
+        "ver estrutura audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0088",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "escanear pasta budget report #18",
+        "escanear pasta budget report from current context",
+        "escanear pasta budget report with navigation pills"
+      ],
+      "pt": [
+        "escanear pasta budget report 18",
+        "escanear pasta budget report no contexto atual",
+        "escanear pasta budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0089",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "buscar arquivo spreadsheet #18",
+        "buscar arquivo spreadsheet from current context",
+        "buscar arquivo spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "buscar arquivo spreadsheet 18",
+        "buscar arquivo spreadsheet no contexto atual",
+        "buscar arquivo spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0090",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "identificar duplicado audit file #18",
+        "identificar duplicado audit file from current context",
+        "identificar duplicado audit file with navigation pills"
+      ],
+      "pt": [
+        "identificar duplicado audit file 18",
+        "identificar duplicado audit file no contexto atual",
+        "identificar duplicado audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0091",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir budget report #19",
+        "abrir budget report from current context",
+        "abrir budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir budget report 19",
+        "abrir budget report no contexto atual",
+        "abrir budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0092",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar árvore spreadsheet #19",
+        "mostrar árvore spreadsheet from current context",
+        "mostrar árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar árvore spreadsheet 19",
+        "mostrar árvore spreadsheet no contexto atual",
+        "mostrar árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0093",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar pasta audit file #19",
+        "listar pasta audit file from current context",
+        "listar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "listar pasta audit file 19",
+        "listar pasta audit file no contexto atual",
+        "listar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0094",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "onde está budget report #19",
+        "onde está budget report from current context",
+        "onde está budget report with navigation pills"
+      ],
+      "pt": [
+        "onde está budget report 19",
+        "onde está budget report no contexto atual",
+        "onde está budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0095",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "verificar repetidos spreadsheet #19",
+        "verificar repetidos spreadsheet from current context",
+        "verificar repetidos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "verificar repetidos spreadsheet 19",
+        "verificar repetidos spreadsheet no contexto atual",
+        "verificar repetidos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0096",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar audit file #20",
+        "mostrar audit file from current context",
+        "mostrar audit file with navigation pills"
+      ],
+      "pt": [
+        "mostrar audit file 20",
+        "mostrar audit file no contexto atual",
+        "mostrar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0097",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir árvore budget report #20",
+        "abrir árvore budget report from current context",
+        "abrir árvore budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir árvore budget report 20",
+        "abrir árvore budget report no contexto atual",
+        "abrir árvore budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0098",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar arquivos spreadsheet #20",
+        "listar arquivos spreadsheet from current context",
+        "listar arquivos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "listar arquivos spreadsheet 20",
+        "listar arquivos spreadsheet no contexto atual",
+        "listar arquivos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0099",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "achar documento audit file #20",
+        "achar documento audit file from current context",
+        "achar documento audit file with navigation pills"
+      ],
+      "pt": [
+        "achar documento audit file 20",
+        "achar documento audit file no contexto atual",
+        "achar documento audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0100",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "filtrar duplicados budget report #20",
+        "filtrar duplicados budget report from current context",
+        "filtrar duplicados budget report with navigation pills"
+      ],
+      "pt": [
+        "filtrar duplicados budget report 20",
+        "filtrar duplicados budget report no contexto atual",
+        "filtrar duplicados budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0101",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir spreadsheet #21",
+        "exibir spreadsheet from current context",
+        "exibir spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "exibir spreadsheet 21",
+        "exibir spreadsheet no contexto atual",
+        "exibir spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0102",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir árvore audit file #21",
+        "exibir árvore audit file from current context",
+        "exibir árvore audit file with navigation pills"
+      ],
+      "pt": [
+        "exibir árvore audit file 21",
+        "exibir árvore audit file no contexto atual",
+        "exibir árvore audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0103",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar documentos budget report #21",
+        "listar documentos budget report from current context",
+        "listar documentos budget report with navigation pills"
+      ],
+      "pt": [
+        "listar documentos budget report 21",
+        "listar documentos budget report no contexto atual",
+        "listar documentos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0104",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo spreadsheet #21",
+        "localizar arquivo spreadsheet from current context",
+        "localizar arquivo spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo spreadsheet 21",
+        "localizar arquivo spreadsheet no contexto atual",
+        "localizar arquivo spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0105",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas audit file #21",
+        "encontrar duplicatas audit file from current context",
+        "encontrar duplicatas audit file with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas audit file 21",
+        "encontrar duplicatas audit file no contexto atual",
+        "encontrar duplicatas audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0106",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "carregar budget report #22",
+        "carregar budget report from current context",
+        "carregar budget report with navigation pills"
+      ],
+      "pt": [
+        "carregar budget report 22",
+        "carregar budget report no contexto atual",
+        "carregar budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0107",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "expandir árvore spreadsheet #22",
+        "expandir árvore spreadsheet from current context",
+        "expandir árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "expandir árvore spreadsheet 22",
+        "expandir árvore spreadsheet no contexto atual",
+        "expandir árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0108",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "navegar pasta audit file #22",
+        "navegar pasta audit file from current context",
+        "navegar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "navegar pasta audit file 22",
+        "navegar pasta audit file no contexto atual",
+        "navegar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0109",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo budget report #22",
+        "encontrar arquivo budget report from current context",
+        "encontrar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo budget report 22",
+        "encontrar arquivo budget report no contexto atual",
+        "encontrar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0110",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado spreadsheet #22",
+        "detectar duplicado spreadsheet from current context",
+        "detectar duplicado spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado spreadsheet 22",
+        "detectar duplicado spreadsheet no contexto atual",
+        "detectar duplicado spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0111",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "acessar audit file #23",
+        "acessar audit file from current context",
+        "acessar audit file with navigation pills"
+      ],
+      "pt": [
+        "acessar audit file 23",
+        "acessar audit file no contexto atual",
+        "acessar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0112",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "inspecionar estrutura budget report #23",
+        "inspecionar estrutura budget report from current context",
+        "inspecionar estrutura budget report with navigation pills"
+      ],
+      "pt": [
+        "inspecionar estrutura budget report 23",
+        "inspecionar estrutura budget report no contexto atual",
+        "inspecionar estrutura budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0113",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar diretório spreadsheet #23",
+        "mostrar diretório spreadsheet from current context",
+        "mostrar diretório spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar diretório spreadsheet 23",
+        "mostrar diretório spreadsheet no contexto atual",
+        "mostrar diretório spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0114",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "buscar arquivo audit file #23",
+        "buscar arquivo audit file from current context",
+        "buscar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "buscar arquivo audit file 23",
+        "buscar arquivo audit file no contexto atual",
+        "buscar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0115",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "identificar duplicado budget report #23",
+        "identificar duplicado budget report from current context",
+        "identificar duplicado budget report with navigation pills"
+      ],
+      "pt": [
+        "identificar duplicado budget report 23",
+        "identificar duplicado budget report no contexto atual",
+        "identificar duplicado budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0116",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "visualizar spreadsheet #24",
+        "visualizar spreadsheet from current context",
+        "visualizar spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "visualizar spreadsheet 24",
+        "visualizar spreadsheet no contexto atual",
+        "visualizar spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0117",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "ver estrutura audit file #24",
+        "ver estrutura audit file from current context",
+        "ver estrutura audit file with navigation pills"
+      ],
+      "pt": [
+        "ver estrutura audit file 24",
+        "ver estrutura audit file no contexto atual",
+        "ver estrutura audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0118",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "escanear pasta budget report #24",
+        "escanear pasta budget report from current context",
+        "escanear pasta budget report with navigation pills"
+      ],
+      "pt": [
+        "escanear pasta budget report 24",
+        "escanear pasta budget report no contexto atual",
+        "escanear pasta budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0119",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "onde está spreadsheet #24",
+        "onde está spreadsheet from current context",
+        "onde está spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "onde está spreadsheet 24",
+        "onde está spreadsheet no contexto atual",
+        "onde está spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0120",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "verificar repetidos audit file #24",
+        "verificar repetidos audit file from current context",
+        "verificar repetidos audit file with navigation pills"
+      ],
+      "pt": [
+        "verificar repetidos audit file 24",
+        "verificar repetidos audit file no contexto atual",
+        "verificar repetidos audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0121",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir budget report #25",
+        "abrir budget report from current context",
+        "abrir budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir budget report 25",
+        "abrir budget report no contexto atual",
+        "abrir budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0122",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar árvore spreadsheet #25",
+        "mostrar árvore spreadsheet from current context",
+        "mostrar árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar árvore spreadsheet 25",
+        "mostrar árvore spreadsheet no contexto atual",
+        "mostrar árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0123",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar pasta audit file #25",
+        "listar pasta audit file from current context",
+        "listar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "listar pasta audit file 25",
+        "listar pasta audit file no contexto atual",
+        "listar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0124",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "achar documento budget report #25",
+        "achar documento budget report from current context",
+        "achar documento budget report with navigation pills"
+      ],
+      "pt": [
+        "achar documento budget report 25",
+        "achar documento budget report no contexto atual",
+        "achar documento budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0125",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "filtrar duplicados spreadsheet #25",
+        "filtrar duplicados spreadsheet from current context",
+        "filtrar duplicados spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "filtrar duplicados spreadsheet 25",
+        "filtrar duplicados spreadsheet no contexto atual",
+        "filtrar duplicados spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0126",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar audit file #26",
+        "mostrar audit file from current context",
+        "mostrar audit file with navigation pills"
+      ],
+      "pt": [
+        "mostrar audit file 26",
+        "mostrar audit file no contexto atual",
+        "mostrar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0127",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir árvore budget report #26",
+        "abrir árvore budget report from current context",
+        "abrir árvore budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir árvore budget report 26",
+        "abrir árvore budget report no contexto atual",
+        "abrir árvore budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0128",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar arquivos spreadsheet #26",
+        "listar arquivos spreadsheet from current context",
+        "listar arquivos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "listar arquivos spreadsheet 26",
+        "listar arquivos spreadsheet no contexto atual",
+        "listar arquivos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0129",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo audit file #26",
+        "localizar arquivo audit file from current context",
+        "localizar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo audit file 26",
+        "localizar arquivo audit file no contexto atual",
+        "localizar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0130",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas budget report #26",
+        "encontrar duplicatas budget report from current context",
+        "encontrar duplicatas budget report with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas budget report 26",
+        "encontrar duplicatas budget report no contexto atual",
+        "encontrar duplicatas budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0131",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir spreadsheet #27",
+        "exibir spreadsheet from current context",
+        "exibir spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "exibir spreadsheet 27",
+        "exibir spreadsheet no contexto atual",
+        "exibir spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0132",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "exibir árvore audit file #27",
+        "exibir árvore audit file from current context",
+        "exibir árvore audit file with navigation pills"
+      ],
+      "pt": [
+        "exibir árvore audit file 27",
+        "exibir árvore audit file no contexto atual",
+        "exibir árvore audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0133",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar documentos budget report #27",
+        "listar documentos budget report from current context",
+        "listar documentos budget report with navigation pills"
+      ],
+      "pt": [
+        "listar documentos budget report 27",
+        "listar documentos budget report no contexto atual",
+        "listar documentos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0134",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo spreadsheet #27",
+        "encontrar arquivo spreadsheet from current context",
+        "encontrar arquivo spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo spreadsheet 27",
+        "encontrar arquivo spreadsheet no contexto atual",
+        "encontrar arquivo spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0135",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado audit file #27",
+        "detectar duplicado audit file from current context",
+        "detectar duplicado audit file with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado audit file 27",
+        "detectar duplicado audit file no contexto atual",
+        "detectar duplicado audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0136",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "carregar budget report #28",
+        "carregar budget report from current context",
+        "carregar budget report with navigation pills"
+      ],
+      "pt": [
+        "carregar budget report 28",
+        "carregar budget report no contexto atual",
+        "carregar budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0137",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "expandir árvore spreadsheet #28",
+        "expandir árvore spreadsheet from current context",
+        "expandir árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "expandir árvore spreadsheet 28",
+        "expandir árvore spreadsheet no contexto atual",
+        "expandir árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0138",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "navegar pasta audit file #28",
+        "navegar pasta audit file from current context",
+        "navegar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "navegar pasta audit file 28",
+        "navegar pasta audit file no contexto atual",
+        "navegar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0139",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "buscar arquivo budget report #28",
+        "buscar arquivo budget report from current context",
+        "buscar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "buscar arquivo budget report 28",
+        "buscar arquivo budget report no contexto atual",
+        "buscar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0140",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "identificar duplicado spreadsheet #28",
+        "identificar duplicado spreadsheet from current context",
+        "identificar duplicado spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "identificar duplicado spreadsheet 28",
+        "identificar duplicado spreadsheet no contexto atual",
+        "identificar duplicado spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0141",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "acessar audit file #29",
+        "acessar audit file from current context",
+        "acessar audit file with navigation pills"
+      ],
+      "pt": [
+        "acessar audit file 29",
+        "acessar audit file no contexto atual",
+        "acessar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0142",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "inspecionar estrutura budget report #29",
+        "inspecionar estrutura budget report from current context",
+        "inspecionar estrutura budget report with navigation pills"
+      ],
+      "pt": [
+        "inspecionar estrutura budget report 29",
+        "inspecionar estrutura budget report no contexto atual",
+        "inspecionar estrutura budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0143",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar diretório spreadsheet #29",
+        "mostrar diretório spreadsheet from current context",
+        "mostrar diretório spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar diretório spreadsheet 29",
+        "mostrar diretório spreadsheet no contexto atual",
+        "mostrar diretório spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0144",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "onde está audit file #29",
+        "onde está audit file from current context",
+        "onde está audit file with navigation pills"
+      ],
+      "pt": [
+        "onde está audit file 29",
+        "onde está audit file no contexto atual",
+        "onde está audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0145",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "verificar repetidos budget report #29",
+        "verificar repetidos budget report from current context",
+        "verificar repetidos budget report with navigation pills"
+      ],
+      "pt": [
+        "verificar repetidos budget report 29",
+        "verificar repetidos budget report no contexto atual",
+        "verificar repetidos budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0146",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "visualizar spreadsheet #30",
+        "visualizar spreadsheet from current context",
+        "visualizar spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "visualizar spreadsheet 30",
+        "visualizar spreadsheet no contexto atual",
+        "visualizar spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0147",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "ver estrutura audit file #30",
+        "ver estrutura audit file from current context",
+        "ver estrutura audit file with navigation pills"
+      ],
+      "pt": [
+        "ver estrutura audit file 30",
+        "ver estrutura audit file no contexto atual",
+        "ver estrutura audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0148",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "escanear pasta budget report #30",
+        "escanear pasta budget report from current context",
+        "escanear pasta budget report with navigation pills"
+      ],
+      "pt": [
+        "escanear pasta budget report 30",
+        "escanear pasta budget report no contexto atual",
+        "escanear pasta budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0149",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "achar documento spreadsheet #30",
+        "achar documento spreadsheet from current context",
+        "achar documento spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "achar documento spreadsheet 30",
+        "achar documento spreadsheet no contexto atual",
+        "achar documento spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0150",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "filtrar duplicados audit file #30",
+        "filtrar duplicados audit file from current context",
+        "filtrar duplicados audit file with navigation pills"
+      ],
+      "pt": [
+        "filtrar duplicados audit file 30",
+        "filtrar duplicados audit file no contexto atual",
+        "filtrar duplicados audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0151",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir budget report #31",
+        "abrir budget report from current context",
+        "abrir budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir budget report 31",
+        "abrir budget report no contexto atual",
+        "abrir budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0152",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar árvore spreadsheet #31",
+        "mostrar árvore spreadsheet from current context",
+        "mostrar árvore spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "mostrar árvore spreadsheet 31",
+        "mostrar árvore spreadsheet no contexto atual",
+        "mostrar árvore spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0153",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar pasta audit file #31",
+        "listar pasta audit file from current context",
+        "listar pasta audit file with navigation pills"
+      ],
+      "pt": [
+        "listar pasta audit file 31",
+        "listar pasta audit file no contexto atual",
+        "listar pasta audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0154",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "localizar arquivo budget report #31",
+        "localizar arquivo budget report from current context",
+        "localizar arquivo budget report with navigation pills"
+      ],
+      "pt": [
+        "localizar arquivo budget report 31",
+        "localizar arquivo budget report no contexto atual",
+        "localizar arquivo budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0155",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar duplicatas spreadsheet #31",
+        "encontrar duplicatas spreadsheet from current context",
+        "encontrar duplicatas spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "encontrar duplicatas spreadsheet 31",
+        "encontrar duplicatas spreadsheet no contexto atual",
+        "encontrar duplicatas spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    },
+    {
+      "id": "NAV_PT_0156",
+      "intent": "open_doc",
+      "action": "OPEN",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "mostrar audit file #32",
+        "mostrar audit file from current context",
+        "mostrar audit file with navigation pills"
+      ],
+      "pt": [
+        "mostrar audit file 32",
+        "mostrar audit file no contexto atual",
+        "mostrar audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:open_doc",
+        "action:OPEN",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.open_choice"
+    },
+    {
+      "id": "NAV_PT_0157",
+      "intent": "show_tree",
+      "action": "TREE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "abrir árvore budget report #32",
+        "abrir árvore budget report from current context",
+        "abrir árvore budget report with navigation pills"
+      ],
+      "pt": [
+        "abrir árvore budget report 32",
+        "abrir árvore budget report no contexto atual",
+        "abrir árvore budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:show_tree",
+        "action:TREE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.tree_choice"
+    },
+    {
+      "id": "NAV_PT_0158",
+      "intent": "list_folder",
+      "action": "LIST",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "listar arquivos spreadsheet #32",
+        "listar arquivos spreadsheet from current context",
+        "listar arquivos spreadsheet with navigation pills"
+      ],
+      "pt": [
+        "listar arquivos spreadsheet 32",
+        "listar arquivos spreadsheet no contexto atual",
+        "listar arquivos spreadsheet com botões de navegação"
+      ],
+      "triggers": [
+        "intent:list_folder",
+        "action:LIST",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.folder_choice"
+    },
+    {
+      "id": "NAV_PT_0159",
+      "intent": "locate_file",
+      "action": "LOCATE",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "encontrar arquivo audit file #32",
+        "encontrar arquivo audit file from current context",
+        "encontrar arquivo audit file with navigation pills"
+      ],
+      "pt": [
+        "encontrar arquivo audit file 32",
+        "encontrar arquivo audit file no contexto atual",
+        "encontrar arquivo audit file com botões de navegação"
+      ],
+      "triggers": [
+        "intent:locate_file",
+        "action:LOCATE",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.locate_choice"
+    },
+    {
+      "id": "NAV_PT_0160",
+      "intent": "duplicates",
+      "action": "DUP",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "en": [
+        "detectar duplicado budget report #32",
+        "detectar duplicado budget report from current context",
+        "detectar duplicado budget report with navigation pills"
+      ],
+      "pt": [
+        "detectar duplicado budget report 32",
+        "detectar duplicado budget report no contexto atual",
+        "detectar duplicado budget report com botões de navegação"
+      ],
+      "triggers": [
+        "intent:duplicates",
+        "action:DUP",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "ignore non-navigation requests",
+        "do not print raw paths",
+        "wait for explicit target when ambiguous"
+      ],
+      "disambiguationTemplateId": "nav.template.duplicate_candidates"
+    }
+  ],
+  "tests": {
+    "positive": [
+      "abra a fatura",
+      "mostrar árvore da pasta",
+      "localizar contrato",
+      "encontrar duplicatas"
+    ],
+    "negative": [
+      "qual a previsão do tempo",
+      "resuma esse texto",
+      "envie um email"
+    ]
+  }
+}

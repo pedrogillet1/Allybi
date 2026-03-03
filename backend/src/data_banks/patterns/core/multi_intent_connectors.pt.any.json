@@ -1,0 +1,2107 @@
+{
+  "_meta": {
+    "bankId": "multi_intent_connectors_pt",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "pt"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_multi_intent_connectors_pt",
+    "description": "Auto-registered bank payload for patterns/core/multi_intent_connectors.pt.any.json"
+  },
+  "connectors": [
+    {
+      "id": "MICL_PT_001",
+      "locale": "pt",
+      "connector": "e agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_002",
+      "locale": "pt",
+      "connector": "e depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_003",
+      "locale": "pt",
+      "connector": "e a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_004",
+      "locale": "pt",
+      "connector": "e seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_005",
+      "locale": "pt",
+      "connector": "e por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_006",
+      "locale": "pt",
+      "connector": "e mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_007",
+      "locale": "pt",
+      "connector": "além disso agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_008",
+      "locale": "pt",
+      "connector": "além disso depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_009",
+      "locale": "pt",
+      "connector": "além disso a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_010",
+      "locale": "pt",
+      "connector": "além disso seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_011",
+      "locale": "pt",
+      "connector": "além disso por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_012",
+      "locale": "pt",
+      "connector": "além disso mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_013",
+      "locale": "pt",
+      "connector": "também agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_014",
+      "locale": "pt",
+      "connector": "também depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_015",
+      "locale": "pt",
+      "connector": "também a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_016",
+      "locale": "pt",
+      "connector": "também seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_017",
+      "locale": "pt",
+      "connector": "também por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_018",
+      "locale": "pt",
+      "connector": "também mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_019",
+      "locale": "pt",
+      "connector": "em seguida agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_020",
+      "locale": "pt",
+      "connector": "em seguida depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_021",
+      "locale": "pt",
+      "connector": "em seguida a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_022",
+      "locale": "pt",
+      "connector": "em seguida seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_023",
+      "locale": "pt",
+      "connector": "em seguida por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_024",
+      "locale": "pt",
+      "connector": "em seguida mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_025",
+      "locale": "pt",
+      "connector": "depois agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_026",
+      "locale": "pt",
+      "connector": "depois depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_027",
+      "locale": "pt",
+      "connector": "depois a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_028",
+      "locale": "pt",
+      "connector": "depois seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_029",
+      "locale": "pt",
+      "connector": "depois por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_030",
+      "locale": "pt",
+      "connector": "depois mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_031",
+      "locale": "pt",
+      "connector": "então agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_032",
+      "locale": "pt",
+      "connector": "então depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_033",
+      "locale": "pt",
+      "connector": "então a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_034",
+      "locale": "pt",
+      "connector": "então seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_035",
+      "locale": "pt",
+      "connector": "então por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_036",
+      "locale": "pt",
+      "connector": "então mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_037",
+      "locale": "pt",
+      "connector": "posteriormente agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_038",
+      "locale": "pt",
+      "connector": "posteriormente depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_039",
+      "locale": "pt",
+      "connector": "posteriormente a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_040",
+      "locale": "pt",
+      "connector": "posteriormente seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_041",
+      "locale": "pt",
+      "connector": "posteriormente por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_042",
+      "locale": "pt",
+      "connector": "posteriormente mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_043",
+      "locale": "pt",
+      "connector": "por fim agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_044",
+      "locale": "pt",
+      "connector": "por fim depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_045",
+      "locale": "pt",
+      "connector": "por fim a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_046",
+      "locale": "pt",
+      "connector": "por fim seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_047",
+      "locale": "pt",
+      "connector": "por fim por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_048",
+      "locale": "pt",
+      "connector": "por fim mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_049",
+      "locale": "pt",
+      "connector": "finalmente agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_050",
+      "locale": "pt",
+      "connector": "finalmente depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_051",
+      "locale": "pt",
+      "connector": "finalmente a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_052",
+      "locale": "pt",
+      "connector": "finalmente seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_053",
+      "locale": "pt",
+      "connector": "finalmente por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_054",
+      "locale": "pt",
+      "connector": "finalmente mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_055",
+      "locale": "pt",
+      "connector": "assim agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_056",
+      "locale": "pt",
+      "connector": "assim depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_057",
+      "locale": "pt",
+      "connector": "assim a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_058",
+      "locale": "pt",
+      "connector": "assim seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_059",
+      "locale": "pt",
+      "connector": "assim por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_060",
+      "locale": "pt",
+      "connector": "assim mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_061",
+      "locale": "pt",
+      "connector": "além do mais agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_062",
+      "locale": "pt",
+      "connector": "além do mais depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_063",
+      "locale": "pt",
+      "connector": "além do mais a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_064",
+      "locale": "pt",
+      "connector": "além do mais seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_065",
+      "locale": "pt",
+      "connector": "além do mais por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_066",
+      "locale": "pt",
+      "connector": "além do mais mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_067",
+      "locale": "pt",
+      "connector": "contudo agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_068",
+      "locale": "pt",
+      "connector": "contudo depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_069",
+      "locale": "pt",
+      "connector": "contudo a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_070",
+      "locale": "pt",
+      "connector": "contudo seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_071",
+      "locale": "pt",
+      "connector": "contudo por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_072",
+      "locale": "pt",
+      "connector": "contudo mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_073",
+      "locale": "pt",
+      "connector": "ou agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_074",
+      "locale": "pt",
+      "connector": "ou depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_075",
+      "locale": "pt",
+      "connector": "ou a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_076",
+      "locale": "pt",
+      "connector": "ou seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_077",
+      "locale": "pt",
+      "connector": "ou por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_078",
+      "locale": "pt",
+      "connector": "ou mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_079",
+      "locale": "pt",
+      "connector": "outra etapa agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_080",
+      "locale": "pt",
+      "connector": "outra etapa depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_081",
+      "locale": "pt",
+      "connector": "outra etapa a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_082",
+      "locale": "pt",
+      "connector": "outra etapa seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_083",
+      "locale": "pt",
+      "connector": "outra etapa por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_084",
+      "locale": "pt",
+      "connector": "outra etapa mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_085",
+      "locale": "pt",
+      "connector": "na sequência agora",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_086",
+      "locale": "pt",
+      "connector": "na sequência depois",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_087",
+      "locale": "pt",
+      "connector": "na sequência a seguir",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_088",
+      "locale": "pt",
+      "connector": "na sequência seguinte",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_089",
+      "locale": "pt",
+      "connector": "na sequência por favor",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_PT_090",
+      "locale": "pt",
+      "connector": "na sequência mais uma vez",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:pt"
+      ],
+      "negatives": [
+        "não é conector de sequência",
+        "frase sem ligação entre intenções"
+      ],
+      "slotHints": [
+        "fronteira_intencao",
+        "proxima_intencao",
+        "intensidade_conector"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "pt",
+        "connector_flow"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

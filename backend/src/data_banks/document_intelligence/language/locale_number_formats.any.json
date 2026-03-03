@@ -1,0 +1,624 @@
+{
+  "_meta": {
+    "id": "di_normalization_rules_vfc81701f",
+    "bankId": "di_normalization_rules",
+    "version": "2.1.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "description": "Locale number format grammar, parsing heuristics, and PT-BR vs EN-US disambiguation rules for retrieval-safe extraction."
+  },
+  "config": {
+    "enabled": true,
+    "defaultLocale": "en-US",
+    "preferExplicitLocale": true,
+    "allowMixedLocaleFallback": true,
+    "ambiguousSeparatorPolicy": "defer_to_context"
+  },
+  "formats": [
+    {
+      "id": "lnf_001",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "currencySymbols": [
+        "$",
+        "USD",
+        "US$"
+      ],
+      "example": "$1,234.56",
+      "description": "US style decimal point and comma thousands"
+    },
+    {
+      "id": "lnf_002",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "currencySymbols": [
+        "R$",
+        "R$",
+        "BRL"
+      ],
+      "example": "R$ 1.234,56",
+      "description": "Brazilian style with comma decimals"
+    },
+    {
+      "id": "lnf_003",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "12,345.67",
+      "negativePolicy": "leading_minus_or_parens",
+      "description": "Generic US numeric format with decimal"
+    },
+    {
+      "id": "lnf_004",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "12,345,678",
+      "description": "US integer thousands style"
+    },
+    {
+      "id": "lnf_005",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "12.345",
+      "description": "BR integer thousands without currency"
+    },
+    {
+      "id": "lnf_006",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "12.345,67",
+      "description": "BR decimal with comma separator"
+    },
+    {
+      "id": "lnf_007",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "1.234,00",
+      "description": "BR money format with two decimal digits"
+    },
+    {
+      "id": "lnf_008",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "(1,234.56)",
+      "negativePolicy": "parentheses",
+      "description": "US negative currency in parentheses"
+    },
+    {
+      "id": "lnf_009",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "-1,234.56",
+      "negativePolicy": "minus_prefix",
+      "description": "US negative with leading minus"
+    },
+    {
+      "id": "lnf_010",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "-1.234,56",
+      "negativePolicy": "minus_prefix",
+      "description": "BR negative with leading minus"
+    },
+    {
+      "id": "lnf_011",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "(1.234,56)",
+      "negativePolicy": "parentheses",
+      "description": "BR negative in parentheses"
+    },
+    {
+      "id": "lnf_012",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "+1,000.00",
+      "description": "US explicit positive sign"
+    },
+    {
+      "id": "lnf_013",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "+1.000,00",
+      "description": "BR explicit positive sign"
+    },
+    {
+      "id": "lnf_014",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "1e3",
+      "supportsScientific": true,
+      "description": "US-style scientific notation"
+    },
+    {
+      "id": "lnf_015",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "1.2e3",
+      "supportsScientific": true,
+      "description": "Scientific notation in digit streams"
+    },
+    {
+      "id": "lnf_016",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "99,99",
+      "description": "US two-digit integer group in non-ambiguous contexts"
+    },
+    {
+      "id": "lnf_017",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "99.99",
+      "description": "BR two-digit integer group in non-ambiguous contexts"
+    },
+    {
+      "id": "lnf_018",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "$0.99",
+      "description": "US cents-first interpretation"
+    },
+    {
+      "id": "lnf_019",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "R$ 0,99",
+      "description": "BR cents-first interpretation"
+    },
+    {
+      "id": "lnf_020",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "3,000,000",
+      "description": "Large US integer with multiple thousands groups"
+    },
+    {
+      "id": "lnf_021",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "3.000.000",
+      "description": "Large BR integer with multiple thousands groups"
+    },
+    {
+      "id": "lnf_022",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "1,000,000.00",
+      "description": "US decimal with grouped integer part"
+    },
+    {
+      "id": "lnf_023",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "1.000.000,00",
+      "description": "BR decimal with grouped integer part"
+    },
+    {
+      "id": "lnf_024",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "0.0001234",
+      "description": "US leading zero with tiny decimal"
+    },
+    {
+      "id": "lnf_025",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "0,0001234",
+      "description": "BR leading zero with tiny decimal"
+    },
+    {
+      "id": "lnf_026",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "currencySymbols": [
+        "$",
+        "USD",
+        "US$"
+      ],
+      "example": "USD 1,234.56",
+      "description": "Currency prefix with US grouping"
+    },
+    {
+      "id": "lnf_027",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "currencySymbols": [
+        "R$",
+        "R$",
+        "BRL"
+      ],
+      "example": "R$1.234,56",
+      "description": "Tight pt-BR currency prefix"
+    },
+    {
+      "id": "lnf_028",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "currencySymbols": [
+        "€",
+        "EUR"
+      ],
+      "example": "€1,234.56",
+      "description": "Euro with US-like separators"
+    },
+    {
+      "id": "lnf_029",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "currencySymbols": [
+        "€",
+        "EUR"
+      ],
+      "example": "R$ 1.234,56",
+      "description": "Euro with pt-like separators and local style"
+    },
+    {
+      "id": "lnf_030",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "1,234%",
+      "description": "US percentage with comma group"
+    },
+    {
+      "id": "lnf_031",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "1.234%",
+      "description": "pt-BR percentage with dot group"
+    },
+    {
+      "id": "lnf_032",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": " (1,234.56) ",
+      "description": "Whitespace tolerant accounting negative",
+      "negativePolicy": "parentheses",
+      "allowWs": true
+    },
+    {
+      "id": "lnf_033",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": " (1.234,56) ",
+      "description": "Whitespace tolerant pt accounting negative",
+      "negativePolicy": "parentheses",
+      "allowWs": true
+    },
+    {
+      "id": "lnf_034",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "1 234.56",
+      "description": "Narrow no-break space thousands separator variant",
+      "thousandSeparatorAliases": [
+        " ",
+        " "
+      ]
+    },
+    {
+      "id": "lnf_035",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "1 234,56",
+      "description": "Narrow space thousands with pt decimal",
+      "thousandSeparatorAliases": [
+        " ",
+        " "
+      ]
+    },
+    {
+      "id": "lnf_036",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "+1,234.56",
+      "description": "Explicit positive sign in USD-style"
+    },
+    {
+      "id": "lnf_037",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "+1.234,56",
+      "description": "Explicit positive sign in pt style"
+    },
+    {
+      "id": "lnf_038",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "1.5",
+      "description": "Single-dot decimal candidate in US-context",
+      "decimalPolicy": "allow_short_fraction"
+    },
+    {
+      "id": "lnf_039",
+      "locale": "pt-BR",
+      "thousandSeparator": ".",
+      "decimalSeparator": ",",
+      "example": "1,5",
+      "description": "Single-comma decimal candidate in pt-context",
+      "decimalPolicy": "allow_short_fraction"
+    },
+    {
+      "id": "lnf_040",
+      "locale": "en-US",
+      "thousandSeparator": ",",
+      "decimalSeparator": ".",
+      "example": "10,00000",
+      "description": "OCR decimal artifact with trailing zeros"
+    }
+  ],
+  "ambiguities": [
+    {
+      "id": "lna_001",
+      "pattern": "(?<!\\d)[+-]?(?:\\\\d{1,3}(?:[\\\\.,]\\\\d{3})+)(?:[\\\\.,]\\\\d+)?(?!\\d)",
+      "description": "Digit groups with both separators are ambiguous unless context specifies locale.",
+      "ambiguous": true,
+      "signals": {
+        "pt": [
+          "currency_symbol_is_R$",
+          "keyword_de",
+          "keyword_fatura",
+          "locale_hint_pt"
+        ],
+        "en": [
+          "currency_symbol_is_$",
+          "keyword_amount",
+          "currency_word"
+        ],
+        "fallback": "both"
+      },
+      "resolvedBy": [
+        "locale_hint",
+        "currency_symbol",
+        "document_language",
+        "neighbored_dates"
+      ]
+    },
+    {
+      "id": "lna_002",
+      "pattern": "(?<!\\d)(\\d{1,2})[\\.,](\\d{1,2})(?!\\d)",
+      "description": "Short integer+separator+integer groups may be decimal or id fragment in noisy OCR.",
+      "ambiguous": true,
+      "policy": {
+        "ifBothDigitsBelow12": "prefer_contextual",
+        "ifThirdDigitPresent": "treatAsDecimal",
+        "default": "leaveNumericAsRaw"
+      }
+    },
+    {
+      "id": "lna_003",
+      "pattern": "(?<!\\w)(?:R\\$|r\\$)\\s*\\d",
+      "description": "R$ strongly indicates pt-BR decimal interpretation unless explicit locale says otherwise.",
+      "ambiguous": false,
+      "signals": {
+        "strong": [
+          "R$"
+        ],
+        "weak": [
+          "Reais",
+          "cents",
+          "mil"
+        ]
+      }
+    },
+    {
+      "id": "lna_004",
+      "pattern": "\\bUSD\\b|\\$|\\bUS\\$\\b",
+      "description": "US currency markers bias parse toward en-US separators unless explicit locale is provided.",
+      "ambiguous": false,
+      "signals": {
+        "strong": [
+          "USD",
+          "US$",
+          "dollar"
+        ],
+        "weak": [
+          "invoice",
+          "net",
+          "tax"
+        ]
+      }
+    },
+    {
+      "id": "lna_005",
+      "pattern": "\\b(?:(?:jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\\b",
+      "description": "Date-heavy documents provide locale bias through month spelling when tokens share numbers.",
+      "ambiguous": true,
+      "signals": {
+        "pt": [
+          "jan",
+          "fev",
+          "mar",
+          "abr",
+          "mai",
+          "jun",
+          "jul",
+          "ago",
+          "set",
+          "out",
+          "nov",
+          "dez"
+        ],
+        "en": [
+          "jan",
+          "feb",
+          "mar",
+          "apr",
+          "may",
+          "jun",
+          "jul",
+          "aug",
+          "sep",
+          "oct",
+          "nov",
+          "dec"
+        ]
+      }
+    },
+    {
+      "id": "lna_006",
+      "pattern": "(?<!\\d)(?:\\d{1,3}\\.\\d{3})(?:,\\d{2,4})?(?!\\d)",
+      "ambiguous": true,
+      "description": "Dot-thousand pattern that can match en-US if locale hint is missing.",
+      "signals": {
+        "pt": [
+          "thousands_dot",
+          "comma_decimal"
+        ],
+        "en": [
+          "thousands_dot_ambiguous"
+        ],
+        "fallback": "context"
+      },
+      "resolvedBy": [
+        "currency_symbol",
+        "locale_hint",
+        "section_language"
+      ]
+    },
+    {
+      "id": "lna_007",
+      "pattern": "(?<!\\d)(?:\\d{1,3},\\d{3})(?:\\.\\d{2,4})?(?!\\d)",
+      "ambiguous": true,
+      "description": "Comma-thousands pattern ambiguous when followed by small decimals.",
+      "signals": {
+        "en": [
+          "thousands_comma",
+          "dollar_context"
+        ],
+        "pt": [
+          "comma_as_decimal"
+        ],
+        "fallback": "context"
+      },
+      "resolvedBy": [
+        "currency_symbol",
+        "locale_hint",
+        "section_language"
+      ]
+    },
+    {
+      "id": "lna_008",
+      "pattern": "(?<!\\d)\\$?\\s*\\d{1,3}(?:[\\.,]\\d{3})+(?:[\\.,]\\d{2})?(?!\\d)",
+      "ambiguous": true,
+      "description": "Generic currency-like number with mixed separators and OCR noise.",
+      "signals": {
+        "mixedSeparators": true
+      },
+      "resolvedBy": [
+        "currency_symbol",
+        "date_context",
+        "document_locale_confidence"
+      ]
+    },
+    {
+      "id": "lna_009",
+      "pattern": "(?<!\\d)\\d{1,2}[\\/.-]\\d{1,2}(?!\\d)",
+      "ambiguous": true,
+      "description": "Date-like short fragments that can be numeric IDs.",
+      "signals": {
+        "mayBeDate": true,
+        "mayBeId": true
+      },
+      "resolvedBy": [
+        "context_window",
+        "neighbor_dates"
+      ]
+    },
+    {
+      "id": "lna_010",
+      "pattern": "(?<!\\d)\\d{2}(?:[\\.,]d{1,3})?(?!\\d)",
+      "ambiguous": true,
+      "description": "Invoice fragments can be short decimals or codes.",
+      "policy": {
+        "whenContextHasDateLike": "leave_raw",
+        "whenContextHasAmountKeywords": "prefer_decimal",
+        "default": "leave_raw"
+      }
+    },
+    {
+      "id": "lna_011",
+      "pattern": "(?<![A-Z])( | | )\\d{1,3}(?:[., ]\\d{3})*(?:[.,]\\d{2})?(?!\\d)",
+      "ambiguous": true,
+      "description": "Narrow-space separators from OCR tables.",
+      "signals": {
+        "ocrArtifact": true
+      },
+      "resolvedBy": [
+        "normalize_space",
+        "locale_policy"
+      ]
+    },
+    {
+      "id": "lna_012",
+      "pattern": "(?<!\\w)(?:R\\$|r\\$|\\$|US\\$|USD|EUR|€)\\s*(?:\\d{1,3}(?:[.,]\\d{3})+|\\d+)(?:[.,]\\d+)?(?!\\d)",
+      "ambiguous": true,
+      "description": "Currency symbol present but separator interpretation ambiguous.",
+      "signals": {
+        "strong": [
+          "currency_symbol"
+        ],
+        "pt": [
+          "R$"
+        ],
+        "en": [
+          "USD",
+          "$",
+          "EUR",
+          "€"
+        ]
+      },
+      "resolvedBy": [
+        "symbol_locale",
+        "adjacent_month_token"
+      ]
+    }
+  ],
+  "fallback": {
+    "preferLocale": "document_language",
+    "ifNoHint": "no_transform_preserve_original",
+    "ifConflict": "emit_both_candidates_with_low_confidence"
+  }
+}

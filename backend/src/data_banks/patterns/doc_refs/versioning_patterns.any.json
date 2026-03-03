@@ -1,0 +1,3959 @@
+{
+  "_meta": {
+    "bankId": "doc_versioning_patterns",
+    "version": "1.0.0",
+    "owner": "doc-reference-curation",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "doc_type_catalog_ssot",
+      "routing_scope_policies"
+    ],
+    "usedBy": [
+      "doc_intent_router",
+      "doc_scope_resolver"
+    ],
+    "tests": {
+      "positive": [
+        "Compare the latest 10-K against the prior 10-K filing",
+        "Puxa o resumo do NDA recente",
+        "No documento de orçamento, use only the signed version"
+      ],
+      "negative": [
+        "What is the weather tomorrow?",
+        "Tell me how to cook pasta"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_doc_refs_versioning_patterns",
+    "description": "Auto-registered bank payload for patterns/doc_refs/versioning_patterns.any.json"
+  },
+  "patterns": [
+    {
+      "id": "VP_0001",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0002",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0003",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0004",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0005",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0006",
+      "en": [
+        "version 7"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0007",
+      "en": [
+        "v1"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0008",
+      "en": [
+        "version 2.1"
+      ],
+      "pt": [
+        "a revisão 2.1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0009",
+      "en": [
+        "the updated version"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0010",
+      "en": [
+        "the updated copy"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0011",
+      "en": [
+        "the revised version"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0012",
+      "en": [
+        "the amended version"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0013",
+      "en": [
+        "the original version"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0014",
+      "en": [
+        "the archived version"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0015",
+      "en": [
+        "the year 2020 version"
+      ],
+      "pt": [
+        "a versão assinada de 2020"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0016",
+      "en": [
+        "the 2021 signed version"
+      ],
+      "pt": [
+        "a cópia de 2021"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0017",
+      "en": [
+        "the 20{yy} copy"
+      ],
+      "pt": [
+        "a versão rascunho"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0018",
+      "en": [
+        "the draft version"
+      ],
+      "pt": [
+        "a revisão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0019",
+      "en": [
+        "the current revision"
+      ],
+      "pt": [
+        "a revisão preliminar e final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0020",
+      "en": [
+        "the draft and final versions"
+      ],
+      "pt": [
+        "a revisão assinada mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0021",
+      "en": [
+        "the latest signed draft"
+      ],
+      "pt": [
+        "a versão mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0022",
+      "en": [
+        "the latest version"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0023",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0024",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0025",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0026",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0027",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0028",
+      "en": [
+        "version 1"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0029",
+      "en": [
+        "v2"
+      ],
+      "pt": [
+        "a revisão 2.2"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0030",
+      "en": [
+        "version 3.3"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0031",
+      "en": [
+        "the updated version"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0032",
+      "en": [
+        "the updated copy"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0033",
+      "en": [
+        "the revised version"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0034",
+      "en": [
+        "the amended version"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0035",
+      "en": [
+        "the original version"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0036",
+      "en": [
+        "the archived version"
+      ],
+      "pt": [
+        "a versão assinada de 2020"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0037",
+      "en": [
+        "the year 2021 version"
+      ],
+      "pt": [
+        "a cópia de 2021"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0038",
+      "en": [
+        "the 2022 signed version"
+      ],
+      "pt": [
+        "a versão rascunho"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0039",
+      "en": [
+        "the 20{yy} copy"
+      ],
+      "pt": [
+        "a revisão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0040",
+      "en": [
+        "the draft version"
+      ],
+      "pt": [
+        "a revisão preliminar e final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0041",
+      "en": [
+        "the current revision"
+      ],
+      "pt": [
+        "a revisão assinada mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0042",
+      "en": [
+        "the draft and final versions"
+      ],
+      "pt": [
+        "a versão mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0043",
+      "en": [
+        "the latest signed draft"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0044",
+      "en": [
+        "the latest version"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0045",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0046",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0047",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0048",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0049",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0050",
+      "en": [
+        "version 2"
+      ],
+      "pt": [
+        "a revisão 2.3"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0051",
+      "en": [
+        "v3"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0052",
+      "en": [
+        "version 4.1"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0053",
+      "en": [
+        "the updated version"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0054",
+      "en": [
+        "the updated copy"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0055",
+      "en": [
+        "the revised version"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0056",
+      "en": [
+        "the amended version"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0057",
+      "en": [
+        "the original version"
+      ],
+      "pt": [
+        "a versão assinada de 2020"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0058",
+      "en": [
+        "the archived version"
+      ],
+      "pt": [
+        "a cópia de 2021"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0059",
+      "en": [
+        "the year 2022 version"
+      ],
+      "pt": [
+        "a versão rascunho"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0060",
+      "en": [
+        "the 2023 signed version"
+      ],
+      "pt": [
+        "a revisão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0061",
+      "en": [
+        "the 20{yy} copy"
+      ],
+      "pt": [
+        "a revisão preliminar e final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0062",
+      "en": [
+        "the draft version"
+      ],
+      "pt": [
+        "a revisão assinada mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0063",
+      "en": [
+        "the current revision"
+      ],
+      "pt": [
+        "a versão mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0064",
+      "en": [
+        "the draft and final versions"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0065",
+      "en": [
+        "the latest signed draft"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0066",
+      "en": [
+        "the latest version"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0067",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0068",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0069",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0070",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0071",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "a revisão 2.4"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0072",
+      "en": [
+        "version 3"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0073",
+      "en": [
+        "v4"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0074",
+      "en": [
+        "version 5.3"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0075",
+      "en": [
+        "the updated version"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0076",
+      "en": [
+        "the updated copy"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0077",
+      "en": [
+        "the revised version"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0078",
+      "en": [
+        "the amended version"
+      ],
+      "pt": [
+        "a versão assinada de 2020"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0079",
+      "en": [
+        "the original version"
+      ],
+      "pt": [
+        "a cópia de 2021"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0080",
+      "en": [
+        "the archived version"
+      ],
+      "pt": [
+        "a versão rascunho"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0081",
+      "en": [
+        "the year 2023 version"
+      ],
+      "pt": [
+        "a revisão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0082",
+      "en": [
+        "the 2024 signed version"
+      ],
+      "pt": [
+        "a revisão preliminar e final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0083",
+      "en": [
+        "the 20{yy} copy"
+      ],
+      "pt": [
+        "a revisão assinada mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0084",
+      "en": [
+        "the draft version"
+      ],
+      "pt": [
+        "a versão mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0085",
+      "en": [
+        "the current revision"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0086",
+      "en": [
+        "the draft and final versions"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0087",
+      "en": [
+        "the latest signed draft"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0088",
+      "en": [
+        "the latest version"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0089",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0090",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0091",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0092",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "a revisão 2.1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0093",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0094",
+      "en": [
+        "version 4"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0095",
+      "en": [
+        "v5"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0096",
+      "en": [
+        "version 6.1"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0097",
+      "en": [
+        "the updated version"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0098",
+      "en": [
+        "the updated copy"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0099",
+      "en": [
+        "the revised version"
+      ],
+      "pt": [
+        "a versão assinada de 2020"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0100",
+      "en": [
+        "the amended version"
+      ],
+      "pt": [
+        "a cópia de 2021"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0101",
+      "en": [
+        "the original version"
+      ],
+      "pt": [
+        "a versão rascunho"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0102",
+      "en": [
+        "the archived version"
+      ],
+      "pt": [
+        "a revisão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0103",
+      "en": [
+        "the year 2024 version"
+      ],
+      "pt": [
+        "a revisão preliminar e final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0104",
+      "en": [
+        "the 2025 signed version"
+      ],
+      "pt": [
+        "a revisão assinada mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0105",
+      "en": [
+        "the 20{yy} copy"
+      ],
+      "pt": [
+        "a versão mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0106",
+      "en": [
+        "the draft version"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0107",
+      "en": [
+        "the current revision"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0108",
+      "en": [
+        "the draft and final versions"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0109",
+      "en": [
+        "the latest signed draft"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0110",
+      "en": [
+        "the latest version"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0111",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0112",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0113",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "a revisão 2.2"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0114",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0115",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0116",
+      "en": [
+        "version 5"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0117",
+      "en": [
+        "v6"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0118",
+      "en": [
+        "version 7.3"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0119",
+      "en": [
+        "the updated version"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0120",
+      "en": [
+        "the updated copy"
+      ],
+      "pt": [
+        "a versão assinada de 2020"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0121",
+      "en": [
+        "the revised version"
+      ],
+      "pt": [
+        "a cópia de 2021"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0122",
+      "en": [
+        "the amended version"
+      ],
+      "pt": [
+        "a versão rascunho"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0123",
+      "en": [
+        "the original version"
+      ],
+      "pt": [
+        "a revisão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0124",
+      "en": [
+        "the archived version"
+      ],
+      "pt": [
+        "a revisão preliminar e final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0125",
+      "en": [
+        "the year 2025 version"
+      ],
+      "pt": [
+        "a revisão assinada mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0126",
+      "en": [
+        "the 2019 signed version"
+      ],
+      "pt": [
+        "a versão mais recente"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0127",
+      "en": [
+        "the 20{yy} copy"
+      ],
+      "pt": [
+        "a versão atual"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0128",
+      "en": [
+        "the draft version"
+      ],
+      "pt": [
+        "a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0129",
+      "en": [
+        "the current revision"
+      ],
+      "pt": [
+        "somente a cópia assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0130",
+      "en": [
+        "the draft and final versions"
+      ],
+      "pt": [
+        "a versão final"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0131",
+      "en": [
+        "the latest signed draft"
+      ],
+      "pt": [
+        "a versão final assinada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0132",
+      "en": [
+        "the latest version"
+      ],
+      "pt": [
+        "a versão 7"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0133",
+      "en": [
+        "the most recent version"
+      ],
+      "pt": [
+        "v1"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0134",
+      "en": [
+        "the signed copy"
+      ],
+      "pt": [
+        "a revisão 2.3"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:2",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0135",
+      "en": [
+        "the signed copy only"
+      ],
+      "pt": [
+        "a versão atualizada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:3",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0136",
+      "en": [
+        "the final version"
+      ],
+      "pt": [
+        "a versão revisada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:4",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0137",
+      "en": [
+        "the final signed copy"
+      ],
+      "pt": [
+        "a versão retificada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:5",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0138",
+      "en": [
+        "version 6"
+      ],
+      "pt": [
+        "a versão original"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:6",
+        "revision_signal:0"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0139",
+      "en": [
+        "v7"
+      ],
+      "pt": [
+        "a versão arquivada"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:7",
+        "revision_signal:1"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    },
+    {
+      "id": "VP_0140",
+      "en": [
+        "version 1.1"
+      ],
+      "pt": [
+        "a versão de 2019"
+      ],
+      "triggers": [
+        "doc_versioning",
+        "version_token:1",
+        "revision_signal:2"
+      ],
+      "negatives": [
+        "plain metric request without version scope",
+        "no document identifier and no version cue"
+      ],
+      "slotHints": [
+        "versionAnchor",
+        "signatureState",
+        "effectiveDate"
+      ],
+      "telemetryTags": [
+        "versioning",
+        "latest_signed",
+        "year_version"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "id": "hedging_and_uncertainty_language",
+    "version": "1.0.0",
+    "description": "Controlled uncertainty phrasing when evidence is partial.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "phrases": {
+    "en": [
+      "based on cited evidence",
+      "appears to",
+      "I cannot confirm beyond sources"
+    ],
+    "pt": [
+      "com base na evidencia citada",
+      "parece",
+      "nao confirmo fora da evidencia"
+    ]
+  },
+  "rules": [
+    {
+      "id": "HU_101",
+      "trigger": "Low evidence confidence",
+      "check": "context.evidenceConfidence < 0.75",
+      "failureAction": "ADD_UNCERTAINTY_PHRASE"
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

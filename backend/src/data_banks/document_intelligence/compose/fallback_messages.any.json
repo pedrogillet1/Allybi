@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "fallback_messages",
+    "version": "1.0.0",
+    "description": "Fallback language for missing evidence and scope issues.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "messages": {
+    "en": {
+      "missingEvidence": "I cannot answer that from current document evidence.",
+      "wrongDoc": "I found a related document, but not the one you selected."
+    },
+    "pt": {
+      "missingEvidence": "Nao consigo responder com base nas evidencias disponiveis.",
+      "wrongDoc": "Encontrei um documento relacionado, mas nao o selecionado."
+    }
+  },
+  "config": {
+    "enabled": true
+  }
+}

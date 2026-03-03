@@ -274,6 +274,7 @@ export interface EvidenceItem {
   };
 
   warnings?: string[];
+  extractionHints?: Array<Record<string, unknown>>;
 }
 
 export interface EvidencePack {
@@ -312,6 +313,13 @@ export interface EvidencePack {
   debug?: {
     phases: Array<{ phaseId: string; candidates: number; note?: string }>;
     reasonCodes: string[];
+    conflicts?: Array<{
+      metric: string;
+      docA: string;
+      valueA: number;
+      docB: string;
+      valueB: number;
+    }>;
   };
 
   telemetry?: {
@@ -518,7 +526,10 @@ export class RetrievalEngineService {
       | "getRetrievalBoostRules"
       | "getQueryRewriteRules"
       | "getSectionPriorityRules"
-    > = getDocumentIntelligenceBanksInstance(),
+    > &
+      Partial<
+        Pick<DocumentIntelligenceBanksService, "getDocTypeExtractionHints">
+      > = getDocumentIntelligenceBanksInstance(),
   ) {}
 
   /**
@@ -1445,12 +1456,13 @@ export class RetrievalEngineService {
     signals: RetrievalRequest["signals"],
     normalizedQuery: string,
   ): boolean {
-    void normalizedQuery;
     const intent = String(signals.intentFamily || "").toLowerCase();
     const operator = String(signals.operator || "").toLowerCase();
     if (intent.includes("compare")) return true;
     if (operator.includes("compare")) return true;
-    return false;
+    return /\b(compare|comparison|vs\.?|versus|difference|differ|between|contrast|comparar|diferenca|diferença|entre)\b/i.test(
+      normalizedQuery,
+    );
   }
 
   private normalizeDocType(value: unknown): string | null {
@@ -1972,7 +1984,7 @@ export class RetrievalEngineService {
       Math.floor(safeNumber(process.env.RETRIEVAL_PHASE_BUDGET_MS, 25000)),
     );
     const extraVariantStrategy = String(
-      process.env.RETRIEVAL_EXTRA_VARIANT_PHASES || "semantic_only",
+      process.env.RETRIEVAL_EXTRA_VARIANT_PHASES || "semantic_and_lexical",
     )
       .trim()
       .toLowerCase();
@@ -2008,6 +2020,8 @@ export class RetrievalEngineService {
         if (
           !isBaseVariant &&
           extraVariantStrategy !== "all" &&
+          !(extraVariantStrategy === "semantic_and_lexical" &&
+            (phase.type === "semantic" || phase.type === "lexical")) &&
           phase.type !== "semantic"
         ) {
           continue;
@@ -2758,11 +2772,27 @@ export class RetrievalEngineService {
           .slice(0, 8)
       : [];
 
+    const entities = this.normalizePlanHintTerms(
+      retrievalPlan.entities,
+      8,
+    );
+    const metrics = this.normalizePlanHintTerms(
+      retrievalPlan.metrics,
+      8,
+    );
+    const timeHints = this.normalizePlanHintTerms(
+      retrievalPlan.timeHints,
+      3,
+    );
+
     if (
       requiredTerms.length === 0 &&
       excludedTerms.length === 0 &&
       docTypePreferences.length === 0 &&
-      locationTargets.length === 0
+      locationTargets.length === 0 &&
+      entities.length === 0 &&
+      metrics.length === 0 &&
+      timeHints.length === 0
     ) {
       return candidates;
     }
@@ -2813,6 +2843,46 @@ export class RetrievalEngineService {
         if (hit) {
           candidate.scores.keywordBoost = clamp01(
             (candidate.scores.keywordBoost ?? 0) + 0.07,
+          );
+        }
+      }
+
+      if (entities.length > 0) {
+        const entityHits = entities.filter((entity) =>
+          searchable.includes(entity),
+        ).length;
+        if (entityHits > 0) {
+          candidate.scores.keywordBoost = clamp01(
+            (candidate.scores.keywordBoost ?? 0) +
+              Math.min(0.12, entityHits * 0.04),
+          );
+        }
+      }
+
+      if (metrics.length > 0) {
+        const hasDigit = /\d/.test(searchable);
+        for (const metric of metrics) {
+          if (searchable.includes(metric)) {
+            candidate.scores.keywordBoost = clamp01(
+              (candidate.scores.keywordBoost ?? 0) +
+                (hasDigit ? 0.06 : 0.02),
+            );
+            break;
+          }
+        }
+      }
+
+      if (timeHints.length > 0) {
+        const timeHit = timeHints.some((hint) =>
+          searchable.includes(hint),
+        );
+        if (timeHit) {
+          candidate.scores.keywordBoost = clamp01(
+            (candidate.scores.keywordBoost ?? 0) + 0.05,
+          );
+        } else {
+          candidate.scores.penalties = clamp01(
+            (candidate.scores.penalties ?? 0) + 0.03,
           );
         }
       }
@@ -3206,6 +3276,164 @@ export class RetrievalEngineService {
   }
 
   // -----------------------------
+  // Extraction Hints
+  // -----------------------------
+
+  private lookupExtractionHints(
+    domain: string | null,
+    docType: string | null,
+  ): Array<Record<string, unknown>> {
+    if (!domain || !docType) return [];
+    try {
+      if (typeof this.documentIntelligenceBanks.getDocTypeExtractionHints !== "function") {
+        return [];
+      }
+      const hints = this.documentIntelligenceBanks.getDocTypeExtractionHints(
+        domain as Parameters<typeof this.documentIntelligenceBanks.getDocTypeExtractionHints>[0],
+        docType,
+      );
+      if (!hints) return [];
+      const fields = Array.isArray(hints.fields)
+        ? hints.fields
+        : Array.isArray(hints.hints)
+          ? hints.hints
+          : [];
+      return fields.slice(0, 5).map((f: unknown) =>
+        f && typeof f === "object" ? (f as Record<string, unknown>) : { hint: String(f) },
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  // -----------------------------
+  // Conflict Detection
+  // -----------------------------
+
+  private detectEvidenceConflicts(
+    evidence: EvidenceItem[],
+  ): Array<{ metric: string; docA: string; valueA: number; docB: string; valueB: number }> {
+    const conflicts: Array<{
+      metric: string;
+      docA: string;
+      valueA: number;
+      docB: string;
+      valueB: number;
+    }> = [];
+
+    const docMetrics = new Map<string, Map<string, number>>();
+    const numPattern = /(?:[\w\s]{1,40}?)\s*([-+]?\d[\d.,]*)/g;
+
+    for (const item of evidence) {
+      const text = String(item.snippet || "");
+      if (!text) continue;
+      let match: RegExpExecArray | null;
+      while ((match = numPattern.exec(text)) !== null) {
+        const fullMatch = match[0].trim();
+        const numStr = match[1].replace(/,/g, "");
+        const value = parseFloat(numStr);
+        if (!Number.isFinite(value)) continue;
+        const words = fullMatch.replace(/[-+]?\d[\d.,]*/g, "").trim().toLowerCase();
+        const metricKey = words.split(/\s+/).slice(-10).join(" ").trim();
+        if (!metricKey || metricKey.length < 3) continue;
+
+        const docMap = docMetrics.get(item.docId) ?? new Map<string, number>();
+        if (!docMap.has(metricKey)) {
+          docMap.set(metricKey, value);
+        }
+        docMetrics.set(item.docId, docMap);
+      }
+    }
+
+    const docIds = Array.from(docMetrics.keys());
+    for (let i = 0; i < docIds.length; i++) {
+      for (let j = i + 1; j < docIds.length; j++) {
+        const mapA = docMetrics.get(docIds[i])!;
+        const mapB = docMetrics.get(docIds[j])!;
+        for (const [metric, valueA] of mapA) {
+          const valueB = mapB.get(metric);
+          if (valueB === undefined) continue;
+          if (valueA === 0 && valueB === 0) continue;
+          const diff = Math.abs(valueA - valueB);
+          const denom = Math.max(Math.abs(valueA), Math.abs(valueB));
+          if (denom > 0 && diff / denom > 0.01) {
+            conflicts.push({
+              metric,
+              docA: docIds[i],
+              valueA,
+              docB: docIds[j],
+              valueB,
+            });
+          }
+        }
+      }
+    }
+
+    return conflicts;
+  }
+
+  // -----------------------------
+  // Snippet Compression (SCP_* rules)
+  // -----------------------------
+
+  private compressSnippet(
+    snippet: string,
+    opts: {
+      maxChars: number;
+      preserveNumericUnits: boolean;
+      preserveHeadings: boolean;
+      hasQuotedText: boolean;
+      compareIntent: boolean;
+    },
+  ): string {
+    if (opts.hasQuotedText) return snippet;
+
+    const effectiveMax = opts.compareIntent
+      ? Math.ceil(opts.maxChars * 1.3)
+      : opts.maxChars;
+
+    if (snippet.length <= effectiveMax) return snippet;
+
+    let truncPoint = effectiveMax;
+
+    if (opts.preserveNumericUnits) {
+      const numUnitPattern = /\d[\d.,]*\s*(?:R\$|\$|EUR|%|kg|months?|years?|days?|hours?)/gi;
+      let match: RegExpExecArray | null;
+      while ((match = numUnitPattern.exec(snippet)) !== null) {
+        const tokenStart = match.index;
+        const tokenEnd = tokenStart + match[0].length;
+        if (tokenStart < truncPoint && tokenEnd > truncPoint) {
+          truncPoint = tokenEnd;
+          break;
+        }
+      }
+    }
+
+    if (opts.preserveHeadings) {
+      const headingPattern = /^#+\s+.+$|^[A-Z][A-Z\s]{2,}$/gm;
+      let match: RegExpExecArray | null;
+      while ((match = headingPattern.exec(snippet)) !== null) {
+        const hStart = match.index;
+        const hEnd = hStart + match[0].length;
+        if (hStart > truncPoint - 60 && hStart <= truncPoint && hEnd > truncPoint) {
+          truncPoint = hEnd;
+          break;
+        }
+      }
+    }
+
+    const sentenceBoundary = snippet.lastIndexOf(". ", truncPoint);
+    const newlineBoundary = snippet.lastIndexOf("\n", truncPoint);
+    const boundary = Math.max(sentenceBoundary, newlineBoundary);
+    if (boundary > effectiveMax * 0.5) {
+      truncPoint = boundary + 1;
+    }
+
+    const truncated = snippet.slice(0, truncPoint).trimEnd();
+    return truncated.length < snippet.length ? truncated + "..." : truncated;
+  }
+
+  // -----------------------------
   // Packaging
   // -----------------------------
 
@@ -3233,6 +3461,14 @@ export class RetrievalEngineService {
     },
   ): EvidencePack {
     const cfg = packagingBank?.config ?? {};
+    const scpBank = this.safeGetBank<Record<string, unknown>>(
+      "snippet_compression_policy",
+    );
+    const scpConfig = (scpBank as Record<string, unknown>)?.config ?? {};
+    const maxSnippetChars = safeNumber(scpConfig.maxSnippetChars, 2200);
+    const preserveNumericUnits = scpConfig.preserveNumericUnits !== false;
+    const preserveHeadings = scpConfig.preserveHeadings !== false;
+    const hasQuotedText = Boolean(signals.hasQuotedText);
     const maxEvidenceHard = safeNumber(
       cfg.actionsContract?.thresholds?.maxEvidenceItemsHard,
       36,
@@ -3415,7 +3651,15 @@ export class RetrievalEngineService {
         filename: c.filename ?? null,
         location: c.location,
         locationKey: c.locationKey,
-        snippet: c.type === "text" ? c.snippet : undefined,
+        snippet: c.type === "text"
+          ? this.compressSnippet(c.snippet, {
+              maxChars: maxSnippetChars,
+              preserveNumericUnits,
+              preserveHeadings,
+              hasQuotedText,
+              compareIntent: ctx.compareIntent,
+            })
+          : undefined,
         table: c.type === "table" ? (c.table ?? undefined) : undefined,
         imageRef: c.type === "image" ? null : undefined,
         score: {
@@ -3436,9 +3680,84 @@ export class RetrievalEngineService {
           },
         },
         warnings: c.table?.warnings ?? undefined,
+        extractionHints: (() => {
+          const domain = ctx.classification?.domain || null;
+          const docType = this.normalizeDocType(c.docType);
+          if (!domain || !docType) return undefined;
+          const hints = this.lookupExtractionHints(domain, docType);
+          return hints.length > 0 ? hints : undefined;
+        })(),
       });
 
       if (evidence.length >= maxEvidenceHard) break;
+    }
+
+    // PACK_004 — Sort by doc then location for coherent reading order
+    evidence.sort((a, b) => {
+      if (a.docId !== b.docId) return a.docId < b.docId ? -1 : 1;
+      const pageA = Number(a.location?.page ?? 0);
+      const pageB = Number(b.location?.page ?? 0);
+      if (pageA !== pageB) return pageA - pageB;
+      return (a.locationKey || "").localeCompare(b.locationKey || "");
+    });
+
+    // PACK_005 — Dedupe near-duplicate snippets within same doc
+    const packDedupeWindowChars = 260;
+    {
+      const seenHashes = new Map<string, Set<string>>();
+      const deduped: EvidenceItem[] = [];
+      for (const item of evidence) {
+        const text = String(item.snippet || "").replace(/\s+/g, " ").trim();
+        const window = text.slice(0, packDedupeWindowChars).toLowerCase();
+        if (window.length > 0) {
+          const docHashes = seenHashes.get(item.docId) ?? new Set<string>();
+          if (docHashes.has(window)) continue;
+          docHashes.add(window);
+          seenHashes.set(item.docId, docHashes);
+        }
+        deduped.push(item);
+      }
+      evidence.length = 0;
+      evidence.push(...deduped);
+    }
+
+    // PACK_003 — Balance for compare intent
+    if (ctx.compareIntent && evidence.length > 2) {
+      const docGroups = new Map<string, EvidenceItem[]>();
+      for (const item of evidence) {
+        const group = docGroups.get(item.docId) ?? [];
+        group.push(item);
+        docGroups.set(item.docId, group);
+      }
+      if (docGroups.size > 1) {
+        const avgCount = evidence.length / docGroups.size;
+        const maxAllowed = Math.max(2, Math.ceil(avgCount * 2));
+        const balanced: EvidenceItem[] = [];
+        for (const [, group] of docGroups) {
+          balanced.push(...group.slice(0, maxAllowed));
+        }
+        evidence.length = 0;
+        evidence.push(...balanced);
+      }
+    }
+
+    // Per-doc cap from bank config
+    {
+      const packMaxPerDoc = safeNumber(
+        (this.safeGetBank<Record<string, unknown>>("evidence_packaging_policy") as Record<string, unknown>)
+          ?.config?.maxPerDoc,
+        maxPerDocHard,
+      );
+      const docCounts = new Map<string, number>();
+      const capped: EvidenceItem[] = [];
+      for (const item of evidence) {
+        const count = docCounts.get(item.docId) ?? 0;
+        if (count >= packMaxPerDoc) continue;
+        docCounts.set(item.docId, count + 1);
+        capped.push(item);
+      }
+      evidence.length = 0;
+      evidence.push(...capped);
     }
 
     const uniqueDocs = new Set(evidence.map((e) => e.docId));
@@ -3482,6 +3801,7 @@ export class RetrievalEngineService {
       debug: {
         phases: [],
         reasonCodes: [],
+        conflicts: this.detectEvidenceConflicts(evidence),
       },
     };
 

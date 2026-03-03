@@ -1,0 +1,215 @@
+{
+  "_meta": {
+    "description": "Golden retrieval evaluation dataset — 25 query/expected-doc pairs",
+    "version": "1.0.0",
+    "categories": [
+      "single_doc_extract",
+      "multi_doc_compare",
+      "numeric_precision",
+      "legal_clause",
+      "time_scoped"
+    ]
+  },
+  "seeds": [
+    {
+      "id": "GE_001",
+      "category": "single_doc_extract",
+      "query": "What is the effective date of the NDA?",
+      "expectedDocIds": ["doc-nda"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_002",
+      "category": "single_doc_extract",
+      "query": "Summarize the key obligations from the MSA",
+      "expectedDocIds": ["doc-msa"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_003",
+      "category": "single_doc_extract",
+      "query": "Extract the total revenue from the financial report",
+      "expectedDocIds": ["doc-fin-report"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_004",
+      "category": "single_doc_extract",
+      "query": "What are the termination conditions in the lease?",
+      "expectedDocIds": ["doc-lease"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_005",
+      "category": "single_doc_extract",
+      "query": "List the action items from the board minutes",
+      "expectedDocIds": ["doc-board-minutes"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_006",
+      "category": "multi_doc_compare",
+      "query": "Compare the revenue figures between Q3 and Q4 reports",
+      "expectedDocIds": ["doc-q3-report", "doc-q4-report"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_007",
+      "category": "multi_doc_compare",
+      "query": "What are the differences between the two NDA versions?",
+      "expectedDocIds": ["doc-nda-v1", "doc-nda-v2"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_008",
+      "category": "multi_doc_compare",
+      "query": "Contrast the payment terms in the vendor agreements",
+      "expectedDocIds": ["doc-vendor-a", "doc-vendor-b"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_009",
+      "category": "multi_doc_compare",
+      "query": "Compare headcount between the January and March reports",
+      "expectedDocIds": ["doc-hr-jan", "doc-hr-mar"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_010",
+      "category": "multi_doc_compare",
+      "query": "What changed between the draft and final versions of the policy?",
+      "expectedDocIds": ["doc-policy-draft", "doc-policy-final"],
+      "expectedMinScore": 0.3,
+      "expectedTopK": 5
+    },
+    {
+      "id": "GE_011",
+      "category": "numeric_precision",
+      "query": "What is the total accounts receivable balance?",
+      "expectedDocIds": ["doc-ar-aging"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_012",
+      "category": "numeric_precision",
+      "query": "What is the monthly recurring revenue?",
+      "expectedDocIds": ["doc-mrr-report"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_013",
+      "category": "numeric_precision",
+      "query": "How much is the outstanding debt as of the latest statement?",
+      "expectedDocIds": ["doc-debt-schedule"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_014",
+      "category": "numeric_precision",
+      "query": "What percentage growth did we achieve year-over-year?",
+      "expectedDocIds": ["doc-fin-report"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_015",
+      "category": "numeric_precision",
+      "query": "What is the cash burn rate from the forecast?",
+      "expectedDocIds": ["doc-cash-forecast"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_016",
+      "category": "legal_clause",
+      "query": "What is the governing law clause in the contract?",
+      "expectedDocIds": ["doc-msa"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_017",
+      "category": "legal_clause",
+      "query": "What are the indemnification obligations?",
+      "expectedDocIds": ["doc-msa"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_018",
+      "category": "legal_clause",
+      "query": "Describe the non-compete provisions in the employment agreement",
+      "expectedDocIds": ["doc-employment"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_019",
+      "category": "legal_clause",
+      "query": "What are the confidentiality exceptions in the NDA?",
+      "expectedDocIds": ["doc-nda"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_020",
+      "category": "legal_clause",
+      "query": "What is the dispute resolution mechanism?",
+      "expectedDocIds": ["doc-msa"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_021",
+      "category": "time_scoped",
+      "query": "What were the Q3 2025 results?",
+      "expectedDocIds": ["doc-q3-report"],
+      "expectedMinScore": 0.25,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_022",
+      "category": "time_scoped",
+      "query": "Show the January 2026 bank reconciliation",
+      "expectedDocIds": ["doc-bank-recon-jan"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_023",
+      "category": "time_scoped",
+      "query": "What does the 2024 annual budget say about marketing spend?",
+      "expectedDocIds": ["doc-budget-2024"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_024",
+      "category": "time_scoped",
+      "query": "Extract the FY2025 forecast assumptions",
+      "expectedDocIds": ["doc-forecast-fy25"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    },
+    {
+      "id": "GE_025",
+      "category": "time_scoped",
+      "query": "What was the December close pack summary?",
+      "expectedDocIds": ["doc-close-pack-dec"],
+      "expectedMinScore": 0.4,
+      "expectedTopK": 3
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "id": "safety_tone_overrides",
+    "version": "1.0.0",
+    "description": "Safety-first tone overrides.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "overrides": [
+    {
+      "id": "STO_001",
+      "domain": "medical",
+      "failureAction": "SHIFT_TO_SUPPORTIVE"
+    },
+    {
+      "id": "STO_002",
+      "domain": "legal",
+      "failureAction": "SHIFT_TO_CAUTION"
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

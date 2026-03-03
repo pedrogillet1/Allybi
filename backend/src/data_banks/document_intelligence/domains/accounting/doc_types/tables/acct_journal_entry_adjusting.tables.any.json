@@ -1,0 +1,327 @@
+{
+  "_meta": {
+    "id": "di_accounting_tables_acct_journal_entry_adjusting",
+    "version": "1.1.0",
+    "description": "Expected table patterns for general ledger documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_journal_entry_adjusting"
+  },
+  "tableHeaderSynonyms": {
+    "debit": [
+      "debit",
+      "dr",
+      "debit amount",
+      "debito"
+    ],
+    "credit": [
+      "credit",
+      "cr",
+      "credit amount",
+      "credito"
+    ],
+    "balance": [
+      "balance",
+      "saldo",
+      "ending balance",
+      "running balance",
+      "saldo corrente"
+    ],
+    "amount": [
+      "amount",
+      "value",
+      "valor",
+      "amt"
+    ],
+    "date": [
+      "date",
+      "posting date",
+      "transaction date",
+      "data"
+    ],
+    "account": [
+      "account",
+      "account code",
+      "acct",
+      "conta"
+    ],
+    "journal_id": [
+      "journal id",
+      "entry no",
+      "journal number",
+      "lancamento"
+    ]
+  },
+  "tables": [
+    {
+      "id": "acct_journal_entry_adjusting_main_table",
+      "name": {
+        "en": "General Ledger Main",
+        "pt": "Razao Geral Principal"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "posting_date",
+        "journal_id",
+        "account_code",
+        "account_name",
+        "counterparty",
+        "description",
+        "currency_code",
+        "debit",
+        "credit",
+        "balance"
+      ],
+      "keyRows": [
+        "grand_total",
+        "subtotal",
+        "end_of_page"
+      ],
+      "headerSynonyms": {
+        "posting_date": [
+          "posting date",
+          "journal date",
+          "transaction date",
+          "data",
+          "data de lancamento"
+        ],
+        "journal_id": [
+          "journal id",
+          "entry id",
+          "journal number",
+          "lancamento"
+        ],
+        "account_code": [
+          "account",
+          "account code",
+          "acct"
+        ],
+        "counterparty": [
+          "vendor",
+          "customer",
+          "counterparty",
+          "parte",
+          "contraparte"
+        ],
+        "description": [
+          "description",
+          "memo",
+          "detalhes",
+          "descricao"
+        ],
+        "currency_code": [
+          "currency",
+          "moeda",
+          "ccy"
+        ],
+        "debit": [
+          "debit",
+          "dr",
+          "debit amount"
+        ],
+        "credit": [
+          "credit",
+          "cr",
+          "credit amount"
+        ],
+        "balance": [
+          "balance",
+          "running balance",
+          "saldo"
+        ]
+      },
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "balance"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "JPY",
+        "$",
+        "€",
+        "£",
+        "R$"
+      ]
+    },
+    {
+      "id": "acct_journal_entry_adjusting_summary_table",
+      "name": {
+        "en": "Journal Summary",
+        "pt": "Resumo do Diario"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "metric",
+        "value",
+        "currency_code"
+      ],
+      "keyRows": [
+        "journal_count",
+        "debit_total",
+        "credit_total",
+        "net_movement"
+      ],
+      "headerSynonyms": {
+        "metric": [
+          "metric",
+          "metric name",
+          "indicador"
+        ],
+        "value": [
+          "value",
+          "amount",
+          "valor"
+        ],
+        "currency_code": [
+          "currency",
+          "moeda"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "GBP"
+      ]
+    },
+    {
+      "id": "acct_journal_entry_adjusting_currency_breakout",
+      "name": {
+        "en": "Currency Breakdown",
+        "pt": "Desdobramento por Moeda"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "currency_code",
+        "dr_total",
+        "cr_total",
+        "net_total"
+      ],
+      "keyRows": [
+        "subtotal",
+        "grand_total"
+      ],
+      "headerSynonyms": {
+        "currency_code": [
+          "currency",
+          "moeda",
+          "ccy"
+        ],
+        "dr_total": [
+          "debit total",
+          "total debits"
+        ],
+        "cr_total": [
+          "credit total",
+          "total credits"
+        ],
+        "net_total": [
+          "net total",
+          "saldo liquido"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "dr_total",
+            "cr_total",
+            "net_total"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "dr_total"
+        ],
+        "creditColumns": [
+          "cr_total"
+        ],
+        "balanceColumns": [
+          "net_total"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "GBP"
+      ]
+    }
+  ]
+}

@@ -40,6 +40,7 @@ import { LLMChatEngine } from "./services/llm/core/llmChatEngine";
 import { loadGeminiConfig } from "./services/llm/providers/gemini/geminiConfig";
 import { loadOpenAIConfig } from "./services/llm/providers/openai/openaiConfig";
 import { TelemetryLLMClient } from "./services/llm/core/telemetryLlmClient.decorator";
+import type { LLMProvider } from "./services/llm/core/llmErrors.types";
 import { PromptRegistryService } from "./services/llm/prompts/promptRegistry.service";
 import { LlmRequestBuilderService } from "./services/llm/core/llmRequestBuilder.service";
 import { LlmRouterService } from "./services/llm/core/llmRouter.service";
@@ -112,21 +113,56 @@ async function startServer() {
     try {
       const envName = (process.env.NODE_ENV as any) || "dev";
       const llmFactory = buildLLMFactory();
-      const rawClient = llmFactory.get();
+      const configuredKeys = llmFactory.listConfigured();
+      const rawDefaultClient = llmFactory.get();
       console.log(
-        `[Server] LLM factory ready — providers: ${llmFactory.listConfigured().join(", ")}`,
+        `[Server] LLM factory ready — providers: ${configuredKeys.join(", ")}`,
       );
 
-      // Wrap with telemetry decorator so every LLM call is logged
-      const llmClient = new TelemetryLLMClient(rawClient, telemetryService);
+      const telemetryClientCache = new Map<string, TelemetryLLMClient>();
+      const getTelemetryClientByKey = (
+        key: "openai" | "google" | "local",
+      ): TelemetryLLMClient | null => {
+        const existing = telemetryClientCache.get(key);
+        if (existing) return existing;
+        const raw = llmFactory.tryGet(key);
+        if (!raw) return null;
+        const wrapped = new TelemetryLLMClient(raw, telemetryService);
+        telemetryClientCache.set(key, wrapped);
+        return wrapped;
+      };
+
+      const defaultKey =
+        configuredKeys.find((k) => llmFactory.get(k) === rawDefaultClient) ||
+        configuredKeys[0];
+      const llmClient = getTelemetryClientByKey(defaultKey || "google");
+      if (!llmClient) {
+        throw new Error("Default LLM client is not configured");
+      }
       console.log("[Server] LLM client wrapped with telemetry decorator");
+
+      const resolveFactoryKey = (
+        provider: LLMProvider,
+      ): "openai" | "google" | "local" | null => {
+        const normalized = String(provider || "")
+          .trim()
+          .toLowerCase();
+        if (!normalized) return null;
+        if (normalized === "openai") return "openai";
+        if (normalized === "google" || normalized === "gemini") return "google";
+        if (normalized === "local" || normalized === "ollama") return "local";
+        if (normalized === "unknown") return null;
+        return null;
+      };
 
       const geminiCfg = loadGeminiConfig(envName);
       const openaiCfg = loadOpenAIConfig(envName);
       const defaultModelId =
         llmClient.provider === "openai"
           ? openaiCfg.defaultModelDraft
-          : geminiCfg.models.defaultDraft;
+          : llmClient.provider === "google"
+            ? geminiCfg.models.defaultDraft
+            : "local-default";
       const bankLoader = getBankLoaderInstance();
       const promptRegistry = new PromptRegistryService(bankLoader);
       const requestBuilder = new LlmRequestBuilderService(promptRegistry);
@@ -147,6 +183,13 @@ async function startServer() {
           modelId: defaultModelId,
           defaultTemperature: 0.2,
           defaultMaxOutputTokens: 900,
+        },
+        {
+          resolve(provider: LLMProvider) {
+            const key = resolveFactoryKey(provider);
+            if (!key) return null;
+            return getTelemetryClientByKey(key);
+          },
         },
       );
       const bankBackedChatEngine = new LLMChatEngine(llmGateway, {

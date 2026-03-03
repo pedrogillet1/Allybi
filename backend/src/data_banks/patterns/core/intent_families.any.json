@@ -1,0 +1,4421 @@
+{
+  "_meta": {
+    "bankId": "intent_families",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_intent_families",
+    "description": "Auto-registered bank payload for patterns/core/intent_families.any.json"
+  },
+  "patterns": [
+    {
+      "id": "IF_001",
+      "family": "extract",
+      "en": [
+        "extract revenue for all entities across quarterly statements 1"
+      ],
+      "pt": [
+        "extrair receita para all entities nos demonstrativos trimestrais 1"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:revenue",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_002",
+      "family": "summarize",
+      "en": [
+        "summarize expense for top performers across contracts 2"
+      ],
+      "pt": [
+        "resumir despesa para top performers nos contratos 2"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:expense",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_003",
+      "family": "compare",
+      "en": [
+        "compare cash flow by month across patient reports 3"
+      ],
+      "pt": [
+        "comparar fluxo de caixa by month nos relatórios clínicos 3"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:cash_flow",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_004",
+      "family": "locate",
+      "en": [
+        "locate margin by geography across accounting ledgers 4"
+      ],
+      "pt": [
+        "localizar margem by geography nos razões contábeis 4"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:margin",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_005",
+      "family": "calculate",
+      "en": [
+        "calculate unit economics with policy references across operations dashboard 5"
+      ],
+      "pt": [
+        "calcular economia unitária with policy references nos painel operacional 5"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:unit_economics",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_006",
+      "family": "validate",
+      "en": [
+        "validate variance with evidence across daily logs 6"
+      ],
+      "pt": [
+        "validar variação with evidence nos logs diários 6"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:variance",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_007",
+      "family": "forecast",
+      "en": [
+        "forecast balance with exceptions across cross-doc context 7"
+      ],
+      "pt": [
+        "prever saldo with exceptions nos contexto entre documentos 7"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:balance",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_008",
+      "family": "trace",
+      "en": [
+        "trace compliance with assumptions listed across quarterly statements 8"
+      ],
+      "pt": [
+        "rastrear conformidade with assumptions listed nos demonstrativos trimestrais 8"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:compliance",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_009",
+      "family": "classify",
+      "en": [
+        "classify risk for review across contracts 9"
+      ],
+      "pt": [
+        "classificar risco para review nos contratos 9"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:risk",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_010",
+      "family": "explain",
+      "en": [
+        "explain timeline for approval across patient reports 10"
+      ],
+      "pt": [
+        "explicar cronograma para approval nos relatórios clínicos 10"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:timeline",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_011",
+      "family": "extract",
+      "en": [
+        "extract signature for all entities across accounting ledgers 11"
+      ],
+      "pt": [
+        "extrair assinatura para all entities nos razões contábeis 11"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:signature",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_012",
+      "family": "summarize",
+      "en": [
+        "summarize entity profile for top performers across operations dashboard 12"
+      ],
+      "pt": [
+        "resumir perfil da entidade para top performers nos painel operacional 12"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:entity_profile",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_013",
+      "family": "compare",
+      "en": [
+        "compare revenue by month across daily logs 13"
+      ],
+      "pt": [
+        "comparar receita by month nos logs diários 13"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:revenue",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_014",
+      "family": "locate",
+      "en": [
+        "locate expense by geography across cross-doc context 14"
+      ],
+      "pt": [
+        "localizar despesa by geography nos contexto entre documentos 14"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:expense",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_015",
+      "family": "calculate",
+      "en": [
+        "calculate cash flow with policy references across quarterly statements 15"
+      ],
+      "pt": [
+        "calcular fluxo de caixa with policy references nos demonstrativos trimestrais 15"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:cash_flow",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_016",
+      "family": "validate",
+      "en": [
+        "validate margin with evidence across contracts 16"
+      ],
+      "pt": [
+        "validar margem with evidence nos contratos 16"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:margin",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_017",
+      "family": "forecast",
+      "en": [
+        "forecast unit economics with exceptions across patient reports 17"
+      ],
+      "pt": [
+        "prever economia unitária with exceptions nos relatórios clínicos 17"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:unit_economics",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_018",
+      "family": "trace",
+      "en": [
+        "trace variance with assumptions listed across accounting ledgers 18"
+      ],
+      "pt": [
+        "rastrear variação with assumptions listed nos razões contábeis 18"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:variance",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_019",
+      "family": "classify",
+      "en": [
+        "classify balance for review across operations dashboard 19"
+      ],
+      "pt": [
+        "classificar saldo para review nos painel operacional 19"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:balance",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_020",
+      "family": "explain",
+      "en": [
+        "explain compliance for approval across daily logs 20"
+      ],
+      "pt": [
+        "explicar conformidade para approval nos logs diários 20"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:compliance",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_021",
+      "family": "extract",
+      "en": [
+        "extract risk for all entities across cross-doc context 21"
+      ],
+      "pt": [
+        "extrair risco para all entities nos contexto entre documentos 21"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:risk",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_022",
+      "family": "summarize",
+      "en": [
+        "summarize timeline for top performers across quarterly statements 22"
+      ],
+      "pt": [
+        "resumir cronograma para top performers nos demonstrativos trimestrais 22"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:timeline",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_023",
+      "family": "compare",
+      "en": [
+        "compare signature by month across contracts 23"
+      ],
+      "pt": [
+        "comparar assinatura by month nos contratos 23"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:signature",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_024",
+      "family": "locate",
+      "en": [
+        "locate entity profile by geography across patient reports 24"
+      ],
+      "pt": [
+        "localizar perfil da entidade by geography nos relatórios clínicos 24"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:entity_profile",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_025",
+      "family": "calculate",
+      "en": [
+        "calculate revenue with policy references across accounting ledgers 25"
+      ],
+      "pt": [
+        "calcular receita with policy references nos razões contábeis 25"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:revenue",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_026",
+      "family": "validate",
+      "en": [
+        "validate expense with evidence across operations dashboard 26"
+      ],
+      "pt": [
+        "validar despesa with evidence nos painel operacional 26"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:expense",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_027",
+      "family": "forecast",
+      "en": [
+        "forecast cash flow with exceptions across daily logs 27"
+      ],
+      "pt": [
+        "prever fluxo de caixa with exceptions nos logs diários 27"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:cash_flow",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_028",
+      "family": "trace",
+      "en": [
+        "trace margin with assumptions listed across cross-doc context 28"
+      ],
+      "pt": [
+        "rastrear margem with assumptions listed nos contexto entre documentos 28"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:margin",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_029",
+      "family": "classify",
+      "en": [
+        "classify unit economics for review across quarterly statements 29"
+      ],
+      "pt": [
+        "classificar economia unitária para review nos demonstrativos trimestrais 29"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:unit_economics",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_030",
+      "family": "explain",
+      "en": [
+        "explain variance for approval across contracts 30"
+      ],
+      "pt": [
+        "explicar variação para approval nos contratos 30"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:variance",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_031",
+      "family": "extract",
+      "en": [
+        "extract balance for all entities across patient reports 31"
+      ],
+      "pt": [
+        "extrair saldo para all entities nos relatórios clínicos 31"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:balance",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_032",
+      "family": "summarize",
+      "en": [
+        "summarize compliance for top performers across accounting ledgers 32"
+      ],
+      "pt": [
+        "resumir conformidade para top performers nos razões contábeis 32"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:compliance",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_033",
+      "family": "compare",
+      "en": [
+        "compare risk by month across operations dashboard 33"
+      ],
+      "pt": [
+        "comparar risco by month nos painel operacional 33"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:risk",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_034",
+      "family": "locate",
+      "en": [
+        "locate timeline by geography across daily logs 34"
+      ],
+      "pt": [
+        "localizar cronograma by geography nos logs diários 34"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:timeline",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_035",
+      "family": "calculate",
+      "en": [
+        "calculate signature with policy references across cross-doc context 35"
+      ],
+      "pt": [
+        "calcular assinatura with policy references nos contexto entre documentos 35"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:signature",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_036",
+      "family": "validate",
+      "en": [
+        "validate entity profile with evidence across quarterly statements 36"
+      ],
+      "pt": [
+        "validar perfil da entidade with evidence nos demonstrativos trimestrais 36"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:entity_profile",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_037",
+      "family": "forecast",
+      "en": [
+        "forecast revenue with exceptions across contracts 37"
+      ],
+      "pt": [
+        "prever receita with exceptions nos contratos 37"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:revenue",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_038",
+      "family": "trace",
+      "en": [
+        "trace expense with assumptions listed across patient reports 38"
+      ],
+      "pt": [
+        "rastrear despesa with assumptions listed nos relatórios clínicos 38"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:expense",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_039",
+      "family": "classify",
+      "en": [
+        "classify cash flow for review across accounting ledgers 39"
+      ],
+      "pt": [
+        "classificar fluxo de caixa para review nos razões contábeis 39"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:cash_flow",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_040",
+      "family": "explain",
+      "en": [
+        "explain margin for approval across operations dashboard 40"
+      ],
+      "pt": [
+        "explicar margem para approval nos painel operacional 40"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:margin",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_041",
+      "family": "extract",
+      "en": [
+        "extract unit economics for all entities across daily logs 41"
+      ],
+      "pt": [
+        "extrair economia unitária para all entities nos logs diários 41"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:unit_economics",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_042",
+      "family": "summarize",
+      "en": [
+        "summarize variance for top performers across cross-doc context 42"
+      ],
+      "pt": [
+        "resumir variação para top performers nos contexto entre documentos 42"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:variance",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_043",
+      "family": "compare",
+      "en": [
+        "compare balance by month across quarterly statements 43"
+      ],
+      "pt": [
+        "comparar saldo by month nos demonstrativos trimestrais 43"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:balance",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_044",
+      "family": "locate",
+      "en": [
+        "locate compliance by geography across contracts 44"
+      ],
+      "pt": [
+        "localizar conformidade by geography nos contratos 44"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:compliance",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_045",
+      "family": "calculate",
+      "en": [
+        "calculate risk with policy references across patient reports 45"
+      ],
+      "pt": [
+        "calcular risco with policy references nos relatórios clínicos 45"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:risk",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_046",
+      "family": "validate",
+      "en": [
+        "validate timeline with evidence across accounting ledgers 46"
+      ],
+      "pt": [
+        "validar cronograma with evidence nos razões contábeis 46"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:timeline",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_047",
+      "family": "forecast",
+      "en": [
+        "forecast signature with exceptions across operations dashboard 47"
+      ],
+      "pt": [
+        "prever assinatura with exceptions nos painel operacional 47"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:signature",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_048",
+      "family": "trace",
+      "en": [
+        "trace entity profile with assumptions listed across daily logs 48"
+      ],
+      "pt": [
+        "rastrear perfil da entidade with assumptions listed nos logs diários 48"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:entity_profile",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_049",
+      "family": "classify",
+      "en": [
+        "classify revenue for review across cross-doc context 49"
+      ],
+      "pt": [
+        "classificar receita para review nos contexto entre documentos 49"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:revenue",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_050",
+      "family": "explain",
+      "en": [
+        "explain expense for approval across quarterly statements 50"
+      ],
+      "pt": [
+        "explicar despesa para approval nos demonstrativos trimestrais 50"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:expense",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_051",
+      "family": "extract",
+      "en": [
+        "extract cash flow for all entities across contracts 51"
+      ],
+      "pt": [
+        "extrair fluxo de caixa para all entities nos contratos 51"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:cash_flow",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_052",
+      "family": "summarize",
+      "en": [
+        "summarize margin for top performers across patient reports 52"
+      ],
+      "pt": [
+        "resumir margem para top performers nos relatórios clínicos 52"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:margin",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_053",
+      "family": "compare",
+      "en": [
+        "compare unit economics by month across accounting ledgers 53"
+      ],
+      "pt": [
+        "comparar economia unitária by month nos razões contábeis 53"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:unit_economics",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_054",
+      "family": "locate",
+      "en": [
+        "locate variance by geography across operations dashboard 54"
+      ],
+      "pt": [
+        "localizar variação by geography nos painel operacional 54"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:variance",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_055",
+      "family": "calculate",
+      "en": [
+        "calculate balance with policy references across daily logs 55"
+      ],
+      "pt": [
+        "calcular saldo with policy references nos logs diários 55"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:balance",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_056",
+      "family": "validate",
+      "en": [
+        "validate compliance with evidence across cross-doc context 56"
+      ],
+      "pt": [
+        "validar conformidade with evidence nos contexto entre documentos 56"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:compliance",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_057",
+      "family": "forecast",
+      "en": [
+        "forecast risk with exceptions across quarterly statements 57"
+      ],
+      "pt": [
+        "prever risco with exceptions nos demonstrativos trimestrais 57"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:risk",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_058",
+      "family": "trace",
+      "en": [
+        "trace timeline with assumptions listed across contracts 58"
+      ],
+      "pt": [
+        "rastrear cronograma with assumptions listed nos contratos 58"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:timeline",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_059",
+      "family": "classify",
+      "en": [
+        "classify signature for review across patient reports 59"
+      ],
+      "pt": [
+        "classificar assinatura para review nos relatórios clínicos 59"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:signature",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_060",
+      "family": "explain",
+      "en": [
+        "explain entity profile for approval across accounting ledgers 60"
+      ],
+      "pt": [
+        "explicar perfil da entidade para approval nos razões contábeis 60"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:entity_profile",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_061",
+      "family": "extract",
+      "en": [
+        "extract revenue for all entities across operations dashboard 61"
+      ],
+      "pt": [
+        "extrair receita para all entities nos painel operacional 61"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:revenue",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_062",
+      "family": "summarize",
+      "en": [
+        "summarize expense for top performers across daily logs 62"
+      ],
+      "pt": [
+        "resumir despesa para top performers nos logs diários 62"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:expense",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_063",
+      "family": "compare",
+      "en": [
+        "compare cash flow by month across cross-doc context 63"
+      ],
+      "pt": [
+        "comparar fluxo de caixa by month nos contexto entre documentos 63"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:cash_flow",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_064",
+      "family": "locate",
+      "en": [
+        "locate margin by geography across quarterly statements 64"
+      ],
+      "pt": [
+        "localizar margem by geography nos demonstrativos trimestrais 64"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:margin",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_065",
+      "family": "calculate",
+      "en": [
+        "calculate unit economics with policy references across contracts 65"
+      ],
+      "pt": [
+        "calcular economia unitária with policy references nos contratos 65"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:unit_economics",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_066",
+      "family": "validate",
+      "en": [
+        "validate variance with evidence across patient reports 66"
+      ],
+      "pt": [
+        "validar variação with evidence nos relatórios clínicos 66"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:variance",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_067",
+      "family": "forecast",
+      "en": [
+        "forecast balance with exceptions across accounting ledgers 67"
+      ],
+      "pt": [
+        "prever saldo with exceptions nos razões contábeis 67"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:balance",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_068",
+      "family": "trace",
+      "en": [
+        "trace compliance with assumptions listed across operations dashboard 68"
+      ],
+      "pt": [
+        "rastrear conformidade with assumptions listed nos painel operacional 68"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:compliance",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_069",
+      "family": "classify",
+      "en": [
+        "classify risk for review across daily logs 69"
+      ],
+      "pt": [
+        "classificar risco para review nos logs diários 69"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:risk",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_070",
+      "family": "explain",
+      "en": [
+        "explain timeline for approval across cross-doc context 70"
+      ],
+      "pt": [
+        "explicar cronograma para approval nos contexto entre documentos 70"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:timeline",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_071",
+      "family": "extract",
+      "en": [
+        "extract signature for all entities across quarterly statements 71"
+      ],
+      "pt": [
+        "extrair assinatura para all entities nos demonstrativos trimestrais 71"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:signature",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_072",
+      "family": "summarize",
+      "en": [
+        "summarize entity profile for top performers across contracts 72"
+      ],
+      "pt": [
+        "resumir perfil da entidade para top performers nos contratos 72"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:entity_profile",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_073",
+      "family": "compare",
+      "en": [
+        "compare revenue by month across patient reports 73"
+      ],
+      "pt": [
+        "comparar receita by month nos relatórios clínicos 73"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:revenue",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_074",
+      "family": "locate",
+      "en": [
+        "locate expense by geography across accounting ledgers 74"
+      ],
+      "pt": [
+        "localizar despesa by geography nos razões contábeis 74"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:expense",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_075",
+      "family": "calculate",
+      "en": [
+        "calculate cash flow with policy references across operations dashboard 75"
+      ],
+      "pt": [
+        "calcular fluxo de caixa with policy references nos painel operacional 75"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:cash_flow",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_076",
+      "family": "validate",
+      "en": [
+        "validate margin with evidence across daily logs 76"
+      ],
+      "pt": [
+        "validar margem with evidence nos logs diários 76"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:margin",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_077",
+      "family": "forecast",
+      "en": [
+        "forecast unit economics with exceptions across cross-doc context 77"
+      ],
+      "pt": [
+        "prever economia unitária with exceptions nos contexto entre documentos 77"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:unit_economics",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_078",
+      "family": "trace",
+      "en": [
+        "trace variance with assumptions listed across quarterly statements 78"
+      ],
+      "pt": [
+        "rastrear variação with assumptions listed nos demonstrativos trimestrais 78"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:variance",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_079",
+      "family": "classify",
+      "en": [
+        "classify balance for review across contracts 79"
+      ],
+      "pt": [
+        "classificar saldo para review nos contratos 79"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:balance",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_080",
+      "family": "explain",
+      "en": [
+        "explain compliance for approval across patient reports 80"
+      ],
+      "pt": [
+        "explicar conformidade para approval nos relatórios clínicos 80"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:compliance",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_081",
+      "family": "extract",
+      "en": [
+        "extract risk for all entities across accounting ledgers 81"
+      ],
+      "pt": [
+        "extrair risco para all entities nos razões contábeis 81"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:risk",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_082",
+      "family": "summarize",
+      "en": [
+        "summarize timeline for top performers across operations dashboard 82"
+      ],
+      "pt": [
+        "resumir cronograma para top performers nos painel operacional 82"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:timeline",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_083",
+      "family": "compare",
+      "en": [
+        "compare signature by month across daily logs 83"
+      ],
+      "pt": [
+        "comparar assinatura by month nos logs diários 83"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:signature",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_084",
+      "family": "locate",
+      "en": [
+        "locate entity profile by geography across cross-doc context 84"
+      ],
+      "pt": [
+        "localizar perfil da entidade by geography nos contexto entre documentos 84"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:entity_profile",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_085",
+      "family": "calculate",
+      "en": [
+        "calculate revenue with policy references across quarterly statements 85"
+      ],
+      "pt": [
+        "calcular receita with policy references nos demonstrativos trimestrais 85"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:revenue",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_086",
+      "family": "validate",
+      "en": [
+        "validate expense with evidence across contracts 86"
+      ],
+      "pt": [
+        "validar despesa with evidence nos contratos 86"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:expense",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_087",
+      "family": "forecast",
+      "en": [
+        "forecast cash flow with exceptions across patient reports 87"
+      ],
+      "pt": [
+        "prever fluxo de caixa with exceptions nos relatórios clínicos 87"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:cash_flow",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_088",
+      "family": "trace",
+      "en": [
+        "trace margin with assumptions listed across accounting ledgers 88"
+      ],
+      "pt": [
+        "rastrear margem with assumptions listed nos razões contábeis 88"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:margin",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_089",
+      "family": "classify",
+      "en": [
+        "classify unit economics for review across operations dashboard 89"
+      ],
+      "pt": [
+        "classificar economia unitária para review nos painel operacional 89"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:unit_economics",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_090",
+      "family": "explain",
+      "en": [
+        "explain variance for approval across daily logs 90"
+      ],
+      "pt": [
+        "explicar variação para approval nos logs diários 90"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:variance",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_091",
+      "family": "extract",
+      "en": [
+        "extract balance for all entities across cross-doc context 91"
+      ],
+      "pt": [
+        "extrair saldo para all entities nos contexto entre documentos 91"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:balance",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_092",
+      "family": "summarize",
+      "en": [
+        "summarize compliance for top performers across quarterly statements 92"
+      ],
+      "pt": [
+        "resumir conformidade para top performers nos demonstrativos trimestrais 92"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:compliance",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_093",
+      "family": "compare",
+      "en": [
+        "compare risk by month across contracts 93"
+      ],
+      "pt": [
+        "comparar risco by month nos contratos 93"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:risk",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_094",
+      "family": "locate",
+      "en": [
+        "locate timeline by geography across patient reports 94"
+      ],
+      "pt": [
+        "localizar cronograma by geography nos relatórios clínicos 94"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:timeline",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_095",
+      "family": "calculate",
+      "en": [
+        "calculate signature with policy references across accounting ledgers 95"
+      ],
+      "pt": [
+        "calcular assinatura with policy references nos razões contábeis 95"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:signature",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_096",
+      "family": "validate",
+      "en": [
+        "validate entity profile with evidence across operations dashboard 96"
+      ],
+      "pt": [
+        "validar perfil da entidade with evidence nos painel operacional 96"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:entity_profile",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_097",
+      "family": "forecast",
+      "en": [
+        "forecast revenue with exceptions across daily logs 97"
+      ],
+      "pt": [
+        "prever receita with exceptions nos logs diários 97"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:revenue",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_098",
+      "family": "trace",
+      "en": [
+        "trace expense with assumptions listed across cross-doc context 98"
+      ],
+      "pt": [
+        "rastrear despesa with assumptions listed nos contexto entre documentos 98"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:expense",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_099",
+      "family": "classify",
+      "en": [
+        "classify cash flow for review across quarterly statements 99"
+      ],
+      "pt": [
+        "classificar fluxo de caixa para review nos demonstrativos trimestrais 99"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:cash_flow",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_100",
+      "family": "explain",
+      "en": [
+        "explain margin for approval across contracts 100"
+      ],
+      "pt": [
+        "explicar margem para approval nos contratos 100"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:margin",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_101",
+      "family": "extract",
+      "en": [
+        "extract unit economics for all entities across patient reports 101"
+      ],
+      "pt": [
+        "extrair economia unitária para all entities nos relatórios clínicos 101"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:unit_economics",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_102",
+      "family": "summarize",
+      "en": [
+        "summarize variance for top performers across accounting ledgers 102"
+      ],
+      "pt": [
+        "resumir variação para top performers nos razões contábeis 102"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:variance",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_103",
+      "family": "compare",
+      "en": [
+        "compare balance by month across operations dashboard 103"
+      ],
+      "pt": [
+        "comparar saldo by month nos painel operacional 103"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:balance",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_104",
+      "family": "locate",
+      "en": [
+        "locate compliance by geography across daily logs 104"
+      ],
+      "pt": [
+        "localizar conformidade by geography nos logs diários 104"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:compliance",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_105",
+      "family": "calculate",
+      "en": [
+        "calculate risk with policy references across cross-doc context 105"
+      ],
+      "pt": [
+        "calcular risco with policy references nos contexto entre documentos 105"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:risk",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_106",
+      "family": "validate",
+      "en": [
+        "validate timeline with evidence across quarterly statements 106"
+      ],
+      "pt": [
+        "validar cronograma with evidence nos demonstrativos trimestrais 106"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:timeline",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_107",
+      "family": "forecast",
+      "en": [
+        "forecast signature with exceptions across contracts 107"
+      ],
+      "pt": [
+        "prever assinatura with exceptions nos contratos 107"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:signature",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_108",
+      "family": "trace",
+      "en": [
+        "trace entity profile with assumptions listed across patient reports 108"
+      ],
+      "pt": [
+        "rastrear perfil da entidade with assumptions listed nos relatórios clínicos 108"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:entity_profile",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_109",
+      "family": "classify",
+      "en": [
+        "classify revenue for review across accounting ledgers 109"
+      ],
+      "pt": [
+        "classificar receita para review nos razões contábeis 109"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:revenue",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_110",
+      "family": "explain",
+      "en": [
+        "explain expense for approval across operations dashboard 110"
+      ],
+      "pt": [
+        "explicar despesa para approval nos painel operacional 110"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:expense",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_111",
+      "family": "extract",
+      "en": [
+        "extract cash flow for all entities across daily logs 111"
+      ],
+      "pt": [
+        "extrair fluxo de caixa para all entities nos logs diários 111"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:cash_flow",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_112",
+      "family": "summarize",
+      "en": [
+        "summarize margin for top performers across cross-doc context 112"
+      ],
+      "pt": [
+        "resumir margem para top performers nos contexto entre documentos 112"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:margin",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_113",
+      "family": "compare",
+      "en": [
+        "compare unit economics by month across quarterly statements 113"
+      ],
+      "pt": [
+        "comparar economia unitária by month nos demonstrativos trimestrais 113"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:unit_economics",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_114",
+      "family": "locate",
+      "en": [
+        "locate variance by geography across contracts 114"
+      ],
+      "pt": [
+        "localizar variação by geography nos contratos 114"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:variance",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_115",
+      "family": "calculate",
+      "en": [
+        "calculate balance with policy references across patient reports 115"
+      ],
+      "pt": [
+        "calcular saldo with policy references nos relatórios clínicos 115"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:balance",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_116",
+      "family": "validate",
+      "en": [
+        "validate compliance with evidence across accounting ledgers 116"
+      ],
+      "pt": [
+        "validar conformidade with evidence nos razões contábeis 116"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:compliance",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_117",
+      "family": "forecast",
+      "en": [
+        "forecast risk with exceptions across operations dashboard 117"
+      ],
+      "pt": [
+        "prever risco with exceptions nos painel operacional 117"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:risk",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_118",
+      "family": "trace",
+      "en": [
+        "trace timeline with assumptions listed across daily logs 118"
+      ],
+      "pt": [
+        "rastrear cronograma with assumptions listed nos logs diários 118"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:timeline",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_119",
+      "family": "classify",
+      "en": [
+        "classify signature for review across cross-doc context 119"
+      ],
+      "pt": [
+        "classificar assinatura para review nos contexto entre documentos 119"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:signature",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_120",
+      "family": "explain",
+      "en": [
+        "explain entity profile for approval across quarterly statements 120"
+      ],
+      "pt": [
+        "explicar perfil da entidade para approval nos demonstrativos trimestrais 120"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:entity_profile",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_121",
+      "family": "extract",
+      "en": [
+        "extract revenue for all entities across contracts 121"
+      ],
+      "pt": [
+        "extrair receita para all entities nos contratos 121"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:revenue",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_122",
+      "family": "summarize",
+      "en": [
+        "summarize expense for top performers across patient reports 122"
+      ],
+      "pt": [
+        "resumir despesa para top performers nos relatórios clínicos 122"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:expense",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_123",
+      "family": "compare",
+      "en": [
+        "compare cash flow by month across accounting ledgers 123"
+      ],
+      "pt": [
+        "comparar fluxo de caixa by month nos razões contábeis 123"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:cash_flow",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_124",
+      "family": "locate",
+      "en": [
+        "locate margin by geography across operations dashboard 124"
+      ],
+      "pt": [
+        "localizar margem by geography nos painel operacional 124"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:margin",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_125",
+      "family": "calculate",
+      "en": [
+        "calculate unit economics with policy references across daily logs 125"
+      ],
+      "pt": [
+        "calcular economia unitária with policy references nos logs diários 125"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:unit_economics",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_126",
+      "family": "validate",
+      "en": [
+        "validate variance with evidence across cross-doc context 126"
+      ],
+      "pt": [
+        "validar variação with evidence nos contexto entre documentos 126"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:variance",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_127",
+      "family": "forecast",
+      "en": [
+        "forecast balance with exceptions across quarterly statements 127"
+      ],
+      "pt": [
+        "prever saldo with exceptions nos demonstrativos trimestrais 127"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:balance",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_128",
+      "family": "trace",
+      "en": [
+        "trace compliance with assumptions listed across contracts 128"
+      ],
+      "pt": [
+        "rastrear conformidade with assumptions listed nos contratos 128"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:compliance",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_129",
+      "family": "classify",
+      "en": [
+        "classify risk for review across patient reports 129"
+      ],
+      "pt": [
+        "classificar risco para review nos relatórios clínicos 129"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:risk",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested risk",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_130",
+      "family": "explain",
+      "en": [
+        "explain timeline for approval across accounting ledgers 130"
+      ],
+      "pt": [
+        "explicar cronograma para approval nos razões contábeis 130"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:timeline",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested timeline",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_131",
+      "family": "extract",
+      "en": [
+        "extract signature for all entities across operations dashboard 131"
+      ],
+      "pt": [
+        "extrair assinatura para all entities nos painel operacional 131"
+      ],
+      "triggers": [
+        "intent:extract",
+        "scope:signature",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested signature",
+        "do not process for all entities as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "entity",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "extract",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_132",
+      "family": "summarize",
+      "en": [
+        "summarize entity profile for top performers across daily logs 132"
+      ],
+      "pt": [
+        "resumir perfil da entidade para top performers nos logs diários 132"
+      ],
+      "triggers": [
+        "intent:summarize",
+        "scope:entity_profile",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested entity profile",
+        "do not process for top performers as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "docType",
+        "section",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "summarize",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_133",
+      "family": "compare",
+      "en": [
+        "compare revenue by month across cross-doc context 133"
+      ],
+      "pt": [
+        "comparar receita by month nos contexto entre documentos 133"
+      ],
+      "triggers": [
+        "intent:compare",
+        "scope:revenue",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested revenue",
+        "do not process by month as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entity",
+        "time",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "compare",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_134",
+      "family": "locate",
+      "en": [
+        "locate expense by geography across quarterly statements 134"
+      ],
+      "pt": [
+        "localizar despesa by geography nos demonstrativos trimestrais 134"
+      ],
+      "triggers": [
+        "intent:locate",
+        "scope:expense",
+        "slot:domain:quarterly statements"
+      ],
+      "negatives": [
+        "ignore non-requested expense",
+        "do not process by geography as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "section",
+        "clause",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "locate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_135",
+      "family": "calculate",
+      "en": [
+        "calculate cash flow with policy references across contracts 135"
+      ],
+      "pt": [
+        "calcular fluxo de caixa with policy references nos contratos 135"
+      ],
+      "triggers": [
+        "intent:calculate",
+        "scope:cash_flow",
+        "slot:domain:contracts"
+      ],
+      "negatives": [
+        "ignore non-requested cash flow",
+        "do not process with policy references as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "operation",
+        "metric",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "calculate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_136",
+      "family": "validate",
+      "en": [
+        "validate margin with evidence across patient reports 136"
+      ],
+      "pt": [
+        "validar margem with evidence nos relatórios clínicos 136"
+      ],
+      "triggers": [
+        "intent:validate",
+        "scope:margin",
+        "slot:domain:patient reports"
+      ],
+      "negatives": [
+        "ignore non-requested margin",
+        "do not process with evidence as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "statement",
+        "evidence",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "validate",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_137",
+      "family": "forecast",
+      "en": [
+        "forecast unit economics with exceptions across accounting ledgers 137"
+      ],
+      "pt": [
+        "prever economia unitária with exceptions nos razões contábeis 137"
+      ],
+      "triggers": [
+        "intent:forecast",
+        "scope:unit_economics",
+        "slot:domain:accounting ledgers"
+      ],
+      "negatives": [
+        "ignore non-requested unit economics",
+        "do not process with exceptions as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "metric",
+        "window",
+        "method",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "forecast",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_138",
+      "family": "trace",
+      "en": [
+        "trace variance with assumptions listed across operations dashboard 138"
+      ],
+      "pt": [
+        "rastrear variação with assumptions listed nos painel operacional 138"
+      ],
+      "triggers": [
+        "intent:trace",
+        "scope:variance",
+        "slot:domain:operations dashboard"
+      ],
+      "negatives": [
+        "ignore non-requested variance",
+        "do not process with assumptions listed as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "source",
+        "provenance",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "trace",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_139",
+      "family": "classify",
+      "en": [
+        "classify balance for review across daily logs 139"
+      ],
+      "pt": [
+        "classificar saldo para review nos logs diários 139"
+      ],
+      "triggers": [
+        "intent:classify",
+        "scope:balance",
+        "slot:domain:daily logs"
+      ],
+      "negatives": [
+        "ignore non-requested balance",
+        "do not process for review as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "entityType",
+        "intent",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "classify",
+        "core_pattern_set"
+      ]
+    },
+    {
+      "id": "IF_140",
+      "family": "explain",
+      "en": [
+        "explain compliance for approval across cross-doc context 140"
+      ],
+      "pt": [
+        "explicar conformidade para approval nos contexto entre documentos 140"
+      ],
+      "triggers": [
+        "intent:explain",
+        "scope:compliance",
+        "slot:domain:cross-doc context"
+      ],
+      "negatives": [
+        "ignore non-requested compliance",
+        "do not process for approval as a blind extraction",
+        "deny when no target intent identified"
+      ],
+      "slotHints": [
+        "policy",
+        "result",
+        "confidence",
+        "sourceDoc"
+      ],
+      "telemetryTags": [
+        "intent_families",
+        "explain",
+        "core_pattern_set"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,6188 @@
+{
+  "_meta": {
+    "id": "connect_intents_pt",
+    "version": "1.0.0",
+    "description": "connect intents pattern bank for PT connector connect intents with connector-aware isolation.",
+    "languages": [
+      "pt",
+      "any"
+    ],
+    "owner": "connectors-patterning",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/retrieval/retrievalEngine.service.ts",
+      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+    ],
+    "tests": [
+      "connect_pt_positive_1",
+      "connect_pt_negative_1",
+      "connect_pt_missing_slot"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "matching": {
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true
+    },
+    "minPatterns": 120,
+    "maxPatterns": 250
+  },
+  "patterns": [
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar conector Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0001",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar conector Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0002",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar conector Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0003",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar conector Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0004",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar conector Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0005",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar conector Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0006",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0007",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0008",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0009",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0010",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0011",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "adicionar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0012",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar acesso Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0013",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar acesso Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0014",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar acesso Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0015",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar acesso Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0016",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar acesso Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0017",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar acesso Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0018",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0019",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0020",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0021",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0022",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0023",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "ativar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0024",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0025",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0026",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0027",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar minha conta Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0028",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar minha conta Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0029",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar minha conta Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0030",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar minha conta Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0031",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar minha conta Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0032",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar minha conta Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0033",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0034",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0035",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "autorizar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0036",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conceder acesso ao Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0037",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conceder acesso ao Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0038",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conceder acesso ao Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0039",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conceder acesso ao Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0040",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conceder acesso ao Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0041",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conceder acesso ao Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0042",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar com Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0043",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar com Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0044",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar com Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0045",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar com Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0046",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar com Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0047",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar com Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0048",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0049",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0050",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0051",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar minha Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0052",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar minha Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0053",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar minha Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0054",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar minha Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0055",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar minha Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0056",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar minha Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0057",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar novamente Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0058",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar novamente Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0059",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar novamente Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0060",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar novamente Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0061",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar novamente Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0062",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar novamente Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0063",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0064",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0065",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "conectar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0066",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0067",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0068",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0069",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar integração Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0070",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar integração Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0071",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar integração Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0072",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar integração Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0073",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar integração Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0074",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar integração Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0075",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0076",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0077",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "configurar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0078",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "dar acesso ao Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0079",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "dar acesso ao Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0080",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "dar acesso ao Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0081",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "dar acesso ao Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0082",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "dar acesso ao Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0083",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "dar acesso ao Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0084",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "fazer login no Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0085",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "fazer login no Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0086",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "fazer login no Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0087",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "fazer login no Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0088",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "fazer login no Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0089",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "fazer login no Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0090",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0091",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0092",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0093",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar integração Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0094",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar integração Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0095",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar integração Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0096",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar integração Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0097",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar integração Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0098",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar integração Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0099",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0100",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0101",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "habilitar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0102",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar oauth para Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0103",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar oauth para Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0104",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar oauth para Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0105",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar oauth para Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0106",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar oauth para Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0107",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar oauth para Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0108",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar uso de Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0109",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar uso de Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0110",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar uso de Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0111",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar uso de Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0112",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar uso de Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0113",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "iniciar uso de Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0114",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "instalar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0115",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "instalar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0116",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "instalar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0117",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "instalar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0118",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "instalar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0119",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "instalar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0120",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "integrar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0121",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "integrar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0122",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "integrar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0123",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "integrar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0124",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "integrar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0125",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "integrar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0126",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "reconectar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0127",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "reconectar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0128",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "reconectar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0129",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "reconectar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0130",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "reconectar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0131",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "reconectar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0132",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0133",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0134",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0135",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha conta Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0136",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha conta Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0137",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha conta Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0138",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha conta Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0139",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha conta Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0140",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha conta Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0141",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0142",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0143",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0144",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0145",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0146",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular minha Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0147",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0148",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0149",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "CONNECT",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query"
+      ],
+      "askOneQuestionTemplate": "Qual conector devo conectar, na conta atual ou em outra conta?",
+      "pt": [
+        "vincular Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:connect",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "connect",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "CONE_PT_0150",
+      "intent": "CONNECTORS"
+    }
+  ]
+}

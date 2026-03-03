@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "id": "error_explanations",
+    "version": "1.0.0",
+    "description": "Explanations shown for policy and validation errors.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "explanations": {
+    "en": {
+      "DOC_SCOPE_MISSING": "I could not anchor this to one document; please select one.",
+      "UNITS_MISSING": "Units are required to compare these values reliably.",
+      "WRONG_DOC": "This result looks like a different doc version."
+    },
+    "pt": {
+      "DOC_SCOPE_MISSING": "Nao ancorei a pergunta em um documento; escolha o documento.",
+      "UNITS_MISSING": "Unidades sao necessarias para comparar estes valores com segurança.",
+      "WRONG_DOC": "Este resultado parece ser de uma versao diferente do documento."
+    }
+  },
+  "config": {
+    "enabled": true
+  }
+}

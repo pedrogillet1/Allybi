@@ -1,0 +1,2648 @@
+{
+  "_meta": {
+    "bankId": "doc_set_compare_patterns",
+    "version": "1.0.0",
+    "owner": "doc-reference-curation",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "doc_type_catalog_ssot",
+      "routing_scope_policies"
+    ],
+    "usedBy": [
+      "doc_intent_router",
+      "doc_scope_resolver"
+    ],
+    "tests": {
+      "positive": [
+        "compare the latest vs prior version",
+        "compare doc A with doc B"
+      ],
+      "negative": [
+        "single document extraction only",
+        "not a comparison query"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_doc_refs_doc_set_compare_patterns",
+    "description": "Auto-registered bank payload for patterns/doc_refs/doc_set_compare_patterns.any.json"
+  },
+  "patterns": [
+    {
+      "id": "DCP_001",
+      "en": [
+        "compare doc1-1 and second-0 for this request (set 1)"
+      ],
+      "pt": [
+        "compare doc1-1 e second-0 para esta solicitação (conjunto 1)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-1_second-0"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_002",
+      "en": [
+        "compare these two: latest-1 versus right-1 (set 2)"
+      ],
+      "pt": [
+        "compare estes dois: latest-1 versus right-1 (conjunto 2)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-1_right-1"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_003",
+      "en": [
+        "A vs B: earlier-1 and reviewed-1 (set 3)"
+      ],
+      "pt": [
+        "A vs B: earlier-1 e reviewed-1 (conjunto 3)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-1_reviewed-1"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_004",
+      "en": [
+        "take first-2 and updated-2 and find differences (set 4)"
+      ],
+      "pt": [
+        "pegue first-2 e updated-2 e encontre diferenças (conjunto 4)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-2_updated-2"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_005",
+      "en": [
+        "compare left-2 to docB-2 (set 5)"
+      ],
+      "pt": [
+        "compare left-2 com docB-2 (conjunto 5)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-2_docB-2"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_006",
+      "en": [
+        "contrast signed-2 and doc2-3 (set 6)"
+      ],
+      "pt": [
+        "contraste signed-2 e doc2-3 (conjunto 6)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-2_doc2-3"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_007",
+      "en": [
+        "between draft-3 and prior-3, which differs (set 7)"
+      ],
+      "pt": [
+        "entre draft-3 e prior-3, qual difere (conjunto 7)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-3_prior-3"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_008",
+      "en": [
+        "cross-document compare docA-3 and second-4 (set 8)"
+      ],
+      "pt": [
+        "comparação entre documentos docA-3 e second-4 (conjunto 8)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-3_second-4"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_009",
+      "en": [
+        "compare latest doc1-3 against prior right-4 (set 9)"
+      ],
+      "pt": [
+        "compare o doc1-3 mais recente com o right-4 anterior (conjunto 9)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-3_right-4"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_010",
+      "en": [
+        "evaluate discrepancy between latest-4 and reviewed-5 (set 10)"
+      ],
+      "pt": [
+        "avalie a divergência entre latest-4 e reviewed-5 (conjunto 10)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-4_reviewed-5"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_011",
+      "en": [
+        "compare earlier-4 with updated-5 side-by-side (set 11)"
+      ],
+      "pt": [
+        "compare earlier-4 com updated-5 lado a lado (conjunto 11)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-4_updated-5"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_012",
+      "en": [
+        "first-4 vs docB-6 reconciliation (set 12)"
+      ],
+      "pt": [
+        "reconciliação first-4 vs docB-6 (conjunto 12)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-4_docB-6"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_013",
+      "en": [
+        "compare left-5 and doc2-6 for this request (set 13)"
+      ],
+      "pt": [
+        "compare left-5 e doc2-6 para esta solicitação (conjunto 13)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-5_doc2-6"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_014",
+      "en": [
+        "compare these two: signed-5 versus prior-7 (set 14)"
+      ],
+      "pt": [
+        "compare estes dois: signed-5 versus prior-7 (conjunto 14)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-5_prior-7"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_015",
+      "en": [
+        "A vs B: draft-5 and second-7 (set 15)"
+      ],
+      "pt": [
+        "A vs B: draft-5 e second-7 (conjunto 15)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-5_second-7"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_016",
+      "en": [
+        "take docA-6 and right-8 and find differences (set 16)"
+      ],
+      "pt": [
+        "pegue docA-6 e right-8 e encontre diferenças (conjunto 16)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-6_right-8"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_017",
+      "en": [
+        "compare doc1-6 to reviewed-8 (set 17)"
+      ],
+      "pt": [
+        "compare doc1-6 com reviewed-8 (conjunto 17)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-6_reviewed-8"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_018",
+      "en": [
+        "contrast latest-6 and updated-9 (set 18)"
+      ],
+      "pt": [
+        "contraste latest-6 e updated-9 (conjunto 18)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-6_updated-9"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_019",
+      "en": [
+        "between earlier-7 and docB-9, which differs (set 19)"
+      ],
+      "pt": [
+        "entre earlier-7 e docB-9, qual difere (conjunto 19)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-7_docB-9"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_020",
+      "en": [
+        "cross-document compare first-7 and doc2-10 (set 20)"
+      ],
+      "pt": [
+        "comparação entre documentos first-7 e doc2-10 (conjunto 20)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-7_doc2-10"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_021",
+      "en": [
+        "compare latest left-7 against prior prior-10 (set 21)"
+      ],
+      "pt": [
+        "compare o left-7 mais recente com o prior-10 anterior (conjunto 21)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-7_prior-10"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_022",
+      "en": [
+        "evaluate discrepancy between signed-8 and second-11 (set 22)"
+      ],
+      "pt": [
+        "avalie a divergência entre signed-8 e second-11 (conjunto 22)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-8_second-11"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_023",
+      "en": [
+        "compare draft-8 with right-11 side-by-side (set 23)"
+      ],
+      "pt": [
+        "compare draft-8 com right-11 lado a lado (conjunto 23)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-8_right-11"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_024",
+      "en": [
+        "docA-8 vs reviewed-12 reconciliation (set 24)"
+      ],
+      "pt": [
+        "reconciliação docA-8 vs reviewed-12 (conjunto 24)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-8_reviewed-12"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_025",
+      "en": [
+        "compare doc1-9 and updated-12 for this request (set 25)"
+      ],
+      "pt": [
+        "compare doc1-9 e updated-12 para esta solicitação (conjunto 25)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-9_updated-12"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_026",
+      "en": [
+        "compare these two: latest-9 versus docB-13 (set 26)"
+      ],
+      "pt": [
+        "compare estes dois: latest-9 versus docB-13 (conjunto 26)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-9_docB-13"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_027",
+      "en": [
+        "A vs B: earlier-9 and doc2-13 (set 27)"
+      ],
+      "pt": [
+        "A vs B: earlier-9 e doc2-13 (conjunto 27)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-9_doc2-13"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_028",
+      "en": [
+        "take first-10 and prior-14 and find differences (set 28)"
+      ],
+      "pt": [
+        "pegue first-10 e prior-14 e encontre diferenças (conjunto 28)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-10_prior-14"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_029",
+      "en": [
+        "compare left-10 to second-14 (set 29)"
+      ],
+      "pt": [
+        "compare left-10 com second-14 (conjunto 29)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-10_second-14"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_030",
+      "en": [
+        "contrast signed-10 and right-15 (set 30)"
+      ],
+      "pt": [
+        "contraste signed-10 e right-15 (conjunto 30)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-10_right-15"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_031",
+      "en": [
+        "between draft-11 and reviewed-15, which differs (set 31)"
+      ],
+      "pt": [
+        "entre draft-11 e reviewed-15, qual difere (conjunto 31)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-11_reviewed-15"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_032",
+      "en": [
+        "cross-document compare docA-11 and updated-16 (set 32)"
+      ],
+      "pt": [
+        "comparação entre documentos docA-11 e updated-16 (conjunto 32)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-11_updated-16"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_033",
+      "en": [
+        "compare latest doc1-11 against prior docB-16 (set 33)"
+      ],
+      "pt": [
+        "compare o doc1-11 mais recente com o docB-16 anterior (conjunto 33)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-11_docB-16"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_034",
+      "en": [
+        "evaluate discrepancy between latest-12 and doc2-17 (set 34)"
+      ],
+      "pt": [
+        "avalie a divergência entre latest-12 e doc2-17 (conjunto 34)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-12_doc2-17"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_035",
+      "en": [
+        "compare earlier-12 with prior-17 side-by-side (set 35)"
+      ],
+      "pt": [
+        "compare earlier-12 com prior-17 lado a lado (conjunto 35)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-12_prior-17"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_036",
+      "en": [
+        "first-12 vs second-18 reconciliation (set 36)"
+      ],
+      "pt": [
+        "reconciliação first-12 vs second-18 (conjunto 36)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-12_second-18"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_037",
+      "en": [
+        "compare left-13 and right-18 for this request (set 37)"
+      ],
+      "pt": [
+        "compare left-13 e right-18 para esta solicitação (conjunto 37)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-13_right-18"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_038",
+      "en": [
+        "compare these two: signed-13 versus reviewed-19 (set 38)"
+      ],
+      "pt": [
+        "compare estes dois: signed-13 versus reviewed-19 (conjunto 38)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-13_reviewed-19"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_039",
+      "en": [
+        "A vs B: draft-13 and updated-19 (set 39)"
+      ],
+      "pt": [
+        "A vs B: draft-13 e updated-19 (conjunto 39)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-13_updated-19"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_040",
+      "en": [
+        "take docA-14 and docB-20 and find differences (set 40)"
+      ],
+      "pt": [
+        "pegue docA-14 e docB-20 e encontre diferenças (conjunto 40)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-14_docB-20"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_041",
+      "en": [
+        "compare doc1-14 to doc2-20 (set 41)"
+      ],
+      "pt": [
+        "compare doc1-14 com doc2-20 (conjunto 41)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-14_doc2-20"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_042",
+      "en": [
+        "contrast latest-14 and prior-21 (set 42)"
+      ],
+      "pt": [
+        "contraste latest-14 e prior-21 (conjunto 42)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-14_prior-21"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_043",
+      "en": [
+        "between earlier-15 and second-21, which differs (set 43)"
+      ],
+      "pt": [
+        "entre earlier-15 e second-21, qual difere (conjunto 43)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-15_second-21"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_044",
+      "en": [
+        "cross-document compare first-15 and right-22 (set 44)"
+      ],
+      "pt": [
+        "comparação entre documentos first-15 e right-22 (conjunto 44)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-15_right-22"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_045",
+      "en": [
+        "compare latest left-15 against prior reviewed-22 (set 45)"
+      ],
+      "pt": [
+        "compare o left-15 mais recente com o reviewed-22 anterior (conjunto 45)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-15_reviewed-22"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_046",
+      "en": [
+        "evaluate discrepancy between signed-16 and updated-23 (set 46)"
+      ],
+      "pt": [
+        "avalie a divergência entre signed-16 e updated-23 (conjunto 46)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-16_updated-23"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_047",
+      "en": [
+        "compare draft-16 with docB-23 side-by-side (set 47)"
+      ],
+      "pt": [
+        "compare draft-16 com docB-23 lado a lado (conjunto 47)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-16_docB-23"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_048",
+      "en": [
+        "docA-16 vs doc2-24 reconciliation (set 48)"
+      ],
+      "pt": [
+        "reconciliação docA-16 vs doc2-24 (conjunto 48)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-16_doc2-24"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_049",
+      "en": [
+        "compare doc1-17 and prior-24 for this request (set 49)"
+      ],
+      "pt": [
+        "compare doc1-17 e prior-24 para esta solicitação (conjunto 49)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-17_prior-24"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_050",
+      "en": [
+        "compare these two: latest-17 versus second-25 (set 50)"
+      ],
+      "pt": [
+        "compare estes dois: latest-17 versus second-25 (conjunto 50)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-17_second-25"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_051",
+      "en": [
+        "A vs B: earlier-17 and right-25 (set 51)"
+      ],
+      "pt": [
+        "A vs B: earlier-17 e right-25 (conjunto 51)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-17_right-25"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_052",
+      "en": [
+        "take first-18 and reviewed-26 and find differences (set 52)"
+      ],
+      "pt": [
+        "pegue first-18 e reviewed-26 e encontre diferenças (conjunto 52)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-18_reviewed-26"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_053",
+      "en": [
+        "compare left-18 to updated-26 (set 53)"
+      ],
+      "pt": [
+        "compare left-18 com updated-26 (conjunto 53)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-18_updated-26"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_054",
+      "en": [
+        "contrast signed-18 and docB-27 (set 54)"
+      ],
+      "pt": [
+        "contraste signed-18 e docB-27 (conjunto 54)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-18_docB-27"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_055",
+      "en": [
+        "between draft-19 and doc2-27, which differs (set 55)"
+      ],
+      "pt": [
+        "entre draft-19 e doc2-27, qual difere (conjunto 55)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-19_doc2-27"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_056",
+      "en": [
+        "cross-document compare docA-19 and prior-28 (set 56)"
+      ],
+      "pt": [
+        "comparação entre documentos docA-19 e prior-28 (conjunto 56)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-19_prior-28"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_057",
+      "en": [
+        "compare latest doc1-19 against prior second-28 (set 57)"
+      ],
+      "pt": [
+        "compare o doc1-19 mais recente com o second-28 anterior (conjunto 57)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-19_second-28"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_058",
+      "en": [
+        "evaluate discrepancy between latest-20 and right-29 (set 58)"
+      ],
+      "pt": [
+        "avalie a divergência entre latest-20 e right-29 (conjunto 58)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-20_right-29"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_059",
+      "en": [
+        "compare earlier-20 with reviewed-29 side-by-side (set 59)"
+      ],
+      "pt": [
+        "compare earlier-20 com reviewed-29 lado a lado (conjunto 59)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-20_reviewed-29"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_060",
+      "en": [
+        "first-20 vs updated-30 reconciliation (set 60)"
+      ],
+      "pt": [
+        "reconciliação first-20 vs updated-30 (conjunto 60)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-20_updated-30"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_061",
+      "en": [
+        "compare left-21 and docB-30 for this request (set 61)"
+      ],
+      "pt": [
+        "compare left-21 e docB-30 para esta solicitação (conjunto 61)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-21_docB-30"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_062",
+      "en": [
+        "compare these two: signed-21 versus doc2-31 (set 62)"
+      ],
+      "pt": [
+        "compare estes dois: signed-21 versus doc2-31 (conjunto 62)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-21_doc2-31"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_063",
+      "en": [
+        "A vs B: draft-21 and prior-31 (set 63)"
+      ],
+      "pt": [
+        "A vs B: draft-21 e prior-31 (conjunto 63)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-21_prior-31"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_064",
+      "en": [
+        "take docA-22 and second-32 and find differences (set 64)"
+      ],
+      "pt": [
+        "pegue docA-22 e second-32 e encontre diferenças (conjunto 64)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-22_second-32"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_065",
+      "en": [
+        "compare doc1-22 to right-32 (set 65)"
+      ],
+      "pt": [
+        "compare doc1-22 com right-32 (conjunto 65)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-22_right-32"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_066",
+      "en": [
+        "contrast latest-22 and reviewed-33 (set 66)"
+      ],
+      "pt": [
+        "contraste latest-22 e reviewed-33 (conjunto 66)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-22_reviewed-33"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_067",
+      "en": [
+        "between earlier-23 and updated-33, which differs (set 67)"
+      ],
+      "pt": [
+        "entre earlier-23 e updated-33, qual difere (conjunto 67)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-23_updated-33"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_068",
+      "en": [
+        "cross-document compare first-23 and docB-34 (set 68)"
+      ],
+      "pt": [
+        "comparação entre documentos first-23 e docB-34 (conjunto 68)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-23_docB-34"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_069",
+      "en": [
+        "compare latest left-23 against prior doc2-34 (set 69)"
+      ],
+      "pt": [
+        "compare o left-23 mais recente com o doc2-34 anterior (conjunto 69)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-23_doc2-34"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_070",
+      "en": [
+        "evaluate discrepancy between signed-24 and prior-35 (set 70)"
+      ],
+      "pt": [
+        "avalie a divergência entre signed-24 e prior-35 (conjunto 70)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-24_prior-35"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_071",
+      "en": [
+        "compare draft-24 with second-35 side-by-side (set 71)"
+      ],
+      "pt": [
+        "compare draft-24 com second-35 lado a lado (conjunto 71)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-24_second-35"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_072",
+      "en": [
+        "docA-24 vs right-36 reconciliation (set 72)"
+      ],
+      "pt": [
+        "reconciliação docA-24 vs right-36 (conjunto 72)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-24_right-36"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_073",
+      "en": [
+        "compare doc1-25 and reviewed-36 for this request (set 73)"
+      ],
+      "pt": [
+        "compare doc1-25 e reviewed-36 para esta solicitação (conjunto 73)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-25_reviewed-36"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_074",
+      "en": [
+        "compare these two: latest-25 versus updated-37 (set 74)"
+      ],
+      "pt": [
+        "compare estes dois: latest-25 versus updated-37 (conjunto 74)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-25_updated-37"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_075",
+      "en": [
+        "A vs B: earlier-25 and docB-37 (set 75)"
+      ],
+      "pt": [
+        "A vs B: earlier-25 e docB-37 (conjunto 75)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-25_docB-37"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_076",
+      "en": [
+        "take first-26 and doc2-38 and find differences (set 76)"
+      ],
+      "pt": [
+        "pegue first-26 e doc2-38 e encontre diferenças (conjunto 76)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-26_doc2-38"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_077",
+      "en": [
+        "compare left-26 to prior-38 (set 77)"
+      ],
+      "pt": [
+        "compare left-26 com prior-38 (conjunto 77)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-26_prior-38"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_078",
+      "en": [
+        "contrast signed-26 and second-39 (set 78)"
+      ],
+      "pt": [
+        "contraste signed-26 e second-39 (conjunto 78)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-26_second-39"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_079",
+      "en": [
+        "between draft-27 and right-39, which differs (set 79)"
+      ],
+      "pt": [
+        "entre draft-27 e right-39, qual difere (conjunto 79)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-27_right-39"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_080",
+      "en": [
+        "cross-document compare docA-27 and reviewed-40 (set 80)"
+      ],
+      "pt": [
+        "comparação entre documentos docA-27 e reviewed-40 (conjunto 80)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-27_reviewed-40"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_081",
+      "en": [
+        "compare latest doc1-27 against prior updated-40 (set 81)"
+      ],
+      "pt": [
+        "compare o doc1-27 mais recente com o updated-40 anterior (conjunto 81)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-27_updated-40"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_082",
+      "en": [
+        "evaluate discrepancy between latest-28 and docB-41 (set 82)"
+      ],
+      "pt": [
+        "avalie a divergência entre latest-28 e docB-41 (conjunto 82)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-28_docB-41"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_083",
+      "en": [
+        "compare earlier-28 with doc2-41 side-by-side (set 83)"
+      ],
+      "pt": [
+        "compare earlier-28 com doc2-41 lado a lado (conjunto 83)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:earlier-28_doc2-41"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_084",
+      "en": [
+        "first-28 vs prior-42 reconciliation (set 84)"
+      ],
+      "pt": [
+        "reconciliação first-28 vs prior-42 (conjunto 84)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:first-28_prior-42"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_085",
+      "en": [
+        "compare left-29 and second-42 for this request (set 85)"
+      ],
+      "pt": [
+        "compare left-29 e second-42 para esta solicitação (conjunto 85)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:left-29_second-42"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_086",
+      "en": [
+        "compare these two: signed-29 versus right-43 (set 86)"
+      ],
+      "pt": [
+        "compare estes dois: signed-29 versus right-43 (conjunto 86)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:signed-29_right-43"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_087",
+      "en": [
+        "A vs B: draft-29 and reviewed-43 (set 87)"
+      ],
+      "pt": [
+        "A vs B: draft-29 e reviewed-43 (conjunto 87)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:draft-29_reviewed-43"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_088",
+      "en": [
+        "take docA-30 and updated-44 and find differences (set 88)"
+      ],
+      "pt": [
+        "pegue docA-30 e updated-44 e encontre diferenças (conjunto 88)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:docA-30_updated-44"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_089",
+      "en": [
+        "compare doc1-30 to docB-44 (set 89)"
+      ],
+      "pt": [
+        "compare doc1-30 com docB-44 (conjunto 89)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:doc1-30_docB-44"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    },
+    {
+      "id": "DCP_090",
+      "en": [
+        "contrast latest-30 and doc2-45 (set 90)"
+      ],
+      "pt": [
+        "contraste latest-30 e doc2-45 (conjunto 90)"
+      ],
+      "triggers": [
+        "doc_set_compare",
+        "pairwise_compare",
+        "pair:latest-30_doc2-45"
+      ],
+      "negatives": [
+        "single document request only",
+        "no explicit doc pair"
+      ],
+      "slotHints": [
+        "docA",
+        "docB",
+        "compareDimension",
+        "scope"
+      ],
+      "telemetryTags": [
+        "doc_compare",
+        "pairwise",
+        "cross_doc"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

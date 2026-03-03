@@ -183,8 +183,52 @@ function pickHealth(
   return { ok: true };
 }
 
+export interface RouterLogger {
+  warn(msg: string, meta?: Record<string, unknown>): void;
+}
+
 export class LlmRouterService {
-  constructor(private readonly bankLoader: BankLoader) {}
+  private bankMissCount = 0;
+  private lastBankMiss: string | null = null;
+
+  constructor(
+    private readonly bankLoader: BankLoader,
+    private readonly logger?: RouterLogger,
+  ) {}
+
+  /** Observability: bank miss diagnostics for health checks */
+  getBankDiagnostics(): { missCount: number; lastMiss: string | null } {
+    return { missCount: this.bankMissCount, lastMiss: this.lastBankMiss };
+  }
+
+  /**
+   * List deterministic fallback candidates for an already-routed primary target.
+   * This is used by the gateway execution loop when the primary provider/model
+   * fails at runtime.
+   */
+  listFallbackTargets(input: {
+    primary: {
+      provider: LlmProviderId;
+      model: LlmModelId;
+      stage: "draft" | "final";
+    };
+    requireStreaming?: boolean;
+    allowTools?: boolean;
+  }): Array<{ provider: LlmProviderId; model: LlmModelId }> {
+    const fallbacks =
+      this.safeGetBank<ProviderFallbacksBank>("providerFallbacks");
+    const flags = this.safeGetBank<FeatureFlagsBank>("feature_flags");
+    const feature = flags?.flags ?? {};
+    const enableMultiProvider = feature.enable_multi_provider !== false;
+
+    return this.computeFallbackList(
+      input.primary,
+      bool(input.requireStreaming),
+      input.allowTools !== false,
+      fallbacks,
+      enableMultiProvider,
+    );
+  }
 
   /**
    * Decide provider+model for a given request context.
@@ -359,14 +403,14 @@ export class LlmRouterService {
 
     // Allybi default strategy:
     // - Draft/fast path: Gemini 2.5 Flash (streaming-first)
-    // - Final/precision: Gemini 2.5 Flash
+    // - Final/precision: GPT-5.2 authority lane
     const DEFAULT_DRAFT = {
       provider: "gemini" as LlmProviderId,
       model: "gemini-2.5-flash" as LlmModelId,
     };
     const DEFAULT_FINAL = {
-      provider: "gemini" as LlmProviderId,
-      model: "gemini-2.5-flash" as LlmModelId,
+      provider: "openai" as LlmProviderId,
+      model: "gpt-5.2" as LlmModelId,
     };
 
     // Dev/local cost control: optionally prefer local for draft
@@ -385,7 +429,28 @@ export class LlmRouterService {
         ? "final"
         : ctx.stage;
 
+    // Tight latency budget: downgrade final to draft
+    const tightBudget = typeof ctx.latencyBudgetMs === "number" && ctx.latencyBudgetMs > 0 && ctx.latencyBudgetMs < 3000;
+    if (tightBudget && stage === "final") {
+      const chosen = bankDraft ?? DEFAULT_DRAFT;
+      return { ...chosen, stage: "draft" };
+    }
+
     if (stage === "final") {
+      if ((ctx.answerMode ?? "") === "doc_grounded_quote") {
+        return {
+          provider: "openai" as LlmProviderId,
+          model: "gpt-5.2" as LlmModelId,
+          stage: "final",
+        };
+      }
+      if (reason === "quality_finish") {
+        return {
+          provider: "openai" as LlmProviderId,
+          model: "gpt-5-mini" as LlmModelId,
+          stage: "final",
+        };
+      }
       const chosen = bankFinal ?? DEFAULT_FINAL;
       return { ...chosen, stage: "final" };
     }
@@ -509,6 +574,9 @@ export class LlmRouterService {
     try {
       return this.bankLoader.getBank<T>(bankId);
     } catch {
+      this.bankMissCount++;
+      this.lastBankMiss = bankId;
+      this.logger?.warn("Bank miss in router", { bankId, missCount: this.bankMissCount });
       return null;
     }
   }

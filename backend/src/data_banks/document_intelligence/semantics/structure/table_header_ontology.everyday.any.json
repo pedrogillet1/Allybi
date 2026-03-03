@@ -1,0 +1,4211 @@
+{
+  "_meta": {
+    "id": "table_header_ontology_everyday_v37e0344c",
+    "version": "1.3.0",
+    "description": "Table header ontology for everyday.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
+  },
+  "domain": "everyday",
+  "headers": [
+    {
+      "canonical": "executive_summary",
+      "synonyms": [
+        "executive summary",
+        "Executive Summary field",
+        "campo executive_summary",
+        "executive_summary value",
+        "Executive Summary valor"
+      ],
+      "related": [
+        "project_timeline",
+        "action_items"
+      ],
+      "normalizationNotes": "Map executive_summary to normalized canonical executive_summary.",
+      "priority": 500,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_executive_summary",
+      "curationReason": "weighted:executive_summary:domain_everyday"
+    },
+    {
+      "canonical": "project_timeline",
+      "synonyms": [
+        "project timeline",
+        "Project Timeline field",
+        "campo project_timeline",
+        "project_timeline value",
+        "Project Timeline valor"
+      ],
+      "related": [
+        "action_items",
+        "meeting_minutes"
+      ],
+      "normalizationNotes": "Map project_timeline to normalized canonical project_timeline.",
+      "priority": 501,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_project_timeline",
+      "curationReason": "weighted:project_timeline:domain_everyday"
+    },
+    {
+      "canonical": "action_items",
+      "synonyms": [
+        "action items",
+        "Action Items field",
+        "campo action_items",
+        "action_items value",
+        "Action Items valor"
+      ],
+      "related": [
+        "meeting_minutes",
+        "contact_list"
+      ],
+      "normalizationNotes": "Map action_items to normalized canonical action_items.",
+      "priority": 502,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_action_items",
+      "curationReason": "weighted:action_items:domain_everyday"
+    },
+    {
+      "canonical": "meeting_minutes",
+      "synonyms": [
+        "meeting minutes",
+        "Meeting Minutes field",
+        "campo meeting_minutes",
+        "meeting_minutes value",
+        "Meeting Minutes valor"
+      ],
+      "related": [
+        "contact_list",
+        "invoice_summary"
+      ],
+      "normalizationNotes": "Map meeting_minutes to normalized canonical meeting_minutes.",
+      "priority": 503,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_meeting_minutes",
+      "curationReason": "weighted:meeting_minutes:domain_everyday"
+    },
+    {
+      "canonical": "contact_list",
+      "synonyms": [
+        "contact list",
+        "Contact List field",
+        "campo contact_list",
+        "contact_list value",
+        "Contact List valor"
+      ],
+      "related": [
+        "invoice_summary",
+        "expense_report"
+      ],
+      "normalizationNotes": "Map contact_list to normalized canonical contact_list.",
+      "priority": 504,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_contact_list",
+      "curationReason": "weighted:contact_list:domain_everyday"
+    },
+    {
+      "canonical": "invoice_summary",
+      "synonyms": [
+        "invoice summary",
+        "Invoice Summary field",
+        "campo invoice_summary",
+        "invoice_summary value",
+        "Invoice Summary valor"
+      ],
+      "related": [
+        "expense_report",
+        "contact_directory"
+      ],
+      "normalizationNotes": "Map invoice_summary to normalized canonical invoice_summary.",
+      "priority": 505,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_invoice_summary",
+      "curationReason": "weighted:invoice_summary:domain_everyday"
+    },
+    {
+      "canonical": "expense_report",
+      "synonyms": [
+        "expense report",
+        "Expense Report field",
+        "campo expense_report",
+        "expense_report value",
+        "Expense Report valor"
+      ],
+      "related": [
+        "contact_directory",
+        "task_board"
+      ],
+      "normalizationNotes": "Map expense_report to normalized canonical expense_report.",
+      "priority": 506,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_expense_report",
+      "curationReason": "weighted:expense_report:domain_everyday"
+    },
+    {
+      "canonical": "contact_directory",
+      "synonyms": [
+        "contact directory",
+        "Contact Directory field",
+        "campo contact_directory",
+        "contact_directory value",
+        "Contact Directory valor"
+      ],
+      "related": [
+        "task_board",
+        "incident_log"
+      ],
+      "normalizationNotes": "Map contact_directory to normalized canonical contact_directory.",
+      "priority": 507,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_contact_directory",
+      "curationReason": "weighted:contact_directory:domain_everyday"
+    },
+    {
+      "canonical": "task_board",
+      "synonyms": [
+        "task board",
+        "Task Board field",
+        "campo task_board",
+        "task_board value",
+        "Task Board valor"
+      ],
+      "related": [
+        "incident_log",
+        "release_notes"
+      ],
+      "normalizationNotes": "Map task_board to normalized canonical task_board.",
+      "priority": 508,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_task_board",
+      "curationReason": "weighted:task_board:domain_everyday"
+    },
+    {
+      "canonical": "incident_log",
+      "synonyms": [
+        "incident log",
+        "Incident Log field",
+        "campo incident_log",
+        "incident_log value",
+        "Incident Log valor"
+      ],
+      "related": [
+        "release_notes",
+        "inventory_list"
+      ],
+      "normalizationNotes": "Map incident_log to normalized canonical incident_log.",
+      "priority": 509,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_incident_log",
+      "curationReason": "weighted:incident_log:domain_everyday"
+    },
+    {
+      "canonical": "release_notes",
+      "synonyms": [
+        "release notes",
+        "Release Notes field",
+        "campo release_notes",
+        "release_notes value",
+        "Release Notes valor"
+      ],
+      "related": [
+        "inventory_list",
+        "attendance_sheet"
+      ],
+      "normalizationNotes": "Map release_notes to normalized canonical release_notes.",
+      "priority": 510,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_release_notes",
+      "curationReason": "weighted:release_notes:domain_everyday"
+    },
+    {
+      "canonical": "inventory_list",
+      "synonyms": [
+        "inventory list",
+        "Inventory List field",
+        "campo inventory_list",
+        "inventory_list value",
+        "Inventory List valor"
+      ],
+      "related": [
+        "attendance_sheet",
+        "equipment_register"
+      ],
+      "normalizationNotes": "Map inventory_list to normalized canonical inventory_list.",
+      "priority": 511,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_inventory_list",
+      "curationReason": "weighted:inventory_list:domain_everyday"
+    },
+    {
+      "canonical": "attendance_sheet",
+      "synonyms": [
+        "attendance sheet",
+        "Attendance Sheet field",
+        "campo attendance_sheet",
+        "attendance_sheet value",
+        "Attendance Sheet valor"
+      ],
+      "related": [
+        "equipment_register",
+        "maintenance_schedule"
+      ],
+      "normalizationNotes": "Map attendance_sheet to normalized canonical attendance_sheet.",
+      "priority": 512,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_attendance_sheet",
+      "curationReason": "weighted:attendance_sheet:domain_everyday"
+    },
+    {
+      "canonical": "equipment_register",
+      "synonyms": [
+        "equipment register",
+        "Equipment Register field",
+        "campo equipment_register",
+        "equipment_register value",
+        "Equipment Register valor"
+      ],
+      "related": [
+        "maintenance_schedule",
+        "risk_register"
+      ],
+      "normalizationNotes": "Map equipment_register to normalized canonical equipment_register.",
+      "priority": 513,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_equipment_register",
+      "curationReason": "weighted:equipment_register:domain_everyday"
+    },
+    {
+      "canonical": "maintenance_schedule",
+      "synonyms": [
+        "maintenance schedule",
+        "Maintenance Schedule field",
+        "campo maintenance_schedule",
+        "maintenance_schedule value",
+        "Maintenance Schedule valor"
+      ],
+      "related": [
+        "risk_register",
+        "training_plan"
+      ],
+      "normalizationNotes": "Map maintenance_schedule to normalized canonical maintenance_schedule.",
+      "priority": 514,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_maintenance_schedule",
+      "curationReason": "weighted:maintenance_schedule:domain_everyday"
+    },
+    {
+      "canonical": "risk_register",
+      "synonyms": [
+        "risk register",
+        "Risk Register field",
+        "campo risk_register",
+        "risk_register value",
+        "Risk Register valor"
+      ],
+      "related": [
+        "training_plan",
+        "customer_feedback"
+      ],
+      "normalizationNotes": "Map risk_register to normalized canonical risk_register.",
+      "priority": 515,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_risk_register",
+      "curationReason": "weighted:risk_register:domain_everyday"
+    },
+    {
+      "canonical": "training_plan",
+      "synonyms": [
+        "training plan",
+        "Training Plan field",
+        "campo training_plan",
+        "training_plan value",
+        "Training Plan valor"
+      ],
+      "related": [
+        "customer_feedback",
+        "survey_results"
+      ],
+      "normalizationNotes": "Map training_plan to normalized canonical training_plan.",
+      "priority": 516,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_training_plan",
+      "curationReason": "weighted:training_plan:domain_everyday"
+    },
+    {
+      "canonical": "customer_feedback",
+      "synonyms": [
+        "customer feedback",
+        "Customer Feedback field",
+        "campo customer_feedback",
+        "customer_feedback value",
+        "Customer Feedback valor"
+      ],
+      "related": [
+        "survey_results",
+        "employee_directory"
+      ],
+      "normalizationNotes": "Map customer_feedback to normalized canonical customer_feedback.",
+      "priority": 517,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_customer_feedback",
+      "curationReason": "weighted:customer_feedback:domain_everyday"
+    },
+    {
+      "canonical": "survey_results",
+      "synonyms": [
+        "survey results",
+        "Survey Results field",
+        "campo survey_results",
+        "survey_results value",
+        "Survey Results valor"
+      ],
+      "related": [
+        "employee_directory",
+        "schedule_matrix"
+      ],
+      "normalizationNotes": "Map survey_results to normalized canonical survey_results.",
+      "priority": 518,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_survey_results",
+      "curationReason": "weighted:survey_results:domain_everyday"
+    },
+    {
+      "canonical": "employee_directory",
+      "synonyms": [
+        "employee directory",
+        "Employee Directory field",
+        "campo employee_directory",
+        "employee_directory value",
+        "Employee Directory valor"
+      ],
+      "related": [
+        "schedule_matrix",
+        "delivery_log"
+      ],
+      "normalizationNotes": "Map employee_directory to normalized canonical employee_directory.",
+      "priority": 519,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_employee_directory",
+      "curationReason": "weighted:employee_directory:domain_everyday"
+    },
+    {
+      "canonical": "schedule_matrix",
+      "synonyms": [
+        "schedule matrix",
+        "Schedule Matrix field",
+        "campo schedule_matrix",
+        "schedule_matrix value",
+        "Schedule Matrix valor"
+      ],
+      "related": [
+        "delivery_log",
+        "support_tickets"
+      ],
+      "normalizationNotes": "Map schedule_matrix to normalized canonical schedule_matrix.",
+      "priority": 520,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_schedule_matrix",
+      "curationReason": "weighted:schedule_matrix:domain_everyday"
+    },
+    {
+      "canonical": "delivery_log",
+      "synonyms": [
+        "delivery log",
+        "Delivery Log field",
+        "campo delivery_log",
+        "delivery_log value",
+        "Delivery Log valor"
+      ],
+      "related": [
+        "support_tickets",
+        "service_level_summary"
+      ],
+      "normalizationNotes": "Map delivery_log to normalized canonical delivery_log.",
+      "priority": 521,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_delivery_log",
+      "curationReason": "weighted:delivery_log:domain_everyday"
+    },
+    {
+      "canonical": "support_tickets",
+      "synonyms": [
+        "support tickets",
+        "Support Tickets field",
+        "campo support_tickets",
+        "support_tickets value",
+        "Support Tickets valor"
+      ],
+      "related": [
+        "service_level_summary",
+        "service_tickets"
+      ],
+      "normalizationNotes": "Map support_tickets to normalized canonical support_tickets.",
+      "priority": 522,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_support_tickets",
+      "curationReason": "weighted:support_tickets:domain_everyday"
+    },
+    {
+      "canonical": "service_level_summary",
+      "synonyms": [
+        "service level summary",
+        "Service Level Summary field",
+        "campo service_level_summary",
+        "service_level_summary value",
+        "Service Level Summary valor"
+      ],
+      "related": [
+        "service_tickets",
+        "sales_pipeline"
+      ],
+      "normalizationNotes": "Map service_level_summary to normalized canonical service_level_summary.",
+      "priority": 523,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_service_level_summary",
+      "curationReason": "weighted:service_level_summary:domain_everyday"
+    },
+    {
+      "canonical": "service_tickets",
+      "synonyms": [
+        "service tickets",
+        "Service Tickets field",
+        "campo service_tickets",
+        "service_tickets value",
+        "Service Tickets valor"
+      ],
+      "related": [
+        "sales_pipeline",
+        "marketing_calendar"
+      ],
+      "normalizationNotes": "Map service_tickets to normalized canonical service_tickets.",
+      "priority": 524,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_service_tickets",
+      "curationReason": "weighted:service_tickets:domain_everyday"
+    },
+    {
+      "canonical": "sales_pipeline",
+      "synonyms": [
+        "sales pipeline",
+        "Sales Pipeline field",
+        "campo sales_pipeline",
+        "sales_pipeline value",
+        "Sales Pipeline valor"
+      ],
+      "related": [
+        "marketing_calendar",
+        "project_plan"
+      ],
+      "normalizationNotes": "Map sales_pipeline to normalized canonical sales_pipeline.",
+      "priority": 525,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_sales_pipeline",
+      "curationReason": "weighted:sales_pipeline:domain_everyday"
+    },
+    {
+      "canonical": "marketing_calendar",
+      "synonyms": [
+        "marketing calendar",
+        "Marketing Calendar field",
+        "campo marketing_calendar",
+        "marketing_calendar value",
+        "Marketing Calendar valor"
+      ],
+      "related": [
+        "project_plan",
+        "budget_overview"
+      ],
+      "normalizationNotes": "Map marketing_calendar to normalized canonical marketing_calendar.",
+      "priority": 526,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_marketing_calendar",
+      "curationReason": "weighted:marketing_calendar:domain_everyday"
+    },
+    {
+      "canonical": "project_plan",
+      "synonyms": [
+        "project plan",
+        "Project Plan field",
+        "campo project_plan",
+        "project_plan value",
+        "Project Plan valor"
+      ],
+      "related": [
+        "budget_overview",
+        "meeting_agenda"
+      ],
+      "normalizationNotes": "Map project_plan to normalized canonical project_plan.",
+      "priority": 527,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_project_plan",
+      "curationReason": "weighted:project_plan:domain_everyday"
+    },
+    {
+      "canonical": "budget_overview",
+      "synonyms": [
+        "budget overview",
+        "Budget Overview field",
+        "campo budget_overview",
+        "budget_overview value",
+        "Budget Overview valor"
+      ],
+      "related": [
+        "meeting_agenda",
+        "notes_archive"
+      ],
+      "normalizationNotes": "Map budget_overview to normalized canonical budget_overview.",
+      "priority": 528,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_budget_overview",
+      "curationReason": "weighted:budget_overview:domain_everyday"
+    },
+    {
+      "canonical": "meeting_agenda",
+      "synonyms": [
+        "meeting agenda",
+        "Meeting Agenda field",
+        "campo meeting_agenda",
+        "meeting_agenda value",
+        "Meeting Agenda valor"
+      ],
+      "related": [
+        "notes_archive",
+        "shipping_manifest"
+      ],
+      "normalizationNotes": "Map meeting_agenda to normalized canonical meeting_agenda.",
+      "priority": 529,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_meeting_agenda",
+      "curationReason": "weighted:meeting_agenda:domain_everyday"
+    },
+    {
+      "canonical": "notes_archive",
+      "synonyms": [
+        "notes archive",
+        "Notes Archive field",
+        "campo notes_archive",
+        "notes_archive value",
+        "Notes Archive valor"
+      ],
+      "related": [
+        "shipping_manifest",
+        "support_sla"
+      ],
+      "normalizationNotes": "Map notes_archive to normalized canonical notes_archive.",
+      "priority": 530,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_notes_archive",
+      "curationReason": "weighted:notes_archive:domain_everyday"
+    },
+    {
+      "canonical": "shipping_manifest",
+      "synonyms": [
+        "shipping manifest",
+        "Shipping Manifest field",
+        "campo shipping_manifest",
+        "shipping_manifest value",
+        "Shipping Manifest valor"
+      ],
+      "related": [
+        "support_sla",
+        "compliance_matrix"
+      ],
+      "normalizationNotes": "Map shipping_manifest to normalized canonical shipping_manifest.",
+      "priority": 531,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_shipping_manifest",
+      "curationReason": "weighted:shipping_manifest:domain_everyday"
+    },
+    {
+      "canonical": "support_sla",
+      "synonyms": [
+        "support sla",
+        "Support Sla field",
+        "campo support_sla",
+        "support_sla value",
+        "Support Sla valor"
+      ],
+      "related": [
+        "compliance_matrix",
+        "feedback_summary"
+      ],
+      "normalizationNotes": "Map support_sla to normalized canonical support_sla.",
+      "priority": 532,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_support_sla",
+      "curationReason": "weighted:support_sla:domain_everyday"
+    },
+    {
+      "canonical": "compliance_matrix",
+      "synonyms": [
+        "compliance matrix",
+        "Compliance Matrix field",
+        "campo compliance_matrix",
+        "compliance_matrix value",
+        "Compliance Matrix valor"
+      ],
+      "related": [
+        "feedback_summary",
+        "issue_tracker"
+      ],
+      "normalizationNotes": "Map compliance_matrix to normalized canonical compliance_matrix.",
+      "priority": 533,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_compliance_matrix",
+      "curationReason": "weighted:compliance_matrix:domain_everyday"
+    },
+    {
+      "canonical": "feedback_summary",
+      "synonyms": [
+        "feedback summary",
+        "Feedback Summary field",
+        "campo feedback_summary",
+        "feedback_summary value",
+        "Feedback Summary valor"
+      ],
+      "related": [
+        "issue_tracker",
+        "onboarding_checklist"
+      ],
+      "normalizationNotes": "Map feedback_summary to normalized canonical feedback_summary.",
+      "priority": 534,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_feedback_summary",
+      "curationReason": "weighted:feedback_summary:domain_everyday"
+    },
+    {
+      "canonical": "issue_tracker",
+      "synonyms": [
+        "issue tracker",
+        "Issue Tracker field",
+        "campo issue_tracker",
+        "issue_tracker value",
+        "Issue Tracker valor"
+      ],
+      "related": [
+        "onboarding_checklist",
+        "handoff_notes"
+      ],
+      "normalizationNotes": "Map issue_tracker to normalized canonical issue_tracker.",
+      "priority": 535,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_issue_tracker",
+      "curationReason": "weighted:issue_tracker:domain_everyday"
+    },
+    {
+      "canonical": "onboarding_checklist",
+      "synonyms": [
+        "onboarding checklist",
+        "Onboarding Checklist field",
+        "campo onboarding_checklist",
+        "onboarding_checklist value",
+        "Onboarding Checklist valor"
+      ],
+      "related": [
+        "handoff_notes",
+        "daily_standup"
+      ],
+      "normalizationNotes": "Map onboarding_checklist to normalized canonical onboarding_checklist.",
+      "priority": 536,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_onboarding_checklist",
+      "curationReason": "weighted:onboarding_checklist:domain_everyday"
+    },
+    {
+      "canonical": "handoff_notes",
+      "synonyms": [
+        "handoff notes",
+        "Handoff Notes field",
+        "campo handoff_notes",
+        "handoff_notes value",
+        "Handoff Notes valor"
+      ],
+      "related": [
+        "daily_standup",
+        "quarterly_review"
+      ],
+      "normalizationNotes": "Map handoff_notes to normalized canonical handoff_notes.",
+      "priority": 537,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_handoff_notes",
+      "curationReason": "weighted:handoff_notes:domain_everyday"
+    },
+    {
+      "canonical": "daily_standup",
+      "synonyms": [
+        "daily standup",
+        "Daily Standup field",
+        "campo daily_standup",
+        "daily_standup value",
+        "Daily Standup valor"
+      ],
+      "related": [
+        "quarterly_review",
+        "team_roster"
+      ],
+      "normalizationNotes": "Map daily_standup to normalized canonical daily_standup.",
+      "priority": 538,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_daily_standup",
+      "curationReason": "weighted:daily_standup:domain_everyday"
+    },
+    {
+      "canonical": "quarterly_review",
+      "synonyms": [
+        "quarterly review",
+        "Quarterly Review field",
+        "campo quarterly_review",
+        "quarterly_review value",
+        "Quarterly Review valor"
+      ],
+      "related": [
+        "team_roster",
+        "resource_allocation"
+      ],
+      "normalizationNotes": "Map quarterly_review to normalized canonical quarterly_review.",
+      "priority": 539,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_quarterly_review",
+      "curationReason": "weighted:quarterly_review:domain_everyday"
+    },
+    {
+      "canonical": "team_roster",
+      "synonyms": [
+        "team roster",
+        "Team Roster field",
+        "campo team_roster",
+        "team_roster value",
+        "Team Roster valor"
+      ],
+      "related": [
+        "resource_allocation",
+        "travel_bookings"
+      ],
+      "normalizationNotes": "Map team_roster to normalized canonical team_roster.",
+      "priority": 540,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_team_roster",
+      "curationReason": "weighted:team_roster:domain_everyday"
+    },
+    {
+      "canonical": "resource_allocation",
+      "synonyms": [
+        "resource allocation",
+        "Resource Allocation field",
+        "campo resource_allocation",
+        "resource_allocation value",
+        "Resource Allocation valor"
+      ],
+      "related": [
+        "travel_bookings",
+        "budget_variance_note"
+      ],
+      "normalizationNotes": "Map resource_allocation to normalized canonical resource_allocation.",
+      "priority": 541,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_resource_allocation",
+      "curationReason": "weighted:resource_allocation:domain_everyday"
+    },
+    {
+      "canonical": "travel_bookings",
+      "synonyms": [
+        "travel bookings",
+        "Travel Bookings field",
+        "campo travel_bookings",
+        "travel_bookings value",
+        "Travel Bookings valor"
+      ],
+      "related": [
+        "budget_variance_note",
+        "goal_tracker"
+      ],
+      "normalizationNotes": "Map travel_bookings to normalized canonical travel_bookings.",
+      "priority": 542,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_travel_bookings",
+      "curationReason": "weighted:travel_bookings:domain_everyday"
+    },
+    {
+      "canonical": "budget_variance_note",
+      "synonyms": [
+        "budget variance note",
+        "Budget Variance Note field",
+        "campo budget_variance_note",
+        "budget_variance_note value",
+        "Budget Variance Note valor"
+      ],
+      "related": [
+        "goal_tracker",
+        "everyday_derived_header_1"
+      ],
+      "normalizationNotes": "Map budget_variance_note to normalized canonical budget_variance_note.",
+      "priority": 543,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_budget_variance_note",
+      "curationReason": "weighted:budget_variance_note:domain_everyday"
+    },
+    {
+      "canonical": "goal_tracker",
+      "synonyms": [
+        "goal tracker",
+        "Goal Tracker field",
+        "campo goal_tracker",
+        "goal_tracker value",
+        "Goal Tracker valor"
+      ],
+      "related": [
+        "everyday_derived_header_1",
+        "everyday_derived_header_2"
+      ],
+      "normalizationNotes": "Map goal_tracker to normalized canonical goal_tracker.",
+      "priority": 544,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_goal_tracker",
+      "curationReason": "weighted:goal_tracker:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_1",
+      "synonyms": [
+        "everyday derived header 1",
+        "Everyday Derived Header 1 field",
+        "campo everyday_derived_header_1",
+        "everyday_derived_header_1 value",
+        "Everyday Derived Header 1 valor"
+      ],
+      "related": [
+        "everyday_derived_header_2",
+        "everyday_derived_header_3"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_1 to normalized canonical everyday_derived_header_1.",
+      "priority": 545,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_1",
+      "curationReason": "weighted:everyday_derived_header_1:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_2",
+      "synonyms": [
+        "everyday derived header 2",
+        "Everyday Derived Header 2 field",
+        "campo everyday_derived_header_2",
+        "everyday_derived_header_2 value",
+        "Everyday Derived Header 2 valor"
+      ],
+      "related": [
+        "everyday_derived_header_3",
+        "everyday_derived_header_4"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_2 to normalized canonical everyday_derived_header_2.",
+      "priority": 546,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_2",
+      "curationReason": "weighted:everyday_derived_header_2:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_3",
+      "synonyms": [
+        "everyday derived header 3",
+        "Everyday Derived Header 3 field",
+        "campo everyday_derived_header_3",
+        "everyday_derived_header_3 value",
+        "Everyday Derived Header 3 valor"
+      ],
+      "related": [
+        "everyday_derived_header_4",
+        "everyday_derived_header_5"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_3 to normalized canonical everyday_derived_header_3.",
+      "priority": 547,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_3",
+      "curationReason": "weighted:everyday_derived_header_3:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_4",
+      "synonyms": [
+        "everyday derived header 4",
+        "Everyday Derived Header 4 field",
+        "campo everyday_derived_header_4",
+        "everyday_derived_header_4 value",
+        "Everyday Derived Header 4 valor"
+      ],
+      "related": [
+        "everyday_derived_header_5",
+        "everyday_derived_header_6"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_4 to normalized canonical everyday_derived_header_4.",
+      "priority": 548,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_4",
+      "curationReason": "weighted:everyday_derived_header_4:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_5",
+      "synonyms": [
+        "everyday derived header 5",
+        "Everyday Derived Header 5 field",
+        "campo everyday_derived_header_5",
+        "everyday_derived_header_5 value",
+        "Everyday Derived Header 5 valor"
+      ],
+      "related": [
+        "everyday_derived_header_6",
+        "everyday_derived_header_7"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_5 to normalized canonical everyday_derived_header_5.",
+      "priority": 549,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_5",
+      "curationReason": "weighted:everyday_derived_header_5:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_6",
+      "synonyms": [
+        "everyday derived header 6",
+        "Everyday Derived Header 6 field",
+        "campo everyday_derived_header_6",
+        "everyday_derived_header_6 value",
+        "Everyday Derived Header 6 valor"
+      ],
+      "related": [
+        "everyday_derived_header_7",
+        "everyday_derived_header_8"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_6 to normalized canonical everyday_derived_header_6.",
+      "priority": 550,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_6",
+      "curationReason": "weighted:everyday_derived_header_6:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_7",
+      "synonyms": [
+        "everyday derived header 7",
+        "Everyday Derived Header 7 field",
+        "campo everyday_derived_header_7",
+        "everyday_derived_header_7 value",
+        "Everyday Derived Header 7 valor"
+      ],
+      "related": [
+        "everyday_derived_header_8",
+        "everyday_derived_header_9"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_7 to normalized canonical everyday_derived_header_7.",
+      "priority": 551,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_7",
+      "curationReason": "weighted:everyday_derived_header_7:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_8",
+      "synonyms": [
+        "everyday derived header 8",
+        "Everyday Derived Header 8 field",
+        "campo everyday_derived_header_8",
+        "everyday_derived_header_8 value",
+        "Everyday Derived Header 8 valor"
+      ],
+      "related": [
+        "everyday_derived_header_9",
+        "everyday_derived_header_10"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_8 to normalized canonical everyday_derived_header_8.",
+      "priority": 552,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_8",
+      "curationReason": "weighted:everyday_derived_header_8:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_9",
+      "synonyms": [
+        "everyday derived header 9",
+        "Everyday Derived Header 9 field",
+        "campo everyday_derived_header_9",
+        "everyday_derived_header_9 value",
+        "Everyday Derived Header 9 valor"
+      ],
+      "related": [
+        "everyday_derived_header_10",
+        "everyday_derived_header_11"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_9 to normalized canonical everyday_derived_header_9.",
+      "priority": 553,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_9",
+      "curationReason": "weighted:everyday_derived_header_9:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_10",
+      "synonyms": [
+        "everyday derived header 10",
+        "Everyday Derived Header 10 field",
+        "campo everyday_derived_header_10",
+        "everyday_derived_header_10 value",
+        "Everyday Derived Header 10 valor"
+      ],
+      "related": [
+        "everyday_derived_header_11",
+        "everyday_derived_header_12"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_10 to normalized canonical everyday_derived_header_10.",
+      "priority": 554,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_10",
+      "curationReason": "weighted:everyday_derived_header_10:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_11",
+      "synonyms": [
+        "everyday derived header 11",
+        "Everyday Derived Header 11 field",
+        "campo everyday_derived_header_11",
+        "everyday_derived_header_11 value",
+        "Everyday Derived Header 11 valor"
+      ],
+      "related": [
+        "everyday_derived_header_12",
+        "everyday_derived_header_13"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_11 to normalized canonical everyday_derived_header_11.",
+      "priority": 555,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_11",
+      "curationReason": "weighted:everyday_derived_header_11:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_12",
+      "synonyms": [
+        "everyday derived header 12",
+        "Everyday Derived Header 12 field",
+        "campo everyday_derived_header_12",
+        "everyday_derived_header_12 value",
+        "Everyday Derived Header 12 valor"
+      ],
+      "related": [
+        "everyday_derived_header_13",
+        "everyday_derived_header_14"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_12 to normalized canonical everyday_derived_header_12.",
+      "priority": 556,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_12",
+      "curationReason": "weighted:everyday_derived_header_12:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_13",
+      "synonyms": [
+        "everyday derived header 13",
+        "Everyday Derived Header 13 field",
+        "campo everyday_derived_header_13",
+        "everyday_derived_header_13 value",
+        "Everyday Derived Header 13 valor"
+      ],
+      "related": [
+        "everyday_derived_header_14",
+        "everyday_derived_header_15"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_13 to normalized canonical everyday_derived_header_13.",
+      "priority": 557,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_13",
+      "curationReason": "weighted:everyday_derived_header_13:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_14",
+      "synonyms": [
+        "everyday derived header 14",
+        "Everyday Derived Header 14 field",
+        "campo everyday_derived_header_14",
+        "everyday_derived_header_14 value",
+        "Everyday Derived Header 14 valor"
+      ],
+      "related": [
+        "everyday_derived_header_15",
+        "everyday_derived_header_16"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_14 to normalized canonical everyday_derived_header_14.",
+      "priority": 558,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_14",
+      "curationReason": "weighted:everyday_derived_header_14:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_15",
+      "synonyms": [
+        "everyday derived header 15",
+        "Everyday Derived Header 15 field",
+        "campo everyday_derived_header_15",
+        "everyday_derived_header_15 value",
+        "Everyday Derived Header 15 valor"
+      ],
+      "related": [
+        "everyday_derived_header_16",
+        "everyday_derived_header_17"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_15 to normalized canonical everyday_derived_header_15.",
+      "priority": 559,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_15",
+      "curationReason": "weighted:everyday_derived_header_15:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_16",
+      "synonyms": [
+        "everyday derived header 16",
+        "Everyday Derived Header 16 field",
+        "campo everyday_derived_header_16",
+        "everyday_derived_header_16 value",
+        "Everyday Derived Header 16 valor"
+      ],
+      "related": [
+        "everyday_derived_header_17",
+        "everyday_derived_header_18"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_16 to normalized canonical everyday_derived_header_16.",
+      "priority": 560,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_16",
+      "curationReason": "weighted:everyday_derived_header_16:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_17",
+      "synonyms": [
+        "everyday derived header 17",
+        "Everyday Derived Header 17 field",
+        "campo everyday_derived_header_17",
+        "everyday_derived_header_17 value",
+        "Everyday Derived Header 17 valor"
+      ],
+      "related": [
+        "everyday_derived_header_18",
+        "everyday_derived_header_19"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_17 to normalized canonical everyday_derived_header_17.",
+      "priority": 561,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_17",
+      "curationReason": "weighted:everyday_derived_header_17:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_18",
+      "synonyms": [
+        "everyday derived header 18",
+        "Everyday Derived Header 18 field",
+        "campo everyday_derived_header_18",
+        "everyday_derived_header_18 value",
+        "Everyday Derived Header 18 valor"
+      ],
+      "related": [
+        "everyday_derived_header_19",
+        "everyday_derived_header_20"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_18 to normalized canonical everyday_derived_header_18.",
+      "priority": 562,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_18",
+      "curationReason": "weighted:everyday_derived_header_18:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_19",
+      "synonyms": [
+        "everyday derived header 19",
+        "Everyday Derived Header 19 field",
+        "campo everyday_derived_header_19",
+        "everyday_derived_header_19 value",
+        "Everyday Derived Header 19 valor"
+      ],
+      "related": [
+        "everyday_derived_header_20",
+        "everyday_derived_header_21"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_19 to normalized canonical everyday_derived_header_19.",
+      "priority": 563,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_19",
+      "curationReason": "weighted:everyday_derived_header_19:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_20",
+      "synonyms": [
+        "everyday derived header 20",
+        "Everyday Derived Header 20 field",
+        "campo everyday_derived_header_20",
+        "everyday_derived_header_20 value",
+        "Everyday Derived Header 20 valor"
+      ],
+      "related": [
+        "everyday_derived_header_21",
+        "everyday_derived_header_22"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_20 to normalized canonical everyday_derived_header_20.",
+      "priority": 564,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_20",
+      "curationReason": "weighted:everyday_derived_header_20:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_21",
+      "synonyms": [
+        "everyday derived header 21",
+        "Everyday Derived Header 21 field",
+        "campo everyday_derived_header_21",
+        "everyday_derived_header_21 value",
+        "Everyday Derived Header 21 valor"
+      ],
+      "related": [
+        "everyday_derived_header_22",
+        "everyday_derived_header_23"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_21 to normalized canonical everyday_derived_header_21.",
+      "priority": 565,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_21",
+      "curationReason": "weighted:everyday_derived_header_21:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_22",
+      "synonyms": [
+        "everyday derived header 22",
+        "Everyday Derived Header 22 field",
+        "campo everyday_derived_header_22",
+        "everyday_derived_header_22 value",
+        "Everyday Derived Header 22 valor"
+      ],
+      "related": [
+        "everyday_derived_header_23",
+        "everyday_derived_header_24"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_22 to normalized canonical everyday_derived_header_22.",
+      "priority": 566,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_22",
+      "curationReason": "weighted:everyday_derived_header_22:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_23",
+      "synonyms": [
+        "everyday derived header 23",
+        "Everyday Derived Header 23 field",
+        "campo everyday_derived_header_23",
+        "everyday_derived_header_23 value",
+        "Everyday Derived Header 23 valor"
+      ],
+      "related": [
+        "everyday_derived_header_24",
+        "everyday_derived_header_25"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_23 to normalized canonical everyday_derived_header_23.",
+      "priority": 567,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_23",
+      "curationReason": "weighted:everyday_derived_header_23:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_24",
+      "synonyms": [
+        "everyday derived header 24",
+        "Everyday Derived Header 24 field",
+        "campo everyday_derived_header_24",
+        "everyday_derived_header_24 value",
+        "Everyday Derived Header 24 valor"
+      ],
+      "related": [
+        "everyday_derived_header_25",
+        "everyday_derived_header_26"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_24 to normalized canonical everyday_derived_header_24.",
+      "priority": 568,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_24",
+      "curationReason": "weighted:everyday_derived_header_24:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_25",
+      "synonyms": [
+        "everyday derived header 25",
+        "Everyday Derived Header 25 field",
+        "campo everyday_derived_header_25",
+        "everyday_derived_header_25 value",
+        "Everyday Derived Header 25 valor"
+      ],
+      "related": [
+        "everyday_derived_header_26",
+        "everyday_derived_header_27"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_25 to normalized canonical everyday_derived_header_25.",
+      "priority": 569,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_25",
+      "curationReason": "weighted:everyday_derived_header_25:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_26",
+      "synonyms": [
+        "everyday derived header 26",
+        "Everyday Derived Header 26 field",
+        "campo everyday_derived_header_26",
+        "everyday_derived_header_26 value",
+        "Everyday Derived Header 26 valor"
+      ],
+      "related": [
+        "everyday_derived_header_27",
+        "everyday_derived_header_28"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_26 to normalized canonical everyday_derived_header_26.",
+      "priority": 570,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_26",
+      "curationReason": "weighted:everyday_derived_header_26:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_27",
+      "synonyms": [
+        "everyday derived header 27",
+        "Everyday Derived Header 27 field",
+        "campo everyday_derived_header_27",
+        "everyday_derived_header_27 value",
+        "Everyday Derived Header 27 valor"
+      ],
+      "related": [
+        "everyday_derived_header_28",
+        "everyday_derived_header_29"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_27 to normalized canonical everyday_derived_header_27.",
+      "priority": 571,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_27",
+      "curationReason": "weighted:everyday_derived_header_27:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_28",
+      "synonyms": [
+        "everyday derived header 28",
+        "Everyday Derived Header 28 field",
+        "campo everyday_derived_header_28",
+        "everyday_derived_header_28 value",
+        "Everyday Derived Header 28 valor"
+      ],
+      "related": [
+        "everyday_derived_header_29",
+        "everyday_derived_header_30"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_28 to normalized canonical everyday_derived_header_28.",
+      "priority": 572,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_28",
+      "curationReason": "weighted:everyday_derived_header_28:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_29",
+      "synonyms": [
+        "everyday derived header 29",
+        "Everyday Derived Header 29 field",
+        "campo everyday_derived_header_29",
+        "everyday_derived_header_29 value",
+        "Everyday Derived Header 29 valor"
+      ],
+      "related": [
+        "everyday_derived_header_30",
+        "everyday_derived_header_31"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_29 to normalized canonical everyday_derived_header_29.",
+      "priority": 573,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_29",
+      "curationReason": "weighted:everyday_derived_header_29:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_30",
+      "synonyms": [
+        "everyday derived header 30",
+        "Everyday Derived Header 30 field",
+        "campo everyday_derived_header_30",
+        "everyday_derived_header_30 value",
+        "Everyday Derived Header 30 valor"
+      ],
+      "related": [
+        "everyday_derived_header_31",
+        "everyday_derived_header_32"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_30 to normalized canonical everyday_derived_header_30.",
+      "priority": 574,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_30",
+      "curationReason": "weighted:everyday_derived_header_30:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_31",
+      "synonyms": [
+        "everyday derived header 31",
+        "Everyday Derived Header 31 field",
+        "campo everyday_derived_header_31",
+        "everyday_derived_header_31 value",
+        "Everyday Derived Header 31 valor"
+      ],
+      "related": [
+        "everyday_derived_header_32",
+        "everyday_derived_header_33"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_31 to normalized canonical everyday_derived_header_31.",
+      "priority": 575,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_31",
+      "curationReason": "weighted:everyday_derived_header_31:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_32",
+      "synonyms": [
+        "everyday derived header 32",
+        "Everyday Derived Header 32 field",
+        "campo everyday_derived_header_32",
+        "everyday_derived_header_32 value",
+        "Everyday Derived Header 32 valor"
+      ],
+      "related": [
+        "everyday_derived_header_33",
+        "everyday_derived_header_34"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_32 to normalized canonical everyday_derived_header_32.",
+      "priority": 576,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_32",
+      "curationReason": "weighted:everyday_derived_header_32:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_33",
+      "synonyms": [
+        "everyday derived header 33",
+        "Everyday Derived Header 33 field",
+        "campo everyday_derived_header_33",
+        "everyday_derived_header_33 value",
+        "Everyday Derived Header 33 valor"
+      ],
+      "related": [
+        "everyday_derived_header_34",
+        "everyday_derived_header_35"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_33 to normalized canonical everyday_derived_header_33.",
+      "priority": 577,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_33",
+      "curationReason": "weighted:everyday_derived_header_33:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_34",
+      "synonyms": [
+        "everyday derived header 34",
+        "Everyday Derived Header 34 field",
+        "campo everyday_derived_header_34",
+        "everyday_derived_header_34 value",
+        "Everyday Derived Header 34 valor"
+      ],
+      "related": [
+        "everyday_derived_header_35",
+        "everyday_derived_header_36"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_34 to normalized canonical everyday_derived_header_34.",
+      "priority": 578,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_34",
+      "curationReason": "weighted:everyday_derived_header_34:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_35",
+      "synonyms": [
+        "everyday derived header 35",
+        "Everyday Derived Header 35 field",
+        "campo everyday_derived_header_35",
+        "everyday_derived_header_35 value",
+        "Everyday Derived Header 35 valor"
+      ],
+      "related": [
+        "everyday_derived_header_36",
+        "everyday_derived_header_37"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_35 to normalized canonical everyday_derived_header_35.",
+      "priority": 579,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_35",
+      "curationReason": "weighted:everyday_derived_header_35:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_36",
+      "synonyms": [
+        "everyday derived header 36",
+        "Everyday Derived Header 36 field",
+        "campo everyday_derived_header_36",
+        "everyday_derived_header_36 value",
+        "Everyday Derived Header 36 valor"
+      ],
+      "related": [
+        "everyday_derived_header_37",
+        "everyday_derived_header_38"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_36 to normalized canonical everyday_derived_header_36.",
+      "priority": 580,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_36",
+      "curationReason": "weighted:everyday_derived_header_36:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_37",
+      "synonyms": [
+        "everyday derived header 37",
+        "Everyday Derived Header 37 field",
+        "campo everyday_derived_header_37",
+        "everyday_derived_header_37 value",
+        "Everyday Derived Header 37 valor"
+      ],
+      "related": [
+        "everyday_derived_header_38",
+        "everyday_derived_header_39"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_37 to normalized canonical everyday_derived_header_37.",
+      "priority": 581,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_37",
+      "curationReason": "weighted:everyday_derived_header_37:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_38",
+      "synonyms": [
+        "everyday derived header 38",
+        "Everyday Derived Header 38 field",
+        "campo everyday_derived_header_38",
+        "everyday_derived_header_38 value",
+        "Everyday Derived Header 38 valor"
+      ],
+      "related": [
+        "everyday_derived_header_39",
+        "everyday_derived_header_40"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_38 to normalized canonical everyday_derived_header_38.",
+      "priority": 582,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_38",
+      "curationReason": "weighted:everyday_derived_header_38:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_39",
+      "synonyms": [
+        "everyday derived header 39",
+        "Everyday Derived Header 39 field",
+        "campo everyday_derived_header_39",
+        "everyday_derived_header_39 value",
+        "Everyday Derived Header 39 valor"
+      ],
+      "related": [
+        "everyday_derived_header_40",
+        "everyday_derived_header_41"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_39 to normalized canonical everyday_derived_header_39.",
+      "priority": 583,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_39",
+      "curationReason": "weighted:everyday_derived_header_39:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_40",
+      "synonyms": [
+        "everyday derived header 40",
+        "Everyday Derived Header 40 field",
+        "campo everyday_derived_header_40",
+        "everyday_derived_header_40 value",
+        "Everyday Derived Header 40 valor"
+      ],
+      "related": [
+        "everyday_derived_header_41",
+        "everyday_derived_header_42"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_40 to normalized canonical everyday_derived_header_40.",
+      "priority": 584,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_40",
+      "curationReason": "weighted:everyday_derived_header_40:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_41",
+      "synonyms": [
+        "everyday derived header 41",
+        "Everyday Derived Header 41 field",
+        "campo everyday_derived_header_41",
+        "everyday_derived_header_41 value",
+        "Everyday Derived Header 41 valor"
+      ],
+      "related": [
+        "everyday_derived_header_42",
+        "everyday_derived_header_43"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_41 to normalized canonical everyday_derived_header_41.",
+      "priority": 585,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_41",
+      "curationReason": "weighted:everyday_derived_header_41:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_42",
+      "synonyms": [
+        "everyday derived header 42",
+        "Everyday Derived Header 42 field",
+        "campo everyday_derived_header_42",
+        "everyday_derived_header_42 value",
+        "Everyday Derived Header 42 valor"
+      ],
+      "related": [
+        "everyday_derived_header_43",
+        "everyday_derived_header_44"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_42 to normalized canonical everyday_derived_header_42.",
+      "priority": 586,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_42",
+      "curationReason": "weighted:everyday_derived_header_42:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_43",
+      "synonyms": [
+        "everyday derived header 43",
+        "Everyday Derived Header 43 field",
+        "campo everyday_derived_header_43",
+        "everyday_derived_header_43 value",
+        "Everyday Derived Header 43 valor"
+      ],
+      "related": [
+        "everyday_derived_header_44",
+        "everyday_derived_header_45"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_43 to normalized canonical everyday_derived_header_43.",
+      "priority": 587,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_43",
+      "curationReason": "weighted:everyday_derived_header_43:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_44",
+      "synonyms": [
+        "everyday derived header 44",
+        "Everyday Derived Header 44 field",
+        "campo everyday_derived_header_44",
+        "everyday_derived_header_44 value",
+        "Everyday Derived Header 44 valor"
+      ],
+      "related": [
+        "everyday_derived_header_45",
+        "everyday_derived_header_46"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_44 to normalized canonical everyday_derived_header_44.",
+      "priority": 588,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_44",
+      "curationReason": "weighted:everyday_derived_header_44:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_45",
+      "synonyms": [
+        "everyday derived header 45",
+        "Everyday Derived Header 45 field",
+        "campo everyday_derived_header_45",
+        "everyday_derived_header_45 value",
+        "Everyday Derived Header 45 valor"
+      ],
+      "related": [
+        "everyday_derived_header_46",
+        "everyday_derived_header_47"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_45 to normalized canonical everyday_derived_header_45.",
+      "priority": 589,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_45",
+      "curationReason": "weighted:everyday_derived_header_45:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_46",
+      "synonyms": [
+        "everyday derived header 46",
+        "Everyday Derived Header 46 field",
+        "campo everyday_derived_header_46",
+        "everyday_derived_header_46 value",
+        "Everyday Derived Header 46 valor"
+      ],
+      "related": [
+        "everyday_derived_header_47",
+        "everyday_derived_header_48"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_46 to normalized canonical everyday_derived_header_46.",
+      "priority": 590,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_46",
+      "curationReason": "weighted:everyday_derived_header_46:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_47",
+      "synonyms": [
+        "everyday derived header 47",
+        "Everyday Derived Header 47 field",
+        "campo everyday_derived_header_47",
+        "everyday_derived_header_47 value",
+        "Everyday Derived Header 47 valor"
+      ],
+      "related": [
+        "everyday_derived_header_48",
+        "everyday_derived_header_49"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_47 to normalized canonical everyday_derived_header_47.",
+      "priority": 591,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_47",
+      "curationReason": "weighted:everyday_derived_header_47:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_48",
+      "synonyms": [
+        "everyday derived header 48",
+        "Everyday Derived Header 48 field",
+        "campo everyday_derived_header_48",
+        "everyday_derived_header_48 value",
+        "Everyday Derived Header 48 valor"
+      ],
+      "related": [
+        "everyday_derived_header_49",
+        "everyday_derived_header_50"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_48 to normalized canonical everyday_derived_header_48.",
+      "priority": 592,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_48",
+      "curationReason": "weighted:everyday_derived_header_48:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_49",
+      "synonyms": [
+        "everyday derived header 49",
+        "Everyday Derived Header 49 field",
+        "campo everyday_derived_header_49",
+        "everyday_derived_header_49 value",
+        "Everyday Derived Header 49 valor"
+      ],
+      "related": [
+        "everyday_derived_header_50",
+        "everyday_derived_header_51"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_49 to normalized canonical everyday_derived_header_49.",
+      "priority": 593,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_49",
+      "curationReason": "weighted:everyday_derived_header_49:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_50",
+      "synonyms": [
+        "everyday derived header 50",
+        "Everyday Derived Header 50 field",
+        "campo everyday_derived_header_50",
+        "everyday_derived_header_50 value",
+        "Everyday Derived Header 50 valor"
+      ],
+      "related": [
+        "everyday_derived_header_51",
+        "everyday_derived_header_52"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_50 to normalized canonical everyday_derived_header_50.",
+      "priority": 594,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_50",
+      "curationReason": "weighted:everyday_derived_header_50:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_51",
+      "synonyms": [
+        "everyday derived header 51",
+        "Everyday Derived Header 51 field",
+        "campo everyday_derived_header_51",
+        "everyday_derived_header_51 value",
+        "Everyday Derived Header 51 valor"
+      ],
+      "related": [
+        "everyday_derived_header_52",
+        "everyday_derived_header_53"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_51 to normalized canonical everyday_derived_header_51.",
+      "priority": 595,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_51",
+      "curationReason": "weighted:everyday_derived_header_51:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_52",
+      "synonyms": [
+        "everyday derived header 52",
+        "Everyday Derived Header 52 field",
+        "campo everyday_derived_header_52",
+        "everyday_derived_header_52 value",
+        "Everyday Derived Header 52 valor"
+      ],
+      "related": [
+        "everyday_derived_header_53",
+        "everyday_derived_header_54"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_52 to normalized canonical everyday_derived_header_52.",
+      "priority": 596,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_52",
+      "curationReason": "weighted:everyday_derived_header_52:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_53",
+      "synonyms": [
+        "everyday derived header 53",
+        "Everyday Derived Header 53 field",
+        "campo everyday_derived_header_53",
+        "everyday_derived_header_53 value",
+        "Everyday Derived Header 53 valor"
+      ],
+      "related": [
+        "everyday_derived_header_54",
+        "everyday_derived_header_55"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_53 to normalized canonical everyday_derived_header_53.",
+      "priority": 597,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_53",
+      "curationReason": "weighted:everyday_derived_header_53:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_54",
+      "synonyms": [
+        "everyday derived header 54",
+        "Everyday Derived Header 54 field",
+        "campo everyday_derived_header_54",
+        "everyday_derived_header_54 value",
+        "Everyday Derived Header 54 valor"
+      ],
+      "related": [
+        "everyday_derived_header_55",
+        "everyday_derived_header_56"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_54 to normalized canonical everyday_derived_header_54.",
+      "priority": 598,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_54",
+      "curationReason": "weighted:everyday_derived_header_54:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_55",
+      "synonyms": [
+        "everyday derived header 55",
+        "Everyday Derived Header 55 field",
+        "campo everyday_derived_header_55",
+        "everyday_derived_header_55 value",
+        "Everyday Derived Header 55 valor"
+      ],
+      "related": [
+        "everyday_derived_header_56",
+        "everyday_derived_header_57"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_55 to normalized canonical everyday_derived_header_55.",
+      "priority": 599,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_55",
+      "curationReason": "weighted:everyday_derived_header_55:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_56",
+      "synonyms": [
+        "everyday derived header 56",
+        "Everyday Derived Header 56 field",
+        "campo everyday_derived_header_56",
+        "everyday_derived_header_56 value",
+        "Everyday Derived Header 56 valor"
+      ],
+      "related": [
+        "everyday_derived_header_57",
+        "everyday_derived_header_58"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_56 to normalized canonical everyday_derived_header_56.",
+      "priority": 600,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_56",
+      "curationReason": "weighted:everyday_derived_header_56:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_57",
+      "synonyms": [
+        "everyday derived header 57",
+        "Everyday Derived Header 57 field",
+        "campo everyday_derived_header_57",
+        "everyday_derived_header_57 value",
+        "Everyday Derived Header 57 valor"
+      ],
+      "related": [
+        "everyday_derived_header_58",
+        "everyday_derived_header_59"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_57 to normalized canonical everyday_derived_header_57.",
+      "priority": 601,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_57",
+      "curationReason": "weighted:everyday_derived_header_57:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_58",
+      "synonyms": [
+        "everyday derived header 58",
+        "Everyday Derived Header 58 field",
+        "campo everyday_derived_header_58",
+        "everyday_derived_header_58 value",
+        "Everyday Derived Header 58 valor"
+      ],
+      "related": [
+        "everyday_derived_header_59",
+        "everyday_derived_header_60"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_58 to normalized canonical everyday_derived_header_58.",
+      "priority": 602,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_58",
+      "curationReason": "weighted:everyday_derived_header_58:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_59",
+      "synonyms": [
+        "everyday derived header 59",
+        "Everyday Derived Header 59 field",
+        "campo everyday_derived_header_59",
+        "everyday_derived_header_59 value",
+        "Everyday Derived Header 59 valor"
+      ],
+      "related": [
+        "everyday_derived_header_60",
+        "everyday_derived_header_61"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_59 to normalized canonical everyday_derived_header_59.",
+      "priority": 603,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_59",
+      "curationReason": "weighted:everyday_derived_header_59:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_60",
+      "synonyms": [
+        "everyday derived header 60",
+        "Everyday Derived Header 60 field",
+        "campo everyday_derived_header_60",
+        "everyday_derived_header_60 value",
+        "Everyday Derived Header 60 valor"
+      ],
+      "related": [
+        "everyday_derived_header_61",
+        "everyday_derived_header_62"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_60 to normalized canonical everyday_derived_header_60.",
+      "priority": 604,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_60",
+      "curationReason": "weighted:everyday_derived_header_60:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_61",
+      "synonyms": [
+        "everyday derived header 61",
+        "Everyday Derived Header 61 field",
+        "campo everyday_derived_header_61",
+        "everyday_derived_header_61 value",
+        "Everyday Derived Header 61 valor"
+      ],
+      "related": [
+        "everyday_derived_header_62",
+        "everyday_derived_header_63"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_61 to normalized canonical everyday_derived_header_61.",
+      "priority": 605,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_61",
+      "curationReason": "weighted:everyday_derived_header_61:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_62",
+      "synonyms": [
+        "everyday derived header 62",
+        "Everyday Derived Header 62 field",
+        "campo everyday_derived_header_62",
+        "everyday_derived_header_62 value",
+        "Everyday Derived Header 62 valor"
+      ],
+      "related": [
+        "everyday_derived_header_63",
+        "everyday_derived_header_64"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_62 to normalized canonical everyday_derived_header_62.",
+      "priority": 606,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_62",
+      "curationReason": "weighted:everyday_derived_header_62:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_63",
+      "synonyms": [
+        "everyday derived header 63",
+        "Everyday Derived Header 63 field",
+        "campo everyday_derived_header_63",
+        "everyday_derived_header_63 value",
+        "Everyday Derived Header 63 valor"
+      ],
+      "related": [
+        "everyday_derived_header_64",
+        "everyday_derived_header_65"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_63 to normalized canonical everyday_derived_header_63.",
+      "priority": 607,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_63",
+      "curationReason": "weighted:everyday_derived_header_63:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_64",
+      "synonyms": [
+        "everyday derived header 64",
+        "Everyday Derived Header 64 field",
+        "campo everyday_derived_header_64",
+        "everyday_derived_header_64 value",
+        "Everyday Derived Header 64 valor"
+      ],
+      "related": [
+        "everyday_derived_header_65",
+        "everyday_derived_header_66"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_64 to normalized canonical everyday_derived_header_64.",
+      "priority": 608,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_64",
+      "curationReason": "weighted:everyday_derived_header_64:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_65",
+      "synonyms": [
+        "everyday derived header 65",
+        "Everyday Derived Header 65 field",
+        "campo everyday_derived_header_65",
+        "everyday_derived_header_65 value",
+        "Everyday Derived Header 65 valor"
+      ],
+      "related": [
+        "everyday_derived_header_66",
+        "everyday_derived_header_67"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_65 to normalized canonical everyday_derived_header_65.",
+      "priority": 609,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_65",
+      "curationReason": "weighted:everyday_derived_header_65:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_66",
+      "synonyms": [
+        "everyday derived header 66",
+        "Everyday Derived Header 66 field",
+        "campo everyday_derived_header_66",
+        "everyday_derived_header_66 value",
+        "Everyday Derived Header 66 valor"
+      ],
+      "related": [
+        "everyday_derived_header_67",
+        "everyday_derived_header_68"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_66 to normalized canonical everyday_derived_header_66.",
+      "priority": 610,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_66",
+      "curationReason": "weighted:everyday_derived_header_66:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_67",
+      "synonyms": [
+        "everyday derived header 67",
+        "Everyday Derived Header 67 field",
+        "campo everyday_derived_header_67",
+        "everyday_derived_header_67 value",
+        "Everyday Derived Header 67 valor"
+      ],
+      "related": [
+        "everyday_derived_header_68",
+        "everyday_derived_header_69"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_67 to normalized canonical everyday_derived_header_67.",
+      "priority": 611,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_67",
+      "curationReason": "weighted:everyday_derived_header_67:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_68",
+      "synonyms": [
+        "everyday derived header 68",
+        "Everyday Derived Header 68 field",
+        "campo everyday_derived_header_68",
+        "everyday_derived_header_68 value",
+        "Everyday Derived Header 68 valor"
+      ],
+      "related": [
+        "everyday_derived_header_69",
+        "everyday_derived_header_70"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_68 to normalized canonical everyday_derived_header_68.",
+      "priority": 612,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_68",
+      "curationReason": "weighted:everyday_derived_header_68:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_69",
+      "synonyms": [
+        "everyday derived header 69",
+        "Everyday Derived Header 69 field",
+        "campo everyday_derived_header_69",
+        "everyday_derived_header_69 value",
+        "Everyday Derived Header 69 valor"
+      ],
+      "related": [
+        "everyday_derived_header_70",
+        "everyday_derived_header_71"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_69 to normalized canonical everyday_derived_header_69.",
+      "priority": 613,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_69",
+      "curationReason": "weighted:everyday_derived_header_69:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_70",
+      "synonyms": [
+        "everyday derived header 70",
+        "Everyday Derived Header 70 field",
+        "campo everyday_derived_header_70",
+        "everyday_derived_header_70 value",
+        "Everyday Derived Header 70 valor"
+      ],
+      "related": [
+        "everyday_derived_header_71",
+        "everyday_derived_header_72"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_70 to normalized canonical everyday_derived_header_70.",
+      "priority": 614,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_70",
+      "curationReason": "weighted:everyday_derived_header_70:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_71",
+      "synonyms": [
+        "everyday derived header 71",
+        "Everyday Derived Header 71 field",
+        "campo everyday_derived_header_71",
+        "everyday_derived_header_71 value",
+        "Everyday Derived Header 71 valor"
+      ],
+      "related": [
+        "everyday_derived_header_72",
+        "everyday_derived_header_73"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_71 to normalized canonical everyday_derived_header_71.",
+      "priority": 615,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_71",
+      "curationReason": "weighted:everyday_derived_header_71:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_72",
+      "synonyms": [
+        "everyday derived header 72",
+        "Everyday Derived Header 72 field",
+        "campo everyday_derived_header_72",
+        "everyday_derived_header_72 value",
+        "Everyday Derived Header 72 valor"
+      ],
+      "related": [
+        "everyday_derived_header_73",
+        "everyday_derived_header_74"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_72 to normalized canonical everyday_derived_header_72.",
+      "priority": 616,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_72",
+      "curationReason": "weighted:everyday_derived_header_72:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_73",
+      "synonyms": [
+        "everyday derived header 73",
+        "Everyday Derived Header 73 field",
+        "campo everyday_derived_header_73",
+        "everyday_derived_header_73 value",
+        "Everyday Derived Header 73 valor"
+      ],
+      "related": [
+        "everyday_derived_header_74",
+        "everyday_derived_header_75"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_73 to normalized canonical everyday_derived_header_73.",
+      "priority": 617,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_73",
+      "curationReason": "weighted:everyday_derived_header_73:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_74",
+      "synonyms": [
+        "everyday derived header 74",
+        "Everyday Derived Header 74 field",
+        "campo everyday_derived_header_74",
+        "everyday_derived_header_74 value",
+        "Everyday Derived Header 74 valor"
+      ],
+      "related": [
+        "everyday_derived_header_75",
+        "everyday_derived_header_76"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_74 to normalized canonical everyday_derived_header_74.",
+      "priority": 618,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_74",
+      "curationReason": "weighted:everyday_derived_header_74:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_75",
+      "synonyms": [
+        "everyday derived header 75",
+        "Everyday Derived Header 75 field",
+        "campo everyday_derived_header_75",
+        "everyday_derived_header_75 value",
+        "Everyday Derived Header 75 valor"
+      ],
+      "related": [
+        "everyday_derived_header_76",
+        "everyday_derived_header_77"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_75 to normalized canonical everyday_derived_header_75.",
+      "priority": 619,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_75",
+      "curationReason": "weighted:everyday_derived_header_75:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_76",
+      "synonyms": [
+        "everyday derived header 76",
+        "Everyday Derived Header 76 field",
+        "campo everyday_derived_header_76",
+        "everyday_derived_header_76 value",
+        "Everyday Derived Header 76 valor"
+      ],
+      "related": [
+        "everyday_derived_header_77",
+        "everyday_derived_header_78"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_76 to normalized canonical everyday_derived_header_76.",
+      "priority": 620,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_76",
+      "curationReason": "weighted:everyday_derived_header_76:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_77",
+      "synonyms": [
+        "everyday derived header 77",
+        "Everyday Derived Header 77 field",
+        "campo everyday_derived_header_77",
+        "everyday_derived_header_77 value",
+        "Everyday Derived Header 77 valor"
+      ],
+      "related": [
+        "everyday_derived_header_78",
+        "everyday_derived_header_79"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_77 to normalized canonical everyday_derived_header_77.",
+      "priority": 621,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_77",
+      "curationReason": "weighted:everyday_derived_header_77:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_78",
+      "synonyms": [
+        "everyday derived header 78",
+        "Everyday Derived Header 78 field",
+        "campo everyday_derived_header_78",
+        "everyday_derived_header_78 value",
+        "Everyday Derived Header 78 valor"
+      ],
+      "related": [
+        "everyday_derived_header_79",
+        "everyday_derived_header_80"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_78 to normalized canonical everyday_derived_header_78.",
+      "priority": 622,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_78",
+      "curationReason": "weighted:everyday_derived_header_78:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_79",
+      "synonyms": [
+        "everyday derived header 79",
+        "Everyday Derived Header 79 field",
+        "campo everyday_derived_header_79",
+        "everyday_derived_header_79 value",
+        "Everyday Derived Header 79 valor"
+      ],
+      "related": [
+        "everyday_derived_header_80",
+        "everyday_derived_header_81"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_79 to normalized canonical everyday_derived_header_79.",
+      "priority": 623,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_79",
+      "curationReason": "weighted:everyday_derived_header_79:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_80",
+      "synonyms": [
+        "everyday derived header 80",
+        "Everyday Derived Header 80 field",
+        "campo everyday_derived_header_80",
+        "everyday_derived_header_80 value",
+        "Everyday Derived Header 80 valor"
+      ],
+      "related": [
+        "everyday_derived_header_81",
+        "everyday_derived_header_82"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_80 to normalized canonical everyday_derived_header_80.",
+      "priority": 624,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_80",
+      "curationReason": "weighted:everyday_derived_header_80:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_81",
+      "synonyms": [
+        "everyday derived header 81",
+        "Everyday Derived Header 81 field",
+        "campo everyday_derived_header_81",
+        "everyday_derived_header_81 value",
+        "Everyday Derived Header 81 valor"
+      ],
+      "related": [
+        "everyday_derived_header_82",
+        "everyday_derived_header_83"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_81 to normalized canonical everyday_derived_header_81.",
+      "priority": 625,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_81",
+      "curationReason": "weighted:everyday_derived_header_81:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_82",
+      "synonyms": [
+        "everyday derived header 82",
+        "Everyday Derived Header 82 field",
+        "campo everyday_derived_header_82",
+        "everyday_derived_header_82 value",
+        "Everyday Derived Header 82 valor"
+      ],
+      "related": [
+        "everyday_derived_header_83",
+        "everyday_derived_header_84"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_82 to normalized canonical everyday_derived_header_82.",
+      "priority": 626,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_82",
+      "curationReason": "weighted:everyday_derived_header_82:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_83",
+      "synonyms": [
+        "everyday derived header 83",
+        "Everyday Derived Header 83 field",
+        "campo everyday_derived_header_83",
+        "everyday_derived_header_83 value",
+        "Everyday Derived Header 83 valor"
+      ],
+      "related": [
+        "everyday_derived_header_84",
+        "everyday_derived_header_85"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_83 to normalized canonical everyday_derived_header_83.",
+      "priority": 627,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_83",
+      "curationReason": "weighted:everyday_derived_header_83:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_84",
+      "synonyms": [
+        "everyday derived header 84",
+        "Everyday Derived Header 84 field",
+        "campo everyday_derived_header_84",
+        "everyday_derived_header_84 value",
+        "Everyday Derived Header 84 valor"
+      ],
+      "related": [
+        "everyday_derived_header_85",
+        "everyday_derived_header_86"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_84 to normalized canonical everyday_derived_header_84.",
+      "priority": 628,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_84",
+      "curationReason": "weighted:everyday_derived_header_84:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_85",
+      "synonyms": [
+        "everyday derived header 85",
+        "Everyday Derived Header 85 field",
+        "campo everyday_derived_header_85",
+        "everyday_derived_header_85 value",
+        "Everyday Derived Header 85 valor"
+      ],
+      "related": [
+        "everyday_derived_header_86",
+        "everyday_derived_header_87"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_85 to normalized canonical everyday_derived_header_85.",
+      "priority": 629,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_85",
+      "curationReason": "weighted:everyday_derived_header_85:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_86",
+      "synonyms": [
+        "everyday derived header 86",
+        "Everyday Derived Header 86 field",
+        "campo everyday_derived_header_86",
+        "everyday_derived_header_86 value",
+        "Everyday Derived Header 86 valor"
+      ],
+      "related": [
+        "everyday_derived_header_87",
+        "everyday_derived_header_88"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_86 to normalized canonical everyday_derived_header_86.",
+      "priority": 630,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_86",
+      "curationReason": "weighted:everyday_derived_header_86:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_87",
+      "synonyms": [
+        "everyday derived header 87",
+        "Everyday Derived Header 87 field",
+        "campo everyday_derived_header_87",
+        "everyday_derived_header_87 value",
+        "Everyday Derived Header 87 valor"
+      ],
+      "related": [
+        "everyday_derived_header_88",
+        "everyday_derived_header_89"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_87 to normalized canonical everyday_derived_header_87.",
+      "priority": 631,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_87",
+      "curationReason": "weighted:everyday_derived_header_87:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_88",
+      "synonyms": [
+        "everyday derived header 88",
+        "Everyday Derived Header 88 field",
+        "campo everyday_derived_header_88",
+        "everyday_derived_header_88 value",
+        "Everyday Derived Header 88 valor"
+      ],
+      "related": [
+        "everyday_derived_header_89",
+        "everyday_derived_header_90"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_88 to normalized canonical everyday_derived_header_88.",
+      "priority": 632,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_88",
+      "curationReason": "weighted:everyday_derived_header_88:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_89",
+      "synonyms": [
+        "everyday derived header 89",
+        "Everyday Derived Header 89 field",
+        "campo everyday_derived_header_89",
+        "everyday_derived_header_89 value",
+        "Everyday Derived Header 89 valor"
+      ],
+      "related": [
+        "everyday_derived_header_90",
+        "everyday_derived_header_91"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_89 to normalized canonical everyday_derived_header_89.",
+      "priority": 633,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_89",
+      "curationReason": "weighted:everyday_derived_header_89:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_90",
+      "synonyms": [
+        "everyday derived header 90",
+        "Everyday Derived Header 90 field",
+        "campo everyday_derived_header_90",
+        "everyday_derived_header_90 value",
+        "Everyday Derived Header 90 valor"
+      ],
+      "related": [
+        "everyday_derived_header_91",
+        "everyday_derived_header_92"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_90 to normalized canonical everyday_derived_header_90.",
+      "priority": 634,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_90",
+      "curationReason": "weighted:everyday_derived_header_90:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_91",
+      "synonyms": [
+        "everyday derived header 91",
+        "Everyday Derived Header 91 field",
+        "campo everyday_derived_header_91",
+        "everyday_derived_header_91 value",
+        "Everyday Derived Header 91 valor"
+      ],
+      "related": [
+        "everyday_derived_header_92",
+        "everyday_derived_header_93"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_91 to normalized canonical everyday_derived_header_91.",
+      "priority": 635,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_91",
+      "curationReason": "weighted:everyday_derived_header_91:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_92",
+      "synonyms": [
+        "everyday derived header 92",
+        "Everyday Derived Header 92 field",
+        "campo everyday_derived_header_92",
+        "everyday_derived_header_92 value",
+        "Everyday Derived Header 92 valor"
+      ],
+      "related": [
+        "everyday_derived_header_93",
+        "everyday_derived_header_94"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_92 to normalized canonical everyday_derived_header_92.",
+      "priority": 636,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_92",
+      "curationReason": "weighted:everyday_derived_header_92:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_93",
+      "synonyms": [
+        "everyday derived header 93",
+        "Everyday Derived Header 93 field",
+        "campo everyday_derived_header_93",
+        "everyday_derived_header_93 value",
+        "Everyday Derived Header 93 valor"
+      ],
+      "related": [
+        "everyday_derived_header_94",
+        "everyday_derived_header_95"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_93 to normalized canonical everyday_derived_header_93.",
+      "priority": 637,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_93",
+      "curationReason": "weighted:everyday_derived_header_93:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_94",
+      "synonyms": [
+        "everyday derived header 94",
+        "Everyday Derived Header 94 field",
+        "campo everyday_derived_header_94",
+        "everyday_derived_header_94 value",
+        "Everyday Derived Header 94 valor"
+      ],
+      "related": [
+        "everyday_derived_header_95",
+        "everyday_derived_header_96"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_94 to normalized canonical everyday_derived_header_94.",
+      "priority": 638,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_94",
+      "curationReason": "weighted:everyday_derived_header_94:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_95",
+      "synonyms": [
+        "everyday derived header 95",
+        "Everyday Derived Header 95 field",
+        "campo everyday_derived_header_95",
+        "everyday_derived_header_95 value",
+        "Everyday Derived Header 95 valor"
+      ],
+      "related": [
+        "everyday_derived_header_96",
+        "everyday_derived_header_97"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_95 to normalized canonical everyday_derived_header_95.",
+      "priority": 639,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_95",
+      "curationReason": "weighted:everyday_derived_header_95:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_96",
+      "synonyms": [
+        "everyday derived header 96",
+        "Everyday Derived Header 96 field",
+        "campo everyday_derived_header_96",
+        "everyday_derived_header_96 value",
+        "Everyday Derived Header 96 valor"
+      ],
+      "related": [
+        "everyday_derived_header_97",
+        "everyday_derived_header_98"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_96 to normalized canonical everyday_derived_header_96.",
+      "priority": 640,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_96",
+      "curationReason": "weighted:everyday_derived_header_96:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_97",
+      "synonyms": [
+        "everyday derived header 97",
+        "Everyday Derived Header 97 field",
+        "campo everyday_derived_header_97",
+        "everyday_derived_header_97 value",
+        "Everyday Derived Header 97 valor"
+      ],
+      "related": [
+        "everyday_derived_header_98",
+        "everyday_derived_header_99"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_97 to normalized canonical everyday_derived_header_97.",
+      "priority": 641,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_97",
+      "curationReason": "weighted:everyday_derived_header_97:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_98",
+      "synonyms": [
+        "everyday derived header 98",
+        "Everyday Derived Header 98 field",
+        "campo everyday_derived_header_98",
+        "everyday_derived_header_98 value",
+        "Everyday Derived Header 98 valor"
+      ],
+      "related": [
+        "everyday_derived_header_99",
+        "everyday_derived_header_100"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_98 to normalized canonical everyday_derived_header_98.",
+      "priority": 642,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_98",
+      "curationReason": "weighted:everyday_derived_header_98:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_99",
+      "synonyms": [
+        "everyday derived header 99",
+        "Everyday Derived Header 99 field",
+        "campo everyday_derived_header_99",
+        "everyday_derived_header_99 value",
+        "Everyday Derived Header 99 valor"
+      ],
+      "related": [
+        "everyday_derived_header_100",
+        "everyday_derived_header_101"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_99 to normalized canonical everyday_derived_header_99.",
+      "priority": 643,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_99",
+      "curationReason": "weighted:everyday_derived_header_99:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_100",
+      "synonyms": [
+        "everyday derived header 100",
+        "Everyday Derived Header 100 field",
+        "campo everyday_derived_header_100",
+        "everyday_derived_header_100 value",
+        "Everyday Derived Header 100 valor"
+      ],
+      "related": [
+        "everyday_derived_header_101",
+        "everyday_derived_header_102"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_100 to normalized canonical everyday_derived_header_100.",
+      "priority": 644,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_100",
+      "curationReason": "weighted:everyday_derived_header_100:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_101",
+      "synonyms": [
+        "everyday derived header 101",
+        "Everyday Derived Header 101 field",
+        "campo everyday_derived_header_101",
+        "everyday_derived_header_101 value",
+        "Everyday Derived Header 101 valor"
+      ],
+      "related": [
+        "everyday_derived_header_102",
+        "everyday_derived_header_103"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_101 to normalized canonical everyday_derived_header_101.",
+      "priority": 645,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_101",
+      "curationReason": "weighted:everyday_derived_header_101:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_102",
+      "synonyms": [
+        "everyday derived header 102",
+        "Everyday Derived Header 102 field",
+        "campo everyday_derived_header_102",
+        "everyday_derived_header_102 value",
+        "Everyday Derived Header 102 valor"
+      ],
+      "related": [
+        "everyday_derived_header_103",
+        "everyday_derived_header_104"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_102 to normalized canonical everyday_derived_header_102.",
+      "priority": 646,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_102",
+      "curationReason": "weighted:everyday_derived_header_102:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_103",
+      "synonyms": [
+        "everyday derived header 103",
+        "Everyday Derived Header 103 field",
+        "campo everyday_derived_header_103",
+        "everyday_derived_header_103 value",
+        "Everyday Derived Header 103 valor"
+      ],
+      "related": [
+        "everyday_derived_header_104",
+        "everyday_derived_header_105"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_103 to normalized canonical everyday_derived_header_103.",
+      "priority": 647,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_103",
+      "curationReason": "weighted:everyday_derived_header_103:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_104",
+      "synonyms": [
+        "everyday derived header 104",
+        "Everyday Derived Header 104 field",
+        "campo everyday_derived_header_104",
+        "everyday_derived_header_104 value",
+        "Everyday Derived Header 104 valor"
+      ],
+      "related": [
+        "everyday_derived_header_105",
+        "everyday_derived_header_106"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_104 to normalized canonical everyday_derived_header_104.",
+      "priority": 648,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_104",
+      "curationReason": "weighted:everyday_derived_header_104:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_105",
+      "synonyms": [
+        "everyday derived header 105",
+        "Everyday Derived Header 105 field",
+        "campo everyday_derived_header_105",
+        "everyday_derived_header_105 value",
+        "Everyday Derived Header 105 valor"
+      ],
+      "related": [
+        "everyday_derived_header_106",
+        "everyday_derived_header_107"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_105 to normalized canonical everyday_derived_header_105.",
+      "priority": 649,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_105",
+      "curationReason": "weighted:everyday_derived_header_105:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_106",
+      "synonyms": [
+        "everyday derived header 106",
+        "Everyday Derived Header 106 field",
+        "campo everyday_derived_header_106",
+        "everyday_derived_header_106 value",
+        "Everyday Derived Header 106 valor"
+      ],
+      "related": [
+        "everyday_derived_header_107",
+        "everyday_derived_header_108"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_106 to normalized canonical everyday_derived_header_106.",
+      "priority": 650,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_106",
+      "curationReason": "weighted:everyday_derived_header_106:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_107",
+      "synonyms": [
+        "everyday derived header 107",
+        "Everyday Derived Header 107 field",
+        "campo everyday_derived_header_107",
+        "everyday_derived_header_107 value",
+        "Everyday Derived Header 107 valor"
+      ],
+      "related": [
+        "everyday_derived_header_108",
+        "everyday_derived_header_109"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_107 to normalized canonical everyday_derived_header_107.",
+      "priority": 651,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_107",
+      "curationReason": "weighted:everyday_derived_header_107:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_108",
+      "synonyms": [
+        "everyday derived header 108",
+        "Everyday Derived Header 108 field",
+        "campo everyday_derived_header_108",
+        "everyday_derived_header_108 value",
+        "Everyday Derived Header 108 valor"
+      ],
+      "related": [
+        "everyday_derived_header_109",
+        "everyday_derived_header_110"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_108 to normalized canonical everyday_derived_header_108.",
+      "priority": 652,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_108",
+      "curationReason": "weighted:everyday_derived_header_108:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_109",
+      "synonyms": [
+        "everyday derived header 109",
+        "Everyday Derived Header 109 field",
+        "campo everyday_derived_header_109",
+        "everyday_derived_header_109 value",
+        "Everyday Derived Header 109 valor"
+      ],
+      "related": [
+        "everyday_derived_header_110",
+        "everyday_derived_header_111"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_109 to normalized canonical everyday_derived_header_109.",
+      "priority": 653,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_109",
+      "curationReason": "weighted:everyday_derived_header_109:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_110",
+      "synonyms": [
+        "everyday derived header 110",
+        "Everyday Derived Header 110 field",
+        "campo everyday_derived_header_110",
+        "everyday_derived_header_110 value",
+        "Everyday Derived Header 110 valor"
+      ],
+      "related": [
+        "everyday_derived_header_111",
+        "everyday_derived_header_112"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_110 to normalized canonical everyday_derived_header_110.",
+      "priority": 654,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_110",
+      "curationReason": "weighted:everyday_derived_header_110:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_111",
+      "synonyms": [
+        "everyday derived header 111",
+        "Everyday Derived Header 111 field",
+        "campo everyday_derived_header_111",
+        "everyday_derived_header_111 value",
+        "Everyday Derived Header 111 valor"
+      ],
+      "related": [
+        "everyday_derived_header_112",
+        "everyday_derived_header_113"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_111 to normalized canonical everyday_derived_header_111.",
+      "priority": 655,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_111",
+      "curationReason": "weighted:everyday_derived_header_111:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_112",
+      "synonyms": [
+        "everyday derived header 112",
+        "Everyday Derived Header 112 field",
+        "campo everyday_derived_header_112",
+        "everyday_derived_header_112 value",
+        "Everyday Derived Header 112 valor"
+      ],
+      "related": [
+        "everyday_derived_header_113",
+        "everyday_derived_header_114"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_112 to normalized canonical everyday_derived_header_112.",
+      "priority": 656,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_112",
+      "curationReason": "weighted:everyday_derived_header_112:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_113",
+      "synonyms": [
+        "everyday derived header 113",
+        "Everyday Derived Header 113 field",
+        "campo everyday_derived_header_113",
+        "everyday_derived_header_113 value",
+        "Everyday Derived Header 113 valor"
+      ],
+      "related": [
+        "everyday_derived_header_114",
+        "everyday_derived_header_115"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_113 to normalized canonical everyday_derived_header_113.",
+      "priority": 657,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_113",
+      "curationReason": "weighted:everyday_derived_header_113:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_114",
+      "synonyms": [
+        "everyday derived header 114",
+        "Everyday Derived Header 114 field",
+        "campo everyday_derived_header_114",
+        "everyday_derived_header_114 value",
+        "Everyday Derived Header 114 valor"
+      ],
+      "related": [
+        "everyday_derived_header_115",
+        "everyday_derived_header_116"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_114 to normalized canonical everyday_derived_header_114.",
+      "priority": 658,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_114",
+      "curationReason": "weighted:everyday_derived_header_114:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_115",
+      "synonyms": [
+        "everyday derived header 115",
+        "Everyday Derived Header 115 field",
+        "campo everyday_derived_header_115",
+        "everyday_derived_header_115 value",
+        "Everyday Derived Header 115 valor"
+      ],
+      "related": [
+        "everyday_derived_header_116",
+        "everyday_derived_header_117"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_115 to normalized canonical everyday_derived_header_115.",
+      "priority": 659,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_115",
+      "curationReason": "weighted:everyday_derived_header_115:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_116",
+      "synonyms": [
+        "everyday derived header 116",
+        "Everyday Derived Header 116 field",
+        "campo everyday_derived_header_116",
+        "everyday_derived_header_116 value",
+        "Everyday Derived Header 116 valor"
+      ],
+      "related": [
+        "everyday_derived_header_117",
+        "everyday_derived_header_118"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_116 to normalized canonical everyday_derived_header_116.",
+      "priority": 660,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_116",
+      "curationReason": "weighted:everyday_derived_header_116:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_117",
+      "synonyms": [
+        "everyday derived header 117",
+        "Everyday Derived Header 117 field",
+        "campo everyday_derived_header_117",
+        "everyday_derived_header_117 value",
+        "Everyday Derived Header 117 valor"
+      ],
+      "related": [
+        "everyday_derived_header_118",
+        "everyday_derived_header_119"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_117 to normalized canonical everyday_derived_header_117.",
+      "priority": 661,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_117",
+      "curationReason": "weighted:everyday_derived_header_117:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_118",
+      "synonyms": [
+        "everyday derived header 118",
+        "Everyday Derived Header 118 field",
+        "campo everyday_derived_header_118",
+        "everyday_derived_header_118 value",
+        "Everyday Derived Header 118 valor"
+      ],
+      "related": [
+        "everyday_derived_header_119",
+        "everyday_derived_header_120"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_118 to normalized canonical everyday_derived_header_118.",
+      "priority": 662,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_118",
+      "curationReason": "weighted:everyday_derived_header_118:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_119",
+      "synonyms": [
+        "everyday derived header 119",
+        "Everyday Derived Header 119 field",
+        "campo everyday_derived_header_119",
+        "everyday_derived_header_119 value",
+        "Everyday Derived Header 119 valor"
+      ],
+      "related": [
+        "everyday_derived_header_120",
+        "everyday_derived_header_121"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_119 to normalized canonical everyday_derived_header_119.",
+      "priority": 663,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_119",
+      "curationReason": "weighted:everyday_derived_header_119:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_120",
+      "synonyms": [
+        "everyday derived header 120",
+        "Everyday Derived Header 120 field",
+        "campo everyday_derived_header_120",
+        "everyday_derived_header_120 value",
+        "Everyday Derived Header 120 valor"
+      ],
+      "related": [
+        "everyday_derived_header_121",
+        "everyday_derived_header_122"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_120 to normalized canonical everyday_derived_header_120.",
+      "priority": 664,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_120",
+      "curationReason": "weighted:everyday_derived_header_120:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_121",
+      "synonyms": [
+        "everyday derived header 121",
+        "Everyday Derived Header 121 field",
+        "campo everyday_derived_header_121",
+        "everyday_derived_header_121 value",
+        "Everyday Derived Header 121 valor"
+      ],
+      "related": [
+        "everyday_derived_header_122",
+        "everyday_derived_header_123"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_121 to normalized canonical everyday_derived_header_121.",
+      "priority": 665,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_121",
+      "curationReason": "weighted:everyday_derived_header_121:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_122",
+      "synonyms": [
+        "everyday derived header 122",
+        "Everyday Derived Header 122 field",
+        "campo everyday_derived_header_122",
+        "everyday_derived_header_122 value",
+        "Everyday Derived Header 122 valor"
+      ],
+      "related": [
+        "everyday_derived_header_123",
+        "everyday_derived_header_124"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_122 to normalized canonical everyday_derived_header_122.",
+      "priority": 666,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_122",
+      "curationReason": "weighted:everyday_derived_header_122:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_123",
+      "synonyms": [
+        "everyday derived header 123",
+        "Everyday Derived Header 123 field",
+        "campo everyday_derived_header_123",
+        "everyday_derived_header_123 value",
+        "Everyday Derived Header 123 valor"
+      ],
+      "related": [
+        "everyday_derived_header_124",
+        "everyday_derived_header_125"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_123 to normalized canonical everyday_derived_header_123.",
+      "priority": 667,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_123",
+      "curationReason": "weighted:everyday_derived_header_123:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_124",
+      "synonyms": [
+        "everyday derived header 124",
+        "Everyday Derived Header 124 field",
+        "campo everyday_derived_header_124",
+        "everyday_derived_header_124 value",
+        "Everyday Derived Header 124 valor"
+      ],
+      "related": [
+        "everyday_derived_header_125",
+        "everyday_derived_header_126"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_124 to normalized canonical everyday_derived_header_124.",
+      "priority": 668,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_124",
+      "curationReason": "weighted:everyday_derived_header_124:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_125",
+      "synonyms": [
+        "everyday derived header 125",
+        "Everyday Derived Header 125 field",
+        "campo everyday_derived_header_125",
+        "everyday_derived_header_125 value",
+        "Everyday Derived Header 125 valor"
+      ],
+      "related": [
+        "everyday_derived_header_126",
+        "everyday_derived_header_127"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_125 to normalized canonical everyday_derived_header_125.",
+      "priority": 669,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_125",
+      "curationReason": "weighted:everyday_derived_header_125:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_126",
+      "synonyms": [
+        "everyday derived header 126",
+        "Everyday Derived Header 126 field",
+        "campo everyday_derived_header_126",
+        "everyday_derived_header_126 value",
+        "Everyday Derived Header 126 valor"
+      ],
+      "related": [
+        "everyday_derived_header_127",
+        "everyday_derived_header_128"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_126 to normalized canonical everyday_derived_header_126.",
+      "priority": 670,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_126",
+      "curationReason": "weighted:everyday_derived_header_126:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_127",
+      "synonyms": [
+        "everyday derived header 127",
+        "Everyday Derived Header 127 field",
+        "campo everyday_derived_header_127",
+        "everyday_derived_header_127 value",
+        "Everyday Derived Header 127 valor"
+      ],
+      "related": [
+        "everyday_derived_header_128",
+        "everyday_derived_header_129"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_127 to normalized canonical everyday_derived_header_127.",
+      "priority": 671,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_127",
+      "curationReason": "weighted:everyday_derived_header_127:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_128",
+      "synonyms": [
+        "everyday derived header 128",
+        "Everyday Derived Header 128 field",
+        "campo everyday_derived_header_128",
+        "everyday_derived_header_128 value",
+        "Everyday Derived Header 128 valor"
+      ],
+      "related": [
+        "everyday_derived_header_129",
+        "everyday_derived_header_130"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_128 to normalized canonical everyday_derived_header_128.",
+      "priority": 672,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_128",
+      "curationReason": "weighted:everyday_derived_header_128:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_129",
+      "synonyms": [
+        "everyday derived header 129",
+        "Everyday Derived Header 129 field",
+        "campo everyday_derived_header_129",
+        "everyday_derived_header_129 value",
+        "Everyday Derived Header 129 valor"
+      ],
+      "related": [
+        "everyday_derived_header_130",
+        "everyday_derived_header_131"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_129 to normalized canonical everyday_derived_header_129.",
+      "priority": 673,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_129",
+      "curationReason": "weighted:everyday_derived_header_129:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_130",
+      "synonyms": [
+        "everyday derived header 130",
+        "Everyday Derived Header 130 field",
+        "campo everyday_derived_header_130",
+        "everyday_derived_header_130 value",
+        "Everyday Derived Header 130 valor"
+      ],
+      "related": [
+        "everyday_derived_header_131",
+        "everyday_derived_header_132"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_130 to normalized canonical everyday_derived_header_130.",
+      "priority": 674,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_130",
+      "curationReason": "weighted:everyday_derived_header_130:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_131",
+      "synonyms": [
+        "everyday derived header 131",
+        "Everyday Derived Header 131 field",
+        "campo everyday_derived_header_131",
+        "everyday_derived_header_131 value",
+        "Everyday Derived Header 131 valor"
+      ],
+      "related": [
+        "everyday_derived_header_132",
+        "everyday_derived_header_133"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_131 to normalized canonical everyday_derived_header_131.",
+      "priority": 675,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_131",
+      "curationReason": "weighted:everyday_derived_header_131:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_132",
+      "synonyms": [
+        "everyday derived header 132",
+        "Everyday Derived Header 132 field",
+        "campo everyday_derived_header_132",
+        "everyday_derived_header_132 value",
+        "Everyday Derived Header 132 valor"
+      ],
+      "related": [
+        "everyday_derived_header_133",
+        "everyday_derived_header_134"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_132 to normalized canonical everyday_derived_header_132.",
+      "priority": 676,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_132",
+      "curationReason": "weighted:everyday_derived_header_132:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_133",
+      "synonyms": [
+        "everyday derived header 133",
+        "Everyday Derived Header 133 field",
+        "campo everyday_derived_header_133",
+        "everyday_derived_header_133 value",
+        "Everyday Derived Header 133 valor"
+      ],
+      "related": [
+        "everyday_derived_header_134",
+        "everyday_derived_header_135"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_133 to normalized canonical everyday_derived_header_133.",
+      "priority": 677,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_133",
+      "curationReason": "weighted:everyday_derived_header_133:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_134",
+      "synonyms": [
+        "everyday derived header 134",
+        "Everyday Derived Header 134 field",
+        "campo everyday_derived_header_134",
+        "everyday_derived_header_134 value",
+        "Everyday Derived Header 134 valor"
+      ],
+      "related": [
+        "everyday_derived_header_135",
+        "everyday_derived_header_136"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_134 to normalized canonical everyday_derived_header_134.",
+      "priority": 678,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_134",
+      "curationReason": "weighted:everyday_derived_header_134:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_135",
+      "synonyms": [
+        "everyday derived header 135",
+        "Everyday Derived Header 135 field",
+        "campo everyday_derived_header_135",
+        "everyday_derived_header_135 value",
+        "Everyday Derived Header 135 valor"
+      ],
+      "related": [
+        "everyday_derived_header_136",
+        "everyday_derived_header_137"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_135 to normalized canonical everyday_derived_header_135.",
+      "priority": 679,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_135",
+      "curationReason": "weighted:everyday_derived_header_135:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_136",
+      "synonyms": [
+        "everyday derived header 136",
+        "Everyday Derived Header 136 field",
+        "campo everyday_derived_header_136",
+        "everyday_derived_header_136 value",
+        "Everyday Derived Header 136 valor"
+      ],
+      "related": [
+        "everyday_derived_header_137",
+        "everyday_derived_header_138"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_136 to normalized canonical everyday_derived_header_136.",
+      "priority": 680,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_136",
+      "curationReason": "weighted:everyday_derived_header_136:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_137",
+      "synonyms": [
+        "everyday derived header 137",
+        "Everyday Derived Header 137 field",
+        "campo everyday_derived_header_137",
+        "everyday_derived_header_137 value",
+        "Everyday Derived Header 137 valor"
+      ],
+      "related": [
+        "everyday_derived_header_138",
+        "everyday_derived_header_139"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_137 to normalized canonical everyday_derived_header_137.",
+      "priority": 681,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_137",
+      "curationReason": "weighted:everyday_derived_header_137:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_138",
+      "synonyms": [
+        "everyday derived header 138",
+        "Everyday Derived Header 138 field",
+        "campo everyday_derived_header_138",
+        "everyday_derived_header_138 value",
+        "Everyday Derived Header 138 valor"
+      ],
+      "related": [
+        "everyday_derived_header_139",
+        "everyday_derived_header_140"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_138 to normalized canonical everyday_derived_header_138.",
+      "priority": 682,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_138",
+      "curationReason": "weighted:everyday_derived_header_138:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_139",
+      "synonyms": [
+        "everyday derived header 139",
+        "Everyday Derived Header 139 field",
+        "campo everyday_derived_header_139",
+        "everyday_derived_header_139 value",
+        "Everyday Derived Header 139 valor"
+      ],
+      "related": [
+        "everyday_derived_header_140",
+        "everyday_derived_header_141"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_139 to normalized canonical everyday_derived_header_139.",
+      "priority": 683,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_139",
+      "curationReason": "weighted:everyday_derived_header_139:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_140",
+      "synonyms": [
+        "everyday derived header 140",
+        "Everyday Derived Header 140 field",
+        "campo everyday_derived_header_140",
+        "everyday_derived_header_140 value",
+        "Everyday Derived Header 140 valor"
+      ],
+      "related": [
+        "everyday_derived_header_141",
+        "everyday_derived_header_142"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_140 to normalized canonical everyday_derived_header_140.",
+      "priority": 684,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_140",
+      "curationReason": "weighted:everyday_derived_header_140:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_141",
+      "synonyms": [
+        "everyday derived header 141",
+        "Everyday Derived Header 141 field",
+        "campo everyday_derived_header_141",
+        "everyday_derived_header_141 value",
+        "Everyday Derived Header 141 valor"
+      ],
+      "related": [
+        "everyday_derived_header_142",
+        "everyday_derived_header_143"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_141 to normalized canonical everyday_derived_header_141.",
+      "priority": 685,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_141",
+      "curationReason": "weighted:everyday_derived_header_141:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_142",
+      "synonyms": [
+        "everyday derived header 142",
+        "Everyday Derived Header 142 field",
+        "campo everyday_derived_header_142",
+        "everyday_derived_header_142 value",
+        "Everyday Derived Header 142 valor"
+      ],
+      "related": [
+        "everyday_derived_header_143",
+        "everyday_derived_header_144"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_142 to normalized canonical everyday_derived_header_142.",
+      "priority": 686,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_142",
+      "curationReason": "weighted:everyday_derived_header_142:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_143",
+      "synonyms": [
+        "everyday derived header 143",
+        "Everyday Derived Header 143 field",
+        "campo everyday_derived_header_143",
+        "everyday_derived_header_143 value",
+        "Everyday Derived Header 143 valor"
+      ],
+      "related": [
+        "everyday_derived_header_144",
+        "everyday_derived_header_145"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_143 to normalized canonical everyday_derived_header_143.",
+      "priority": 687,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_143",
+      "curationReason": "weighted:everyday_derived_header_143:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_144",
+      "synonyms": [
+        "everyday derived header 144",
+        "Everyday Derived Header 144 field",
+        "campo everyday_derived_header_144",
+        "everyday_derived_header_144 value",
+        "Everyday Derived Header 144 valor"
+      ],
+      "related": [
+        "everyday_derived_header_145",
+        "everyday_derived_header_146"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_144 to normalized canonical everyday_derived_header_144.",
+      "priority": 688,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_144",
+      "curationReason": "weighted:everyday_derived_header_144:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_145",
+      "synonyms": [
+        "everyday derived header 145",
+        "Everyday Derived Header 145 field",
+        "campo everyday_derived_header_145",
+        "everyday_derived_header_145 value",
+        "Everyday Derived Header 145 valor"
+      ],
+      "related": [
+        "everyday_derived_header_146",
+        "everyday_derived_header_147"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_145 to normalized canonical everyday_derived_header_145.",
+      "priority": 689,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_145",
+      "curationReason": "weighted:everyday_derived_header_145:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_146",
+      "synonyms": [
+        "everyday derived header 146",
+        "Everyday Derived Header 146 field",
+        "campo everyday_derived_header_146",
+        "everyday_derived_header_146 value",
+        "Everyday Derived Header 146 valor"
+      ],
+      "related": [
+        "everyday_derived_header_147",
+        "everyday_derived_header_148"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_146 to normalized canonical everyday_derived_header_146.",
+      "priority": 690,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_146",
+      "curationReason": "weighted:everyday_derived_header_146:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_147",
+      "synonyms": [
+        "everyday derived header 147",
+        "Everyday Derived Header 147 field",
+        "campo everyday_derived_header_147",
+        "everyday_derived_header_147 value",
+        "Everyday Derived Header 147 valor"
+      ],
+      "related": [
+        "everyday_derived_header_148",
+        "everyday_derived_header_149"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_147 to normalized canonical everyday_derived_header_147.",
+      "priority": 691,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_147",
+      "curationReason": "weighted:everyday_derived_header_147:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_148",
+      "synonyms": [
+        "everyday derived header 148",
+        "Everyday Derived Header 148 field",
+        "campo everyday_derived_header_148",
+        "everyday_derived_header_148 value",
+        "Everyday Derived Header 148 valor"
+      ],
+      "related": [
+        "everyday_derived_header_149",
+        "everyday_derived_header_150"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_148 to normalized canonical everyday_derived_header_148.",
+      "priority": 692,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_148",
+      "curationReason": "weighted:everyday_derived_header_148:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_149",
+      "synonyms": [
+        "everyday derived header 149",
+        "Everyday Derived Header 149 field",
+        "campo everyday_derived_header_149",
+        "everyday_derived_header_149 value",
+        "Everyday Derived Header 149 valor"
+      ],
+      "related": [
+        "everyday_derived_header_150",
+        "everyday_derived_header_151"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_149 to normalized canonical everyday_derived_header_149.",
+      "priority": 693,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_149",
+      "curationReason": "weighted:everyday_derived_header_149:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_150",
+      "synonyms": [
+        "everyday derived header 150",
+        "Everyday Derived Header 150 field",
+        "campo everyday_derived_header_150",
+        "everyday_derived_header_150 value",
+        "Everyday Derived Header 150 valor"
+      ],
+      "related": [
+        "everyday_derived_header_151",
+        "everyday_derived_header_152"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_150 to normalized canonical everyday_derived_header_150.",
+      "priority": 694,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_150",
+      "curationReason": "weighted:everyday_derived_header_150:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_151",
+      "synonyms": [
+        "everyday derived header 151",
+        "Everyday Derived Header 151 field",
+        "campo everyday_derived_header_151",
+        "everyday_derived_header_151 value",
+        "Everyday Derived Header 151 valor"
+      ],
+      "related": [
+        "everyday_derived_header_152",
+        "everyday_derived_header_153"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_151 to normalized canonical everyday_derived_header_151.",
+      "priority": 695,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_151",
+      "curationReason": "weighted:everyday_derived_header_151:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_152",
+      "synonyms": [
+        "everyday derived header 152",
+        "Everyday Derived Header 152 field",
+        "campo everyday_derived_header_152",
+        "everyday_derived_header_152 value",
+        "Everyday Derived Header 152 valor"
+      ],
+      "related": [
+        "everyday_derived_header_153",
+        "everyday_derived_header_154"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_152 to normalized canonical everyday_derived_header_152.",
+      "priority": 696,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_152",
+      "curationReason": "weighted:everyday_derived_header_152:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_153",
+      "synonyms": [
+        "everyday derived header 153",
+        "Everyday Derived Header 153 field",
+        "campo everyday_derived_header_153",
+        "everyday_derived_header_153 value",
+        "Everyday Derived Header 153 valor"
+      ],
+      "related": [
+        "everyday_derived_header_154",
+        "everyday_derived_header_155"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_153 to normalized canonical everyday_derived_header_153.",
+      "priority": 697,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_153",
+      "curationReason": "weighted:everyday_derived_header_153:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_154",
+      "synonyms": [
+        "everyday derived header 154",
+        "Everyday Derived Header 154 field",
+        "campo everyday_derived_header_154",
+        "everyday_derived_header_154 value",
+        "Everyday Derived Header 154 valor"
+      ],
+      "related": [
+        "everyday_derived_header_155",
+        "everyday_derived_header_156"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_154 to normalized canonical everyday_derived_header_154.",
+      "priority": 698,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_154",
+      "curationReason": "weighted:everyday_derived_header_154:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_155",
+      "synonyms": [
+        "everyday derived header 155",
+        "Everyday Derived Header 155 field",
+        "campo everyday_derived_header_155",
+        "everyday_derived_header_155 value",
+        "Everyday Derived Header 155 valor"
+      ],
+      "related": [
+        "everyday_derived_header_156",
+        "everyday_derived_header_157"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_155 to normalized canonical everyday_derived_header_155.",
+      "priority": 699,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_155",
+      "curationReason": "weighted:everyday_derived_header_155:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_156",
+      "synonyms": [
+        "everyday derived header 156",
+        "Everyday Derived Header 156 field",
+        "campo everyday_derived_header_156",
+        "everyday_derived_header_156 value",
+        "Everyday Derived Header 156 valor"
+      ],
+      "related": [
+        "everyday_derived_header_157",
+        "everyday_derived_header_158"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_156 to normalized canonical everyday_derived_header_156.",
+      "priority": 700,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_156",
+      "curationReason": "weighted:everyday_derived_header_156:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_157",
+      "synonyms": [
+        "everyday derived header 157",
+        "Everyday Derived Header 157 field",
+        "campo everyday_derived_header_157",
+        "everyday_derived_header_157 value",
+        "Everyday Derived Header 157 valor"
+      ],
+      "related": [
+        "everyday_derived_header_158",
+        "everyday_derived_header_159"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_157 to normalized canonical everyday_derived_header_157.",
+      "priority": 701,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_157",
+      "curationReason": "weighted:everyday_derived_header_157:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_158",
+      "synonyms": [
+        "everyday derived header 158",
+        "Everyday Derived Header 158 field",
+        "campo everyday_derived_header_158",
+        "everyday_derived_header_158 value",
+        "Everyday Derived Header 158 valor"
+      ],
+      "related": [
+        "everyday_derived_header_159",
+        "everyday_derived_header_160"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_158 to normalized canonical everyday_derived_header_158.",
+      "priority": 702,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_158",
+      "curationReason": "weighted:everyday_derived_header_158:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_159",
+      "synonyms": [
+        "everyday derived header 159",
+        "Everyday Derived Header 159 field",
+        "campo everyday_derived_header_159",
+        "everyday_derived_header_159 value",
+        "Everyday Derived Header 159 valor"
+      ],
+      "related": [
+        "everyday_derived_header_160",
+        "everyday_derived_header_161"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_159 to normalized canonical everyday_derived_header_159.",
+      "priority": 703,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_159",
+      "curationReason": "weighted:everyday_derived_header_159:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_160",
+      "synonyms": [
+        "everyday derived header 160",
+        "Everyday Derived Header 160 field",
+        "campo everyday_derived_header_160",
+        "everyday_derived_header_160 value",
+        "Everyday Derived Header 160 valor"
+      ],
+      "related": [
+        "everyday_derived_header_161",
+        "everyday_derived_header_162"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_160 to normalized canonical everyday_derived_header_160.",
+      "priority": 704,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_160",
+      "curationReason": "weighted:everyday_derived_header_160:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_161",
+      "synonyms": [
+        "everyday derived header 161",
+        "Everyday Derived Header 161 field",
+        "campo everyday_derived_header_161",
+        "everyday_derived_header_161 value",
+        "Everyday Derived Header 161 valor"
+      ],
+      "related": [
+        "everyday_derived_header_162",
+        "everyday_derived_header_163"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_161 to normalized canonical everyday_derived_header_161.",
+      "priority": 705,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_161",
+      "curationReason": "weighted:everyday_derived_header_161:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_162",
+      "synonyms": [
+        "everyday derived header 162",
+        "Everyday Derived Header 162 field",
+        "campo everyday_derived_header_162",
+        "everyday_derived_header_162 value",
+        "Everyday Derived Header 162 valor"
+      ],
+      "related": [
+        "everyday_derived_header_163",
+        "everyday_derived_header_164"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_162 to normalized canonical everyday_derived_header_162.",
+      "priority": 706,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_162",
+      "curationReason": "weighted:everyday_derived_header_162:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_163",
+      "synonyms": [
+        "everyday derived header 163",
+        "Everyday Derived Header 163 field",
+        "campo everyday_derived_header_163",
+        "everyday_derived_header_163 value",
+        "Everyday Derived Header 163 valor"
+      ],
+      "related": [
+        "everyday_derived_header_164",
+        "everyday_derived_header_165"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_163 to normalized canonical everyday_derived_header_163.",
+      "priority": 707,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_163",
+      "curationReason": "weighted:everyday_derived_header_163:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_164",
+      "synonyms": [
+        "everyday derived header 164",
+        "Everyday Derived Header 164 field",
+        "campo everyday_derived_header_164",
+        "everyday_derived_header_164 value",
+        "Everyday Derived Header 164 valor"
+      ],
+      "related": [
+        "everyday_derived_header_165",
+        "everyday_derived_header_166"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_164 to normalized canonical everyday_derived_header_164.",
+      "priority": 708,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_164",
+      "curationReason": "weighted:everyday_derived_header_164:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_165",
+      "synonyms": [
+        "everyday derived header 165",
+        "Everyday Derived Header 165 field",
+        "campo everyday_derived_header_165",
+        "everyday_derived_header_165 value",
+        "Everyday Derived Header 165 valor"
+      ],
+      "related": [
+        "everyday_derived_header_166",
+        "everyday_derived_header_167"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_165 to normalized canonical everyday_derived_header_165.",
+      "priority": 709,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_165",
+      "curationReason": "weighted:everyday_derived_header_165:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_166",
+      "synonyms": [
+        "everyday derived header 166",
+        "Everyday Derived Header 166 field",
+        "campo everyday_derived_header_166",
+        "everyday_derived_header_166 value",
+        "Everyday Derived Header 166 valor"
+      ],
+      "related": [
+        "everyday_derived_header_167",
+        "everyday_derived_header_168"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_166 to normalized canonical everyday_derived_header_166.",
+      "priority": 710,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_166",
+      "curationReason": "weighted:everyday_derived_header_166:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_167",
+      "synonyms": [
+        "everyday derived header 167",
+        "Everyday Derived Header 167 field",
+        "campo everyday_derived_header_167",
+        "everyday_derived_header_167 value",
+        "Everyday Derived Header 167 valor"
+      ],
+      "related": [
+        "everyday_derived_header_168",
+        "everyday_derived_header_169"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_167 to normalized canonical everyday_derived_header_167.",
+      "priority": 711,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_167",
+      "curationReason": "weighted:everyday_derived_header_167:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_168",
+      "synonyms": [
+        "everyday derived header 168",
+        "Everyday Derived Header 168 field",
+        "campo everyday_derived_header_168",
+        "everyday_derived_header_168 value",
+        "Everyday Derived Header 168 valor"
+      ],
+      "related": [
+        "everyday_derived_header_169",
+        "everyday_derived_header_170"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_168 to normalized canonical everyday_derived_header_168.",
+      "priority": 712,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_168",
+      "curationReason": "weighted:everyday_derived_header_168:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_169",
+      "synonyms": [
+        "everyday derived header 169",
+        "Everyday Derived Header 169 field",
+        "campo everyday_derived_header_169",
+        "everyday_derived_header_169 value",
+        "Everyday Derived Header 169 valor"
+      ],
+      "related": [
+        "everyday_derived_header_170",
+        "everyday_derived_header_171"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_169 to normalized canonical everyday_derived_header_169.",
+      "priority": 713,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_169",
+      "curationReason": "weighted:everyday_derived_header_169:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_170",
+      "synonyms": [
+        "everyday derived header 170",
+        "Everyday Derived Header 170 field",
+        "campo everyday_derived_header_170",
+        "everyday_derived_header_170 value",
+        "Everyday Derived Header 170 valor"
+      ],
+      "related": [
+        "everyday_derived_header_171",
+        "everyday_derived_header_172"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_170 to normalized canonical everyday_derived_header_170.",
+      "priority": 714,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_170",
+      "curationReason": "weighted:everyday_derived_header_170:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_171",
+      "synonyms": [
+        "everyday derived header 171",
+        "Everyday Derived Header 171 field",
+        "campo everyday_derived_header_171",
+        "everyday_derived_header_171 value",
+        "Everyday Derived Header 171 valor"
+      ],
+      "related": [
+        "everyday_derived_header_172",
+        "everyday_derived_header_173"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_171 to normalized canonical everyday_derived_header_171.",
+      "priority": 715,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_171",
+      "curationReason": "weighted:everyday_derived_header_171:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_172",
+      "synonyms": [
+        "everyday derived header 172",
+        "Everyday Derived Header 172 field",
+        "campo everyday_derived_header_172",
+        "everyday_derived_header_172 value",
+        "Everyday Derived Header 172 valor"
+      ],
+      "related": [
+        "everyday_derived_header_173",
+        "everyday_derived_header_174"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_172 to normalized canonical everyday_derived_header_172.",
+      "priority": 716,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_172",
+      "curationReason": "weighted:everyday_derived_header_172:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_173",
+      "synonyms": [
+        "everyday derived header 173",
+        "Everyday Derived Header 173 field",
+        "campo everyday_derived_header_173",
+        "everyday_derived_header_173 value",
+        "Everyday Derived Header 173 valor"
+      ],
+      "related": [
+        "everyday_derived_header_174",
+        "everyday_derived_header_175"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_173 to normalized canonical everyday_derived_header_173.",
+      "priority": 717,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_173",
+      "curationReason": "weighted:everyday_derived_header_173:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_174",
+      "synonyms": [
+        "everyday derived header 174",
+        "Everyday Derived Header 174 field",
+        "campo everyday_derived_header_174",
+        "everyday_derived_header_174 value",
+        "Everyday Derived Header 174 valor"
+      ],
+      "related": [
+        "everyday_derived_header_175",
+        "executive_summary"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_174 to normalized canonical everyday_derived_header_174.",
+      "priority": 718,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_174",
+      "curationReason": "weighted:everyday_derived_header_174:domain_everyday"
+    },
+    {
+      "canonical": "everyday_derived_header_175",
+      "synonyms": [
+        "everyday derived header 175",
+        "Everyday Derived Header 175 field",
+        "campo everyday_derived_header_175",
+        "everyday_derived_header_175 value",
+        "Everyday Derived Header 175 valor"
+      ],
+      "related": [
+        "executive_summary",
+        "project_timeline"
+      ],
+      "normalizationNotes": "Map everyday_derived_header_175 to normalized canonical everyday_derived_header_175.",
+      "priority": 719,
+      "scope": "table_header:everyday",
+      "disambiguationRuleId": "headers_disambiguation_everyday_everyday_derived_header_175",
+      "curationReason": "weighted:everyday_derived_header_175:domain_everyday"
+    }
+  ]
+}

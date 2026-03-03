@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "llm_nav_pills_contract",
+    "version": "1.0.0",
+    "description": "Nav pills mode contract rules injected when answerMode is nav_pills. Replaces hardcoded applyNavPillsGuard().",
+    "lastUpdated": "2026-03-03"
+  },
+  "config": { "enabled": true },
+  "rules": [
+    {
+      "id": "one_intro_line",
+      "text": "Output only ONE short intro line (max 1 sentence)."
+    },
+    {
+      "id": "no_sources_label",
+      "text": "Do NOT include a 'Sources:' label or inline citations."
+    },
+    {
+      "id": "no_message_actions",
+      "text": "Do NOT include message actions or claim actions were executed."
+    },
+    {
+      "id": "files_via_buttons",
+      "text": "Files are represented via attachments/buttons, not in the text."
+    }
+  ]
+}

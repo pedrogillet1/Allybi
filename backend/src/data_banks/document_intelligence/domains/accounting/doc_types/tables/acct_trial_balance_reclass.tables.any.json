@@ -1,0 +1,340 @@
+{
+  "_meta": {
+    "id": "di_accounting_tables_acct_trial_balance_reclass",
+    "version": "1.1.0",
+    "description": "Expected table patterns for trial balance documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_trial_balance_reclass"
+  },
+  "tableHeaderSynonyms": {
+    "debit": [
+      "debit",
+      "dr",
+      "debit amount",
+      "debito"
+    ],
+    "credit": [
+      "credit",
+      "cr",
+      "credit amount",
+      "credito"
+    ],
+    "balance": [
+      "balance",
+      "saldo",
+      "ending balance",
+      "running balance",
+      "saldo corrente"
+    ],
+    "amount": [
+      "amount",
+      "value",
+      "valor",
+      "amt"
+    ],
+    "date": [
+      "date",
+      "posting date",
+      "transaction date",
+      "data"
+    ],
+    "account": [
+      "account",
+      "account code",
+      "acct",
+      "conto",
+      "conta"
+    ]
+  },
+  "tables": [
+    {
+      "id": "acct_trial_balance_reclass_main_table",
+      "name": {
+        "en": "Trial Balance Detail",
+        "pt": "Detalhe do Balanco de Verificacao"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "account_code",
+        "account_name",
+        "currency_code",
+        "opening_balance",
+        "debit",
+        "credit",
+        "balance_change",
+        "ending_balance"
+      ],
+      "keyRows": [
+        "grand_total",
+        "subtotal",
+        "total"
+      ],
+      "headerSynonyms": {
+        "account_code": [
+          "account code",
+          "account",
+          "account number",
+          "acct",
+          "conta",
+          "codigo"
+        ],
+        "account_name": [
+          "account name",
+          "description",
+          "descricao"
+        ],
+        "currency_code": [
+          "currency",
+          "moeda",
+          "ccy"
+        ],
+        "opening_balance": [
+          "opening balance",
+          "saldo inicial"
+        ],
+        "debit": [
+          "debit",
+          "dr",
+          "debit amount"
+        ],
+        "credit": [
+          "credit",
+          "cr",
+          "credit amount"
+        ],
+        "balance_change": [
+          "balance change",
+          "movement",
+          "variacao"
+        ],
+        "ending_balance": [
+          "ending balance",
+          "saldo final",
+          "balance"
+        ]
+      },
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "ending_balance"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "balance_change",
+            "ending_balance",
+            "opening_balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "balance_change",
+            "ending_balance",
+            "opening_balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m",
+            "mm"
+          ]
+        }
+      ],
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "JPY",
+        "CHF",
+        "$",
+        "€",
+        "£",
+        "R$"
+      ]
+    },
+    {
+      "id": "acct_trial_balance_reclass_currency_table",
+      "name": {
+        "en": "Trial Balance by Currency",
+        "pt": "Balanco por Moeda"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "currency_code",
+        "row_count",
+        "opening_balance",
+        "debit",
+        "credit",
+        "ending_balance"
+      ],
+      "keyRows": [
+        "grand_total",
+        "subtotal"
+      ],
+      "headerSynonyms": {
+        "currency_code": [
+          "currency",
+          "currency code",
+          "moeda"
+        ],
+        "row_count": [
+          "rows",
+          "row count"
+        ],
+        "opening_balance": [
+          "opening"
+        ],
+        "debit": [
+          "debit",
+          "dr"
+        ],
+        "credit": [
+          "credit",
+          "cr"
+        ],
+        "ending_balance": [
+          "balance",
+          "ending balance"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "row_count",
+            "opening_balance",
+            "debit",
+            "credit",
+            "ending_balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "opening_balance",
+            "debit",
+            "credit",
+            "ending_balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "ending_balance"
+        ]
+      }
+    },
+    {
+      "id": "acct_trial_balance_reclass_variance_table",
+      "name": {
+        "en": "Variance and Checks",
+        "pt": "Variacao e Verificacoes"
+      },
+      "section": "totals",
+      "expectedColumns": [
+        "metric",
+        "expected",
+        "actual",
+        "difference"
+      ],
+      "keyRows": [
+        "debit_credit_check",
+        "out_of_balance",
+        "variance_total"
+      ],
+      "headerSynonyms": {
+        "metric": [
+          "metric",
+          "indicator"
+        ],
+        "expected": [
+          "expected",
+          "esperado"
+        ],
+        "actual": [
+          "actual",
+          "atual"
+        ],
+        "difference": [
+          "difference",
+          "variance",
+          "diferenca"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "expected",
+            "actual",
+            "difference"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "expected",
+            "actual",
+            "difference"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "debitColumns": [
+          "expected",
+          "actual"
+        ]
+      }
+    }
+  ]
+}

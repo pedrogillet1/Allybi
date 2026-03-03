@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "id": "empathy_and_support_language",
+    "version": "1.0.0",
+    "description": "Empathetic language patterns for sensitive outputs.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "phrases": {
+    "en": [
+      "I know this can be sensitive",
+      "I can verify this safely",
+      "Let me keep this grounded"
+    ],
+    "pt": [
+      "Sei que isso pode ser sensivel",
+      "Posso verificar com seguranca",
+      "Manterei isso baseado no documento"
+    ]
+  },
+  "rules": [
+    {
+      "id": "ES_001",
+      "trigger": "Sensitive domain query",
+      "check": "context.domain IN ['medical','legal']",
+      "failureAction": "APPLY_EMPATHETIC_TONE"
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

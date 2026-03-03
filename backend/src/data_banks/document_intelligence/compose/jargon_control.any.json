@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "jargon_control",
+    "version": "1.0.0",
+    "description": "Replace high-jargon terms with clearer alternatives.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "maps": {
+    "en": {
+      "accrual": "accrual basis",
+      "materiality": "materiality threshold"
+    },
+    "pt": {
+      "accrual": "competencia",
+      "materiality": "limiar de materialidade"
+    }
+  },
+  "config": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "help_microcopy",
+    "version": "1.0.0",
+    "description": "Microcopy used during clarification and low-confidence states.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "messages": {
+    "en": {
+      "clarify": "Tell me period and scope for a safer result.",
+      "units": "If you want, specify unit or currency context."
+    },
+    "pt": {
+      "clarify": "Informe periodo e escopo para resposta mais segura.",
+      "units": "Especifique unidade ou moeda se necessario."
+    }
+  },
+  "config": {
+    "enabled": true
+  }
+}

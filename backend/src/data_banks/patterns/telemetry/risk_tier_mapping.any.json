@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "marketing_risk_tier_mapping",
+    "version": "1.0.0",
+    "description": "Risk tier definitions used for marketing discovery telemetry routing and scoring.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true
+  },
+  "tiers": [
+    {
+      "tier": "low",
+      "scoreMin": 0,
+      "scoreMax": 0.34,
+      "description": "Routine intent gaps with limited user friction.",
+      "ownerAction": "monitor",
+      "routingHint": "standard_flow"
+    },
+    {
+      "tier": "medium",
+      "scoreMin": 0.35,
+      "scoreMax": 0.59,
+      "description": "Recurring intent friction requiring prompt follow-up.",
+      "ownerAction": "ask_clarifying_question",
+      "routingHint": "soft_followup"
+    },
+    {
+      "tier": "high",
+      "scoreMin": 0.6,
+      "scoreMax": 0.84,
+      "description": "Frequent re-ask/weak-evidence patterns with user churn signals.",
+      "ownerAction": "promote_disambiguation",
+      "routingHint": "priority_followup"
+    },
+    {
+      "tier": "critical",
+      "scoreMin": 0.85,
+      "scoreMax": 1,
+      "description": "Safety/regulatory or wrong-doc risk that impacts trust.",
+      "ownerAction": "interruptive_guardrail",
+      "routingHint": "escalate_or_block"
+    }
+  ]
+}

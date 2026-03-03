@@ -1,0 +1,3483 @@
+{
+  "_meta": {
+    "id": "layout_cues_v61e6793a",
+    "version": "1.3.0",
+    "description": "High-depth layout markers for structural extraction.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "tiebreakContract": {
+      "version": "2.0.0",
+      "deterministic": true,
+      "requiredFields": [
+        "priority",
+        "scope",
+        "disambiguationRuleId"
+      ],
+      "defaultDisambiguationRuleId": "structure_tiebreak_default",
+      "strategy": "semantic_priority_weighting",
+      "requireCurationReason": true,
+      "requireDisambiguationRulePerRow": true
+    }
+  },
+  "cues": [
+    {
+      "id": "footnote_marker",
+      "patterns": [
+        "footnote",
+        "f.n.",
+        "fn",
+        "nota de rodape",
+        "nota de rodapé"
+      ],
+      "meaning": "footnote_marker",
+      "priority": 700,
+      "scope": "layout:footnote_marker",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_marker",
+      "curationReason": "weighted:footnote_marker:domain_general"
+    },
+    {
+      "id": "exhibit_marker",
+      "patterns": [
+        "exhibit",
+        "anexo",
+        "appendix",
+        "anexo i",
+        "apendice"
+      ],
+      "meaning": "exhibit_marker",
+      "priority": 700,
+      "scope": "layout:exhibit_marker",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_marker",
+      "curationReason": "weighted:exhibit_marker:domain_general"
+    },
+    {
+      "id": "signature_block",
+      "patterns": [
+        "signature",
+        "assinatura",
+        "assinado por",
+        "for signature",
+        "assinou",
+        "signature:",
+        "assinado por:"
+      ],
+      "meaning": "signature_block",
+      "priority": 700,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block",
+      "curationReason": "weighted:signature_block:domain_general"
+    },
+    {
+      "id": "lab_panel",
+      "patterns": [
+        "lab panel",
+        "painel laboratorial",
+        "hematology",
+        "chemistry panel",
+        "sorologia",
+        "hemograma"
+      ],
+      "meaning": "lab_panel",
+      "priority": 700,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel",
+      "curationReason": "weighted:lab_panel:domain_general"
+    },
+    {
+      "id": "statement_layout",
+      "patterns": [
+        "statement",
+        "declaração",
+        "balancete",
+        "financial statement",
+        "demonstração",
+        "statement of"
+      ],
+      "meaning": "statement_layout",
+      "priority": 700,
+      "scope": "layout:statement_layout",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_layout",
+      "curationReason": "weighted:statement_layout:domain_general"
+    },
+    {
+      "id": "grid_header",
+      "patterns": [
+        "coluna",
+        "header",
+        "encabezado",
+        "table header",
+        "cabeçalho da tabela"
+      ],
+      "meaning": "grid_header",
+      "priority": 700,
+      "scope": "layout:grid_header",
+      "disambiguationRuleId": "cues_disambiguation_general_grid_header",
+      "curationReason": "weighted:grid_header:domain_general"
+    },
+    {
+      "id": "date_block",
+      "patterns": [
+        "date",
+        "data",
+        "emissao",
+        "issue date",
+        "data de emissao"
+      ],
+      "meaning": "date_block",
+      "priority": 700,
+      "scope": "layout:date_block",
+      "disambiguationRuleId": "cues_disambiguation_general_date_block",
+      "curationReason": "weighted:date_block:domain_general"
+    },
+    {
+      "id": "address_block",
+      "patterns": [
+        "address",
+        "endereco",
+        "endereço",
+        "shipping",
+        "billing address"
+      ],
+      "meaning": "address_block",
+      "priority": 700,
+      "scope": "layout:address_block",
+      "disambiguationRuleId": "cues_disambiguation_general_address_block",
+      "curationReason": "weighted:address_block:domain_general"
+    },
+    {
+      "id": "amount_box",
+      "patterns": [
+        "amount due",
+        "valor",
+        "montante",
+        "valor total",
+        "total amount"
+      ],
+      "meaning": "amount_box",
+      "priority": 700,
+      "scope": "layout:amount_box",
+      "disambiguationRuleId": "cues_disambiguation_general_amount_box",
+      "curationReason": "weighted:amount_box:domain_general"
+    },
+    {
+      "id": "party_block",
+      "patterns": [
+        "party",
+        "parte",
+        "representado por",
+        "representada por",
+        "party name"
+      ],
+      "meaning": "party_block",
+      "priority": 700,
+      "scope": "layout:party_block",
+      "disambiguationRuleId": "cues_disambiguation_general_party_block",
+      "curationReason": "weighted:party_block:domain_general"
+    },
+    {
+      "id": "footnote_cue_1",
+      "patterns": [
+        "footnote 1",
+        "footnote section 1",
+        "FOOTNOTE-1",
+        "footnote bloco 1",
+        "footnote area 1"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_1",
+      "curationReason": "weighted:footnote_cue_1:domain_general"
+    },
+    {
+      "id": "footnote_cue_2",
+      "patterns": [
+        "footnote 2",
+        "footnote section 2",
+        "FOOTNOTE-2",
+        "footnote bloco 2",
+        "footnote area 2"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_2",
+      "curationReason": "weighted:footnote_cue_2:domain_general"
+    },
+    {
+      "id": "footnote_cue_3",
+      "patterns": [
+        "footnote 3",
+        "footnote section 3",
+        "FOOTNOTE-3",
+        "footnote bloco 3",
+        "footnote area 3"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_3",
+      "curationReason": "weighted:footnote_cue_3:domain_general"
+    },
+    {
+      "id": "footnote_cue_4",
+      "patterns": [
+        "footnote 4",
+        "footnote section 4",
+        "FOOTNOTE-4",
+        "footnote bloco 4",
+        "footnote area 4"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_4",
+      "curationReason": "weighted:footnote_cue_4:domain_general"
+    },
+    {
+      "id": "footnote_cue_5",
+      "patterns": [
+        "footnote 5",
+        "footnote section 5",
+        "FOOTNOTE-5",
+        "footnote bloco 5",
+        "footnote area 5"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_5",
+      "curationReason": "weighted:footnote_cue_5:domain_general"
+    },
+    {
+      "id": "footnote_cue_6",
+      "patterns": [
+        "footnote 6",
+        "footnote section 6",
+        "FOOTNOTE-6",
+        "footnote bloco 6",
+        "footnote area 6"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_6",
+      "curationReason": "weighted:footnote_cue_6:domain_general"
+    },
+    {
+      "id": "footnote_cue_7",
+      "patterns": [
+        "footnote 7",
+        "footnote section 7",
+        "FOOTNOTE-7",
+        "footnote bloco 7",
+        "footnote area 7"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_7",
+      "curationReason": "weighted:footnote_cue_7:domain_general"
+    },
+    {
+      "id": "footnote_cue_8",
+      "patterns": [
+        "footnote 8",
+        "footnote section 8",
+        "FOOTNOTE-8",
+        "footnote bloco 8",
+        "footnote area 8"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_8",
+      "curationReason": "weighted:footnote_cue_8:domain_general"
+    },
+    {
+      "id": "footnote_cue_9",
+      "patterns": [
+        "footnote 9",
+        "footnote section 9",
+        "FOOTNOTE-9",
+        "footnote bloco 9",
+        "footnote area 9"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_9",
+      "curationReason": "weighted:footnote_cue_9:domain_general"
+    },
+    {
+      "id": "footnote_cue_10",
+      "patterns": [
+        "footnote 10",
+        "footnote section 10",
+        "FOOTNOTE-10",
+        "footnote bloco 10",
+        "footnote area 10"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_10",
+      "curationReason": "weighted:footnote_cue_10:domain_general"
+    },
+    {
+      "id": "footnote_cue_11",
+      "patterns": [
+        "footnote 11",
+        "footnote section 11",
+        "FOOTNOTE-11",
+        "footnote bloco 11",
+        "footnote area 11"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_11",
+      "curationReason": "weighted:footnote_cue_11:domain_general"
+    },
+    {
+      "id": "footnote_cue_12",
+      "patterns": [
+        "footnote 12",
+        "footnote section 12",
+        "FOOTNOTE-12",
+        "footnote bloco 12",
+        "footnote area 12"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_12",
+      "curationReason": "weighted:footnote_cue_12:domain_general"
+    },
+    {
+      "id": "footnote_cue_13",
+      "patterns": [
+        "footnote 13",
+        "footnote section 13",
+        "FOOTNOTE-13",
+        "footnote bloco 13",
+        "footnote area 13"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_13",
+      "curationReason": "weighted:footnote_cue_13:domain_general"
+    },
+    {
+      "id": "footnote_cue_14",
+      "patterns": [
+        "footnote 14",
+        "footnote section 14",
+        "FOOTNOTE-14",
+        "footnote bloco 14",
+        "footnote area 14"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_14",
+      "curationReason": "weighted:footnote_cue_14:domain_general"
+    },
+    {
+      "id": "footnote_cue_15",
+      "patterns": [
+        "footnote 15",
+        "footnote section 15",
+        "FOOTNOTE-15",
+        "footnote bloco 15",
+        "footnote area 15"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_15",
+      "curationReason": "weighted:footnote_cue_15:domain_general"
+    },
+    {
+      "id": "footnote_cue_16",
+      "patterns": [
+        "footnote 16",
+        "footnote section 16",
+        "FOOTNOTE-16",
+        "footnote bloco 16",
+        "footnote area 16"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_16",
+      "curationReason": "weighted:footnote_cue_16:domain_general"
+    },
+    {
+      "id": "footnote_cue_17",
+      "patterns": [
+        "footnote 17",
+        "footnote section 17",
+        "FOOTNOTE-17",
+        "footnote bloco 17",
+        "footnote area 17"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_17",
+      "curationReason": "weighted:footnote_cue_17:domain_general"
+    },
+    {
+      "id": "footnote_cue_18",
+      "patterns": [
+        "footnote 18",
+        "footnote section 18",
+        "FOOTNOTE-18",
+        "footnote bloco 18",
+        "footnote area 18"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_18",
+      "curationReason": "weighted:footnote_cue_18:domain_general"
+    },
+    {
+      "id": "footnote_cue_19",
+      "patterns": [
+        "footnote 19",
+        "footnote section 19",
+        "FOOTNOTE-19",
+        "footnote bloco 19",
+        "footnote area 19"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_19",
+      "curationReason": "weighted:footnote_cue_19:domain_general"
+    },
+    {
+      "id": "footnote_cue_20",
+      "patterns": [
+        "footnote 20",
+        "footnote section 20",
+        "FOOTNOTE-20",
+        "footnote bloco 20",
+        "footnote area 20"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_20",
+      "curationReason": "weighted:footnote_cue_20:domain_general"
+    },
+    {
+      "id": "footnote_cue_21",
+      "patterns": [
+        "footnote 21",
+        "footnote section 21",
+        "FOOTNOTE-21",
+        "footnote bloco 21",
+        "footnote area 21"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_21",
+      "curationReason": "weighted:footnote_cue_21:domain_general"
+    },
+    {
+      "id": "footnote_cue_22",
+      "patterns": [
+        "footnote 22",
+        "footnote section 22",
+        "FOOTNOTE-22",
+        "footnote bloco 22",
+        "footnote area 22"
+      ],
+      "meaning": "footnote",
+      "priority": 500,
+      "scope": "layout:footnote",
+      "disambiguationRuleId": "cues_disambiguation_general_footnote_cue_22",
+      "curationReason": "weighted:footnote_cue_22:domain_general"
+    },
+    {
+      "id": "exhibit_cue_1",
+      "patterns": [
+        "exhibit 1",
+        "exhibit section 1",
+        "EXHIBIT-1",
+        "exhibit bloco 1",
+        "exhibit area 1"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_1",
+      "curationReason": "weighted:exhibit_cue_1:domain_general"
+    },
+    {
+      "id": "exhibit_cue_2",
+      "patterns": [
+        "exhibit 2",
+        "exhibit section 2",
+        "EXHIBIT-2",
+        "exhibit bloco 2",
+        "exhibit area 2"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_2",
+      "curationReason": "weighted:exhibit_cue_2:domain_general"
+    },
+    {
+      "id": "exhibit_cue_3",
+      "patterns": [
+        "exhibit 3",
+        "exhibit section 3",
+        "EXHIBIT-3",
+        "exhibit bloco 3",
+        "exhibit area 3"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_3",
+      "curationReason": "weighted:exhibit_cue_3:domain_general"
+    },
+    {
+      "id": "exhibit_cue_4",
+      "patterns": [
+        "exhibit 4",
+        "exhibit section 4",
+        "EXHIBIT-4",
+        "exhibit bloco 4",
+        "exhibit area 4"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_4",
+      "curationReason": "weighted:exhibit_cue_4:domain_general"
+    },
+    {
+      "id": "exhibit_cue_5",
+      "patterns": [
+        "exhibit 5",
+        "exhibit section 5",
+        "EXHIBIT-5",
+        "exhibit bloco 5",
+        "exhibit area 5"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_5",
+      "curationReason": "weighted:exhibit_cue_5:domain_general"
+    },
+    {
+      "id": "exhibit_cue_6",
+      "patterns": [
+        "exhibit 6",
+        "exhibit section 6",
+        "EXHIBIT-6",
+        "exhibit bloco 6",
+        "exhibit area 6"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_6",
+      "curationReason": "weighted:exhibit_cue_6:domain_general"
+    },
+    {
+      "id": "exhibit_cue_7",
+      "patterns": [
+        "exhibit 7",
+        "exhibit section 7",
+        "EXHIBIT-7",
+        "exhibit bloco 7",
+        "exhibit area 7"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_7",
+      "curationReason": "weighted:exhibit_cue_7:domain_general"
+    },
+    {
+      "id": "exhibit_cue_8",
+      "patterns": [
+        "exhibit 8",
+        "exhibit section 8",
+        "EXHIBIT-8",
+        "exhibit bloco 8",
+        "exhibit area 8"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_8",
+      "curationReason": "weighted:exhibit_cue_8:domain_general"
+    },
+    {
+      "id": "exhibit_cue_9",
+      "patterns": [
+        "exhibit 9",
+        "exhibit section 9",
+        "EXHIBIT-9",
+        "exhibit bloco 9",
+        "exhibit area 9"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_9",
+      "curationReason": "weighted:exhibit_cue_9:domain_general"
+    },
+    {
+      "id": "exhibit_cue_10",
+      "patterns": [
+        "exhibit 10",
+        "exhibit section 10",
+        "EXHIBIT-10",
+        "exhibit bloco 10",
+        "exhibit area 10"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_10",
+      "curationReason": "weighted:exhibit_cue_10:domain_general"
+    },
+    {
+      "id": "exhibit_cue_11",
+      "patterns": [
+        "exhibit 11",
+        "exhibit section 11",
+        "EXHIBIT-11",
+        "exhibit bloco 11",
+        "exhibit area 11"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_11",
+      "curationReason": "weighted:exhibit_cue_11:domain_general"
+    },
+    {
+      "id": "exhibit_cue_12",
+      "patterns": [
+        "exhibit 12",
+        "exhibit section 12",
+        "EXHIBIT-12",
+        "exhibit bloco 12",
+        "exhibit area 12"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_12",
+      "curationReason": "weighted:exhibit_cue_12:domain_general"
+    },
+    {
+      "id": "exhibit_cue_13",
+      "patterns": [
+        "exhibit 13",
+        "exhibit section 13",
+        "EXHIBIT-13",
+        "exhibit bloco 13",
+        "exhibit area 13"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_13",
+      "curationReason": "weighted:exhibit_cue_13:domain_general"
+    },
+    {
+      "id": "exhibit_cue_14",
+      "patterns": [
+        "exhibit 14",
+        "exhibit section 14",
+        "EXHIBIT-14",
+        "exhibit bloco 14",
+        "exhibit area 14"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_14",
+      "curationReason": "weighted:exhibit_cue_14:domain_general"
+    },
+    {
+      "id": "exhibit_cue_15",
+      "patterns": [
+        "exhibit 15",
+        "exhibit section 15",
+        "EXHIBIT-15",
+        "exhibit bloco 15",
+        "exhibit area 15"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_15",
+      "curationReason": "weighted:exhibit_cue_15:domain_general"
+    },
+    {
+      "id": "exhibit_cue_16",
+      "patterns": [
+        "exhibit 16",
+        "exhibit section 16",
+        "EXHIBIT-16",
+        "exhibit bloco 16",
+        "exhibit area 16"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_16",
+      "curationReason": "weighted:exhibit_cue_16:domain_general"
+    },
+    {
+      "id": "exhibit_cue_17",
+      "patterns": [
+        "exhibit 17",
+        "exhibit section 17",
+        "EXHIBIT-17",
+        "exhibit bloco 17",
+        "exhibit area 17"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_17",
+      "curationReason": "weighted:exhibit_cue_17:domain_general"
+    },
+    {
+      "id": "exhibit_cue_18",
+      "patterns": [
+        "exhibit 18",
+        "exhibit section 18",
+        "EXHIBIT-18",
+        "exhibit bloco 18",
+        "exhibit area 18"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_18",
+      "curationReason": "weighted:exhibit_cue_18:domain_general"
+    },
+    {
+      "id": "exhibit_cue_19",
+      "patterns": [
+        "exhibit 19",
+        "exhibit section 19",
+        "EXHIBIT-19",
+        "exhibit bloco 19",
+        "exhibit area 19"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_19",
+      "curationReason": "weighted:exhibit_cue_19:domain_general"
+    },
+    {
+      "id": "exhibit_cue_20",
+      "patterns": [
+        "exhibit 20",
+        "exhibit section 20",
+        "EXHIBIT-20",
+        "exhibit bloco 20",
+        "exhibit area 20"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_20",
+      "curationReason": "weighted:exhibit_cue_20:domain_general"
+    },
+    {
+      "id": "exhibit_cue_21",
+      "patterns": [
+        "exhibit 21",
+        "exhibit section 21",
+        "EXHIBIT-21",
+        "exhibit bloco 21",
+        "exhibit area 21"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_21",
+      "curationReason": "weighted:exhibit_cue_21:domain_general"
+    },
+    {
+      "id": "exhibit_cue_22",
+      "patterns": [
+        "exhibit 22",
+        "exhibit section 22",
+        "EXHIBIT-22",
+        "exhibit bloco 22",
+        "exhibit area 22"
+      ],
+      "meaning": "exhibit",
+      "priority": 500,
+      "scope": "layout:exhibit",
+      "disambiguationRuleId": "cues_disambiguation_general_exhibit_cue_22",
+      "curationReason": "weighted:exhibit_cue_22:domain_general"
+    },
+    {
+      "id": "signature_cue_1",
+      "patterns": [
+        "signature 1",
+        "signature section 1",
+        "SIGNATURE-1",
+        "signature bloco 1",
+        "signature area 1"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_1",
+      "curationReason": "weighted:signature_cue_1:domain_general"
+    },
+    {
+      "id": "signature_cue_2",
+      "patterns": [
+        "signature 2",
+        "signature section 2",
+        "SIGNATURE-2",
+        "signature bloco 2",
+        "signature area 2"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_2",
+      "curationReason": "weighted:signature_cue_2:domain_general"
+    },
+    {
+      "id": "signature_cue_3",
+      "patterns": [
+        "signature 3",
+        "signature section 3",
+        "SIGNATURE-3",
+        "signature bloco 3",
+        "signature area 3"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_3",
+      "curationReason": "weighted:signature_cue_3:domain_general"
+    },
+    {
+      "id": "signature_cue_4",
+      "patterns": [
+        "signature 4",
+        "signature section 4",
+        "SIGNATURE-4",
+        "signature bloco 4",
+        "signature area 4"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_4",
+      "curationReason": "weighted:signature_cue_4:domain_general"
+    },
+    {
+      "id": "signature_cue_5",
+      "patterns": [
+        "signature 5",
+        "signature section 5",
+        "SIGNATURE-5",
+        "signature bloco 5",
+        "signature area 5"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_5",
+      "curationReason": "weighted:signature_cue_5:domain_general"
+    },
+    {
+      "id": "signature_cue_6",
+      "patterns": [
+        "signature 6",
+        "signature section 6",
+        "SIGNATURE-6",
+        "signature bloco 6",
+        "signature area 6"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_6",
+      "curationReason": "weighted:signature_cue_6:domain_general"
+    },
+    {
+      "id": "signature_cue_7",
+      "patterns": [
+        "signature 7",
+        "signature section 7",
+        "SIGNATURE-7",
+        "signature bloco 7",
+        "signature area 7"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_7",
+      "curationReason": "weighted:signature_cue_7:domain_general"
+    },
+    {
+      "id": "signature_cue_8",
+      "patterns": [
+        "signature 8",
+        "signature section 8",
+        "SIGNATURE-8",
+        "signature bloco 8",
+        "signature area 8"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_8",
+      "curationReason": "weighted:signature_cue_8:domain_general"
+    },
+    {
+      "id": "signature_cue_9",
+      "patterns": [
+        "signature 9",
+        "signature section 9",
+        "SIGNATURE-9",
+        "signature bloco 9",
+        "signature area 9"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_9",
+      "curationReason": "weighted:signature_cue_9:domain_general"
+    },
+    {
+      "id": "signature_cue_10",
+      "patterns": [
+        "signature 10",
+        "signature section 10",
+        "SIGNATURE-10",
+        "signature bloco 10",
+        "signature area 10"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_10",
+      "curationReason": "weighted:signature_cue_10:domain_general"
+    },
+    {
+      "id": "signature_cue_11",
+      "patterns": [
+        "signature 11",
+        "signature section 11",
+        "SIGNATURE-11",
+        "signature bloco 11",
+        "signature area 11"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_11",
+      "curationReason": "weighted:signature_cue_11:domain_general"
+    },
+    {
+      "id": "signature_cue_12",
+      "patterns": [
+        "signature 12",
+        "signature section 12",
+        "SIGNATURE-12",
+        "signature bloco 12",
+        "signature area 12"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_12",
+      "curationReason": "weighted:signature_cue_12:domain_general"
+    },
+    {
+      "id": "signature_cue_13",
+      "patterns": [
+        "signature 13",
+        "signature section 13",
+        "SIGNATURE-13",
+        "signature bloco 13",
+        "signature area 13"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_13",
+      "curationReason": "weighted:signature_cue_13:domain_general"
+    },
+    {
+      "id": "signature_cue_14",
+      "patterns": [
+        "signature 14",
+        "signature section 14",
+        "SIGNATURE-14",
+        "signature bloco 14",
+        "signature area 14"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_14",
+      "curationReason": "weighted:signature_cue_14:domain_general"
+    },
+    {
+      "id": "signature_cue_15",
+      "patterns": [
+        "signature 15",
+        "signature section 15",
+        "SIGNATURE-15",
+        "signature bloco 15",
+        "signature area 15"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_15",
+      "curationReason": "weighted:signature_cue_15:domain_general"
+    },
+    {
+      "id": "signature_cue_16",
+      "patterns": [
+        "signature 16",
+        "signature section 16",
+        "SIGNATURE-16",
+        "signature bloco 16",
+        "signature area 16"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_16",
+      "curationReason": "weighted:signature_cue_16:domain_general"
+    },
+    {
+      "id": "signature_cue_17",
+      "patterns": [
+        "signature 17",
+        "signature section 17",
+        "SIGNATURE-17",
+        "signature bloco 17",
+        "signature area 17"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_17",
+      "curationReason": "weighted:signature_cue_17:domain_general"
+    },
+    {
+      "id": "signature_cue_18",
+      "patterns": [
+        "signature 18",
+        "signature section 18",
+        "SIGNATURE-18",
+        "signature bloco 18",
+        "signature area 18"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_18",
+      "curationReason": "weighted:signature_cue_18:domain_general"
+    },
+    {
+      "id": "signature_cue_19",
+      "patterns": [
+        "signature 19",
+        "signature section 19",
+        "SIGNATURE-19",
+        "signature bloco 19",
+        "signature area 19"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_19",
+      "curationReason": "weighted:signature_cue_19:domain_general"
+    },
+    {
+      "id": "signature_cue_20",
+      "patterns": [
+        "signature 20",
+        "signature section 20",
+        "SIGNATURE-20",
+        "signature bloco 20",
+        "signature area 20"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_20",
+      "curationReason": "weighted:signature_cue_20:domain_general"
+    },
+    {
+      "id": "signature_cue_21",
+      "patterns": [
+        "signature 21",
+        "signature section 21",
+        "SIGNATURE-21",
+        "signature bloco 21",
+        "signature area 21"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_21",
+      "curationReason": "weighted:signature_cue_21:domain_general"
+    },
+    {
+      "id": "signature_cue_22",
+      "patterns": [
+        "signature 22",
+        "signature section 22",
+        "SIGNATURE-22",
+        "signature bloco 22",
+        "signature area 22"
+      ],
+      "meaning": "signature",
+      "priority": 500,
+      "scope": "layout:signature",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_cue_22",
+      "curationReason": "weighted:signature_cue_22:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_1",
+      "patterns": [
+        "lab_panel 1",
+        "lab_panel section 1",
+        "LAB_PANEL-1",
+        "lab_panel bloco 1",
+        "lab_panel area 1"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_1",
+      "curationReason": "weighted:lab_panel_cue_1:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_2",
+      "patterns": [
+        "lab_panel 2",
+        "lab_panel section 2",
+        "LAB_PANEL-2",
+        "lab_panel bloco 2",
+        "lab_panel area 2"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_2",
+      "curationReason": "weighted:lab_panel_cue_2:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_3",
+      "patterns": [
+        "lab_panel 3",
+        "lab_panel section 3",
+        "LAB_PANEL-3",
+        "lab_panel bloco 3",
+        "lab_panel area 3"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_3",
+      "curationReason": "weighted:lab_panel_cue_3:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_4",
+      "patterns": [
+        "lab_panel 4",
+        "lab_panel section 4",
+        "LAB_PANEL-4",
+        "lab_panel bloco 4",
+        "lab_panel area 4"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_4",
+      "curationReason": "weighted:lab_panel_cue_4:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_5",
+      "patterns": [
+        "lab_panel 5",
+        "lab_panel section 5",
+        "LAB_PANEL-5",
+        "lab_panel bloco 5",
+        "lab_panel area 5"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_5",
+      "curationReason": "weighted:lab_panel_cue_5:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_6",
+      "patterns": [
+        "lab_panel 6",
+        "lab_panel section 6",
+        "LAB_PANEL-6",
+        "lab_panel bloco 6",
+        "lab_panel area 6"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_6",
+      "curationReason": "weighted:lab_panel_cue_6:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_7",
+      "patterns": [
+        "lab_panel 7",
+        "lab_panel section 7",
+        "LAB_PANEL-7",
+        "lab_panel bloco 7",
+        "lab_panel area 7"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_7",
+      "curationReason": "weighted:lab_panel_cue_7:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_8",
+      "patterns": [
+        "lab_panel 8",
+        "lab_panel section 8",
+        "LAB_PANEL-8",
+        "lab_panel bloco 8",
+        "lab_panel area 8"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_8",
+      "curationReason": "weighted:lab_panel_cue_8:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_9",
+      "patterns": [
+        "lab_panel 9",
+        "lab_panel section 9",
+        "LAB_PANEL-9",
+        "lab_panel bloco 9",
+        "lab_panel area 9"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_9",
+      "curationReason": "weighted:lab_panel_cue_9:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_10",
+      "patterns": [
+        "lab_panel 10",
+        "lab_panel section 10",
+        "LAB_PANEL-10",
+        "lab_panel bloco 10",
+        "lab_panel area 10"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_10",
+      "curationReason": "weighted:lab_panel_cue_10:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_11",
+      "patterns": [
+        "lab_panel 11",
+        "lab_panel section 11",
+        "LAB_PANEL-11",
+        "lab_panel bloco 11",
+        "lab_panel area 11"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_11",
+      "curationReason": "weighted:lab_panel_cue_11:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_12",
+      "patterns": [
+        "lab_panel 12",
+        "lab_panel section 12",
+        "LAB_PANEL-12",
+        "lab_panel bloco 12",
+        "lab_panel area 12"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_12",
+      "curationReason": "weighted:lab_panel_cue_12:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_13",
+      "patterns": [
+        "lab_panel 13",
+        "lab_panel section 13",
+        "LAB_PANEL-13",
+        "lab_panel bloco 13",
+        "lab_panel area 13"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_13",
+      "curationReason": "weighted:lab_panel_cue_13:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_14",
+      "patterns": [
+        "lab_panel 14",
+        "lab_panel section 14",
+        "LAB_PANEL-14",
+        "lab_panel bloco 14",
+        "lab_panel area 14"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_14",
+      "curationReason": "weighted:lab_panel_cue_14:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_15",
+      "patterns": [
+        "lab_panel 15",
+        "lab_panel section 15",
+        "LAB_PANEL-15",
+        "lab_panel bloco 15",
+        "lab_panel area 15"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_15",
+      "curationReason": "weighted:lab_panel_cue_15:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_16",
+      "patterns": [
+        "lab_panel 16",
+        "lab_panel section 16",
+        "LAB_PANEL-16",
+        "lab_panel bloco 16",
+        "lab_panel area 16"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_16",
+      "curationReason": "weighted:lab_panel_cue_16:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_17",
+      "patterns": [
+        "lab_panel 17",
+        "lab_panel section 17",
+        "LAB_PANEL-17",
+        "lab_panel bloco 17",
+        "lab_panel area 17"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_17",
+      "curationReason": "weighted:lab_panel_cue_17:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_18",
+      "patterns": [
+        "lab_panel 18",
+        "lab_panel section 18",
+        "LAB_PANEL-18",
+        "lab_panel bloco 18",
+        "lab_panel area 18"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_18",
+      "curationReason": "weighted:lab_panel_cue_18:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_19",
+      "patterns": [
+        "lab_panel 19",
+        "lab_panel section 19",
+        "LAB_PANEL-19",
+        "lab_panel bloco 19",
+        "lab_panel area 19"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_19",
+      "curationReason": "weighted:lab_panel_cue_19:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_20",
+      "patterns": [
+        "lab_panel 20",
+        "lab_panel section 20",
+        "LAB_PANEL-20",
+        "lab_panel bloco 20",
+        "lab_panel area 20"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_20",
+      "curationReason": "weighted:lab_panel_cue_20:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_21",
+      "patterns": [
+        "lab_panel 21",
+        "lab_panel section 21",
+        "LAB_PANEL-21",
+        "lab_panel bloco 21",
+        "lab_panel area 21"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_21",
+      "curationReason": "weighted:lab_panel_cue_21:domain_general"
+    },
+    {
+      "id": "lab_panel_cue_22",
+      "patterns": [
+        "lab_panel 22",
+        "lab_panel section 22",
+        "LAB_PANEL-22",
+        "lab_panel bloco 22",
+        "lab_panel area 22"
+      ],
+      "meaning": "lab_panel",
+      "priority": 500,
+      "scope": "layout:lab_panel",
+      "disambiguationRuleId": "cues_disambiguation_general_lab_panel_cue_22",
+      "curationReason": "weighted:lab_panel_cue_22:domain_general"
+    },
+    {
+      "id": "statement_cue_1",
+      "patterns": [
+        "statement 1",
+        "statement section 1",
+        "STATEMENT-1",
+        "statement bloco 1",
+        "statement area 1"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_1",
+      "curationReason": "weighted:statement_cue_1:domain_general"
+    },
+    {
+      "id": "statement_cue_2",
+      "patterns": [
+        "statement 2",
+        "statement section 2",
+        "STATEMENT-2",
+        "statement bloco 2",
+        "statement area 2"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_2",
+      "curationReason": "weighted:statement_cue_2:domain_general"
+    },
+    {
+      "id": "statement_cue_3",
+      "patterns": [
+        "statement 3",
+        "statement section 3",
+        "STATEMENT-3",
+        "statement bloco 3",
+        "statement area 3"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_3",
+      "curationReason": "weighted:statement_cue_3:domain_general"
+    },
+    {
+      "id": "statement_cue_4",
+      "patterns": [
+        "statement 4",
+        "statement section 4",
+        "STATEMENT-4",
+        "statement bloco 4",
+        "statement area 4"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_4",
+      "curationReason": "weighted:statement_cue_4:domain_general"
+    },
+    {
+      "id": "statement_cue_5",
+      "patterns": [
+        "statement 5",
+        "statement section 5",
+        "STATEMENT-5",
+        "statement bloco 5",
+        "statement area 5"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_5",
+      "curationReason": "weighted:statement_cue_5:domain_general"
+    },
+    {
+      "id": "statement_cue_6",
+      "patterns": [
+        "statement 6",
+        "statement section 6",
+        "STATEMENT-6",
+        "statement bloco 6",
+        "statement area 6"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_6",
+      "curationReason": "weighted:statement_cue_6:domain_general"
+    },
+    {
+      "id": "statement_cue_7",
+      "patterns": [
+        "statement 7",
+        "statement section 7",
+        "STATEMENT-7",
+        "statement bloco 7",
+        "statement area 7"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_7",
+      "curationReason": "weighted:statement_cue_7:domain_general"
+    },
+    {
+      "id": "statement_cue_8",
+      "patterns": [
+        "statement 8",
+        "statement section 8",
+        "STATEMENT-8",
+        "statement bloco 8",
+        "statement area 8"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_8",
+      "curationReason": "weighted:statement_cue_8:domain_general"
+    },
+    {
+      "id": "statement_cue_9",
+      "patterns": [
+        "statement 9",
+        "statement section 9",
+        "STATEMENT-9",
+        "statement bloco 9",
+        "statement area 9"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_9",
+      "curationReason": "weighted:statement_cue_9:domain_general"
+    },
+    {
+      "id": "statement_cue_10",
+      "patterns": [
+        "statement 10",
+        "statement section 10",
+        "STATEMENT-10",
+        "statement bloco 10",
+        "statement area 10"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_10",
+      "curationReason": "weighted:statement_cue_10:domain_general"
+    },
+    {
+      "id": "statement_cue_11",
+      "patterns": [
+        "statement 11",
+        "statement section 11",
+        "STATEMENT-11",
+        "statement bloco 11",
+        "statement area 11"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_11",
+      "curationReason": "weighted:statement_cue_11:domain_general"
+    },
+    {
+      "id": "statement_cue_12",
+      "patterns": [
+        "statement 12",
+        "statement section 12",
+        "STATEMENT-12",
+        "statement bloco 12",
+        "statement area 12"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_12",
+      "curationReason": "weighted:statement_cue_12:domain_general"
+    },
+    {
+      "id": "statement_cue_13",
+      "patterns": [
+        "statement 13",
+        "statement section 13",
+        "STATEMENT-13",
+        "statement bloco 13",
+        "statement area 13"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_13",
+      "curationReason": "weighted:statement_cue_13:domain_general"
+    },
+    {
+      "id": "statement_cue_14",
+      "patterns": [
+        "statement 14",
+        "statement section 14",
+        "STATEMENT-14",
+        "statement bloco 14",
+        "statement area 14"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_14",
+      "curationReason": "weighted:statement_cue_14:domain_general"
+    },
+    {
+      "id": "statement_cue_15",
+      "patterns": [
+        "statement 15",
+        "statement section 15",
+        "STATEMENT-15",
+        "statement bloco 15",
+        "statement area 15"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_15",
+      "curationReason": "weighted:statement_cue_15:domain_general"
+    },
+    {
+      "id": "statement_cue_16",
+      "patterns": [
+        "statement 16",
+        "statement section 16",
+        "STATEMENT-16",
+        "statement bloco 16",
+        "statement area 16"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_16",
+      "curationReason": "weighted:statement_cue_16:domain_general"
+    },
+    {
+      "id": "statement_cue_17",
+      "patterns": [
+        "statement 17",
+        "statement section 17",
+        "STATEMENT-17",
+        "statement bloco 17",
+        "statement area 17"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_17",
+      "curationReason": "weighted:statement_cue_17:domain_general"
+    },
+    {
+      "id": "statement_cue_18",
+      "patterns": [
+        "statement 18",
+        "statement section 18",
+        "STATEMENT-18",
+        "statement bloco 18",
+        "statement area 18"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_18",
+      "curationReason": "weighted:statement_cue_18:domain_general"
+    },
+    {
+      "id": "statement_cue_19",
+      "patterns": [
+        "statement 19",
+        "statement section 19",
+        "STATEMENT-19",
+        "statement bloco 19",
+        "statement area 19"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_19",
+      "curationReason": "weighted:statement_cue_19:domain_general"
+    },
+    {
+      "id": "statement_cue_20",
+      "patterns": [
+        "statement 20",
+        "statement section 20",
+        "STATEMENT-20",
+        "statement bloco 20",
+        "statement area 20"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_20",
+      "curationReason": "weighted:statement_cue_20:domain_general"
+    },
+    {
+      "id": "statement_cue_21",
+      "patterns": [
+        "statement 21",
+        "statement section 21",
+        "STATEMENT-21",
+        "statement bloco 21",
+        "statement area 21"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_21",
+      "curationReason": "weighted:statement_cue_21:domain_general"
+    },
+    {
+      "id": "statement_cue_22",
+      "patterns": [
+        "statement 22",
+        "statement section 22",
+        "STATEMENT-22",
+        "statement bloco 22",
+        "statement area 22"
+      ],
+      "meaning": "statement",
+      "priority": 500,
+      "scope": "layout:statement",
+      "disambiguationRuleId": "cues_disambiguation_general_statement_cue_22",
+      "curationReason": "weighted:statement_cue_22:domain_general"
+    },
+    {
+      "id": "invoice_cue_1",
+      "patterns": [
+        "invoice 1",
+        "invoice section 1",
+        "INVOICE-1",
+        "invoice bloco 1",
+        "invoice area 1"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_1",
+      "curationReason": "weighted:invoice_cue_1:domain_general"
+    },
+    {
+      "id": "invoice_cue_2",
+      "patterns": [
+        "invoice 2",
+        "invoice section 2",
+        "INVOICE-2",
+        "invoice bloco 2",
+        "invoice area 2"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_2",
+      "curationReason": "weighted:invoice_cue_2:domain_general"
+    },
+    {
+      "id": "invoice_cue_3",
+      "patterns": [
+        "invoice 3",
+        "invoice section 3",
+        "INVOICE-3",
+        "invoice bloco 3",
+        "invoice area 3"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_3",
+      "curationReason": "weighted:invoice_cue_3:domain_general"
+    },
+    {
+      "id": "invoice_cue_4",
+      "patterns": [
+        "invoice 4",
+        "invoice section 4",
+        "INVOICE-4",
+        "invoice bloco 4",
+        "invoice area 4"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_4",
+      "curationReason": "weighted:invoice_cue_4:domain_general"
+    },
+    {
+      "id": "invoice_cue_5",
+      "patterns": [
+        "invoice 5",
+        "invoice section 5",
+        "INVOICE-5",
+        "invoice bloco 5",
+        "invoice area 5"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_5",
+      "curationReason": "weighted:invoice_cue_5:domain_general"
+    },
+    {
+      "id": "invoice_cue_6",
+      "patterns": [
+        "invoice 6",
+        "invoice section 6",
+        "INVOICE-6",
+        "invoice bloco 6",
+        "invoice area 6"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_6",
+      "curationReason": "weighted:invoice_cue_6:domain_general"
+    },
+    {
+      "id": "invoice_cue_7",
+      "patterns": [
+        "invoice 7",
+        "invoice section 7",
+        "INVOICE-7",
+        "invoice bloco 7",
+        "invoice area 7"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_7",
+      "curationReason": "weighted:invoice_cue_7:domain_general"
+    },
+    {
+      "id": "invoice_cue_8",
+      "patterns": [
+        "invoice 8",
+        "invoice section 8",
+        "INVOICE-8",
+        "invoice bloco 8",
+        "invoice area 8"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_8",
+      "curationReason": "weighted:invoice_cue_8:domain_general"
+    },
+    {
+      "id": "invoice_cue_9",
+      "patterns": [
+        "invoice 9",
+        "invoice section 9",
+        "INVOICE-9",
+        "invoice bloco 9",
+        "invoice area 9"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_9",
+      "curationReason": "weighted:invoice_cue_9:domain_general"
+    },
+    {
+      "id": "invoice_cue_10",
+      "patterns": [
+        "invoice 10",
+        "invoice section 10",
+        "INVOICE-10",
+        "invoice bloco 10",
+        "invoice area 10"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_10",
+      "curationReason": "weighted:invoice_cue_10:domain_general"
+    },
+    {
+      "id": "invoice_cue_11",
+      "patterns": [
+        "invoice 11",
+        "invoice section 11",
+        "INVOICE-11",
+        "invoice bloco 11",
+        "invoice area 11"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_11",
+      "curationReason": "weighted:invoice_cue_11:domain_general"
+    },
+    {
+      "id": "invoice_cue_12",
+      "patterns": [
+        "invoice 12",
+        "invoice section 12",
+        "INVOICE-12",
+        "invoice bloco 12",
+        "invoice area 12"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_12",
+      "curationReason": "weighted:invoice_cue_12:domain_general"
+    },
+    {
+      "id": "invoice_cue_13",
+      "patterns": [
+        "invoice 13",
+        "invoice section 13",
+        "INVOICE-13",
+        "invoice bloco 13",
+        "invoice area 13"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_13",
+      "curationReason": "weighted:invoice_cue_13:domain_general"
+    },
+    {
+      "id": "invoice_cue_14",
+      "patterns": [
+        "invoice 14",
+        "invoice section 14",
+        "INVOICE-14",
+        "invoice bloco 14",
+        "invoice area 14"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_14",
+      "curationReason": "weighted:invoice_cue_14:domain_general"
+    },
+    {
+      "id": "invoice_cue_15",
+      "patterns": [
+        "invoice 15",
+        "invoice section 15",
+        "INVOICE-15",
+        "invoice bloco 15",
+        "invoice area 15"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_15",
+      "curationReason": "weighted:invoice_cue_15:domain_general"
+    },
+    {
+      "id": "invoice_cue_16",
+      "patterns": [
+        "invoice 16",
+        "invoice section 16",
+        "INVOICE-16",
+        "invoice bloco 16",
+        "invoice area 16"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_16",
+      "curationReason": "weighted:invoice_cue_16:domain_general"
+    },
+    {
+      "id": "invoice_cue_17",
+      "patterns": [
+        "invoice 17",
+        "invoice section 17",
+        "INVOICE-17",
+        "invoice bloco 17",
+        "invoice area 17"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_17",
+      "curationReason": "weighted:invoice_cue_17:domain_general"
+    },
+    {
+      "id": "invoice_cue_18",
+      "patterns": [
+        "invoice 18",
+        "invoice section 18",
+        "INVOICE-18",
+        "invoice bloco 18",
+        "invoice area 18"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_18",
+      "curationReason": "weighted:invoice_cue_18:domain_general"
+    },
+    {
+      "id": "invoice_cue_19",
+      "patterns": [
+        "invoice 19",
+        "invoice section 19",
+        "INVOICE-19",
+        "invoice bloco 19",
+        "invoice area 19"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_19",
+      "curationReason": "weighted:invoice_cue_19:domain_general"
+    },
+    {
+      "id": "invoice_cue_20",
+      "patterns": [
+        "invoice 20",
+        "invoice section 20",
+        "INVOICE-20",
+        "invoice bloco 20",
+        "invoice area 20"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_20",
+      "curationReason": "weighted:invoice_cue_20:domain_general"
+    },
+    {
+      "id": "invoice_cue_21",
+      "patterns": [
+        "invoice 21",
+        "invoice section 21",
+        "INVOICE-21",
+        "invoice bloco 21",
+        "invoice area 21"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_21",
+      "curationReason": "weighted:invoice_cue_21:domain_general"
+    },
+    {
+      "id": "invoice_cue_22",
+      "patterns": [
+        "invoice 22",
+        "invoice section 22",
+        "INVOICE-22",
+        "invoice bloco 22",
+        "invoice area 22"
+      ],
+      "meaning": "invoice",
+      "priority": 500,
+      "scope": "layout:invoice",
+      "disambiguationRuleId": "cues_disambiguation_general_invoice_cue_22",
+      "curationReason": "weighted:invoice_cue_22:domain_general"
+    },
+    {
+      "id": "disclosure_cue_1",
+      "patterns": [
+        "disclosure 1",
+        "disclosure section 1",
+        "DISCLOSURE-1",
+        "disclosure bloco 1",
+        "disclosure area 1"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_1",
+      "curationReason": "weighted:disclosure_cue_1:domain_general"
+    },
+    {
+      "id": "disclosure_cue_2",
+      "patterns": [
+        "disclosure 2",
+        "disclosure section 2",
+        "DISCLOSURE-2",
+        "disclosure bloco 2",
+        "disclosure area 2"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_2",
+      "curationReason": "weighted:disclosure_cue_2:domain_general"
+    },
+    {
+      "id": "disclosure_cue_3",
+      "patterns": [
+        "disclosure 3",
+        "disclosure section 3",
+        "DISCLOSURE-3",
+        "disclosure bloco 3",
+        "disclosure area 3"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_3",
+      "curationReason": "weighted:disclosure_cue_3:domain_general"
+    },
+    {
+      "id": "disclosure_cue_4",
+      "patterns": [
+        "disclosure 4",
+        "disclosure section 4",
+        "DISCLOSURE-4",
+        "disclosure bloco 4",
+        "disclosure area 4"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_4",
+      "curationReason": "weighted:disclosure_cue_4:domain_general"
+    },
+    {
+      "id": "disclosure_cue_5",
+      "patterns": [
+        "disclosure 5",
+        "disclosure section 5",
+        "DISCLOSURE-5",
+        "disclosure bloco 5",
+        "disclosure area 5"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_5",
+      "curationReason": "weighted:disclosure_cue_5:domain_general"
+    },
+    {
+      "id": "disclosure_cue_6",
+      "patterns": [
+        "disclosure 6",
+        "disclosure section 6",
+        "DISCLOSURE-6",
+        "disclosure bloco 6",
+        "disclosure area 6"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_6",
+      "curationReason": "weighted:disclosure_cue_6:domain_general"
+    },
+    {
+      "id": "disclosure_cue_7",
+      "patterns": [
+        "disclosure 7",
+        "disclosure section 7",
+        "DISCLOSURE-7",
+        "disclosure bloco 7",
+        "disclosure area 7"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_7",
+      "curationReason": "weighted:disclosure_cue_7:domain_general"
+    },
+    {
+      "id": "disclosure_cue_8",
+      "patterns": [
+        "disclosure 8",
+        "disclosure section 8",
+        "DISCLOSURE-8",
+        "disclosure bloco 8",
+        "disclosure area 8"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_8",
+      "curationReason": "weighted:disclosure_cue_8:domain_general"
+    },
+    {
+      "id": "disclosure_cue_9",
+      "patterns": [
+        "disclosure 9",
+        "disclosure section 9",
+        "DISCLOSURE-9",
+        "disclosure bloco 9",
+        "disclosure area 9"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_9",
+      "curationReason": "weighted:disclosure_cue_9:domain_general"
+    },
+    {
+      "id": "disclosure_cue_10",
+      "patterns": [
+        "disclosure 10",
+        "disclosure section 10",
+        "DISCLOSURE-10",
+        "disclosure bloco 10",
+        "disclosure area 10"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_10",
+      "curationReason": "weighted:disclosure_cue_10:domain_general"
+    },
+    {
+      "id": "disclosure_cue_11",
+      "patterns": [
+        "disclosure 11",
+        "disclosure section 11",
+        "DISCLOSURE-11",
+        "disclosure bloco 11",
+        "disclosure area 11"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_11",
+      "curationReason": "weighted:disclosure_cue_11:domain_general"
+    },
+    {
+      "id": "disclosure_cue_12",
+      "patterns": [
+        "disclosure 12",
+        "disclosure section 12",
+        "DISCLOSURE-12",
+        "disclosure bloco 12",
+        "disclosure area 12"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_12",
+      "curationReason": "weighted:disclosure_cue_12:domain_general"
+    },
+    {
+      "id": "disclosure_cue_13",
+      "patterns": [
+        "disclosure 13",
+        "disclosure section 13",
+        "DISCLOSURE-13",
+        "disclosure bloco 13",
+        "disclosure area 13"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_13",
+      "curationReason": "weighted:disclosure_cue_13:domain_general"
+    },
+    {
+      "id": "disclosure_cue_14",
+      "patterns": [
+        "disclosure 14",
+        "disclosure section 14",
+        "DISCLOSURE-14",
+        "disclosure bloco 14",
+        "disclosure area 14"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_14",
+      "curationReason": "weighted:disclosure_cue_14:domain_general"
+    },
+    {
+      "id": "disclosure_cue_15",
+      "patterns": [
+        "disclosure 15",
+        "disclosure section 15",
+        "DISCLOSURE-15",
+        "disclosure bloco 15",
+        "disclosure area 15"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_15",
+      "curationReason": "weighted:disclosure_cue_15:domain_general"
+    },
+    {
+      "id": "disclosure_cue_16",
+      "patterns": [
+        "disclosure 16",
+        "disclosure section 16",
+        "DISCLOSURE-16",
+        "disclosure bloco 16",
+        "disclosure area 16"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_16",
+      "curationReason": "weighted:disclosure_cue_16:domain_general"
+    },
+    {
+      "id": "disclosure_cue_17",
+      "patterns": [
+        "disclosure 17",
+        "disclosure section 17",
+        "DISCLOSURE-17",
+        "disclosure bloco 17",
+        "disclosure area 17"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_17",
+      "curationReason": "weighted:disclosure_cue_17:domain_general"
+    },
+    {
+      "id": "disclosure_cue_18",
+      "patterns": [
+        "disclosure 18",
+        "disclosure section 18",
+        "DISCLOSURE-18",
+        "disclosure bloco 18",
+        "disclosure area 18"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_18",
+      "curationReason": "weighted:disclosure_cue_18:domain_general"
+    },
+    {
+      "id": "disclosure_cue_19",
+      "patterns": [
+        "disclosure 19",
+        "disclosure section 19",
+        "DISCLOSURE-19",
+        "disclosure bloco 19",
+        "disclosure area 19"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_19",
+      "curationReason": "weighted:disclosure_cue_19:domain_general"
+    },
+    {
+      "id": "disclosure_cue_20",
+      "patterns": [
+        "disclosure 20",
+        "disclosure section 20",
+        "DISCLOSURE-20",
+        "disclosure bloco 20",
+        "disclosure area 20"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_20",
+      "curationReason": "weighted:disclosure_cue_20:domain_general"
+    },
+    {
+      "id": "disclosure_cue_21",
+      "patterns": [
+        "disclosure 21",
+        "disclosure section 21",
+        "DISCLOSURE-21",
+        "disclosure bloco 21",
+        "disclosure area 21"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_21",
+      "curationReason": "weighted:disclosure_cue_21:domain_general"
+    },
+    {
+      "id": "disclosure_cue_22",
+      "patterns": [
+        "disclosure 22",
+        "disclosure section 22",
+        "DISCLOSURE-22",
+        "disclosure bloco 22",
+        "disclosure area 22"
+      ],
+      "meaning": "disclosure",
+      "priority": 500,
+      "scope": "layout:disclosure",
+      "disambiguationRuleId": "cues_disambiguation_general_disclosure_cue_22",
+      "curationReason": "weighted:disclosure_cue_22:domain_general"
+    },
+    {
+      "id": "signature_block_cue_1",
+      "patterns": [
+        "signature_block 1",
+        "signature_block section 1",
+        "SIGNATURE_BLOCK-1",
+        "signature_block bloco 1",
+        "signature_block area 1"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_1",
+      "curationReason": "weighted:signature_block_cue_1:domain_general"
+    },
+    {
+      "id": "signature_block_cue_2",
+      "patterns": [
+        "signature_block 2",
+        "signature_block section 2",
+        "SIGNATURE_BLOCK-2",
+        "signature_block bloco 2",
+        "signature_block area 2"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_2",
+      "curationReason": "weighted:signature_block_cue_2:domain_general"
+    },
+    {
+      "id": "signature_block_cue_3",
+      "patterns": [
+        "signature_block 3",
+        "signature_block section 3",
+        "SIGNATURE_BLOCK-3",
+        "signature_block bloco 3",
+        "signature_block area 3"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_3",
+      "curationReason": "weighted:signature_block_cue_3:domain_general"
+    },
+    {
+      "id": "signature_block_cue_4",
+      "patterns": [
+        "signature_block 4",
+        "signature_block section 4",
+        "SIGNATURE_BLOCK-4",
+        "signature_block bloco 4",
+        "signature_block area 4"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_4",
+      "curationReason": "weighted:signature_block_cue_4:domain_general"
+    },
+    {
+      "id": "signature_block_cue_5",
+      "patterns": [
+        "signature_block 5",
+        "signature_block section 5",
+        "SIGNATURE_BLOCK-5",
+        "signature_block bloco 5",
+        "signature_block area 5"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_5",
+      "curationReason": "weighted:signature_block_cue_5:domain_general"
+    },
+    {
+      "id": "signature_block_cue_6",
+      "patterns": [
+        "signature_block 6",
+        "signature_block section 6",
+        "SIGNATURE_BLOCK-6",
+        "signature_block bloco 6",
+        "signature_block area 6"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_6",
+      "curationReason": "weighted:signature_block_cue_6:domain_general"
+    },
+    {
+      "id": "signature_block_cue_7",
+      "patterns": [
+        "signature_block 7",
+        "signature_block section 7",
+        "SIGNATURE_BLOCK-7",
+        "signature_block bloco 7",
+        "signature_block area 7"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_7",
+      "curationReason": "weighted:signature_block_cue_7:domain_general"
+    },
+    {
+      "id": "signature_block_cue_8",
+      "patterns": [
+        "signature_block 8",
+        "signature_block section 8",
+        "SIGNATURE_BLOCK-8",
+        "signature_block bloco 8",
+        "signature_block area 8"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_8",
+      "curationReason": "weighted:signature_block_cue_8:domain_general"
+    },
+    {
+      "id": "signature_block_cue_9",
+      "patterns": [
+        "signature_block 9",
+        "signature_block section 9",
+        "SIGNATURE_BLOCK-9",
+        "signature_block bloco 9",
+        "signature_block area 9"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_9",
+      "curationReason": "weighted:signature_block_cue_9:domain_general"
+    },
+    {
+      "id": "signature_block_cue_10",
+      "patterns": [
+        "signature_block 10",
+        "signature_block section 10",
+        "SIGNATURE_BLOCK-10",
+        "signature_block bloco 10",
+        "signature_block area 10"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_10",
+      "curationReason": "weighted:signature_block_cue_10:domain_general"
+    },
+    {
+      "id": "signature_block_cue_11",
+      "patterns": [
+        "signature_block 11",
+        "signature_block section 11",
+        "SIGNATURE_BLOCK-11",
+        "signature_block bloco 11",
+        "signature_block area 11"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_11",
+      "curationReason": "weighted:signature_block_cue_11:domain_general"
+    },
+    {
+      "id": "signature_block_cue_12",
+      "patterns": [
+        "signature_block 12",
+        "signature_block section 12",
+        "SIGNATURE_BLOCK-12",
+        "signature_block bloco 12",
+        "signature_block area 12"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_12",
+      "curationReason": "weighted:signature_block_cue_12:domain_general"
+    },
+    {
+      "id": "signature_block_cue_13",
+      "patterns": [
+        "signature_block 13",
+        "signature_block section 13",
+        "SIGNATURE_BLOCK-13",
+        "signature_block bloco 13",
+        "signature_block area 13"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_13",
+      "curationReason": "weighted:signature_block_cue_13:domain_general"
+    },
+    {
+      "id": "signature_block_cue_14",
+      "patterns": [
+        "signature_block 14",
+        "signature_block section 14",
+        "SIGNATURE_BLOCK-14",
+        "signature_block bloco 14",
+        "signature_block area 14"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_14",
+      "curationReason": "weighted:signature_block_cue_14:domain_general"
+    },
+    {
+      "id": "signature_block_cue_15",
+      "patterns": [
+        "signature_block 15",
+        "signature_block section 15",
+        "SIGNATURE_BLOCK-15",
+        "signature_block bloco 15",
+        "signature_block area 15"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_15",
+      "curationReason": "weighted:signature_block_cue_15:domain_general"
+    },
+    {
+      "id": "signature_block_cue_16",
+      "patterns": [
+        "signature_block 16",
+        "signature_block section 16",
+        "SIGNATURE_BLOCK-16",
+        "signature_block bloco 16",
+        "signature_block area 16"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_16",
+      "curationReason": "weighted:signature_block_cue_16:domain_general"
+    },
+    {
+      "id": "signature_block_cue_17",
+      "patterns": [
+        "signature_block 17",
+        "signature_block section 17",
+        "SIGNATURE_BLOCK-17",
+        "signature_block bloco 17",
+        "signature_block area 17"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_17",
+      "curationReason": "weighted:signature_block_cue_17:domain_general"
+    },
+    {
+      "id": "signature_block_cue_18",
+      "patterns": [
+        "signature_block 18",
+        "signature_block section 18",
+        "SIGNATURE_BLOCK-18",
+        "signature_block bloco 18",
+        "signature_block area 18"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_18",
+      "curationReason": "weighted:signature_block_cue_18:domain_general"
+    },
+    {
+      "id": "signature_block_cue_19",
+      "patterns": [
+        "signature_block 19",
+        "signature_block section 19",
+        "SIGNATURE_BLOCK-19",
+        "signature_block bloco 19",
+        "signature_block area 19"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_19",
+      "curationReason": "weighted:signature_block_cue_19:domain_general"
+    },
+    {
+      "id": "signature_block_cue_20",
+      "patterns": [
+        "signature_block 20",
+        "signature_block section 20",
+        "SIGNATURE_BLOCK-20",
+        "signature_block bloco 20",
+        "signature_block area 20"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_20",
+      "curationReason": "weighted:signature_block_cue_20:domain_general"
+    },
+    {
+      "id": "signature_block_cue_21",
+      "patterns": [
+        "signature_block 21",
+        "signature_block section 21",
+        "SIGNATURE_BLOCK-21",
+        "signature_block bloco 21",
+        "signature_block area 21"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_21",
+      "curationReason": "weighted:signature_block_cue_21:domain_general"
+    },
+    {
+      "id": "signature_block_cue_22",
+      "patterns": [
+        "signature_block 22",
+        "signature_block section 22",
+        "SIGNATURE_BLOCK-22",
+        "signature_block bloco 22",
+        "signature_block area 22"
+      ],
+      "meaning": "signature_block",
+      "priority": 500,
+      "scope": "layout:signature_block",
+      "disambiguationRuleId": "cues_disambiguation_general_signature_block_cue_22",
+      "curationReason": "weighted:signature_block_cue_22:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_1",
+      "patterns": [
+        "executive_summary 1",
+        "executive_summary section 1",
+        "EXECUTIVE_SUMMARY-1",
+        "executive_summary bloco 1",
+        "executive_summary area 1"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_1",
+      "curationReason": "weighted:executive_summary_cue_1:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_2",
+      "patterns": [
+        "executive_summary 2",
+        "executive_summary section 2",
+        "EXECUTIVE_SUMMARY-2",
+        "executive_summary bloco 2",
+        "executive_summary area 2"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_2",
+      "curationReason": "weighted:executive_summary_cue_2:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_3",
+      "patterns": [
+        "executive_summary 3",
+        "executive_summary section 3",
+        "EXECUTIVE_SUMMARY-3",
+        "executive_summary bloco 3",
+        "executive_summary area 3"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_3",
+      "curationReason": "weighted:executive_summary_cue_3:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_4",
+      "patterns": [
+        "executive_summary 4",
+        "executive_summary section 4",
+        "EXECUTIVE_SUMMARY-4",
+        "executive_summary bloco 4",
+        "executive_summary area 4"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_4",
+      "curationReason": "weighted:executive_summary_cue_4:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_5",
+      "patterns": [
+        "executive_summary 5",
+        "executive_summary section 5",
+        "EXECUTIVE_SUMMARY-5",
+        "executive_summary bloco 5",
+        "executive_summary area 5"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_5",
+      "curationReason": "weighted:executive_summary_cue_5:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_6",
+      "patterns": [
+        "executive_summary 6",
+        "executive_summary section 6",
+        "EXECUTIVE_SUMMARY-6",
+        "executive_summary bloco 6",
+        "executive_summary area 6"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_6",
+      "curationReason": "weighted:executive_summary_cue_6:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_7",
+      "patterns": [
+        "executive_summary 7",
+        "executive_summary section 7",
+        "EXECUTIVE_SUMMARY-7",
+        "executive_summary bloco 7",
+        "executive_summary area 7"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_7",
+      "curationReason": "weighted:executive_summary_cue_7:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_8",
+      "patterns": [
+        "executive_summary 8",
+        "executive_summary section 8",
+        "EXECUTIVE_SUMMARY-8",
+        "executive_summary bloco 8",
+        "executive_summary area 8"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_8",
+      "curationReason": "weighted:executive_summary_cue_8:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_9",
+      "patterns": [
+        "executive_summary 9",
+        "executive_summary section 9",
+        "EXECUTIVE_SUMMARY-9",
+        "executive_summary bloco 9",
+        "executive_summary area 9"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_9",
+      "curationReason": "weighted:executive_summary_cue_9:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_10",
+      "patterns": [
+        "executive_summary 10",
+        "executive_summary section 10",
+        "EXECUTIVE_SUMMARY-10",
+        "executive_summary bloco 10",
+        "executive_summary area 10"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_10",
+      "curationReason": "weighted:executive_summary_cue_10:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_11",
+      "patterns": [
+        "executive_summary 11",
+        "executive_summary section 11",
+        "EXECUTIVE_SUMMARY-11",
+        "executive_summary bloco 11",
+        "executive_summary area 11"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_11",
+      "curationReason": "weighted:executive_summary_cue_11:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_12",
+      "patterns": [
+        "executive_summary 12",
+        "executive_summary section 12",
+        "EXECUTIVE_SUMMARY-12",
+        "executive_summary bloco 12",
+        "executive_summary area 12"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_12",
+      "curationReason": "weighted:executive_summary_cue_12:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_13",
+      "patterns": [
+        "executive_summary 13",
+        "executive_summary section 13",
+        "EXECUTIVE_SUMMARY-13",
+        "executive_summary bloco 13",
+        "executive_summary area 13"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_13",
+      "curationReason": "weighted:executive_summary_cue_13:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_14",
+      "patterns": [
+        "executive_summary 14",
+        "executive_summary section 14",
+        "EXECUTIVE_SUMMARY-14",
+        "executive_summary bloco 14",
+        "executive_summary area 14"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_14",
+      "curationReason": "weighted:executive_summary_cue_14:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_15",
+      "patterns": [
+        "executive_summary 15",
+        "executive_summary section 15",
+        "EXECUTIVE_SUMMARY-15",
+        "executive_summary bloco 15",
+        "executive_summary area 15"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_15",
+      "curationReason": "weighted:executive_summary_cue_15:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_16",
+      "patterns": [
+        "executive_summary 16",
+        "executive_summary section 16",
+        "EXECUTIVE_SUMMARY-16",
+        "executive_summary bloco 16",
+        "executive_summary area 16"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_16",
+      "curationReason": "weighted:executive_summary_cue_16:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_17",
+      "patterns": [
+        "executive_summary 17",
+        "executive_summary section 17",
+        "EXECUTIVE_SUMMARY-17",
+        "executive_summary bloco 17",
+        "executive_summary area 17"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_17",
+      "curationReason": "weighted:executive_summary_cue_17:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_18",
+      "patterns": [
+        "executive_summary 18",
+        "executive_summary section 18",
+        "EXECUTIVE_SUMMARY-18",
+        "executive_summary bloco 18",
+        "executive_summary area 18"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_18",
+      "curationReason": "weighted:executive_summary_cue_18:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_19",
+      "patterns": [
+        "executive_summary 19",
+        "executive_summary section 19",
+        "EXECUTIVE_SUMMARY-19",
+        "executive_summary bloco 19",
+        "executive_summary area 19"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_19",
+      "curationReason": "weighted:executive_summary_cue_19:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_20",
+      "patterns": [
+        "executive_summary 20",
+        "executive_summary section 20",
+        "EXECUTIVE_SUMMARY-20",
+        "executive_summary bloco 20",
+        "executive_summary area 20"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_20",
+      "curationReason": "weighted:executive_summary_cue_20:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_21",
+      "patterns": [
+        "executive_summary 21",
+        "executive_summary section 21",
+        "EXECUTIVE_SUMMARY-21",
+        "executive_summary bloco 21",
+        "executive_summary area 21"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_21",
+      "curationReason": "weighted:executive_summary_cue_21:domain_general"
+    },
+    {
+      "id": "executive_summary_cue_22",
+      "patterns": [
+        "executive_summary 22",
+        "executive_summary section 22",
+        "EXECUTIVE_SUMMARY-22",
+        "executive_summary bloco 22",
+        "executive_summary area 22"
+      ],
+      "meaning": "executive_summary",
+      "priority": 500,
+      "scope": "layout:executive_summary",
+      "disambiguationRuleId": "cues_disambiguation_general_executive_summary_cue_22",
+      "curationReason": "weighted:executive_summary_cue_22:domain_general"
+    },
+    {
+      "id": "table_block_cue_1",
+      "patterns": [
+        "table_block 1",
+        "table_block section 1",
+        "TABLE_BLOCK-1",
+        "table_block bloco 1",
+        "table_block area 1"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_1",
+      "curationReason": "weighted:table_block_cue_1:domain_general"
+    },
+    {
+      "id": "table_block_cue_2",
+      "patterns": [
+        "table_block 2",
+        "table_block section 2",
+        "TABLE_BLOCK-2",
+        "table_block bloco 2",
+        "table_block area 2"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_2",
+      "curationReason": "weighted:table_block_cue_2:domain_general"
+    },
+    {
+      "id": "table_block_cue_3",
+      "patterns": [
+        "table_block 3",
+        "table_block section 3",
+        "TABLE_BLOCK-3",
+        "table_block bloco 3",
+        "table_block area 3"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_3",
+      "curationReason": "weighted:table_block_cue_3:domain_general"
+    },
+    {
+      "id": "table_block_cue_4",
+      "patterns": [
+        "table_block 4",
+        "table_block section 4",
+        "TABLE_BLOCK-4",
+        "table_block bloco 4",
+        "table_block area 4"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_4",
+      "curationReason": "weighted:table_block_cue_4:domain_general"
+    },
+    {
+      "id": "table_block_cue_5",
+      "patterns": [
+        "table_block 5",
+        "table_block section 5",
+        "TABLE_BLOCK-5",
+        "table_block bloco 5",
+        "table_block area 5"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_5",
+      "curationReason": "weighted:table_block_cue_5:domain_general"
+    },
+    {
+      "id": "table_block_cue_6",
+      "patterns": [
+        "table_block 6",
+        "table_block section 6",
+        "TABLE_BLOCK-6",
+        "table_block bloco 6",
+        "table_block area 6"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_6",
+      "curationReason": "weighted:table_block_cue_6:domain_general"
+    },
+    {
+      "id": "table_block_cue_7",
+      "patterns": [
+        "table_block 7",
+        "table_block section 7",
+        "TABLE_BLOCK-7",
+        "table_block bloco 7",
+        "table_block area 7"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_7",
+      "curationReason": "weighted:table_block_cue_7:domain_general"
+    },
+    {
+      "id": "table_block_cue_8",
+      "patterns": [
+        "table_block 8",
+        "table_block section 8",
+        "TABLE_BLOCK-8",
+        "table_block bloco 8",
+        "table_block area 8"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_8",
+      "curationReason": "weighted:table_block_cue_8:domain_general"
+    },
+    {
+      "id": "table_block_cue_9",
+      "patterns": [
+        "table_block 9",
+        "table_block section 9",
+        "TABLE_BLOCK-9",
+        "table_block bloco 9",
+        "table_block area 9"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_9",
+      "curationReason": "weighted:table_block_cue_9:domain_general"
+    },
+    {
+      "id": "table_block_cue_10",
+      "patterns": [
+        "table_block 10",
+        "table_block section 10",
+        "TABLE_BLOCK-10",
+        "table_block bloco 10",
+        "table_block area 10"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_10",
+      "curationReason": "weighted:table_block_cue_10:domain_general"
+    },
+    {
+      "id": "table_block_cue_11",
+      "patterns": [
+        "table_block 11",
+        "table_block section 11",
+        "TABLE_BLOCK-11",
+        "table_block bloco 11",
+        "table_block area 11"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_11",
+      "curationReason": "weighted:table_block_cue_11:domain_general"
+    },
+    {
+      "id": "table_block_cue_12",
+      "patterns": [
+        "table_block 12",
+        "table_block section 12",
+        "TABLE_BLOCK-12",
+        "table_block bloco 12",
+        "table_block area 12"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_12",
+      "curationReason": "weighted:table_block_cue_12:domain_general"
+    },
+    {
+      "id": "table_block_cue_13",
+      "patterns": [
+        "table_block 13",
+        "table_block section 13",
+        "TABLE_BLOCK-13",
+        "table_block bloco 13",
+        "table_block area 13"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_13",
+      "curationReason": "weighted:table_block_cue_13:domain_general"
+    },
+    {
+      "id": "table_block_cue_14",
+      "patterns": [
+        "table_block 14",
+        "table_block section 14",
+        "TABLE_BLOCK-14",
+        "table_block bloco 14",
+        "table_block area 14"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_14",
+      "curationReason": "weighted:table_block_cue_14:domain_general"
+    },
+    {
+      "id": "table_block_cue_15",
+      "patterns": [
+        "table_block 15",
+        "table_block section 15",
+        "TABLE_BLOCK-15",
+        "table_block bloco 15",
+        "table_block area 15"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_15",
+      "curationReason": "weighted:table_block_cue_15:domain_general"
+    },
+    {
+      "id": "table_block_cue_16",
+      "patterns": [
+        "table_block 16",
+        "table_block section 16",
+        "TABLE_BLOCK-16",
+        "table_block bloco 16",
+        "table_block area 16"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_16",
+      "curationReason": "weighted:table_block_cue_16:domain_general"
+    },
+    {
+      "id": "table_block_cue_17",
+      "patterns": [
+        "table_block 17",
+        "table_block section 17",
+        "TABLE_BLOCK-17",
+        "table_block bloco 17",
+        "table_block area 17"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_17",
+      "curationReason": "weighted:table_block_cue_17:domain_general"
+    },
+    {
+      "id": "table_block_cue_18",
+      "patterns": [
+        "table_block 18",
+        "table_block section 18",
+        "TABLE_BLOCK-18",
+        "table_block bloco 18",
+        "table_block area 18"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_18",
+      "curationReason": "weighted:table_block_cue_18:domain_general"
+    },
+    {
+      "id": "table_block_cue_19",
+      "patterns": [
+        "table_block 19",
+        "table_block section 19",
+        "TABLE_BLOCK-19",
+        "table_block bloco 19",
+        "table_block area 19"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_19",
+      "curationReason": "weighted:table_block_cue_19:domain_general"
+    },
+    {
+      "id": "table_block_cue_20",
+      "patterns": [
+        "table_block 20",
+        "table_block section 20",
+        "TABLE_BLOCK-20",
+        "table_block bloco 20",
+        "table_block area 20"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_20",
+      "curationReason": "weighted:table_block_cue_20:domain_general"
+    },
+    {
+      "id": "table_block_cue_21",
+      "patterns": [
+        "table_block 21",
+        "table_block section 21",
+        "TABLE_BLOCK-21",
+        "table_block bloco 21",
+        "table_block area 21"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_21",
+      "curationReason": "weighted:table_block_cue_21:domain_general"
+    },
+    {
+      "id": "table_block_cue_22",
+      "patterns": [
+        "table_block 22",
+        "table_block section 22",
+        "TABLE_BLOCK-22",
+        "table_block bloco 22",
+        "table_block area 22"
+      ],
+      "meaning": "table_block",
+      "priority": 500,
+      "scope": "layout:table_block",
+      "disambiguationRuleId": "cues_disambiguation_general_table_block_cue_22",
+      "curationReason": "weighted:table_block_cue_22:domain_general"
+    }
+  ]
+}

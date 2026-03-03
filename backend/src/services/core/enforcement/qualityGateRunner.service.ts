@@ -548,7 +548,55 @@ function normalizeRuleExpression(rawExpression: string): string {
   );
   expression = expression.replace(/\bsum\(/g, "diSum(");
   expression = expression.replace(/\blog10\(/g, "diLog10(");
+  expression = expression.replace(/\babs\(/g, "Math.abs(");
+  expression = expression.replace(
+    /\bnumbersMatchSource\(/g,
+    "diNumbersMatchSource(",
+  );
   return expression;
+}
+
+function extractCitedDocsFromResponse(
+  responseText: string,
+  knownDocNames: Map<string, string>,
+): string[] {
+  const cited = new Set<string>();
+  const filePattern = /[\w.()-]+\.(?:pdf|xlsx?|pptx?|docx?|csv|txt|jpg|jpeg|png)/gi;
+  const fileMatches = responseText.match(filePattern) || [];
+  for (const match of fileMatches) {
+    const lower = match.toLowerCase();
+    for (const [docId, name] of knownDocNames) {
+      if (lower === name.toLowerCase() || lower.includes(name.toLowerCase())) {
+        cited.add(docId);
+      }
+    }
+  }
+  for (const [docId, name] of knownDocNames) {
+    if (name && responseText.toLowerCase().includes(name.toLowerCase())) {
+      cited.add(docId);
+    }
+  }
+  return Array.from(cited);
+}
+
+function extractSectionRefsFromResponse(responseText: string): string[] {
+  const pattern = /\b(?:Section|Chapter|Article|Clause)\s+\d+(?:\.\d+)*/gi;
+  const matches = responseText.match(pattern) || [];
+  return Array.from(new Set(matches.map((m) => m.trim())));
+}
+
+function deriveEvidenceStrength(
+  evidenceItems: Array<{ snippet?: string; docId?: string; score?: number }> | undefined,
+): string {
+  if (!Array.isArray(evidenceItems) || evidenceItems.length === 0) return "weak";
+  const scores = evidenceItems
+    .map((item) => Number((item as Record<string, unknown>).score ?? 0))
+    .filter((s) => Number.isFinite(s) && s > 0);
+  if (scores.length === 0) return "weak";
+  const topScore = Math.max(...scores);
+  if (topScore < 0.4) return "weak";
+  if (topScore < 0.6) return "moderate";
+  return "strong";
 }
 
 function extractDocIdsFromEvidence(
@@ -562,6 +610,102 @@ function extractDocIdsFromEvidence(
         .filter(Boolean),
     ),
   );
+}
+
+function extractSourceNumericContext(
+  evidenceItems: Array<{ snippet?: string; docId?: string }> | undefined,
+): Record<string, unknown> {
+  if (!Array.isArray(evidenceItems) || evidenceItems.length === 0) return {};
+  const allText = evidenceItems
+    .map((item) => String(item?.snippet || ""))
+    .join(" ");
+  if (!allText.trim()) return {};
+
+  const currencyMatches = allText.match(/R\$|\$|€|£|EUR|USD|BRL|GBP/gi) || [];
+  const currencyFreq = new Map<string, number>();
+  for (const m of currencyMatches) {
+    const normalized = m.toUpperCase().replace("R$", "R$");
+    currencyFreq.set(normalized, (currencyFreq.get(normalized) ?? 0) + 1);
+  }
+  let dominantCurrency: string | null = null;
+  let maxFreq = 0;
+  for (const [currency, freq] of currencyFreq) {
+    if (freq > maxFreq) { dominantCurrency = currency; maxFreq = freq; }
+  }
+
+  const isPtBrFormat = /\d{1,3}\.\d{3},\d{2}/.test(allText);
+  const isEnUsFormat = /\d{1,3},\d{3}\.\d{2}/.test(allText);
+  const separatorConvention = isPtBrFormat && !isEnUsFormat
+    ? "pt_br"
+    : isEnUsFormat && !isPtBrFormat
+      ? "en_us"
+      : "unknown";
+
+  const numericValues = (allText.match(/[-+]?\d[\d.,]*/g) || [])
+    .map((raw) => {
+      const cleaned = raw.replace(/[.,]/g, "");
+      return { raw, digitCount: cleaned.replace(/[-+]/g, "").length };
+    });
+
+  const hasPercent = /%/.test(allText);
+  const hasUnit = /\b(?:kg|g|mg|lb|lbs|km|mi|hours?|hrs?|days?|months?|years?)\b/i.test(allText);
+
+  return {
+    currencySymbol: dominantCurrency,
+    numberFormat: { separatorConvention },
+    numericValues,
+    percentSymbolPresent: hasPercent,
+    unitPresent: hasUnit,
+    rawDigitCount: (allText.match(/\d/g) || []).length,
+    digitSequence: allText.match(/\d+/g)?.join("") || "",
+  };
+}
+
+function diNumbersMatchSource(
+  outputNumbers: unknown[],
+  sourceNumbers: unknown[],
+): { magnitudeError: boolean; separatorSwap: boolean; digitTransposition: boolean } {
+  const result = { magnitudeError: false, separatorSwap: false, digitTransposition: false };
+  if (!Array.isArray(outputNumbers) || !Array.isArray(sourceNumbers)) return result;
+
+  const outVals = outputNumbers
+    .map((n) => {
+      const rec = n as Record<string, unknown>;
+      const raw = String(rec?.raw ?? n ?? "");
+      const cleaned = raw.replace(/[^0-9.-]/g, "");
+      return { raw, digits: raw.replace(/\D/g, ""), value: parseFloat(cleaned) };
+    })
+    .filter((v) => Number.isFinite(v.value));
+
+  const srcVals = sourceNumbers
+    .map((n) => {
+      const rec = n as Record<string, unknown>;
+      const raw = String(rec?.raw ?? n ?? "");
+      const cleaned = raw.replace(/[^0-9.-]/g, "");
+      return { raw, digits: raw.replace(/\D/g, ""), value: parseFloat(cleaned) };
+    })
+    .filter((v) => Number.isFinite(v.value));
+
+  for (const out of outVals) {
+    for (const src of srcVals) {
+      if (src.value === 0 || out.value === 0) continue;
+      const ratio = out.value / src.value;
+      if ([10, 100, 1000, 0.1, 0.01, 0.001].some((r) => Math.abs(ratio - r) < 0.01)) {
+        result.magnitudeError = true;
+      }
+      if (out.digits === src.digits && Math.abs(out.value - src.value) > 0.01) {
+        result.separatorSwap = true;
+      }
+      if (
+        out.digits.length === src.digits.length &&
+        out.digits !== src.digits &&
+        out.digits.split("").sort().join("") === src.digits.split("").sort().join("")
+      ) {
+        result.digitTransposition = true;
+      }
+    }
+  }
+  return result;
 }
 
 function mergeDeep(baseValue: unknown, overrideValue: unknown): unknown {
@@ -1189,8 +1333,11 @@ export class QualityGateRunnerService {
       evidenceStrength:
         ctx.diPolicyContext?.evidenceStrength !== undefined
           ? ctx.diPolicyContext?.evidenceStrength
-          : "strong",
-      synthesizedDocCount: Number(ctx.diPolicyContext?.synthesizedDocCount ?? 0),
+          : deriveEvidenceStrength(ctx.evidenceItems),
+      synthesizedDocCount: Number(
+        ctx.diPolicyContext?.synthesizedDocCount ??
+        new Set(evidenceDocIds).size,
+      ),
       docNameMap: asRecord(ctx.diPolicyContext?.docNameMap),
       docVersionsLatest: Number(ctx.diPolicyContext?.docVersionsLatest ?? 0),
       conversionRequested: ctx.diPolicyContext?.conversionRequested === true,
@@ -1381,16 +1528,35 @@ export class QualityGateRunnerService {
       containsInlineSources:
         /\b(?:sources|fontes|fuentes)\s*:/i.test(responseText) ||
         /\.(pdf|xlsx?|pptx?|docx?|csv|txt|jpg|jpeg|png)\b/i.test(responseText),
-      citedDocs:
-        asArray(ctx.diPolicyOutput?.citedDocs).length > 0
-          ? asArray(ctx.diPolicyOutput?.citedDocs)
-          : evidenceDocIds,
+      citedDocs: (() => {
+        if (asArray(ctx.diPolicyOutput?.citedDocs).length > 0) {
+          return asArray(ctx.diPolicyOutput?.citedDocs);
+        }
+        const knownDocNames = new Map<string, string>();
+        if (Array.isArray(ctx.evidenceItems)) {
+          for (const item of ctx.evidenceItems) {
+            const docId = String((item as Record<string, unknown>).docId || "").trim();
+            const filename = String(
+              (item as Record<string, unknown>).filename ||
+              (item as Record<string, unknown>).title || "",
+            ).trim();
+            if (docId && filename) knownDocNames.set(docId, filename);
+          }
+        }
+        if (knownDocNames.size > 0) {
+          const cited = extractCitedDocsFromResponse(responseText, knownDocNames);
+          if (cited.length > 0) return cited;
+        }
+        return evidenceDocIds;
+      })(),
       pageRefs,
       sourceDocs: derivedSourceDocs,
       citationFormats,
       sourcesSectionPosition,
       sourcesSectionPresent: Boolean(sourceSectionMatch),
-      sectionRefs: asArray(ctx.diPolicyOutput?.sectionRefs),
+      sectionRefs: asArray(ctx.diPolicyOutput?.sectionRefs).length > 0
+        ? asArray(ctx.diPolicyOutput?.sectionRefs)
+        : extractSectionRefsFromResponse(responseText),
       attributions: asArray(ctx.diPolicyOutput?.attributions),
       qualifyingLanguage,
       citedDocCount:
@@ -1420,6 +1586,8 @@ export class QualityGateRunnerService {
         diMatchesPattern(responseText, pattern, flags),
     };
 
+    const derivedSourceNumeric = extractSourceNumericContext(ctx.evidenceItems);
+
     const baseSource = {
       pageCount: Number(ctx.diPolicySource?.pageCount ?? 0),
       sectionIndex: sourceSectionIndex,
@@ -1427,12 +1595,20 @@ export class QualityGateRunnerService {
       currencySymbol:
         ctx.diPolicySource?.currencySymbol !== undefined
           ? ctx.diPolicySource.currencySymbol
-          : null,
-      numberFormat: asRecord(ctx.diPolicySource?.numberFormat),
+          : (derivedSourceNumeric.currencySymbol ?? null),
+      numberFormat: Object.keys(asRecord(ctx.diPolicySource?.numberFormat)).length > 0
+        ? asRecord(ctx.diPolicySource?.numberFormat)
+        : asRecord(derivedSourceNumeric.numberFormat),
+      numericValues: asArray(
+        ctx.diPolicySource?.numericValues ?? derivedSourceNumeric.numericValues,
+      ),
       percentSymbolPresent:
-        ctx.diPolicySource?.percentSymbolPresent === true ? true : false,
+        ctx.diPolicySource?.percentSymbolPresent === true
+          ? true
+          : Boolean(derivedSourceNumeric.percentSymbolPresent),
       percentValue: toFiniteNumber(ctx.diPolicySource?.percentValue),
-      unitPresent: ctx.diPolicySource?.unitPresent === true,
+      unitPresent: ctx.diPolicySource?.unitPresent === true
+        || Boolean(derivedSourceNumeric.unitPresent),
       unit:
         ctx.diPolicySource?.unit !== undefined ? ctx.diPolicySource.unit : null,
       numericValue: toFiniteNumber(ctx.diPolicySource?.numericValue),
@@ -1442,11 +1618,13 @@ export class QualityGateRunnerService {
         ctx.diPolicySource?.periodLabel !== undefined
           ? ctx.diPolicySource.periodLabel
           : null,
-      rawDigitCount: Number(ctx.diPolicySource?.rawDigitCount ?? 0),
+      rawDigitCount: Number(
+        ctx.diPolicySource?.rawDigitCount ?? derivedSourceNumeric.rawDigitCount ?? 0,
+      ),
       digitSequence:
         ctx.diPolicySource?.digitSequence !== undefined
           ? ctx.diPolicySource.digitSequence
-          : null,
+          : (derivedSourceNumeric.digitSequence ?? null),
       digitSet:
         asArray(ctx.diPolicySource?.digitSet).length > 0
           ? asArray(ctx.diPolicySource?.digitSet)
@@ -1496,6 +1674,7 @@ export class QualityGateRunnerService {
         hasDuplicateDocIds: sourceButtonsHasDuplicateDocIds,
         isOrderedByRelevance: sourceButtonsOrderedByRelevance,
         any: (predicate: unknown) => diAny(sourceButtons, predicate),
+        _items: sourceButtons,
       },
       messageActions: {
         count: messageActions.length,
@@ -1554,6 +1733,7 @@ export class QualityGateRunnerService {
             diIncludes,
             diSum,
             diLog10,
+            diNumbersMatchSource,
           },
         }),
       };

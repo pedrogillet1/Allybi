@@ -1,0 +1,382 @@
+{
+  "_meta": {
+    "id": "di_normalization_rules_vf6f60bcf",
+    "bankId": "di_normalization_rules",
+    "version": "2.1.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "description": "PT-BR and EN-US date locale disambiguation rules with explicit conflict handling for numeric date tokens."
+  },
+  "config": {
+    "enabled": true,
+    "defaultLocale": "en-US",
+    "fallbackLocale": "en-US",
+    "preferCanonical": true
+  },
+  "dateLocaleRules": [
+    {
+      "id": "dlr_001",
+      "pattern": "(?<![0-9])(19|20)[0-9]{2}-[0-1]?[0-9]-[0-3]?[0-9](?![0-9])",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "iso",
+      "description": "YYYY-MM-DD is canonical and unambiguous for locale handling"
+    },
+    {
+      "id": "dlr_002",
+      "pattern": "(?<![0-9])[0-3]?[0-9]/[0-1]?[0-9]/(19|20)[0-9]{2}(?![0-9])",
+      "localePriorities": [
+        "pt-BR",
+        "en-US"
+      ],
+      "interpretation": "ambiguous_dd_mm_yyyy_or_mm_dd_yyyy",
+      "signalHint": "day_or_month_boundary",
+      "description": "Slash dates with 4-digit year are ambiguous until boundary check"
+    },
+    {
+      "id": "dlr_003",
+      "pattern": "(?<![0-9])[0-1]?[0-9]/[0-3]?[0-9]/[0-9]{2}(?![0-9])",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "ambiguous_short_year",
+      "description": "Slash date with 2-digit year uses context and century inference"
+    },
+    {
+      "id": "dlr_004",
+      "pattern": "(?<![0-9])[0-3]?[0-9]-[0-1]?[0-9]-(19|20)[0-9]{2}(?![0-9])",
+      "localePriorities": [
+        "pt-BR",
+        "en-US"
+      ],
+      "interpretation": "ambiguous_dash_yyyy",
+      "description": "Dash dates with 4-digit year and day-first ordering by pt preference"
+    },
+    {
+      "id": "dlr_005",
+      "pattern": "(?<![0-9])[0-3]?[0-9]\\.[0-1]?[0-9]\\.[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "dot_style",
+      "description": "Dot notation is usually pt-BR"
+    },
+    {
+      "id": "dlr_006",
+      "pattern": "(?<![0-9])[0-9]{1,2}\\s*(?:JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "text_month_pt",
+      "description": "Portuguese month token strongly indicates pt-BR"
+    },
+    {
+      "id": "dlr_007",
+      "pattern": "(?<![0-9])[0-9]{1,2}\\s*(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US"
+      ],
+      "interpretation": "text_month_en",
+      "description": "English month token strongly indicates en-US"
+    },
+    {
+      "id": "dlr_008",
+      "pattern": "(?<![0-9])[0-9]{1,2}(?:st|nd|rd|th)?\\s+(?:of\\s+)?(?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)[,\\s]+[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US"
+      ],
+      "interpretation": "textual_month_en",
+      "description": "English full month text format"
+    },
+    {
+      "id": "dlr_009",
+      "pattern": "(?<![0-9])[0-9]{1,2}\\s+DE\\s+(?:JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ)\\s+[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "full_text_pt",
+      "description": "Portuguese month text with 'de'"
+    },
+    {
+      "id": "dlr_010",
+      "pattern": "(?<![0-9])[0-9]{1,2}/[0-1]?[0-9](?![0-9])",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "short_month_or_day",
+      "description": "Short slash pattern must be resolved from nearby fields"
+    },
+    {
+      "id": "dlr_011",
+      "pattern": "Q[1-4]\\s*[0-9]{4}",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "quarter",
+      "description": "Quarter notation is locale-neutral but order-sensitive for context"
+    },
+    {
+      "id": "dlr_012",
+      "pattern": "(?:JAN|FEV|MAR|ABR|MAI|JUN|JUL|AGO|SET|OUT|NOV|DEZ|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)\\s+[0-9]{1,2}(?:,[0-9]{4})?",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "month_then_day_or_year",
+      "description": "Month token then day/year; usually safe as date anchor"
+    },
+    {
+      "id": "dlr_013",
+      "pattern": "(?<![0-9])[0-3]?[0-9]\\s+de\\s+(?:jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\\s+de\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "pt_textual_month",
+      "ambiguity": false,
+      "signals": [
+        "pt_month_token",
+        "de_connector"
+      ],
+      "description": "DD de MMM de YYYY"
+    },
+    {
+      "id": "dlr_014",
+      "pattern": "(?<![0-9])[0-3]?[0-9]\\s+(?:de\\s+)?(?:janeiro|fevereiro|marco|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "pt_full_month",
+      "ambiguity": false,
+      "description": "DD full-month YYYY"
+    },
+    {
+      "id": "dlr_015",
+      "pattern": "(?<![0-9])[0-1]?[0-9]\\/[0-1]?[0-9]\\/[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US"
+      ],
+      "interpretation": "ambiguous_us_preferred",
+      "ambiguity": true,
+      "signals": [
+        "month_first_candidate"
+      ],
+      "description": "MM/DD/YYYY candidate with fixed 4-digit year"
+    },
+    {
+      "id": "dlr_016",
+      "pattern": "(?<![0-9])[0-3]?[0-9]\\/[0-1]?[0-9]\\/[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "ambiguous_pt_preferred",
+      "ambiguity": true,
+      "signals": [
+        "day_first_candidate"
+      ],
+      "description": "DD/MM/YYYY candidate with fixed 4-digit year"
+    },
+    {
+      "id": "dlr_017",
+      "pattern": "(?<![0-9])[0-3]?[0-9]\\-[0-1]?[0-9]\\-[0-9]{2}(?![0-9])",
+      "localePriorities": [
+        "pt-BR",
+        "en-US"
+      ],
+      "interpretation": "short_year_ambiguous",
+      "ambiguity": true,
+      "signals": [
+        "dmy_or_mdy_short_year"
+      ],
+      "description": "Dashes with short year and ambiguous order"
+    },
+    {
+      "id": "dlr_018",
+      "pattern": "(?<![0-9])[0-9]{4}\\.[0-1]?[0-9]\\.[0-3]?[0-9](?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "iso_like_dotted",
+      "ambiguity": false,
+      "description": "Year-first dotted date form"
+    },
+    {
+      "id": "dlr_019",
+      "pattern": "(?<![0-9])[0-3]?[0-9].[0-1]?[0-9].[0-9]{2}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "dd.mm.yy",
+      "ambiguity": true,
+      "description": "Short dotted day-month year form"
+    },
+    {
+      "id": "dlr_020",
+      "pattern": "(?<![0-9])[0-1]?[0-9]s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC),?s+[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US"
+      ],
+      "interpretation": "textual_english_month",
+      "ambiguity": false,
+      "description": "DD MMM YYYY in English"
+    },
+    {
+      "id": "dlr_021",
+      "pattern": "(?<![0-9])[0-1]?[0-9](?:st|nd|rd|th)?s+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)s+[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US"
+      ],
+      "interpretation": "ordinal_month_english",
+      "ambiguity": false,
+      "description": "Ordinal month/day in English"
+    },
+    {
+      "id": "dlr_022",
+      "pattern": "(?<![0-9])(?:jan|fev|mar|apr|feb|mar|jun|jul|ago|set|out|nov|dez|sep|oct|nov|dec)\\s+[0-3]?[0-9](?:,)?\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "month_first_or_textual",
+      "ambiguity": true,
+      "description": "Short month-first token date mixed language"
+    },
+    {
+      "id": "dlr_023",
+      "pattern": "(?<![0-9])(?:january|february|march|april|may|june|july|august|september|october|november|december)\\s+[0-3]?[0-9],?\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "en-US"
+      ],
+      "interpretation": "full_month_textual_en",
+      "ambiguity": false,
+      "description": "Full English month textual date"
+    },
+    {
+      "id": "dlr_024",
+      "pattern": "(?<![0-9])(?:janeiro|fevereiro|marco|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\s+[0-3]?[0-9],?\\s*[0-9]{4}(?![0-9])",
+      "localePriorities": [
+        "pt-BR"
+      ],
+      "interpretation": "full_month_textual_pt",
+      "ambiguity": false,
+      "description": "Full Portuguese month textual date"
+    },
+    {
+      "id": "dlr_025",
+      "pattern": "(?<![0-9])(?:today|ontem|tomorrow|hoje|amanhã|amanha)\\b",
+      "localePriorities": [
+        "en-US",
+        "pt-BR"
+      ],
+      "interpretation": "relative_date_term",
+      "ambiguity": true,
+      "description": "Relative date references by language context"
+    }
+  ],
+  "ambiguityResolutions": [
+    {
+      "id": "adr_001",
+      "trigger": "month_day_exceeds_12",
+      "decision": "locale_pt",
+      "patternRef": "dlr_002",
+      "explanation": "If first token > 12, it is day in pt-BR; parse as DD/MM/YYYY."
+    },
+    {
+      "id": "adr_002",
+      "trigger": "first_token_exceeds_12",
+      "decision": "locale_en",
+      "patternRef": "dlr_002",
+      "explanation": "If first token > 12, it is month in en-US; parse as MM/DD/YYYY."
+    },
+    {
+      "id": "adr_003",
+      "trigger": "lang_hint",
+      "decision": "language_preferred",
+      "patternRef": "dlr_002",
+      "explanation": "Use document language when numeric date is perfectly valid in both locales."
+    },
+    {
+      "id": "adr_004",
+      "trigger": "currency_and_date_neighbors",
+      "decision": "bias_to_same_locale",
+      "patternRef": "dlr_002",
+      "explanation": "If same sentence has pt-BR currency symbols, prefer pt-BR parsing."
+    },
+    {
+      "id": "adr_005",
+      "trigger": "month_token_pt",
+      "decision": "locale_pt",
+      "patternRef": "dlr_013",
+      "explanation": "PT connector \"de\" around month token resolves pt-BR."
+    },
+    {
+      "id": "adr_006",
+      "trigger": "month_token_en",
+      "decision": "locale_en",
+      "patternRef": "dlr_020",
+      "explanation": "English month names resolve to en-US ordering."
+    },
+    {
+      "id": "adr_007",
+      "trigger": "digit_count_bias",
+      "decision": "prefer_pt_if_thousand_context",
+      "patternRef": "dlr_015",
+      "explanation": "Nearby pt-BR percentage/numbering style can bias toward dd/mm/YYYY."
+    },
+    {
+      "id": "adr_008",
+      "trigger": "dot_date_with_short_year",
+      "decision": "locale_pt",
+      "patternRef": "dlr_019",
+      "explanation": "Dot dates with short year and pt context often are pt-BR."
+    },
+    {
+      "id": "adr_009",
+      "trigger": "weekday_followed_by_pt_month",
+      "decision": "locale_pt",
+      "patternRef": "dlr_022",
+      "explanation": "PT weekday/month coupling increases pt-BR confidence."
+    },
+    {
+      "id": "adr_010",
+      "trigger": "full_month_pt",
+      "decision": "locale_pt",
+      "patternRef": "dlr_024",
+      "explanation": "Portuguese full month lexemes force pt-BR parsing."
+    },
+    {
+      "id": "adr_011",
+      "trigger": "full_month_en",
+      "decision": "locale_en",
+      "patternRef": "dlr_023",
+      "explanation": "English full month lexemes force en-US parsing."
+    },
+    {
+      "id": "adr_012",
+      "trigger": "currency_neighbor",
+      "decision": "bias_to_locale_of_symbol",
+      "patternRef": "dlr_004",
+      "explanation": "Date near R$ should prefer pt-BR; near USD/$ prefer en-US."
+    }
+  ],
+  "negativePatterns": [
+    "(?<![A-Z])[0-9]{6}(?![0-9])",
+    "(?:[0-9]{4})$",
+    "(?<![A-Z])[0-9]{7}(?![0-9])",
+    "(?:[A-Z]{2,5}[0-9]{6,})",
+    "(?i)\\b(?:invoice\\s*)?(?:no\\.?|n[ºo]\\.?|n\\.?\\s*\\xBA)\\s*[0-9]{6,}(?![0-9])"
+  ],
+  "fallback": {
+    "emitBothCandidates": true,
+    "confidencePenalty": 0.18,
+    "requiredContextWindow": 120
+  }
+}

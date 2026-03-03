@@ -1,0 +1,2107 @@
+{
+  "_meta": {
+    "bankId": "multi_intent_connectors_en",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "en"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_multi_intent_connectors_en",
+    "description": "Auto-registered bank payload for patterns/core/multi_intent_connectors.en.any.json"
+  },
+  "connectors": [
+    {
+      "id": "MICL_EN_001",
+      "locale": "en",
+      "connector": "and please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_002",
+      "locale": "en",
+      "connector": "and you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_003",
+      "locale": "en",
+      "connector": "and now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_004",
+      "locale": "en",
+      "connector": "and after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_005",
+      "locale": "en",
+      "connector": "and afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_006",
+      "locale": "en",
+      "connector": "and next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_007",
+      "locale": "en",
+      "connector": "and further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_008",
+      "locale": "en",
+      "connector": "and then please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_009",
+      "locale": "en",
+      "connector": "and then you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_010",
+      "locale": "en",
+      "connector": "and then now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_011",
+      "locale": "en",
+      "connector": "and then after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_012",
+      "locale": "en",
+      "connector": "and then afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_013",
+      "locale": "en",
+      "connector": "and then next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_014",
+      "locale": "en",
+      "connector": "and then further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_015",
+      "locale": "en",
+      "connector": "also please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_016",
+      "locale": "en",
+      "connector": "also you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_017",
+      "locale": "en",
+      "connector": "also now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_018",
+      "locale": "en",
+      "connector": "also after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_019",
+      "locale": "en",
+      "connector": "also afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_020",
+      "locale": "en",
+      "connector": "also next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_021",
+      "locale": "en",
+      "connector": "also further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_022",
+      "locale": "en",
+      "connector": "plus please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_023",
+      "locale": "en",
+      "connector": "plus you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_024",
+      "locale": "en",
+      "connector": "plus now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_025",
+      "locale": "en",
+      "connector": "plus after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_026",
+      "locale": "en",
+      "connector": "plus afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_027",
+      "locale": "en",
+      "connector": "plus next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_028",
+      "locale": "en",
+      "connector": "plus further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_029",
+      "locale": "en",
+      "connector": "furthermore please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_030",
+      "locale": "en",
+      "connector": "furthermore you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_031",
+      "locale": "en",
+      "connector": "furthermore now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_032",
+      "locale": "en",
+      "connector": "furthermore after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_033",
+      "locale": "en",
+      "connector": "furthermore afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_034",
+      "locale": "en",
+      "connector": "furthermore next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_035",
+      "locale": "en",
+      "connector": "furthermore further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_036",
+      "locale": "en",
+      "connector": "moreover please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_037",
+      "locale": "en",
+      "connector": "moreover you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_038",
+      "locale": "en",
+      "connector": "moreover now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_039",
+      "locale": "en",
+      "connector": "moreover after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_040",
+      "locale": "en",
+      "connector": "moreover afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_041",
+      "locale": "en",
+      "connector": "moreover next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_042",
+      "locale": "en",
+      "connector": "moreover further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_043",
+      "locale": "en",
+      "connector": "in addition please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_044",
+      "locale": "en",
+      "connector": "in addition you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_045",
+      "locale": "en",
+      "connector": "in addition now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_046",
+      "locale": "en",
+      "connector": "in addition after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_047",
+      "locale": "en",
+      "connector": "in addition afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_048",
+      "locale": "en",
+      "connector": "in addition next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_049",
+      "locale": "en",
+      "connector": "in addition further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_050",
+      "locale": "en",
+      "connector": "next please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_051",
+      "locale": "en",
+      "connector": "next you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_052",
+      "locale": "en",
+      "connector": "next now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_053",
+      "locale": "en",
+      "connector": "next after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_054",
+      "locale": "en",
+      "connector": "next afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_055",
+      "locale": "en",
+      "connector": "next next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_056",
+      "locale": "en",
+      "connector": "next further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_057",
+      "locale": "en",
+      "connector": "after that please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_058",
+      "locale": "en",
+      "connector": "after that you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_059",
+      "locale": "en",
+      "connector": "after that now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_060",
+      "locale": "en",
+      "connector": "after that after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_061",
+      "locale": "en",
+      "connector": "after that afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_062",
+      "locale": "en",
+      "connector": "after that next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_063",
+      "locale": "en",
+      "connector": "after that further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_064",
+      "locale": "en",
+      "connector": "then please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_065",
+      "locale": "en",
+      "connector": "then you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_066",
+      "locale": "en",
+      "connector": "then now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_067",
+      "locale": "en",
+      "connector": "then after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_068",
+      "locale": "en",
+      "connector": "then afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_069",
+      "locale": "en",
+      "connector": "then next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_070",
+      "locale": "en",
+      "connector": "then further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_071",
+      "locale": "en",
+      "connector": "also now please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_072",
+      "locale": "en",
+      "connector": "also now you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_073",
+      "locale": "en",
+      "connector": "also now now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_074",
+      "locale": "en",
+      "connector": "also now after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_075",
+      "locale": "en",
+      "connector": "also now afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_076",
+      "locale": "en",
+      "connector": "also now next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_077",
+      "locale": "en",
+      "connector": "also now further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_078",
+      "locale": "en",
+      "connector": "and next please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_079",
+      "locale": "en",
+      "connector": "and next you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_080",
+      "locale": "en",
+      "connector": "and next now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_081",
+      "locale": "en",
+      "connector": "and next after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_082",
+      "locale": "en",
+      "connector": "and next afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_083",
+      "locale": "en",
+      "connector": "and next next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_084",
+      "locale": "en",
+      "connector": "and next further",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_085",
+      "locale": "en",
+      "connector": "while please",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_086",
+      "locale": "en",
+      "connector": "while you should",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_087",
+      "locale": "en",
+      "connector": "while now",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_088",
+      "locale": "en",
+      "connector": "while after this",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_089",
+      "locale": "en",
+      "connector": "while afterwards",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    },
+    {
+      "id": "MICL_EN_090",
+      "locale": "en",
+      "connector": "while next",
+      "triggers": [
+        "multi_intent_connector",
+        "locale:en"
+      ],
+      "negatives": [
+        "not connector-like",
+        "sentence-ending token"
+      ],
+      "slotHints": [
+        "intentBoundary",
+        "nextIntentHint",
+        "connectorStrength"
+      ],
+      "telemetryTags": [
+        "multi_intent_connectors",
+        "en",
+        "connector_flow"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

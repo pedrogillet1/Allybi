@@ -1,0 +1,5926 @@
+{
+  "_meta": {
+    "id": "search_intents_en",
+    "version": "1.0.0",
+    "description": "search intents pattern bank for EN connector search intents with connector-aware isolation.",
+    "languages": [
+      "en",
+      "any"
+    ],
+    "owner": "connectors-patterning",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/retrieval/retrievalEngine.service.ts",
+      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+    ],
+    "tests": [
+      "search_en_positive_1",
+      "search_en_negative_1",
+      "search_en_missing_slot"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "matching": {
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true
+    },
+    "minPatterns": 120,
+    "maxPatterns": 250
+  },
+  "patterns": [
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox mentions of outage"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0001",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search messages in Dropbox about strategy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0002",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search messages in Gmail about strategy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0003",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search messages in Google Drive about strategy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0004",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search messages in Outlook about strategy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0005",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search messages in Slack about strategy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0006",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search messages in Teams about strategy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0007",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail mentions of outage"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0008",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive mentions of outage"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0009",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook mentions of outage"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0010",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for deployment issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0011",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for incident"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0012",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack mentions of outage"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0013",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams mentions of outage"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0014",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Dropbox message about compliance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0015",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search the email from Ana about incident in Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0016",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from Ana about incident in Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0017",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from Ana about incident in Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0018",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from Ana about incident in Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0019",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from Ana about incident in Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0020",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from Ana about incident in Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0021",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from payroll about overtime in Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0022",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from payroll about overtime in Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0023",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from payroll about overtime in Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0024",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from payroll about overtime in Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0025",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from payroll about overtime in Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0026",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the email from payroll about overtime in Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0027",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Gmail message about compliance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0028",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Google Drive message about compliance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0029",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Outlook message about compliance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0030",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Slack message about compliance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0031",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Teams message about compliance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0032",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Dropbox for security alerts"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0033",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Dropbox thread about budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0034",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Dropbox thread about risks"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0035",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Gmail for security alerts"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0036",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Gmail thread about budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0037",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Gmail thread about risks"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0038",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Google Drive for security alerts"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0039",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Google Drive thread about budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0040",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Google Drive thread about risks"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0041",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Outlook for security alerts"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0042",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Outlook thread about budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0043",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Outlook thread about risks"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0044",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Slack for security alerts"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0045",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Slack thread about budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0046",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Slack thread about risks"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0047",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Teams for security alerts"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0048",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Teams thread about budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0049",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "lookup Teams thread about risks"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0050",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Dropbox for customer issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0051",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Dropbox for policy changes"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0052",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Gmail for customer issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0053",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Gmail for policy changes"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0054",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Google Drive for customer issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0055",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Google Drive for policy changes"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0056",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Outlook for customer issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0057",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Outlook for policy changes"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0058",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Slack for customer issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0059",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Slack for policy changes"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0060",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Teams for customer issue"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0061",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "query Teams for policy changes"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0062",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0063",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox emails from finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0064",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search dropbox messages for proposal"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0065",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox for invoice attachments"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0066",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox for invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0067",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox for migration plan"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0068",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox for Q4 report"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0069",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox for the latest status update"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0070",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox inbox from last week"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0071",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Dropbox messages from Bob"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0072",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0073",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail emails from finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0074",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail messages for proposal"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0075",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail for invoice attachments"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0076",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail for invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0077",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail for migration plan"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0078",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail for Q4 report"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0079",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail for the latest status update"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0080",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail inbox from last week"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0081",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Gmail messages from Bob"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0082",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0083",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive emails from finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0084",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive messages for proposal"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0085",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive for invoice attachments"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0086",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive for invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0087",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive for migration plan"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0088",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive for Q4 report"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0089",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive for the latest status update"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0090",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive inbox from last week"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0091",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Google Drive messages from Bob"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0092",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0093",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook emails from finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0094",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search outlook messages for proposal"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0095",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook for invoice attachments"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0096",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook for invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0097",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook for migration plan"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0098",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook for Q4 report"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0099",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook for the latest status update"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0100",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook inbox from last week"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0101",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Outlook messages from Bob"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0102",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0103",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack emails from finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0104",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack messages for proposal"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0105",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for invoice attachments"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0106",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0107",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for migration plan"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0108",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for Q4 report"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0109",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack for the latest status update"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0110",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack inbox from last week"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0111",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Slack messages from Bob"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0112",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0113",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams emails from finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0114",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams messages for proposal"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0115",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams for invoice attachments"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0116",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams for invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0117",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams for migration plan"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0118",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams for Q4 report"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0119",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams for the latest status update"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0120",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams inbox from last week"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0121",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search Teams messages from Bob"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0122",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Dropbox workspace for budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0123",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Gmail workspace for budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0124",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Google Drive workspace for budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0125",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Outlook workspace for budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0126",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Slack workspace for budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0127",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Who is the sender, which channel, what query, what folder, and what time range should I search in?",
+      "en": [
+        "search in the Teams workspace for budget"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_EN_0128",
+      "intent": "CONNECTORS"
+    }
+  ]
+}

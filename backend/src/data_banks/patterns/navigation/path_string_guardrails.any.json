@@ -1,0 +1,2842 @@
+{
+  "_meta": {
+    "id": "path_string_guardrails",
+    "version": "1.0.0",
+    "description": "Guardrails that block filesystem-style strings in navigation responses and require semantic labels.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "owner": "navigation-patterning",
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requiresNavigationMode": true,
+    "deterministic": true,
+    "policy": "no_raw_path"
+  },
+  "guardrails": [
+    {
+      "id": "PSG_0001",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "[A-Za-z]:\\\\[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 1 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 1 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0002",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\\\\\\\server\\\\share\\\\[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 2 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 2 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0003",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/home/[^\\s]+/[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 3 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 3 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0004",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/Users/[^\\s]+/[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 4 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 4 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0005",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/usr/[^\\s]+/"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 5 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 5 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0006",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/var/[^\\s]+/"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 6 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 6 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0007",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/tmp/[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 7 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 7 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0008",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/opt/[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 8 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 8 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0009",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/mnt/[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 9 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 9 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0010",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/media/[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 10 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 10 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0011",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "C:\\\\[^\\s]+\\\\[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 11 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 11 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0012",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "D:\\\\[^\\s]+\\\\[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 12 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 12 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0013",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "E:\\\\[^\\s]+\\\\[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 13 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 13 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0014",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\.[\\.a-zA-Z0-9_/\\\\-]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 14 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 14 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0015",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\.{2}(?:/|\\\\)[^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 15 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 15 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0016",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "([A-Za-z]:)?\\\\(?:[^\\\\/\\s]+\\\\)+[^\\\\/\\s]+\\.(pdf|xlsx?|docx?|pptx?|csv|txt|json|yaml|yml)"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 16 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 16 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0017",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "([A-Za-z]:)?/(?:[^/\\s]+/)+[^/\\s]+\\.(pdf|xlsx?|docx?|pptx?|csv|txt|json|yaml|yml)"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 17 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 17 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0018",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "[A-Za-z0-9_\\- ]+\\.\\w+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 18 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 18 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0019",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "[A-Za-z0-9_\\- ]+/[A-Za-z0-9_\\- ]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 19 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 19 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0020",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "[A-Za-z0-9_\\- ]+\\\\[A-Za-z0-9_\\- ]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 20 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 20 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0021",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\b[a-f0-9]{8,}\\b"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 21 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 21 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0022",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\b\\d{1,3}(?:\\.\\d{1,3}){3}(?::\\d+)?"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 22 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 22 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0023",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\b[a-z]+:\\\\"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 23 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 23 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0024",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\b[a-z]+:/[a-z0-9_\\-./]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 24 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 24 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0025",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "file:[/\\\\][^\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 25 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 25 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0026",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "/\\w+/\\w+/\\w+/"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 26 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 26 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0027",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "\\\\\\w+\\\\\\w+\\\\\\w+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 27 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 27 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0028",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "(?:[A-Za-z]:)?/(?:[^/\\s]+/){2,}[^/\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 28 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 28 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0029",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "(?:[A-Za-z]:)?\\\\(?:[^\\\\\\s]+\\\\){2,}[^\\\\\\s]+"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 29 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 29 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0030",
+      "kind": "forbid_raw_path",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_remap",
+      "patterns": [
+        "[A-Za-z]:[^\\s]{0,80}"
+      ],
+      "en": [
+        "Do not render raw file system path text; show semantic label only.",
+        "Replace filesystem token shape 30 with descriptive label."
+      ],
+      "pt": [
+        "Não mostre caminho bruto de sistema de arquivos; exiba apenas rótulo semântico.",
+        "Substitua padrão de caminho do sistema 30 por rótulo descritivo."
+      ],
+      "action": {
+        "type": "block_or_replace",
+        "requireSemanticLabel": true
+      }
+    },
+    {
+      "id": "PSG_0031",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic folder_label_only labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de folder_label_only em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "folder_label_only"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0032",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic document_alias_only labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de document_alias_only em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "document_alias_only"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0033",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic human_readable_name labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de human_readable_name em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "human_readable_name"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0034",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic short_nav_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de short_nav_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "short_nav_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0035",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic semantic_handle labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de semantic_handle em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "semantic_handle"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0036",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic natural_title labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de natural_title em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "natural_title"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0037",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic descriptive_title labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de descriptive_title em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "descriptive_title"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0038",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic contextual_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de contextual_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "contextual_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0039",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic stable_anchor_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de stable_anchor_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "stable_anchor_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0040",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic section_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de section_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "section_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0041",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic document_type_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de document_type_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "document_type_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0042",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic timebound_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de timebound_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "timebound_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0043",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic role_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de role_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "role_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0044",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic tenant_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de tenant_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "tenant_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0045",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic bucket_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de bucket_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "bucket_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0046",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic owner_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de owner_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "owner_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0047",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic project_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de project_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "project_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0048",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic status_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de status_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "status_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0049",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic priority_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de priority_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "priority_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0050",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic category_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de category_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "category_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0051",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic cost_center_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de cost_center_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "cost_center_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0052",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic period_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de period_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "period_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0053",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic source_name_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de source_name_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "source_name_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0054",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic client_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de client_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "client_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0055",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic partner_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de partner_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "partner_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0056",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic product_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de product_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "product_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0057",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic team_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de team_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "team_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0058",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic policy_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de policy_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "policy_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0059",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic statement_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de statement_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "statement_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0060",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic claim_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de claim_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "claim_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0061",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic receipt_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de receipt_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "receipt_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0062",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic invoice_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de invoice_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "invoice_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0063",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic contract_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de contract_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "contract_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0064",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic audit_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de audit_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "audit_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0065",
+      "kind": "require_semantic_label",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.path_label_requirement",
+      "en": [
+        "Use semantic medical_label labels on all navigation pills."
+      ],
+      "pt": [
+        "Use rótulos semânticos de medical_label em todos os botões de navegação."
+      ],
+      "conditions": {
+        "outputMode": "nav_pills",
+        "avoidRawPath": true,
+        "labelMode": "medical_label"
+      },
+      "action": {
+        "type": "require_label_only",
+        "style": "human_readable"
+      }
+    },
+    {
+      "id": "PSG_0066",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0067",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0068",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0069",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0070",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0071",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0072",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0073",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0074",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0075",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0076",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0077",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0078",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0079",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0080",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0081",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0082",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0083",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0084",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0085",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0086",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0087",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0088",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0089",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0090",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0091",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0092",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0093",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0094",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    },
+    {
+      "id": "PSG_0095",
+      "kind": "pill_text_cleanse",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "disambiguationTemplateId": "nav.disambiguation.pill_label_only",
+      "en": [
+        "Navigation pills must contain only semantic labels and not raw paths."
+      ],
+      "pt": [
+        "Os botões de navegação devem conter só rótulos semânticos e não caminhos brutos."
+      ],
+      "conditions": {
+        "answerMode": "navigation",
+        "renderMode": "pills",
+        "allowPathChars": false
+      },
+      "action": {
+        "type": "strip_paths_from_pills"
+      }
+    }
+  ]
+}

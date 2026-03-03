@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "id": "closers",
+    "version": "1.0.0",
+    "description": "Close responses with useful next-step language.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true
+  },
+  "closers": [
+    {
+      "id": "CLS_001",
+      "language": "en",
+      "text": "If you want, I can also run a second pass for period tie-out."
+    },
+    {
+      "id": "CLS_002",
+      "language": "pt",
+      "text": "Se quiser, faço tambem uma segunda passada para fechar periodo."
+    }
+  ]
+}

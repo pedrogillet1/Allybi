@@ -1,0 +1,918 @@
+{
+  "_meta": {
+    "id": "di_finance_extraction_fin_annual_financials",
+    "version": "2.1.0",
+    "description": "Extraction heuristics for Annual Financial Statements.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_annual_financials"
+  },
+  "hints": [
+    {
+      "id": "fin_annual_financials_hint_001",
+      "entity": "document_id",
+      "primarySignals": [
+        "document_header",
+        "\\bfinancials+statements\\b",
+        "\\bdocument_id\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.68,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_002",
+      "entity": "source_file_name",
+      "primarySignals": [
+        "summary",
+        "\\bsummary\\b",
+        "\\bsource_file_name\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.693,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_003",
+      "entity": "extraction_timestamp",
+      "primarySignals": [
+        "financial_statements",
+        "\\bbalance sheet\\b",
+        "\\bextraction_timestamp\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.706,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_004",
+      "entity": "company_name",
+      "primarySignals": [
+        "notes",
+        "\\bincome statement\\b",
+        "\\bcompany_name\\b"
+      ],
+      "location": "notes",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.719,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_005",
+      "entity": "fiscal_year_end",
+      "primarySignals": [
+        "ratios",
+        "\\bcash flow\\b",
+        "\\bfiscal_year_end\\b"
+      ],
+      "location": "financial_summary",
+      "extractionMethod": "section_priority_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.732,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_006",
+      "entity": "fiscal_year_start",
+      "primarySignals": [
+        "assumptions",
+        "\\brevenue\\b",
+        "\\bfiscal_year_start\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 6,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.745,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_007",
+      "entity": "reporting_currency",
+      "primarySignals": [
+        "disclosures",
+        "\\bexpense\\b",
+        "\\breporting_currency\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 7,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.758,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_008",
+      "entity": "unit_scale",
+      "primarySignals": [
+        "risk_disclosure",
+        "\\bdividend\\b",
+        "\\bunit_scale\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 8,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.771,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_009",
+      "entity": "period",
+      "primarySignals": [
+        "appendix",
+        "\\bforecast\\b",
+        "\\bperiod\\b"
+      ],
+      "location": "notes",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 9,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.784,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_010",
+      "entity": "ticker",
+      "primarySignals": [
+        "management_discussion",
+        "\\brisk\\b",
+        "\\bticker\\b"
+      ],
+      "location": "financial_summary",
+      "extractionMethod": "section_priority_scan",
+      "sourceHints": {
+        "sectionPriority": 10,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.797,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_011",
+      "entity": "entity_type",
+      "primarySignals": [
+        "cash_flow_analysis",
+        "\\bcovenant\\b",
+        "\\bentity_type\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_012",
+      "entity": "auditor_opinion",
+      "primarySignals": [
+        "balance_sheet",
+        "\\btax\\b",
+        "\\bauditor_opinion\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.823,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_013",
+      "entity": "audited_by",
+      "primarySignals": [
+        "income_statement",
+        "\\bdebt\\b",
+        "\\baudited_by\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.836,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_014",
+      "entity": "gross_revenue",
+      "primarySignals": [
+        "liquidity",
+        "\\baudit\\b",
+        "\\bgross_revenue\\b"
+      ],
+      "location": "notes",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.849,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_015",
+      "entity": "net_revenue",
+      "primarySignals": [
+        "solvency",
+        "\\bcompliance\\b",
+        "\\bnet_revenue\\b"
+      ],
+      "location": "financial_summary",
+      "extractionMethod": "section_priority_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.862,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_016",
+      "entity": "cost_of_goods_sold",
+      "primarySignals": [
+        "working_capital",
+        "\\binvestor\\b",
+        "\\bcost_of_goods_sold\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 6,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.875,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_017",
+      "entity": "gross_profit",
+      "primarySignals": [
+        "revenue_mix",
+        "\\bportfolio\\b",
+        "\\bgross_profit\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 7,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.888,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_018",
+      "entity": "operating_expense",
+      "primarySignals": [
+        "expense_breakdown",
+        "\\bliquidity\\b",
+        "\\boperating_expense\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 8,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.901,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_019",
+      "entity": "ebitda",
+      "primarySignals": [
+        "debt_profile",
+        "\\bvariance\\b",
+        "\\bebitda\\b"
+      ],
+      "location": "notes",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 9,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.68,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_020",
+      "entity": "ebit",
+      "primarySignals": [
+        "covenant_tracking",
+        "\\brunway\\b",
+        "\\bebit\\b"
+      ],
+      "location": "financial_summary",
+      "extractionMethod": "section_priority_scan",
+      "sourceHints": {
+        "sectionPriority": 10,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.693,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_021",
+      "entity": "ebt",
+      "primarySignals": [
+        "tax_position",
+        "\\bburn\\b",
+        "\\bebt\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 1,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.706,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_022",
+      "entity": "net_income",
+      "primarySignals": [
+        "shareholder_information",
+        "\\bfx\\b",
+        "\\bnet_income\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 2,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.719,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_023",
+      "entity": "total_assets",
+      "primarySignals": [
+        "market_risk",
+        "\\btreasury\\b",
+        "\\btotal_assets\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 3,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.732,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_024",
+      "entity": "total_liabilities",
+      "primarySignals": [
+        "credit_risk",
+        "\\bsensitivity\\b",
+        "\\btotal_liabilities\\b"
+      ],
+      "location": "notes",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 4,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.745,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_025",
+      "entity": "equity",
+      "primarySignals": [
+        "operating_metrics",
+        "\\bkpi\\b",
+        "\\bequity\\b"
+      ],
+      "location": "financial_summary",
+      "extractionMethod": "section_priority_scan",
+      "sourceHints": {
+        "sectionPriority": 5,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": true,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.758,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_026",
+      "entity": "working_capital",
+      "primarySignals": [
+        "cash_management",
+        "\\bfinancials+statements\\b",
+        "\\bworking_capital\\b"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity",
+      "sourceHints": {
+        "sectionPriority": 6,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": true
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.771,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_027",
+      "entity": "current_ratio",
+      "primarySignals": [
+        "portfolio_summary",
+        "\\bsummary\\b",
+        "\\bcurrent_ratio\\b"
+      ],
+      "location": "tables",
+      "extractionMethod": "pattern_scan",
+      "sourceHints": {
+        "sectionPriority": 7,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.784,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_028",
+      "entity": "quick_ratio",
+      "primarySignals": [
+        "investor_comm",
+        "\\bbalance sheet\\b",
+        "\\bquick_ratio\\b"
+      ],
+      "location": "appendix",
+      "extractionMethod": "table_header_row_context",
+      "sourceHints": {
+        "sectionPriority": 8,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": true
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": true,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.797,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_029",
+      "entity": "cash_and_equivalents",
+      "primarySignals": [
+        "board_oversight",
+        "\\bincome statement\\b",
+        "\\bcash_and_equivalents\\b"
+      ],
+      "location": "notes",
+      "extractionMethod": "cross_page_merge",
+      "sourceHints": {
+        "sectionPriority": 9,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": true,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": true,
+        "handleMergedCells": false,
+        "handleRotatedPages": true,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "single-page expected",
+      "confidence": 0.81,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    },
+    {
+      "id": "fin_annual_financials_hint_030",
+      "entity": "cash_operating_activity",
+      "primarySignals": [
+        "pipeline_health",
+        "\\bcash flow\\b",
+        "\\bcash_operating_activity\\b"
+      ],
+      "location": "financial_summary",
+      "extractionMethod": "section_priority_scan",
+      "sourceHints": {
+        "sectionPriority": 10,
+        "mustHave": [
+          "table_header_context",
+          "unit",
+          "period"
+        ],
+        "allowSlidingWindow": false,
+        "pageContinuity": false
+      },
+      "dirtyPdfHandling": {
+        "handleSplitHeaders": false,
+        "handleMergedCells": false,
+        "handleRotatedPages": false,
+        "handleSlideHeaders": false
+      },
+      "slideHint": "multi-page table continuation likely",
+      "confidence": 0.823,
+      "notes": "Prefer explicit table + section anchors for fin_annual_financials."
+    }
+  ]
+}

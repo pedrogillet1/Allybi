@@ -1,0 +1,3180 @@
+{
+  "_meta": {
+    "id": "patterns_modes_preview_vs_apply",
+    "version": "1.0.0",
+    "owner": "mode-switch-patterns",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "description": "Deterministic preview vs apply governance rules with destructive/ambiguous/irreversible safeguards and direct-apply trivial formatting policy.",
+    "usedBy": [
+      "editor_router",
+      "mutation_guard",
+      "preview_apply_policy",
+      "tests.patternDeterminism"
+    ],
+    "tests": {
+      "positive": [
+        "show me a draft first before replacing values",
+        "delete worksheet now",
+        "confirm delete worksheet",
+        "bold selected header"
+      ],
+      "negative": [
+        "calculate total only",
+        "summarize this section only",
+        "export file do not send email"
+      ]
+    },
+    "dependsOn": [
+      "patterns_modes_mode_switch_en",
+      "patterns_modes_mode_switch_pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "dedupeCaseInsensitive": true,
+    "sortBy": "id",
+    "minRules": 80,
+    "maxRules": 200,
+    "kind": "preview-vs-apply-governance",
+    "defaultPolicy": {
+      "destructiveOrAmbiguous": "PREVIEW_ONLY",
+      "irreversible": "DOUBLE_CONFIRM_REQUIRED",
+      "trivialFormatting": "APPLY_DIRECT_ALLOWED"
+    }
+  },
+  "rules": [
+    {
+      "id": "PVA_0001",
+      "trigger": {
+        "operation": "delete rows",
+        "phrases": [
+          "delete rows",
+          "delete rows now",
+          "delete rows in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "delete rows but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0002",
+      "trigger": {
+        "operation": "delete rows",
+        "phrases": [
+          "confirm delete rows",
+          "yes delete rows",
+          "delete rows confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm delete rows in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0003",
+      "trigger": {
+        "operation": "delete columns",
+        "phrases": [
+          "delete columns",
+          "delete columns now",
+          "delete columns in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "delete columns but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0004",
+      "trigger": {
+        "operation": "delete columns",
+        "phrases": [
+          "confirm delete columns",
+          "yes delete columns",
+          "delete columns confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm delete columns in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0005",
+      "trigger": {
+        "operation": "delete worksheet",
+        "phrases": [
+          "delete worksheet",
+          "delete worksheet now",
+          "delete worksheet in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "delete worksheet but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0006",
+      "trigger": {
+        "operation": "delete worksheet",
+        "phrases": [
+          "confirm delete worksheet",
+          "yes delete worksheet",
+          "delete worksheet confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm delete worksheet in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0007",
+      "trigger": {
+        "operation": "remove section",
+        "phrases": [
+          "remove section",
+          "remove section now",
+          "remove section in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "remove section but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0008",
+      "trigger": {
+        "operation": "remove section",
+        "phrases": [
+          "confirm remove section",
+          "yes remove section",
+          "remove section confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm remove section in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0009",
+      "trigger": {
+        "operation": "overwrite formula range",
+        "phrases": [
+          "overwrite formula range",
+          "overwrite formula range now",
+          "overwrite formula range in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "overwrite formula range but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0010",
+      "trigger": {
+        "operation": "overwrite formula range",
+        "phrases": [
+          "confirm overwrite formula range",
+          "yes overwrite formula range",
+          "overwrite formula range confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm overwrite formula range in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0011",
+      "trigger": {
+        "operation": "replace all values",
+        "phrases": [
+          "replace all values",
+          "replace all values now",
+          "replace all values in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "replace all values but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0012",
+      "trigger": {
+        "operation": "replace all values",
+        "phrases": [
+          "confirm replace all values",
+          "yes replace all values",
+          "replace all values confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm replace all values in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0013",
+      "trigger": {
+        "operation": "clear cells",
+        "phrases": [
+          "clear cells",
+          "clear cells now",
+          "clear cells in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "clear cells but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0014",
+      "trigger": {
+        "operation": "clear cells",
+        "phrases": [
+          "confirm clear cells",
+          "yes clear cells",
+          "clear cells confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm clear cells in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0015",
+      "trigger": {
+        "operation": "truncate table",
+        "phrases": [
+          "truncate table",
+          "truncate table now",
+          "truncate table in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "truncate table but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0016",
+      "trigger": {
+        "operation": "truncate table",
+        "phrases": [
+          "confirm truncate table",
+          "yes truncate table",
+          "truncate table confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm truncate table in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0017",
+      "trigger": {
+        "operation": "drop records",
+        "phrases": [
+          "drop records",
+          "drop records now",
+          "drop records in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "drop records but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0018",
+      "trigger": {
+        "operation": "drop records",
+        "phrases": [
+          "confirm drop records",
+          "yes drop records",
+          "drop records confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm drop records in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0019",
+      "trigger": {
+        "operation": "reset workbook",
+        "phrases": [
+          "reset workbook",
+          "reset workbook now",
+          "reset workbook in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "reset workbook but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0020",
+      "trigger": {
+        "operation": "reset workbook",
+        "phrases": [
+          "confirm reset workbook",
+          "yes reset workbook",
+          "reset workbook confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm reset workbook in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0021",
+      "trigger": {
+        "operation": "remove paragraph",
+        "phrases": [
+          "remove paragraph",
+          "remove paragraph now",
+          "remove paragraph in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "remove paragraph but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0022",
+      "trigger": {
+        "operation": "remove paragraph",
+        "phrases": [
+          "confirm remove paragraph",
+          "yes remove paragraph",
+          "remove paragraph confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm remove paragraph in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0023",
+      "trigger": {
+        "operation": "strip formatting from document",
+        "phrases": [
+          "strip formatting from document",
+          "strip formatting from document now",
+          "strip formatting from document in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "strip formatting from document but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0024",
+      "trigger": {
+        "operation": "strip formatting from document",
+        "phrases": [
+          "confirm strip formatting from document",
+          "yes strip formatting from document",
+          "strip formatting from document confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm strip formatting from document in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0025",
+      "trigger": {
+        "operation": "bulk replace across file",
+        "phrases": [
+          "bulk replace across file",
+          "bulk replace across file now",
+          "bulk replace across file in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "bulk replace across file but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0026",
+      "trigger": {
+        "operation": "bulk replace across file",
+        "phrases": [
+          "confirm bulk replace across file",
+          "yes bulk replace across file",
+          "bulk replace across file confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm bulk replace across file in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0027",
+      "trigger": {
+        "operation": "erase comments",
+        "phrases": [
+          "erase comments",
+          "erase comments now",
+          "erase comments in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "erase comments but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0028",
+      "trigger": {
+        "operation": "erase comments",
+        "phrases": [
+          "confirm erase comments",
+          "yes erase comments",
+          "erase comments confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm erase comments in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0029",
+      "trigger": {
+        "operation": "purge history",
+        "phrases": [
+          "purge history",
+          "purge history now",
+          "purge history in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "purge history but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0030",
+      "trigger": {
+        "operation": "purge history",
+        "phrases": [
+          "confirm purge history",
+          "yes purge history",
+          "purge history confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm purge history in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0031",
+      "trigger": {
+        "operation": "remove attachments",
+        "phrases": [
+          "remove attachments",
+          "remove attachments now",
+          "remove attachments in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "remove attachments but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0032",
+      "trigger": {
+        "operation": "remove attachments",
+        "phrases": [
+          "confirm remove attachments",
+          "yes remove attachments",
+          "remove attachments confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm remove attachments in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0033",
+      "trigger": {
+        "operation": "clear named ranges",
+        "phrases": [
+          "clear named ranges",
+          "clear named ranges now",
+          "clear named ranges in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "clear named ranges but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0034",
+      "trigger": {
+        "operation": "clear named ranges",
+        "phrases": [
+          "confirm clear named ranges",
+          "yes clear named ranges",
+          "clear named ranges confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm clear named ranges in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0035",
+      "trigger": {
+        "operation": "delete chart",
+        "phrases": [
+          "delete chart",
+          "delete chart now",
+          "delete chart in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "delete chart but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0036",
+      "trigger": {
+        "operation": "delete chart",
+        "phrases": [
+          "confirm delete chart",
+          "yes delete chart",
+          "delete chart confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm delete chart in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0037",
+      "trigger": {
+        "operation": "drop pivot",
+        "phrases": [
+          "drop pivot",
+          "drop pivot now",
+          "drop pivot in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "drop pivot but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0038",
+      "trigger": {
+        "operation": "drop pivot",
+        "phrases": [
+          "confirm drop pivot",
+          "yes drop pivot",
+          "drop pivot confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm drop pivot in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0039",
+      "trigger": {
+        "operation": "remove filters",
+        "phrases": [
+          "remove filters",
+          "remove filters now",
+          "remove filters in the file"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "single",
+        "applyAllowed": false,
+        "next": "SHOW_DIFF_AND_CONFIRM"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "remove filters but show preview first"
+      ]
+    },
+    {
+      "id": "PVA_0040",
+      "trigger": {
+        "operation": "remove filters",
+        "phrases": [
+          "confirm remove filters",
+          "yes remove filters",
+          "remove filters confirmed"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "APPLY_AFTER_CONFIRM",
+        "requireConfirm": false,
+        "confirmLevel": "already_confirmed",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "confirm remove filters in selected range"
+      ]
+    },
+    {
+      "id": "PVA_0041",
+      "trigger": {
+        "operation": "hard delete worksheet",
+        "phrases": [
+          "hard delete worksheet",
+          "hard delete worksheet immediately",
+          "execute hard delete worksheet"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "hard delete worksheet requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0042",
+      "trigger": {
+        "operation": "permanently remove rows",
+        "phrases": [
+          "permanently remove rows",
+          "permanently remove rows immediately",
+          "execute permanently remove rows"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "permanently remove rows requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0043",
+      "trigger": {
+        "operation": "overwrite entire column",
+        "phrases": [
+          "overwrite entire column",
+          "overwrite entire column immediately",
+          "execute overwrite entire column"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "overwrite entire column requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0044",
+      "trigger": {
+        "operation": "replace all formulas with values",
+        "phrases": [
+          "replace all formulas with values",
+          "replace all formulas with values immediately",
+          "execute replace all formulas with values"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "replace all formulas with values requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0045",
+      "trigger": {
+        "operation": "drop hidden sheets",
+        "phrases": [
+          "drop hidden sheets",
+          "drop hidden sheets immediately",
+          "execute drop hidden sheets"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "drop hidden sheets requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0046",
+      "trigger": {
+        "operation": "erase revision history",
+        "phrases": [
+          "erase revision history",
+          "erase revision history immediately",
+          "execute erase revision history"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "erase revision history requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0047",
+      "trigger": {
+        "operation": "remove document section permanently",
+        "phrases": [
+          "remove document section permanently",
+          "remove document section permanently immediately",
+          "execute remove document section permanently"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "remove document section permanently requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0048",
+      "trigger": {
+        "operation": "truncate source table permanently",
+        "phrases": [
+          "truncate source table permanently",
+          "truncate source table permanently immediately",
+          "execute truncate source table permanently"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "truncate source table permanently requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0049",
+      "trigger": {
+        "operation": "clear all workbook names",
+        "phrases": [
+          "clear all workbook names",
+          "clear all workbook names immediately",
+          "execute clear all workbook names"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "clear all workbook names requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0050",
+      "trigger": {
+        "operation": "delete protected range permanently",
+        "phrases": [
+          "delete protected range permanently",
+          "delete protected range permanently immediately",
+          "execute delete protected range permanently"
+        ]
+      },
+      "check": {
+        "isDestructive": true,
+        "isIrreversible": true,
+        "isAmbiguous": false,
+        "userConfirmed": false,
+        "hasScopedTarget": true
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "double",
+        "applyAllowed": false,
+        "next": "REQUIRE_DOUBLE_CONFIRM_AND_BACKUP"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "delete protected range permanently requires two-step confirmation"
+      ]
+    },
+    {
+      "id": "PVA_0051",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "fix it",
+          "fix it for me",
+          "fix it please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "fix it in the document"
+      ]
+    },
+    {
+      "id": "PVA_0052",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "change this",
+          "change this for me",
+          "change this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "change this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0053",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "update that",
+          "update that for me",
+          "update that please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "update that in the document"
+      ]
+    },
+    {
+      "id": "PVA_0054",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "improve this",
+          "improve this for me",
+          "improve this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "improve this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0055",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "make it better",
+          "make it better for me",
+          "make it better please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "make it better in the document"
+      ]
+    },
+    {
+      "id": "PVA_0056",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "adjust numbers",
+          "adjust numbers for me",
+          "adjust numbers please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "adjust numbers in the document"
+      ]
+    },
+    {
+      "id": "PVA_0057",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "clean this up",
+          "clean this up for me",
+          "clean this up please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "clean this up in the document"
+      ]
+    },
+    {
+      "id": "PVA_0058",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "refine formatting",
+          "refine formatting for me",
+          "refine formatting please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "refine formatting in the document"
+      ]
+    },
+    {
+      "id": "PVA_0059",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "optimize the table",
+          "optimize the table for me",
+          "optimize the table please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "optimize the table in the document"
+      ]
+    },
+    {
+      "id": "PVA_0060",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "rewrite this section",
+          "rewrite this section for me",
+          "rewrite this section please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "rewrite this section in the document"
+      ]
+    },
+    {
+      "id": "PVA_0061",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "patch it",
+          "patch it for me",
+          "patch it please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "patch it in the document"
+      ]
+    },
+    {
+      "id": "PVA_0062",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "correct this",
+          "correct this for me",
+          "correct this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "correct this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0063",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "polish it",
+          "polish it for me",
+          "polish it please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "polish it in the document"
+      ]
+    },
+    {
+      "id": "PVA_0064",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "edit this part",
+          "edit this part for me",
+          "edit this part please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "edit this part in the document"
+      ]
+    },
+    {
+      "id": "PVA_0065",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "change the values",
+          "change the values for me",
+          "change the values please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "change the values in the document"
+      ]
+    },
+    {
+      "id": "PVA_0066",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "update formulas",
+          "update formulas for me",
+          "update formulas please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "update formulas in the document"
+      ]
+    },
+    {
+      "id": "PVA_0067",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "align this",
+          "align this for me",
+          "align this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "align this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0068",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "simplify this",
+          "simplify this for me",
+          "simplify this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "simplify this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0069",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "rework this",
+          "rework this for me",
+          "rework this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "rework this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0070",
+      "trigger": {
+        "operation": "ambiguous_edit_request",
+        "phrases": [
+          "tune this",
+          "tune this for me",
+          "tune this please"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": true,
+        "userConfirmed": false,
+        "hasScopedTarget": false
+      },
+      "action": {
+        "mode": "PREVIEW_ONLY",
+        "requireConfirm": true,
+        "confirmLevel": "clarify",
+        "applyAllowed": false,
+        "next": "ASK_SCOPE_AND_SHOW_DRAFT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "tune this in the document"
+      ]
+    },
+    {
+      "id": "PVA_0071",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "bold selected header",
+          "bold selected header now",
+          "bold selected header in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "bold selected header"
+      ]
+    },
+    {
+      "id": "PVA_0072",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "italicize selected text",
+          "italicize selected text now",
+          "italicize selected text in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "italicize selected text"
+      ]
+    },
+    {
+      "id": "PVA_0073",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "increase font size by one",
+          "increase font size by one now",
+          "increase font size by one in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "increase font size by one"
+      ]
+    },
+    {
+      "id": "PVA_0074",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "decrease font size by one",
+          "decrease font size by one now",
+          "decrease font size by one in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "decrease font size by one"
+      ]
+    },
+    {
+      "id": "PVA_0075",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "align selected cells center",
+          "align selected cells center now",
+          "align selected cells center in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "align selected cells center"
+      ]
+    },
+    {
+      "id": "PVA_0076",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "align selected cells left",
+          "align selected cells left now",
+          "align selected cells left in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "align selected cells left"
+      ]
+    },
+    {
+      "id": "PVA_0077",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "align selected cells right",
+          "align selected cells right now",
+          "align selected cells right in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "align selected cells right"
+      ]
+    },
+    {
+      "id": "PVA_0078",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "apply currency format",
+          "apply currency format now",
+          "apply currency format in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "apply currency format"
+      ]
+    },
+    {
+      "id": "PVA_0079",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "apply percent format",
+          "apply percent format now",
+          "apply percent format in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "apply percent format"
+      ]
+    },
+    {
+      "id": "PVA_0080",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "set two decimal places",
+          "set two decimal places now",
+          "set two decimal places in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "set two decimal places"
+      ]
+    },
+    {
+      "id": "PVA_0081",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "set date format",
+          "set date format now",
+          "set date format in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "set date format"
+      ]
+    },
+    {
+      "id": "PVA_0082",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "wrap text in selected cells",
+          "wrap text in selected cells now",
+          "wrap text in selected cells in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "wrap text in selected cells"
+      ]
+    },
+    {
+      "id": "PVA_0083",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "add thin border to selection",
+          "add thin border to selection now",
+          "add thin border to selection in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "add thin border to selection"
+      ]
+    },
+    {
+      "id": "PVA_0084",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "remove border from selection",
+          "remove border from selection now",
+          "remove border from selection in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "remove border from selection"
+      ]
+    },
+    {
+      "id": "PVA_0085",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "change text color in selection",
+          "change text color in selection now",
+          "change text color in selection in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "change text color in selection"
+      ]
+    },
+    {
+      "id": "PVA_0086",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "change fill color in selection",
+          "change fill color in selection now",
+          "change fill color in selection in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "change fill color in selection"
+      ]
+    },
+    {
+      "id": "PVA_0087",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "capitalize selected sentence",
+          "capitalize selected sentence now",
+          "capitalize selected sentence in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "capitalize selected sentence"
+      ]
+    },
+    {
+      "id": "PVA_0088",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "trim extra spaces in selection",
+          "trim extra spaces in selection now",
+          "trim extra spaces in selection in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "trim extra spaces in selection"
+      ]
+    },
+    {
+      "id": "PVA_0089",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "sort selected rows ascending",
+          "sort selected rows ascending now",
+          "sort selected rows ascending in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "sort selected rows ascending"
+      ]
+    },
+    {
+      "id": "PVA_0090",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "sort selected rows descending",
+          "sort selected rows descending now",
+          "sort selected rows descending in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "sort selected rows descending"
+      ]
+    },
+    {
+      "id": "PVA_0091",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "freeze top row",
+          "freeze top row now",
+          "freeze top row in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "freeze top row"
+      ]
+    },
+    {
+      "id": "PVA_0092",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "unfreeze panes",
+          "unfreeze panes now",
+          "unfreeze panes in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "unfreeze panes"
+      ]
+    },
+    {
+      "id": "PVA_0093",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "autofit selected columns",
+          "autofit selected columns now",
+          "autofit selected columns in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "autofit selected columns"
+      ]
+    },
+    {
+      "id": "PVA_0094",
+      "trigger": {
+        "operation": "trivial_formatting",
+        "phrases": [
+          "highlight selected row",
+          "highlight selected row now",
+          "highlight selected row in selection"
+        ]
+      },
+      "check": {
+        "isDestructive": false,
+        "isIrreversible": false,
+        "isAmbiguous": false,
+        "userConfirmed": true,
+        "hasScopedTarget": true,
+        "isTrivialFormatting": true
+      },
+      "action": {
+        "mode": "APPLY_DIRECT",
+        "requireConfirm": false,
+        "confirmLevel": "none",
+        "applyAllowed": true,
+        "next": "APPLY_AND_REPORT"
+      },
+      "guards": [
+        "guard:calculate_vs_format",
+        "guard:highlight_vs_summarize",
+        "guard:send_email_vs_export_file"
+      ],
+      "examples": [
+        "highlight selected row"
+      ]
+    }
+  ]
+}

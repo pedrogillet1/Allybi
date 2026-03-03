@@ -1,7 +1,14 @@
 import { createHash } from "crypto";
-import type { LLMClient, LLMMessage, LLMRequest } from "./llmClient.interface";
+import type {
+  LLMClient,
+  LLMCompletionResponse,
+  LLMStreamResponse,
+  LLMMessage,
+  LLMRequest,
+} from "./llmClient.interface";
 import type { LLMProvider } from "./llmErrors.types";
 import type { LLMStreamingConfig, StreamSink } from "./llmStreaming.types";
+import type { LlmRoutePlan } from "../types/llm.types";
 
 import type { LangCode } from "../prompts/promptRegistry.service";
 import { LlmRouterService } from "./llmRouter.service";
@@ -49,12 +56,25 @@ export interface LlmGatewayRequest {
 }
 
 interface PreparedGatewayRequest {
+  route: LlmRoutePlan;
   request: LLMRequest;
   promptType: string;
   promptTrace: GatewayPromptTrace;
   outputLanguage: LangCode;
   promptMode: "compose" | "retrieval_plan";
   userText: string;
+}
+
+interface GatewayClientResolver {
+  resolve(provider: LLMProvider): LLMClient | null;
+}
+
+interface GatewayExecutionAttempt {
+  provider: LLMProvider;
+  model: string;
+  status: "ok" | "fail";
+  durationMs: number;
+  errorCode?: string | null;
 }
 
 type GatewayDisambiguation = {
@@ -77,8 +97,16 @@ type MemoryPolicyRuntimeTuning = {
 };
 
 function mapProviderForRequest(provider: LLMProvider): LLMProvider {
-  if (provider === "unknown") return "google";
-  return provider;
+  const normalized = String(provider || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized || normalized === "unknown" || normalized === "gemini")
+    return "google";
+  if (normalized === "google") return "google";
+  if (normalized === "openai") return "openai";
+  if (normalized === "local") return "local";
+  if (normalized === "ollama") return "local";
+  return "unknown";
 }
 
 function mapPurpose(promptType: string): LLMRequest["purpose"] {
@@ -88,14 +116,28 @@ function mapPurpose(promptType: string): LLMRequest["purpose"] {
   return "answer_compose";
 }
 
-const composedFragmentCache = new BankRuntimeCache<{
+type ComposedCacheEntry = {
   text: string;
   telemetry?: Record<string, unknown>;
   promptTrace: GatewayPromptTrace;
-}>({
-  maxEntries: Number(process.env.BANK_COMPOSE_CACHE_MAX || 600),
-  ttlMs: Number(process.env.BANK_COMPOSE_CACHE_TTL_MS || 5 * 60 * 1000),
-});
+};
+
+let _composedFragmentCache: BankRuntimeCache<ComposedCacheEntry> | null = null;
+
+function getSharedComposedFragmentCache(): BankRuntimeCache<ComposedCacheEntry> {
+  if (!_composedFragmentCache) {
+    _composedFragmentCache = new BankRuntimeCache<ComposedCacheEntry>({
+      maxEntries: Number(process.env.BANK_COMPOSE_CACHE_MAX || 600),
+      ttlMs: Number(process.env.BANK_COMPOSE_CACHE_TTL_MS || 5 * 60 * 1000),
+    });
+  }
+  return _composedFragmentCache;
+}
+
+/** Clear gateway caches (for test teardown). */
+export function clearGatewayCaches(): void {
+  _composedFragmentCache = null;
+}
 
 function clampText(input: string, maxChars: number): string {
   const v = String(input || "").trim();
@@ -238,13 +280,39 @@ function hashEvidencePack(evidencePack: EvidencePackLike | null | undefined): st
 }
 
 export class LlmGatewayService {
+  private readonly answerModeRouter: ReturnType<typeof getAnswerModeRouterService>;
+  private readonly clientResolver?: GatewayClientResolver;
+
   constructor(
     private readonly llmClient: LLMClient,
     private readonly router: LlmRouterService,
     private readonly builder: LlmRequestBuilderService,
     private readonly cfg: LlmGatewayConfig,
-    private readonly answerModeRouter = getAnswerModeRouterService(),
-  ) {}
+    answerModeRouterOrResolver:
+      | ReturnType<typeof getAnswerModeRouterService>
+      | GatewayClientResolver = getAnswerModeRouterService(),
+    maybeResolver?: GatewayClientResolver,
+  ) {
+    if (LlmGatewayService.isClientResolver(answerModeRouterOrResolver)) {
+      this.answerModeRouter = getAnswerModeRouterService();
+      this.clientResolver = answerModeRouterOrResolver;
+    } else {
+      this.answerModeRouter = answerModeRouterOrResolver;
+      this.clientResolver = maybeResolver;
+    }
+  }
+
+  private static isClientResolver(
+    value:
+      | ReturnType<typeof getAnswerModeRouterService>
+      | GatewayClientResolver,
+  ): value is GatewayClientResolver {
+    return (
+      !!value &&
+      typeof value === "object" &&
+      typeof (value as GatewayClientResolver).resolve === "function"
+    );
+  }
 
   async generate(params: LlmGatewayRequest): Promise<{
     text: string;
@@ -252,6 +320,8 @@ export class LlmGatewayService {
     promptTrace: GatewayPromptTrace;
   }> {
     const prepared = this.prepareProviderRequest(params, false);
+    const routedProvider = prepared.request.model.provider;
+    const routedModel = prepared.request.model.model;
     const composeCacheEnabled =
       process.env.BANK_MULTI_LEVEL_CACHE_ENABLED === "true" &&
       process.env.BANK_COMPOSE_CACHE_ENABLED !== "false";
@@ -260,14 +330,21 @@ export class LlmGatewayService {
         ? this.buildComposeCacheKey(params, prepared)
         : null;
     if (composeCacheKey) {
-      const cached = composedFragmentCache.get(composeCacheKey);
+      const cached = getSharedComposedFragmentCache().get(composeCacheKey);
       if (cached) {
         return {
           text: cached.text,
           telemetry: {
             ...(cached.telemetry || {}),
-            provider: this.cfg.provider,
-            model: this.cfg.modelId,
+            provider: routedProvider,
+            model: routedModel,
+            routedProvider,
+            routedModel,
+            executedProvider: routedProvider,
+            executedModel: routedModel,
+            fallbackUsed: false,
+            attemptCount: 0,
+            attempts: [],
             finishReason: "cache_hit",
             promptType: prepared.promptType,
             requestedMaxOutputTokens:
@@ -279,11 +356,22 @@ export class LlmGatewayService {
         };
       }
     }
-    const response = await this.llmClient.complete(prepared.request);
+    const execution = await this.completeWithFallback(
+      prepared.route,
+      prepared.request,
+    );
+    const response = execution.response;
 
     const telemetry = {
-      provider: this.cfg.provider,
-      model: this.cfg.modelId,
+      provider: execution.executed.provider,
+      model: execution.executed.model,
+      routedProvider: execution.routed.provider,
+      routedModel: execution.routed.model,
+      executedProvider: execution.executed.provider,
+      executedModel: execution.executed.model,
+      fallbackUsed: execution.fallbackUsed,
+      attemptCount: execution.attempts.length,
+      attempts: execution.attempts,
       finishReason: response.finishReason || "unknown",
       usage: response.usage,
       promptType: prepared.promptType,
@@ -292,8 +380,8 @@ export class LlmGatewayService {
       cacheHit: false,
       ...prepared.promptTrace,
     };
-    if (composeCacheKey) {
-      composedFragmentCache.set(composeCacheKey, {
+    if (composeCacheKey && !execution.fallbackUsed) {
+      getSharedComposedFragmentCache().set(composeCacheKey, {
         text: response.content,
         telemetry,
         promptTrace: prepared.promptTrace,
@@ -321,13 +409,24 @@ export class LlmGatewayService {
       },
     };
     const prepared = this.prepareProviderRequest(enriched, false);
-    const response = await this.llmClient.complete(prepared.request);
+    const execution = await this.completeWithFallback(
+      prepared.route,
+      prepared.request,
+    );
+    const response = execution.response;
 
     return {
       text: response.content,
       telemetry: {
-        provider: this.cfg.provider,
-        model: this.cfg.modelId,
+        provider: execution.executed.provider,
+        model: execution.executed.model,
+        routedProvider: execution.routed.provider,
+        routedModel: execution.routed.model,
+        executedProvider: execution.executed.provider,
+        executedModel: execution.executed.model,
+        fallbackUsed: execution.fallbackUsed,
+        attemptCount: execution.attempts.length,
+        attempts: execution.attempts,
         finishReason: response.finishReason || "unknown",
         usage: response.usage,
         promptType: prepared.promptType,
@@ -350,17 +449,26 @@ export class LlmGatewayService {
     promptTrace: GatewayPromptTrace;
   }> {
     const prepared = this.prepareProviderRequest(params, true);
-    const result = await this.llmClient.stream({
-      req: prepared.request,
-      sink: params.sink,
-      config: params.streamingConfig,
-    });
+    const execution = await this.streamWithFallback(
+      prepared.route,
+      prepared.request,
+      params.sink,
+      params.streamingConfig,
+    );
+    const result = execution.response;
 
     return {
       finalText: result.finalText,
       telemetry: {
-        provider: this.cfg.provider,
-        model: this.cfg.modelId,
+        provider: execution.executed.provider,
+        model: execution.executed.model,
+        routedProvider: execution.routed.provider,
+        routedModel: execution.routed.model,
+        executedProvider: execution.executed.provider,
+        executedModel: execution.executed.model,
+        fallbackUsed: execution.fallbackUsed,
+        attemptCount: execution.attempts.length,
+        attempts: execution.attempts,
         finishReason: result.finishReason || "unknown",
         usage: result.usage,
         promptType: prepared.promptType,
@@ -370,6 +478,254 @@ export class LlmGatewayService {
       },
       promptTrace: prepared.promptTrace,
     };
+  }
+
+  private resolveClient(provider: LLMProvider): LLMClient | null {
+    const normalized = mapProviderForRequest(provider);
+    if (normalized === this.llmClient.provider) return this.llmClient;
+    return this.clientResolver?.resolve(normalized) ?? null;
+  }
+
+  private buildAttemptOrder(
+    route: LlmRoutePlan,
+  ): Array<{ provider: LLMProvider; model: string }> {
+    const order: Array<{ provider: LLMProvider; model: string }> = [
+      {
+        provider: mapProviderForRequest(route.provider as LLMProvider),
+        model: route.model,
+      },
+    ];
+
+    const fallbackTargets =
+      typeof (this.router as { listFallbackTargets?: unknown })
+        .listFallbackTargets === "function"
+        ? (
+            this.router as {
+              listFallbackTargets: (input: {
+                primary: {
+                  provider: string;
+                  model: string;
+                  stage: "draft" | "final";
+                };
+                requireStreaming?: boolean;
+                allowTools?: boolean;
+              }) => Array<{ provider: string; model: string }>;
+            }
+          ).listFallbackTargets({
+            primary: {
+              provider: route.provider,
+              model: route.model,
+              stage: route.stage === "draft" ? "draft" : "final",
+            },
+            requireStreaming: route.constraints?.requireStreaming,
+            allowTools: route.constraints?.disallowTools !== true,
+          })
+        : [];
+
+    for (const t of fallbackTargets) {
+      order.push({
+        provider: mapProviderForRequest(t.provider as LLMProvider),
+        model: t.model,
+      });
+    }
+
+    const deduped: Array<{ provider: LLMProvider; model: string }> = [];
+    const seen = new Set<string>();
+    for (const item of order) {
+      const key = `${item.provider}:${item.model}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(item);
+    }
+    return deduped;
+  }
+
+  private static toErrorCode(err: unknown): string {
+    if (err && typeof err === "object") {
+      const code = (err as Record<string, unknown>).code;
+      if (typeof code === "string" && code.trim()) return code.trim();
+      const message = (err as Record<string, unknown>).message;
+      if (typeof message === "string" && message.trim()) {
+        return message.trim().slice(0, 120);
+      }
+    }
+    return "LLM_GENERATION_FAILED";
+  }
+
+  private async completeWithFallback(
+    route: LlmRoutePlan,
+    request: LLMRequest,
+  ): Promise<{
+    response: LLMCompletionResponse;
+    attempts: GatewayExecutionAttempt[];
+    routed: { provider: LLMProvider; model: string };
+    executed: { provider: LLMProvider; model: string };
+    fallbackUsed: boolean;
+  }> {
+    const routed = {
+      provider: mapProviderForRequest(route.provider as LLMProvider),
+      model: route.model,
+    };
+    const attempts: GatewayExecutionAttempt[] = [];
+    const order = this.buildAttemptOrder(route);
+    let lastError: unknown = null;
+
+    for (const candidate of order) {
+      const client = this.resolveClient(candidate.provider);
+      if (!client) {
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "fail",
+          durationMs: 0,
+          errorCode: "LLM_CLIENT_NOT_CONFIGURED",
+        });
+        continue;
+      }
+
+      const attemptRequest: LLMRequest = {
+        ...request,
+        model: {
+          provider: candidate.provider,
+          model: candidate.model,
+        },
+      };
+
+      const startedAtMs = Date.now();
+      try {
+        const response = await client.complete(attemptRequest);
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "ok",
+          durationMs: Date.now() - startedAtMs,
+          errorCode: null,
+        });
+        return {
+          response,
+          attempts,
+          routed,
+          executed: candidate,
+          fallbackUsed:
+            candidate.provider !== routed.provider ||
+            candidate.model !== routed.model,
+        };
+      } catch (err) {
+        lastError = err;
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "fail",
+          durationMs: Date.now() - startedAtMs,
+          errorCode: LlmGatewayService.toErrorCode(err),
+        });
+      }
+    }
+
+    if (lastError) throw lastError;
+    throw new Error("LLM_CLIENT_NOT_CONFIGURED");
+  }
+
+  private async streamWithFallback(
+    route: LlmRoutePlan,
+    request: LLMRequest,
+    sink: StreamSink,
+    streamingConfig: LLMStreamingConfig,
+  ): Promise<{
+    response: LLMStreamResponse;
+    attempts: GatewayExecutionAttempt[];
+    routed: { provider: LLMProvider; model: string };
+    executed: { provider: LLMProvider; model: string };
+    fallbackUsed: boolean;
+  }> {
+    const routed = {
+      provider: mapProviderForRequest(route.provider as LLMProvider),
+      model: route.model,
+    };
+    const attempts: GatewayExecutionAttempt[] = [];
+    const order = this.buildAttemptOrder(route);
+    let lastError: unknown = null;
+
+    for (const candidate of order) {
+      const client = this.resolveClient(candidate.provider);
+      if (!client) {
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "fail",
+          durationMs: 0,
+          errorCode: "LLM_CLIENT_NOT_CONFIGURED",
+        });
+        continue;
+      }
+
+      const attemptRequest: LLMRequest = {
+        ...request,
+        model: {
+          provider: candidate.provider,
+          model: candidate.model,
+        },
+      };
+
+      let wroteEvents = 0;
+      let closeRequested = false;
+      const retryableSink: StreamSink = {
+        transport: sink.transport,
+        write(event) {
+          wroteEvents += 1;
+          sink.write(event);
+        },
+        flush: sink.flush ? () => sink.flush!() : undefined,
+        close() {
+          closeRequested = true;
+        },
+        isOpen() {
+          return sink.isOpen();
+        },
+      };
+
+      const startedAtMs = Date.now();
+      try {
+        const response = await client.stream({
+          req: attemptRequest,
+          sink: retryableSink,
+          config: streamingConfig,
+        });
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "ok",
+          durationMs: Date.now() - startedAtMs,
+          errorCode: null,
+        });
+        if (closeRequested && sink.isOpen()) sink.close();
+        return {
+          response,
+          attempts,
+          routed,
+          executed: candidate,
+          fallbackUsed:
+            candidate.provider !== routed.provider ||
+            candidate.model !== routed.model,
+        };
+      } catch (err) {
+        lastError = err;
+        attempts.push({
+          provider: candidate.provider,
+          model: candidate.model,
+          status: "fail",
+          durationMs: Date.now() - startedAtMs,
+          errorCode: LlmGatewayService.toErrorCode(err),
+        });
+
+        // If any events were already sent (or close was requested), the stream is
+        // already externally observable. Retrying would duplicate/overlap events.
+        if (wroteEvents > 0 || closeRequested) throw err;
+      }
+    }
+
+    if (lastError) throw lastError;
+    throw new Error("LLM_CLIENT_NOT_CONFIGURED");
   }
 
   private buildComposeCacheKey(
@@ -400,8 +756,8 @@ export class LlmGatewayService {
       locale,
       userTextHash,
       promptMode: prepared.promptMode,
-      modelVersion: this.cfg.modelId,
-      provider: this.cfg.provider,
+      modelVersion: prepared.request.model.model,
+      provider: prepared.request.model.provider,
       promptHashes,
       composeCacheVersion: "v1",
     };
@@ -413,14 +769,25 @@ export class LlmGatewayService {
     streaming: boolean,
   ): PreparedGatewayRequest {
     const parsed = this.parseIncomingMessages(params);
+    const routeStage: "draft" | "final" =
+      parsed.promptMode === "retrieval_plan" ||
+      parsed.answerMode === "nav_pills" ||
+      parsed.answerMode === "help_steps"
+        ? "draft"
+        : "final";
+    const routeReasonCodes = [
+      ...(parsed.fallback?.reasonCode ? [parsed.fallback.reasonCode] : []),
+      ...(parsed.semanticFlags || []),
+    ];
 
     const route = this.router.route({
       env: this.cfg.env,
-      stage: "final",
+      stage: routeStage,
       answerMode: parsed.answerMode,
       intentFamily: parsed.intentFamily,
       operator: parsed.operator,
       operatorFamily: parsed.operatorFamily,
+      reasonCodes: routeReasonCodes,
       requireStreaming: streaming,
       allowTools: false,
     });
@@ -534,8 +901,8 @@ export class LlmGatewayService {
       traceId: params.traceId,
       turnId: `turn_${Date.now().toString(36)}`,
       model: {
-        provider: mapProviderForRequest(this.cfg.provider),
-        model: this.cfg.modelId,
+        provider: mapProviderForRequest(route.provider as LLMProvider),
+        model: route.model || this.cfg.modelId,
       },
       messages: providerMessages,
       sampling: {
@@ -557,6 +924,7 @@ export class LlmGatewayService {
     };
 
     return {
+      route,
       request,
       promptType: String(
         kodaMeta?.promptType || "compose_answer",

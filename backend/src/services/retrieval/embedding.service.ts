@@ -160,7 +160,7 @@ export class EmbeddingsService {
     }
 
     if (this.cfg.enableCache) {
-      const cached = await cacheService.getCachedEmbedding(processedText);
+      const cached = await cacheService.getCachedEmbedding(processedText, this.cfg.model, this.cfg.dimensions);
       if (cached && Array.isArray(cached) && cached.length > 0) {
         return {
           text: processedText,
@@ -176,7 +176,7 @@ export class EmbeddingsService {
     ]).then((arr) => arr[0]);
 
     if (this.cfg.enableCache) {
-      await cacheService.cacheEmbedding(processedText, embedding);
+      await cacheService.cacheEmbedding(processedText, embedding, this.cfg.model, this.cfg.dimensions);
     }
 
     return {
@@ -218,7 +218,7 @@ export class EmbeddingsService {
       const cachedResults = await Promise.all(
         processed.map(async (t, idx) => {
           if (!t) return { idx, text: t, cached: null as number[] | null };
-          const cached = await cacheService.getCachedEmbedding(t);
+          const cached = await cacheService.getCachedEmbedding(t, this.cfg.model, this.cfg.dimensions);
           return { idx, text: t, cached };
         }),
       );
@@ -302,7 +302,7 @@ export class EmbeddingsService {
           }
 
           if (this.cfg.enableCache) {
-            cachePromises.push(cacheService.cacheEmbedding(text, emb));
+            cachePromises.push(cacheService.cacheEmbedding(text, emb, this.cfg.model, this.cfg.dimensions));
           }
 
           out[idx] = {

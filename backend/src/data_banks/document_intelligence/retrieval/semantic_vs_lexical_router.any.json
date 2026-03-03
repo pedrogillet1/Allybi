@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "id": "semantic_vs_lexical_router",
+    "version": "1.0.0",
+    "description": "Policy for semantic vs lexical retrieval routing.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultMode": "blended",
+    "semanticFloor": 0.25,
+    "lexicalFloor": 0.2
+  },
+  "routes": [
+    {
+      "id": "SVL_001",
+      "mode": "lexical",
+      "conditions": ["query.hasExactTokens == true", "query.hasNumericUnits == true"]
+    },
+    {
+      "id": "SVL_002",
+      "mode": "semantic",
+      "conditions": ["query.semanticSimilarity > 0.62", "query.hasExactTokens == false"]
+    }
+  ],
+  "weights": {
+    "semantic": 0.56,
+    "lexical": 0.44
+  },
+  "rules": [
+    {
+      "id": "SVL_101",
+      "trigger": "Missing exact quote while requiring exact citation",
+      "check": "context.requiresExactQuote == true",
+      "failureAction": "FORCE_LEXICAL_ROUTE"
+    }
+  ],
+  "templates": [
+    {
+      "id": "SEMANTIC_VS_LEXICAL_ROUTER_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in semantic_vs_lexical_router.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

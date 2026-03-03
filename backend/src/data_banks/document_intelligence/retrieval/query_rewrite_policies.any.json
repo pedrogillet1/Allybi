@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "id": "query_rewrite_policies",
+    "version": "1.0.0",
+    "description": "Canonical rewriting rules for malformed or shorthand queries.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "applySafeRewrite": true,
+    "maxRewritesPerQuery": 2
+  },
+  "rewrites": [
+    {
+      "id": "RQ_001",
+      "pattern": "\\bYTD\\b",
+      "replaceWith": "year to date",
+      "domain": "finance"
+    },
+    {
+      "id": "RQ_002",
+      "pattern": "\\b10k\\b",
+      "replaceWith": "form 10-k",
+      "domain": "finance"
+    }
+  ],
+  "rules": [
+    {
+      "id": "RQ_101",
+      "trigger": "Rewrite matched query token",
+      "check": "query.wasRewritten == true",
+      "failureAction": "VALIDATE_REWRITE_SCOPE"
+    }
+  ],
+  "templates": [
+    {
+      "id": "QUERY_REWRITE_POLICIES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in query_rewrite_policies.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

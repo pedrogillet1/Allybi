@@ -1,0 +1,200 @@
+{
+  "_meta": {
+    "id": "di_accounting_entities_acct_general_ledger",
+    "version": "1.1.0",
+    "description": "Entity schema for acct_general_ledger accounting documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_general_ledger"
+  },
+  "entities": [
+    {
+      "id": "docTypeId",
+      "type": "string",
+      "required": true,
+      "description": "DocType identifier for extraction routing"
+    },
+    {
+      "id": "documentTitle",
+      "type": "string",
+      "required": false,
+      "description": "Document title as printed on the document header"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Reporting entity or legal entity name"
+    },
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Period label captured from document"
+    },
+    {
+      "id": "periodStart",
+      "type": "date",
+      "required": false,
+      "description": "Period start date"
+    },
+    {
+      "id": "periodEnd",
+      "type": "date",
+      "required": false,
+      "description": "Period end date"
+    },
+    {
+      "id": "asOfDate",
+      "type": "date",
+      "required": false,
+      "description": "As-of date for balances"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or reporting currency"
+    },
+    {
+      "id": "isMultiCurrency",
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the report spans multiple currencies"
+    },
+    {
+      "id": "presentationCurrency",
+      "type": "string",
+      "required": false,
+      "description": "Presentation currency when single-currency summary is shown"
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": false,
+      "description": "Source system or export generator"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": false,
+      "description": "Accounting basis in use",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "totalRows",
+      "type": "number",
+      "required": false,
+      "description": "Total row count extracted from the main tables"
+    },
+    {
+      "id": "lineCount",
+      "type": "number",
+      "required": false,
+      "description": "Total count of detail lines"
+    },
+    {
+      "id": "missingRows",
+      "type": "number",
+      "required": false,
+      "description": "Rows that failed to parse"
+    },
+    {
+      "id": "currencyCount",
+      "type": "number",
+      "required": false,
+      "description": "Number of distinct currencies present"
+    },
+    {
+      "id": "extractionStatus",
+      "type": "enum",
+      "required": false,
+      "description": "Extraction completeness",
+      "values": [
+        "full",
+        "partial",
+        "manual_review"
+      ]
+    },
+    {
+      "id": "anomalyCount",
+      "type": "number",
+      "required": false,
+      "description": "Count of validation anomalies identified"
+    },
+    {
+      "id": "controlReference",
+      "type": "string",
+      "required": false,
+      "description": "Internal control or review reference"
+    },
+    {
+      "id": "fileDate",
+      "type": "date",
+      "required": false,
+      "description": "File generation date if available"
+    },
+    {
+      "id": "runBy",
+      "type": "string",
+      "required": false,
+      "description": "System/user that produced the export"
+    },
+    {
+      "id": "status",
+      "type": "enum",
+      "required": false,
+      "description": "Export status label",
+      "values": [
+        "final",
+        "draft",
+        "interim",
+        "archived",
+        "amended"
+      ]
+    },
+    {
+      "id": "journalCount",
+      "type": "number",
+      "required": false,
+      "description": "Count of journal or ledger lines"
+    },
+    {
+      "id": "uniqueAccounts",
+      "type": "number",
+      "required": false,
+      "description": "Count of unique account codes"
+    },
+    {
+      "id": "lineSource",
+      "type": "string",
+      "required": false,
+      "description": "Primary source file name"
+    },
+    {
+      "id": "totalDebits",
+      "type": "currency",
+      "required": false,
+      "description": "Total debit across rows"
+    },
+    {
+      "id": "totalCredits",
+      "type": "currency",
+      "required": false,
+      "description": "Total credit across rows"
+    }
+  ]
+}

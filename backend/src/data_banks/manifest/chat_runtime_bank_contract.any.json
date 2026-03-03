@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "id": "chat_runtime_bank_contract",
+    "version": "1.0.0",
+    "description": "Fail-closed chat runtime contract that guarantees all registered data banks are loadable before chat execution. This keeps orchestrator/runtime behavior deterministic and prevents silent bank drift.",
+    "languages": [
+      "any"
+    ],
+    "usedBy": [
+      "ChatRuntimeService",
+      "RuntimeWiringIntegrityService",
+      "runtime-bank-coverage"
+    ],
+    "tests": {
+      "positive": [
+        "chat runtime preloads all registered banks before first answer",
+        "mode-switch banks are available for chat/editor mode routing"
+      ],
+      "negative": [
+        "missing registered bank fails chat runtime bootstrap",
+        "empty contract set is rejected"
+      ]
+    },
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosed": true,
+    "enforceOnBoot": true,
+    "description": "Require full registry coverage in runtime chat bootstrap."
+  },
+  "coreRequiredBankIds": [
+    "bank_registry",
+    "chat_runtime_bank_contract",
+    "intent_config",
+    "intent_patterns",
+    "operator_contracts",
+    "operator_families",
+    "operator_output_shapes",
+    "render_policy"
+  ],
+  "chatModeRequiredBankIds": [
+    "patterns_modes_mode_switch_en",
+    "patterns_modes_mode_switch_pt",
+    "patterns_modes_preview_vs_apply"
+  ],
+  "requiredBankIdPrefixes": [],
+  "requiredBankIdPatterns": [
+    "^.+$"
+  ]
+}

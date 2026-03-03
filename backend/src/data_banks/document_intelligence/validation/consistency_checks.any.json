@@ -1,0 +1,80 @@
+{
+  "_meta": {
+    "id": "consistency_checks",
+    "version": "1.0.0",
+    "description": "Cross-field consistency and logical coherence checks before finalizing answers.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxInconsistencies": 3,
+    "requireDisagreementDisclosure": true
+  },
+  "checks": [
+    {
+      "id": "CC_001_header_body_alignment",
+      "trigger": "Section/heading mismatch between cited row and referenced value.",
+      "check": "output.citedValue.sectionHeader != output.value.sectionHeader",
+      "failureAction": "BLOCK_AND_RETRIEVE_CELL_CONTEXT",
+      "severity": "error",
+      "examples": [
+        "Value shown under Assets but cited as liabilities heading.",
+        "Revenue table entry attributed to Summary section."
+      ]
+    },
+    {
+      "id": "CC_002_period_chain_consistency",
+      "trigger": "One answer mixes YTD and quarter scopes without explicit conversion.",
+      "check": "facts.some((f) => f.scopeMode == 'quarter') AND facts.some((f) => f.scopeMode == 'ytd')",
+      "failureAction": "ASK_PERIOD_DISAMBIGUATION",
+      "severity": "warning",
+      "examples": [
+        "Q2 figure compared to YTD total.",
+        "Month and quarter values blended in same paragraph."
+      ]
+    },
+    {
+      "id": "CC_003_entity_scope_consistency",
+      "trigger": "Numeric comparison spans two entities without explicit consolidation flag.",
+      "check": "query.compareEntities == true AND context.explicitEntityConsolidation == false AND context.entities.uniqCount > 1",
+      "failureAction": "BLOCK_CONSOLIDATION_GUARD",
+      "severity": "warning",
+      "examples": [
+        "Compares BR and US entities as if single balance.",
+        "Inter-company and consolidated values mixed."
+      ]
+    },
+    {
+      "id": "CC_004_currency_basis_consistency",
+      "trigger": "Same calculation chain contains mixed currencies without explicit FX context.",
+      "check": "facts.map(f => f.currency).unique().count > 1 AND context.fxRateUsed == null",
+      "failureAction": "ASK_FX_BASIS",
+      "severity": "error",
+      "examples": [
+        "USD and BRL totals summed without conversion basis.",
+        "Local and reporting currency compared side by side."
+      ]
+    },
+    {
+      "id": "CC_005_unit_basis_consistency",
+      "trigger": "Values with different unit scales are combined.",
+      "check": "output.numericComparisons.any(c => c.baseUnit != c.comparedUnit)",
+      "failureAction": "NORMALIZE_WITH_SCALE_EXPLANATION",
+      "severity": "warning",
+      "examples": [
+        "Adds thousands to units without scaling.",
+        "Mixes USD and USDk in totals."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "CC_R_001_negatives_for_debits",
+      "trigger": "Debit/credit values appear with swapped sign convention between adjacent rows.",
+      "check": "output.tableRows.any(r => r.signConventionChangedWithinBlock == true)",
+      "failureAction": "FLAG_SIGN_MISMATCH",
+      "severity": "error"
+    }
+  ]
+}

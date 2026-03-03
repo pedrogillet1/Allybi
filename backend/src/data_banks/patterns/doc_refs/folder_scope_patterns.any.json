@@ -1,0 +1,3679 @@
+{
+  "_meta": {
+    "bankId": "folder_scope_patterns",
+    "version": "1.0.0",
+    "owner": "doc-reference-curation",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "doc_type_catalog_ssot",
+      "routing_scope_policies"
+    ],
+    "usedBy": [
+      "doc_intent_router",
+      "doc_scope_resolver"
+    ],
+    "tests": {
+      "positive": [
+        "Compare the latest 10-K against the prior 10-K filing",
+        "Puxa o resumo do NDA recente",
+        "No documento de orçamento, use only the signed version"
+      ],
+      "negative": [
+        "What is the weather tomorrow?",
+        "Tell me how to cook pasta"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_doc_refs_folder_scope_patterns",
+    "description": "Auto-registered bank payload for patterns/doc_refs/folder_scope_patterns.any.json"
+  },
+  "patterns": [
+    {
+      "id": "FSP_0001",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0002",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0003",
+      "en": [
+        "inside folder medical"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0004",
+      "en": [
+        "only in folder accounting"
+      ],
+      "pt": [
+        "apenas na pasta accounting"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0005",
+      "en": [
+        "restricted to folder archive"
+      ],
+      "pt": [
+        "somente na pasta archive"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0006",
+      "en": [
+        "from signed only"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta signed"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0007",
+      "en": [
+        "do not use documents outside submitted"
+      ],
+      "pt": [
+        "dos documentos da pasta submitted"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0008",
+      "en": [
+        "docs under draft"
+      ],
+      "pt": [
+        "dentro do diretório draft"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0009",
+      "en": [
+        "documents inside tax"
+      ],
+      "pt": [
+        "somente na coleção tax"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0010",
+      "en": [
+        "look only at audit"
+      ],
+      "pt": [
+        "apenas dentro de audit"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0011",
+      "en": [
+        "inside the contracts directory"
+      ],
+      "pt": [
+        "entre as pastas contracts e finance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0012",
+      "en": [
+        "inside finance scope"
+      ],
+      "pt": [
+        "fora da pasta finance não considerar"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0013",
+      "en": [
+        "between folders legal and submitted"
+      ],
+      "pt": [
+        "na pasta de arquivamento"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0014",
+      "en": [
+        "exclude outside medical"
+      ],
+      "pt": [
+        "na pasta ativa"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0015",
+      "en": [
+        "from the accounting collection only"
+      ],
+      "pt": [
+        "na pasta de pendencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0016",
+      "en": [
+        "from the archive pack only"
+      ],
+      "pt": [
+        "na pasta mais recente"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0017",
+      "en": [
+        "inside the signed workspace"
+      ],
+      "pt": [
+        "na pasta de aprovação"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0018",
+      "en": [
+        "in the archived folder"
+      ],
+      "pt": [
+        "na pasta de evidencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0019",
+      "en": [
+        "in the active folder"
+      ],
+      "pt": [
+        "na pasta de trabalho"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0020",
+      "en": [
+        "in the pending docs folder"
+      ],
+      "pt": [
+        "na pasta de compliance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0021",
+      "en": [
+        "inside the latest folder"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0022",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0023",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0024",
+      "en": [
+        "inside folder legal"
+      ],
+      "pt": [
+        "apenas na pasta legal"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0025",
+      "en": [
+        "only in folder medical"
+      ],
+      "pt": [
+        "somente na pasta medical"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0026",
+      "en": [
+        "restricted to folder accounting"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta accounting"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0027",
+      "en": [
+        "from archive only"
+      ],
+      "pt": [
+        "dos documentos da pasta archive"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0028",
+      "en": [
+        "do not use documents outside signed"
+      ],
+      "pt": [
+        "dentro do diretório signed"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0029",
+      "en": [
+        "docs under submitted"
+      ],
+      "pt": [
+        "somente na coleção submitted"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0030",
+      "en": [
+        "documents inside draft"
+      ],
+      "pt": [
+        "apenas dentro de draft"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0031",
+      "en": [
+        "look only at tax"
+      ],
+      "pt": [
+        "entre as pastas tax e signed"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0032",
+      "en": [
+        "inside the audit directory"
+      ],
+      "pt": [
+        "fora da pasta audit não considerar"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0033",
+      "en": [
+        "inside contracts scope"
+      ],
+      "pt": [
+        "na pasta de arquivamento"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0034",
+      "en": [
+        "between folders finance and accounting"
+      ],
+      "pt": [
+        "na pasta ativa"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0035",
+      "en": [
+        "exclude outside legal"
+      ],
+      "pt": [
+        "na pasta de pendencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0036",
+      "en": [
+        "from the medical collection only"
+      ],
+      "pt": [
+        "na pasta mais recente"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0037",
+      "en": [
+        "from the accounting pack only"
+      ],
+      "pt": [
+        "na pasta de aprovação"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0038",
+      "en": [
+        "inside the archive workspace"
+      ],
+      "pt": [
+        "na pasta de evidencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0039",
+      "en": [
+        "in the archived folder"
+      ],
+      "pt": [
+        "na pasta de trabalho"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0040",
+      "en": [
+        "in the active folder"
+      ],
+      "pt": [
+        "na pasta de compliance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0041",
+      "en": [
+        "in the pending docs folder"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0042",
+      "en": [
+        "inside the latest folder"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0043",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0044",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "apenas na pasta contracts"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0045",
+      "en": [
+        "inside folder finance"
+      ],
+      "pt": [
+        "somente na pasta finance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0046",
+      "en": [
+        "only in folder legal"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta legal"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0047",
+      "en": [
+        "restricted to folder medical"
+      ],
+      "pt": [
+        "dos documentos da pasta medical"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0048",
+      "en": [
+        "from accounting only"
+      ],
+      "pt": [
+        "dentro do diretório accounting"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0049",
+      "en": [
+        "do not use documents outside archive"
+      ],
+      "pt": [
+        "somente na coleção archive"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0050",
+      "en": [
+        "docs under signed"
+      ],
+      "pt": [
+        "apenas dentro de signed"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0051",
+      "en": [
+        "documents inside submitted"
+      ],
+      "pt": [
+        "entre as pastas submitted e contracts"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0052",
+      "en": [
+        "look only at draft"
+      ],
+      "pt": [
+        "fora da pasta draft não considerar"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0053",
+      "en": [
+        "inside the tax directory"
+      ],
+      "pt": [
+        "na pasta de arquivamento"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0054",
+      "en": [
+        "inside audit scope"
+      ],
+      "pt": [
+        "na pasta ativa"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0055",
+      "en": [
+        "between folders contracts and finance"
+      ],
+      "pt": [
+        "na pasta de pendencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0056",
+      "en": [
+        "exclude outside finance"
+      ],
+      "pt": [
+        "na pasta mais recente"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0057",
+      "en": [
+        "from the legal collection only"
+      ],
+      "pt": [
+        "na pasta de aprovação"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0058",
+      "en": [
+        "from the medical pack only"
+      ],
+      "pt": [
+        "na pasta de evidencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0059",
+      "en": [
+        "inside the accounting workspace"
+      ],
+      "pt": [
+        "na pasta de trabalho"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0060",
+      "en": [
+        "in the archived folder"
+      ],
+      "pt": [
+        "na pasta de compliance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0061",
+      "en": [
+        "in the active folder"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0062",
+      "en": [
+        "in the pending docs folder"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0063",
+      "en": [
+        "inside the latest folder"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0064",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "apenas na pasta tax"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0065",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "somente na pasta audit"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0066",
+      "en": [
+        "inside folder contracts"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta contracts"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0067",
+      "en": [
+        "only in folder finance"
+      ],
+      "pt": [
+        "dos documentos da pasta finance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0068",
+      "en": [
+        "restricted to folder legal"
+      ],
+      "pt": [
+        "dentro do diretório legal"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0069",
+      "en": [
+        "from medical only"
+      ],
+      "pt": [
+        "somente na coleção medical"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0070",
+      "en": [
+        "do not use documents outside accounting"
+      ],
+      "pt": [
+        "apenas dentro de accounting"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0071",
+      "en": [
+        "docs under archive"
+      ],
+      "pt": [
+        "entre as pastas archive e archive"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0072",
+      "en": [
+        "documents inside signed"
+      ],
+      "pt": [
+        "fora da pasta signed não considerar"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0073",
+      "en": [
+        "look only at submitted"
+      ],
+      "pt": [
+        "na pasta de arquivamento"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0074",
+      "en": [
+        "inside the draft directory"
+      ],
+      "pt": [
+        "na pasta ativa"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0075",
+      "en": [
+        "inside tax scope"
+      ],
+      "pt": [
+        "na pasta de pendencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0076",
+      "en": [
+        "between folders audit and tax"
+      ],
+      "pt": [
+        "na pasta mais recente"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0077",
+      "en": [
+        "exclude outside contracts"
+      ],
+      "pt": [
+        "na pasta de aprovação"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0078",
+      "en": [
+        "from the finance collection only"
+      ],
+      "pt": [
+        "na pasta de evidencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0079",
+      "en": [
+        "from the legal pack only"
+      ],
+      "pt": [
+        "na pasta de trabalho"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0080",
+      "en": [
+        "inside the medical workspace"
+      ],
+      "pt": [
+        "na pasta de compliance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0081",
+      "en": [
+        "in the archived folder"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0082",
+      "en": [
+        "in the active folder"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0083",
+      "en": [
+        "in the pending docs folder"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0084",
+      "en": [
+        "inside the latest folder"
+      ],
+      "pt": [
+        "apenas na pasta submitted"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0085",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "somente na pasta draft"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0086",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta tax"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0087",
+      "en": [
+        "inside folder audit"
+      ],
+      "pt": [
+        "dos documentos da pasta audit"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0088",
+      "en": [
+        "only in folder contracts"
+      ],
+      "pt": [
+        "dentro do diretório contracts"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0089",
+      "en": [
+        "restricted to folder finance"
+      ],
+      "pt": [
+        "somente na coleção finance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0090",
+      "en": [
+        "from legal only"
+      ],
+      "pt": [
+        "apenas dentro de legal"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0091",
+      "en": [
+        "do not use documents outside medical"
+      ],
+      "pt": [
+        "entre as pastas medical e audit"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0092",
+      "en": [
+        "docs under accounting"
+      ],
+      "pt": [
+        "fora da pasta accounting não considerar"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0093",
+      "en": [
+        "documents inside archive"
+      ],
+      "pt": [
+        "na pasta de arquivamento"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0094",
+      "en": [
+        "look only at signed"
+      ],
+      "pt": [
+        "na pasta ativa"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0095",
+      "en": [
+        "inside the submitted directory"
+      ],
+      "pt": [
+        "na pasta de pendencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0096",
+      "en": [
+        "inside draft scope"
+      ],
+      "pt": [
+        "na pasta mais recente"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0097",
+      "en": [
+        "between folders tax and signed"
+      ],
+      "pt": [
+        "na pasta de aprovação"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0098",
+      "en": [
+        "exclude outside audit"
+      ],
+      "pt": [
+        "na pasta de evidencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0099",
+      "en": [
+        "from the contracts collection only"
+      ],
+      "pt": [
+        "na pasta de trabalho"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0100",
+      "en": [
+        "from the finance pack only"
+      ],
+      "pt": [
+        "na pasta de compliance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0101",
+      "en": [
+        "inside the legal workspace"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0102",
+      "en": [
+        "in the archived folder"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0103",
+      "en": [
+        "in the active folder"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0104",
+      "en": [
+        "in the pending docs folder"
+      ],
+      "pt": [
+        "apenas na pasta archive"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0105",
+      "en": [
+        "inside the latest folder"
+      ],
+      "pt": [
+        "somente na pasta signed"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0106",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta submitted"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0107",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "dos documentos da pasta draft"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0108",
+      "en": [
+        "inside folder tax"
+      ],
+      "pt": [
+        "dentro do diretório tax"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0109",
+      "en": [
+        "only in folder audit"
+      ],
+      "pt": [
+        "somente na coleção audit"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0110",
+      "en": [
+        "restricted to folder contracts"
+      ],
+      "pt": [
+        "apenas dentro de contracts"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0111",
+      "en": [
+        "from finance only"
+      ],
+      "pt": [
+        "entre as pastas finance e accounting"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0112",
+      "en": [
+        "do not use documents outside legal"
+      ],
+      "pt": [
+        "fora da pasta legal não considerar"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0113",
+      "en": [
+        "docs under medical"
+      ],
+      "pt": [
+        "na pasta de arquivamento"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0114",
+      "en": [
+        "documents inside accounting"
+      ],
+      "pt": [
+        "na pasta ativa"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0115",
+      "en": [
+        "look only at archive"
+      ],
+      "pt": [
+        "na pasta de pendencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0116",
+      "en": [
+        "inside the signed directory"
+      ],
+      "pt": [
+        "na pasta mais recente"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0117",
+      "en": [
+        "inside submitted scope"
+      ],
+      "pt": [
+        "na pasta de aprovação"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0118",
+      "en": [
+        "between folders draft and medical"
+      ],
+      "pt": [
+        "na pasta de evidencias"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0119",
+      "en": [
+        "exclude outside tax"
+      ],
+      "pt": [
+        "na pasta de trabalho"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0120",
+      "en": [
+        "from the audit collection only"
+      ],
+      "pt": [
+        "na pasta de compliance"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:audit"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0121",
+      "en": [
+        "from the contracts pack only"
+      ],
+      "pt": [
+        "nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:contracts"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0122",
+      "en": [
+        "inside the finance workspace"
+      ],
+      "pt": [
+        "dentro desta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:finance"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0123",
+      "en": [
+        "in the archived folder"
+      ],
+      "pt": [
+        "somente nesta pasta"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:legal"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0124",
+      "en": [
+        "in the active folder"
+      ],
+      "pt": [
+        "apenas na pasta medical"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:medical"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0125",
+      "en": [
+        "in the pending docs folder"
+      ],
+      "pt": [
+        "somente na pasta accounting"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:accounting"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0126",
+      "en": [
+        "inside the latest folder"
+      ],
+      "pt": [
+        "não usar documentos fora da pasta archive"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:archive"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0127",
+      "en": [
+        "in this folder"
+      ],
+      "pt": [
+        "dos documentos da pasta signed"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:signed"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0128",
+      "en": [
+        "within this folder"
+      ],
+      "pt": [
+        "dentro do diretório submitted"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:submitted"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0129",
+      "en": [
+        "inside folder draft"
+      ],
+      "pt": [
+        "somente na coleção draft"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:draft"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    },
+    {
+      "id": "FSP_0130",
+      "en": [
+        "only in folder tax"
+      ],
+      "pt": [
+        "apenas dentro de tax"
+      ],
+      "triggers": [
+        "folder_scope",
+        "scope_only",
+        "folder:tax"
+      ],
+      "negatives": [
+        "all-folders wildcard request",
+        "no folder boundary mention"
+      ],
+      "slotHints": [
+        "folderName",
+        "scopeMode",
+        "scopeBoundary"
+      ],
+      "telemetryTags": [
+        "folder_scope",
+        "scope_precision",
+        "document_boundary"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

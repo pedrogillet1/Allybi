@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "id": "voice_personality_profiles",
+    "version": "1.0.0",
+    "description": "Cross-domain personality profiles for tone and phrasing.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultProfile": "balanced"
+  },
+  "profiles": [
+    {
+      "id": "balanced",
+      "tone": "balanced",
+      "traits": ["direct", "evidence_first"]
+    },
+    {
+      "id": "supportive",
+      "tone": "supportive",
+      "traits": ["empathetic", "careful"]
+    }
+  ],
+  "rules": [
+    {
+      "id": "VP_101",
+      "trigger": "Safety gate active",
+      "check": "context.safetyGate == true",
+      "failureAction": "USE_PROFILE_supportive"
+    }
+  ],
+  "templates": [
+    {
+      "id": "VOICE_PERSONALITY_PROFILES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in voice_personality_profiles.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

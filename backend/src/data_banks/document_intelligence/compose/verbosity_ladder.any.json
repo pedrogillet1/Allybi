@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "id": "verbosity_ladder",
+    "version": "1.0.0",
+    "description": "Controls answer verbosity by intent and risk.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "levels": {
+    "short": {
+      "maxWords": 110
+    },
+    "balanced": {
+      "maxWords": 220
+    },
+    "detailed": {
+      "maxWords": 360
+    }
+  },
+  "rules": [
+    {
+      "id": "VL_101",
+      "trigger": "Compare or reconcile requested",
+      "check": "context.requiresReconciliation == true || context.requiresTieout == true",
+      "failureAction": "SET_VERBOSITY_detailed"
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

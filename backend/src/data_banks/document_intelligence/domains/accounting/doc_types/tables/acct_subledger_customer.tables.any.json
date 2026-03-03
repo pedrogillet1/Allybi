@@ -1,0 +1,272 @@
+{
+  "_meta": {
+    "id": "di_accounting_tables_acct_subledger_customer",
+    "version": "1.1.0",
+    "description": "Expected table patterns for acct_subledger_customer documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "accounting",
+    "docType": "acct_subledger_customer"
+  },
+  "tableHeaderSynonyms": {
+    "debit": [
+      "debit",
+      "dr",
+      "debit amount",
+      "debito"
+    ],
+    "credit": [
+      "credit",
+      "cr",
+      "credit amount",
+      "credito"
+    ],
+    "balance": [
+      "balance",
+      "saldo",
+      "ending balance",
+      "running balance",
+      "saldo corrente"
+    ],
+    "amount": [
+      "amount",
+      "value",
+      "valor",
+      "amt"
+    ],
+    "date": [
+      "date",
+      "posting date",
+      "transaction date",
+      "data"
+    ],
+    "party": [
+      "counterparty",
+      "customer",
+      "vendor",
+      "fornecedor",
+      "cliente",
+      "parte"
+    ]
+  },
+  "tables": [
+    {
+      "id": "acct_subledger_customer_main_table",
+      "name": {
+        "en": "Document Detail",
+        "pt": "Detalhe do Documento"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "record_id",
+        "record_date",
+        "counterparty",
+        "description",
+        "currency_code",
+        "amount",
+        "balance"
+      ],
+      "keyRows": [
+        "subtotal",
+        "total",
+        "grand_total"
+      ],
+      "headerSynonyms": {
+        "record_id": [
+          "id",
+          "reference",
+          "document",
+          "no",
+          "referencia"
+        ],
+        "record_date": [
+          "date",
+          "effective date",
+          "posting date",
+          "data"
+        ],
+        "counterparty": [
+          "party",
+          "customer",
+          "vendor",
+          "conta"
+        ],
+        "description": [
+          "description",
+          "memo",
+          "detail",
+          "detalhe"
+        ],
+        "currency_code": [
+          "currency",
+          "moeda",
+          "ccy"
+        ],
+        "amount": [
+          "amount",
+          "value",
+          "valor"
+        ],
+        "balance": [
+          "balance",
+          "saldo",
+          "running"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "amount",
+            "balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "amount",
+            "balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "valueColumns": [
+          "amount",
+          "balance"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "€",
+        "£",
+        "R$"
+      ]
+    },
+    {
+      "id": "acct_subledger_customer_totals",
+      "name": {
+        "en": "Totals",
+        "pt": "Totais"
+      },
+      "section": "summary",
+      "expectedColumns": [
+        "metric",
+        "value",
+        "currency_code"
+      ],
+      "keyRows": [
+        "total",
+        "subtotal",
+        "record_count"
+      ],
+      "headerSynonyms": {
+        "metric": [
+          "metric",
+          "summary",
+          "totais"
+        ],
+        "value": [
+          "value",
+          "total",
+          "valor"
+        ],
+        "currency_code": [
+          "currency",
+          "moeda"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ]
+      }
+    },
+    {
+      "id": "acct_subledger_customer_support_table",
+      "name": {
+        "en": "Supporting Breakdown",
+        "pt": "Desdobramento Suporte"
+      },
+      "section": "line_items",
+      "expectedColumns": [
+        "item",
+        "notes",
+        "amount"
+      ],
+      "keyRows": [
+        "subtotal",
+        "grand_total"
+      ],
+      "headerSynonyms": {
+        "item": [
+          "item",
+          "line",
+          "category",
+          "tipo"
+        ],
+        "notes": [
+          "notes",
+          "notes",
+          "observacao"
+        ],
+        "amount": [
+          "amount",
+          "value",
+          "valor"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "amount"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "id": "quote_integrity_rules",
+    "version": "1.0.0",
+    "description": "Ensures quoted values preserve verbatim meaning and source citation integrity.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "allowNearVerbatim": false
+  },
+  "rules": [
+    {
+      "id": "QIR_001_quote_without_source",
+      "trigger": "A quote is presented without source span.",
+      "check": "output.quotes.any(q => q.sourceSpan == null)",
+      "failureAction": "BLOCK_WITHOUT_QUOTE_SOURCE",
+      "severity": "error",
+      "examples": [
+        "Inserted contract sentence with no source span.",
+        "Clause quote without section reference."
+      ]
+    },
+    {
+      "id": "QIR_002_quote_truncation_conflict",
+      "trigger": "Quote appears shortened or expanded such that legal meaning changes.",
+      "check": "output.quotes.any(q => q.truncationRisk == true)",
+      "failureAction": "RETURN_WITH_PARAPHRASE_NOTE",
+      "severity": "warning"
+    },
+    {
+      "id": "QIR_003_cross_source_quote_mix",
+      "trigger": "Single quote combines tokens from two different source spans.",
+      "check": "output.quotes.any(q => q.sourceSpanIds.uniq().count > 1)",
+      "failureAction": "SPLIT_QUOTE_BOUNDARIES",
+      "severity": "warning"
+    },
+    {
+      "id": "QIR_004_numeric_quote_normalization",
+      "trigger": "Numeric value in quote normalized (unit or decimal separators) without disclosure.",
+      "check": "output.quotes.any(q => q.numericNormalized == true AND q.explainedNormalization == false)",
+      "failureAction": "NORMALIZE_WITH_DISCLAIMER",
+      "severity": "info"
+    }
+  ]
+}

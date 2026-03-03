@@ -1,0 +1,5834 @@
+{
+  "_meta": {
+    "id": "sync_intents_en",
+    "version": "1.0.0",
+    "description": "sync intents pattern bank for EN connector sync intents with connector-aware isolation.",
+    "languages": [
+      "en",
+      "any"
+    ],
+    "owner": "connectors-patterning",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/retrieval/retrievalEngine.service.ts",
+      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+    ],
+    "tests": [
+      "sync_en_positive_1",
+      "sync_en_negative_1",
+      "sync_en_missing_slot"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "matching": {
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true
+    },
+    "minPatterns": 120,
+    "maxPatterns": 250
+  },
+  "patterns": [
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "fetch updates from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0001",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "fetch updates from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0002",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "fetch updates from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0003",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "fetch updates from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0004",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "fetch updates from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0005",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "fetch updates from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0006",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import attachments from last 7 days in Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0007",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import attachments from last 7 days in Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0008",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import attachments from last 7 days in Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0009",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import attachments from last 7 days in Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0010",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import attachments from last 7 days in Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0011",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import attachments from last 7 days in Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0012",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import invoices from Dropbox workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0013",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import invoices from Gmail workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0014",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import invoices from Google Drive workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0015",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import invoices from Outlook workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0016",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import invoices from Slack workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0017",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import invoices from Teams workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0018",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import new files from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0019",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import new files from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0020",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import new files from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0021",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import new files from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0022",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import new files from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0023",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "import new files from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0024",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull Dropbox invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0025",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull Gmail invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0026",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull Google Drive invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0027",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest messages from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0028",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest messages from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0029",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest messages from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0030",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest messages from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0031",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest messages from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0032",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest messages from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0033",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest threads from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0034",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest threads from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0035",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest threads from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0036",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest threads from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0037",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest threads from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0038",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull latest threads from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0039",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull Outlook invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0040",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull Slack invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0041",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "pull Teams invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0042",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0043",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Dropbox now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0044",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0045",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Gmail now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0046",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0047",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Google Drive now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0048",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0049",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Outlook now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0050",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0051",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Slack now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0052",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0053",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "refresh Teams now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0054",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0055",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0056",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0057",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync my Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0058",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync my Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0059",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync my Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0060",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync my Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0061",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync my Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0062",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync my Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0063",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0064",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0065",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "resync Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0066",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run delta sync for Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0067",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run delta sync for Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0068",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run delta sync for Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0069",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run delta sync for Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0070",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run delta sync for Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0071",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run delta sync for Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0072",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run full sync on Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0073",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run full sync on Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0074",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run full sync on Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0075",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run full sync on Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0076",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run full sync on Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0077",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "run full sync on Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0078",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync attachments from last week in Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0079",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync attachments from last week in Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0080",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync attachments from last week in Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0081",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync attachments from last week in Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0082",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync attachments from last week in Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0083",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync attachments from last week in Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0084",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0085",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Dropbox shared workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0086",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0087",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Gmail shared workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0088",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0089",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Google Drive shared workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0090",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last month from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0091",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last month from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0092",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last month from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0093",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last month from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0094",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last month from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0095",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last month from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0096",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last week from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0097",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last week from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0098",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last week from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0099",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last week from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0100",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last week from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0101",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync last week from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0102",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0103",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Dropbox workspace now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0104",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0105",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Gmail workspace now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0106",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0107",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Google Drive workspace now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0108",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0109",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Outlook workspace now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0110",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0111",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Slack workspace now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0112",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0113",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync my Teams workspace now"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0114",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0115",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Outlook shared workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0116",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0117",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Slack shared workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0118",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0119",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync Teams shared workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0120",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync the Dropbox workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0121",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync the Gmail workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0122",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync the Google Drive workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0123",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync the Outlook workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0124",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync the Slack workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0125",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "sync the Teams workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0126",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0127",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0128",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0129",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize my Dropbox data"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0130",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize my Gmail data"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0131",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize my Google Drive data"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0132",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize my Outlook data"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0133",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize my Slack data"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0134",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize my Teams data"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0135",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0136",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0137",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Which integration and workspace should I sync, and what time range should I use?",
+      "en": [
+        "synchronize Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_EN_0138",
+      "intent": "CONNECTORS"
+    }
+  ]
+}

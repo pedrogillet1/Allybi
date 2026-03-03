@@ -1,0 +1,7234 @@
+{
+  "_meta": {
+    "bankId": "medical_encounter_timeline_patterns",
+    "version": "1.0.0",
+    "owner": "koda-medical-curator",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "medical_profile_v1",
+      "timeline_parser"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "doc_extractor",
+      "safe_reasoning"
+    ],
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_medical_encounter_timeline_patterns",
+    "description": "Encounter timeline and medication sequence patterns for medical document reasoning without diagnostic conclusions."
+  },
+  "config": {
+    "deterministic": true,
+    "dedupe": true,
+    "requiresNavigationMode": true,
+    "minPatterns": 150,
+    "maxPatterns": 400,
+    "enabled": true
+  },
+  "patterns": [
+    {
+      "id": "MED_TL_0001",
+      "en": [
+        "extract between admission date in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre data de admissão na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:admission_date",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "admission_date",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0002",
+      "en": [
+        "extract before admission date in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes data de admissão na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:admission_date",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "admission_date",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0003",
+      "en": [
+        "extract after admission date in encounter timeline"
+      ],
+      "pt": [
+        "extrair após data de admissão na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:admission_date",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "admission_date",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0004",
+      "en": [
+        "extract on admission date in encounter timeline"
+      ],
+      "pt": [
+        "extrair em data de admissão na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:admission_date",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "admission_date",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0005",
+      "en": [
+        "extract recent admission date in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente data de admissão na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:admission_date",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "admission_date",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0006",
+      "en": [
+        "extract at admission date in encounter timeline"
+      ],
+      "pt": [
+        "extrair às data de admissão na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:admission_date",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "admission_date",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0007",
+      "en": [
+        "extract between discharge date in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre data de alta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:discharge_date",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "discharge_date",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0008",
+      "en": [
+        "extract before discharge date in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes data de alta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:discharge_date",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "discharge_date",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0009",
+      "en": [
+        "extract after discharge date in encounter timeline"
+      ],
+      "pt": [
+        "extrair após data de alta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:discharge_date",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "discharge_date",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0010",
+      "en": [
+        "extract on discharge date in encounter timeline"
+      ],
+      "pt": [
+        "extrair em data de alta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:discharge_date",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "discharge_date",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0011",
+      "en": [
+        "extract recent discharge date in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente data de alta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:discharge_date",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "discharge_date",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0012",
+      "en": [
+        "extract at discharge date in encounter timeline"
+      ],
+      "pt": [
+        "extrair às data de alta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:discharge_date",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "discharge_date",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0013",
+      "en": [
+        "extract between consultation date in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre data de consulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:consultation_date",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "consultation_date",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0014",
+      "en": [
+        "extract before consultation date in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes data de consulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:consultation_date",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "consultation_date",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0015",
+      "en": [
+        "extract after consultation date in encounter timeline"
+      ],
+      "pt": [
+        "extrair após data de consulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:consultation_date",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "consultation_date",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0016",
+      "en": [
+        "extract on consultation date in encounter timeline"
+      ],
+      "pt": [
+        "extrair em data de consulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:consultation_date",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "consultation_date",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0017",
+      "en": [
+        "extract recent consultation date in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente data de consulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:consultation_date",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "consultation_date",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0018",
+      "en": [
+        "extract at consultation date in encounter timeline"
+      ],
+      "pt": [
+        "extrair às data de consulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:consultation_date",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "consultation_date",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0019",
+      "en": [
+        "extract between follow-up date in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre data de retorno na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:follow_up_date",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "follow_up_date",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0020",
+      "en": [
+        "extract before follow-up date in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes data de retorno na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:follow_up_date",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "follow_up_date",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0021",
+      "en": [
+        "extract after follow-up date in encounter timeline"
+      ],
+      "pt": [
+        "extrair após data de retorno na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:follow_up_date",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "follow_up_date",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0022",
+      "en": [
+        "extract on follow-up date in encounter timeline"
+      ],
+      "pt": [
+        "extrair em data de retorno na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:follow_up_date",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "follow_up_date",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0023",
+      "en": [
+        "extract recent follow-up date in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente data de retorno na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:follow_up_date",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "follow_up_date",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0024",
+      "en": [
+        "extract at follow-up date in encounter timeline"
+      ],
+      "pt": [
+        "extrair às data de retorno na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:follow_up_date",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "follow_up_date",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0025",
+      "en": [
+        "extract between medication start in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre início de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_start",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_start",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0026",
+      "en": [
+        "extract before medication start in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes início de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_start",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_start",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0027",
+      "en": [
+        "extract after medication start in encounter timeline"
+      ],
+      "pt": [
+        "extrair após início de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_start",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_start",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0028",
+      "en": [
+        "extract on medication start in encounter timeline"
+      ],
+      "pt": [
+        "extrair em início de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_start",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_start",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0029",
+      "en": [
+        "extract recent medication start in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente início de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_start",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_start",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0030",
+      "en": [
+        "extract at medication start in encounter timeline"
+      ],
+      "pt": [
+        "extrair às início de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_start",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_start",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0031",
+      "en": [
+        "extract between medication stop in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre fim de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_stop",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_stop",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0032",
+      "en": [
+        "extract before medication stop in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes fim de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_stop",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_stop",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0033",
+      "en": [
+        "extract after medication stop in encounter timeline"
+      ],
+      "pt": [
+        "extrair após fim de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_stop",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_stop",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0034",
+      "en": [
+        "extract on medication stop in encounter timeline"
+      ],
+      "pt": [
+        "extrair em fim de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_stop",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_stop",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0035",
+      "en": [
+        "extract recent medication stop in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente fim de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_stop",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_stop",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0036",
+      "en": [
+        "extract at medication stop in encounter timeline"
+      ],
+      "pt": [
+        "extrair às fim de medicação na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:medication_stop",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "medication_stop",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0037",
+      "en": [
+        "extract between dose change in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre mudança de dose na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dose_change",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dose_change",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0038",
+      "en": [
+        "extract before dose change in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes mudança de dose na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dose_change",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dose_change",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0039",
+      "en": [
+        "extract after dose change in encounter timeline"
+      ],
+      "pt": [
+        "extrair após mudança de dose na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dose_change",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dose_change",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0040",
+      "en": [
+        "extract on dose change in encounter timeline"
+      ],
+      "pt": [
+        "extrair em mudança de dose na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dose_change",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dose_change",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0041",
+      "en": [
+        "extract recent dose change in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente mudança de dose na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dose_change",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dose_change",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0042",
+      "en": [
+        "extract at dose change in encounter timeline"
+      ],
+      "pt": [
+        "extrair às mudança de dose na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dose_change",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dose_change",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0043",
+      "en": [
+        "extract between lab draw in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre coleta de exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_draw",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_draw",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0044",
+      "en": [
+        "extract before lab draw in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes coleta de exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_draw",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_draw",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0045",
+      "en": [
+        "extract after lab draw in encounter timeline"
+      ],
+      "pt": [
+        "extrair após coleta de exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_draw",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_draw",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0046",
+      "en": [
+        "extract on lab draw in encounter timeline"
+      ],
+      "pt": [
+        "extrair em coleta de exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_draw",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_draw",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0047",
+      "en": [
+        "extract recent lab draw in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente coleta de exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_draw",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_draw",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0048",
+      "en": [
+        "extract at lab draw in encounter timeline"
+      ],
+      "pt": [
+        "extrair às coleta de exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_draw",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_draw",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0049",
+      "en": [
+        "extract between imaging date in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre data de imagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:imaging_date",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "imaging_date",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0050",
+      "en": [
+        "extract before imaging date in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes data de imagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:imaging_date",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "imaging_date",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0051",
+      "en": [
+        "extract after imaging date in encounter timeline"
+      ],
+      "pt": [
+        "extrair após data de imagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:imaging_date",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "imaging_date",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0052",
+      "en": [
+        "extract on imaging date in encounter timeline"
+      ],
+      "pt": [
+        "extrair em data de imagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:imaging_date",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "imaging_date",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0053",
+      "en": [
+        "extract recent imaging date in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente data de imagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:imaging_date",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "imaging_date",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0054",
+      "en": [
+        "extract at imaging date in encounter timeline"
+      ],
+      "pt": [
+        "extrair às data de imagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:imaging_date",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "imaging_date",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0055",
+      "en": [
+        "extract between surgery date in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre data da cirurgia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:surgery_date",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "surgery_date",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0056",
+      "en": [
+        "extract before surgery date in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes data da cirurgia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:surgery_date",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "surgery_date",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0057",
+      "en": [
+        "extract after surgery date in encounter timeline"
+      ],
+      "pt": [
+        "extrair após data da cirurgia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:surgery_date",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "surgery_date",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0058",
+      "en": [
+        "extract on surgery date in encounter timeline"
+      ],
+      "pt": [
+        "extrair em data da cirurgia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:surgery_date",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "surgery_date",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0059",
+      "en": [
+        "extract recent surgery date in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente data da cirurgia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:surgery_date",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "surgery_date",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0060",
+      "en": [
+        "extract at surgery date in encounter timeline"
+      ],
+      "pt": [
+        "extrair às data da cirurgia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:surgery_date",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "surgery_date",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0061",
+      "en": [
+        "extract between allergy update in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre atualização de alergia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allergy_update",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allergy_update",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0062",
+      "en": [
+        "extract before allergy update in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes atualização de alergia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allergy_update",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allergy_update",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0063",
+      "en": [
+        "extract after allergy update in encounter timeline"
+      ],
+      "pt": [
+        "extrair após atualização de alergia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allergy_update",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allergy_update",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0064",
+      "en": [
+        "extract on allergy update in encounter timeline"
+      ],
+      "pt": [
+        "extrair em atualização de alergia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allergy_update",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allergy_update",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0065",
+      "en": [
+        "extract recent allergy update in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente atualização de alergia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allergy_update",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allergy_update",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0066",
+      "en": [
+        "extract at allergy update in encounter timeline"
+      ],
+      "pt": [
+        "extrair às atualização de alergia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allergy_update",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allergy_update",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0067",
+      "en": [
+        "extract between triage time in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre hora de triagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:triage_time",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "triage_time",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0068",
+      "en": [
+        "extract before triage time in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes hora de triagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:triage_time",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "triage_time",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0069",
+      "en": [
+        "extract after triage time in encounter timeline"
+      ],
+      "pt": [
+        "extrair após hora de triagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:triage_time",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "triage_time",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0070",
+      "en": [
+        "extract on triage time in encounter timeline"
+      ],
+      "pt": [
+        "extrair em hora de triagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:triage_time",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "triage_time",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0071",
+      "en": [
+        "extract recent triage time in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente hora de triagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:triage_time",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "triage_time",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0072",
+      "en": [
+        "extract at triage time in encounter timeline"
+      ],
+      "pt": [
+        "extrair às hora de triagem na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:triage_time",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "triage_time",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0073",
+      "en": [
+        "extract between vital sign collection in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre coleta de sinais vitais na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vital_sign_collection",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vital_sign_collection",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0074",
+      "en": [
+        "extract before vital sign collection in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes coleta de sinais vitais na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vital_sign_collection",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vital_sign_collection",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0075",
+      "en": [
+        "extract after vital sign collection in encounter timeline"
+      ],
+      "pt": [
+        "extrair após coleta de sinais vitais na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vital_sign_collection",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vital_sign_collection",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0076",
+      "en": [
+        "extract on vital sign collection in encounter timeline"
+      ],
+      "pt": [
+        "extrair em coleta de sinais vitais na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vital_sign_collection",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vital_sign_collection",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0077",
+      "en": [
+        "extract recent vital sign collection in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente coleta de sinais vitais na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vital_sign_collection",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vital_sign_collection",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0078",
+      "en": [
+        "extract at vital sign collection in encounter timeline"
+      ],
+      "pt": [
+        "extrair às coleta de sinais vitais na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vital_sign_collection",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vital_sign_collection",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0079",
+      "en": [
+        "extract between hospital stay in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre permanência hospitalar na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:hospital_stay",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "hospital_stay",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0080",
+      "en": [
+        "extract before hospital stay in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes permanência hospitalar na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:hospital_stay",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "hospital_stay",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0081",
+      "en": [
+        "extract after hospital stay in encounter timeline"
+      ],
+      "pt": [
+        "extrair após permanência hospitalar na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:hospital_stay",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "hospital_stay",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0082",
+      "en": [
+        "extract on hospital stay in encounter timeline"
+      ],
+      "pt": [
+        "extrair em permanência hospitalar na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:hospital_stay",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "hospital_stay",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0083",
+      "en": [
+        "extract recent hospital stay in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente permanência hospitalar na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:hospital_stay",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "hospital_stay",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0084",
+      "en": [
+        "extract at hospital stay in encounter timeline"
+      ],
+      "pt": [
+        "extrair às permanência hospitalar na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:hospital_stay",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "hospital_stay",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0085",
+      "en": [
+        "extract between ER arrival in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre chegada ao pronto-socorro na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:er_arrival",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "er_arrival",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0086",
+      "en": [
+        "extract before ER arrival in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes chegada ao pronto-socorro na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:er_arrival",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "er_arrival",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0087",
+      "en": [
+        "extract after ER arrival in encounter timeline"
+      ],
+      "pt": [
+        "extrair após chegada ao pronto-socorro na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:er_arrival",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "er_arrival",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0088",
+      "en": [
+        "extract on ER arrival in encounter timeline"
+      ],
+      "pt": [
+        "extrair em chegada ao pronto-socorro na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:er_arrival",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "er_arrival",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0089",
+      "en": [
+        "extract recent ER arrival in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente chegada ao pronto-socorro na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:er_arrival",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "er_arrival",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0090",
+      "en": [
+        "extract at ER arrival in encounter timeline"
+      ],
+      "pt": [
+        "extrair às chegada ao pronto-socorro na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:er_arrival",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "er_arrival",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0091",
+      "en": [
+        "extract between ICU transfer in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre transferência para UTI na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:icu_transfer",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "icu_transfer",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0092",
+      "en": [
+        "extract before ICU transfer in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes transferência para UTI na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:icu_transfer",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "icu_transfer",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0093",
+      "en": [
+        "extract after ICU transfer in encounter timeline"
+      ],
+      "pt": [
+        "extrair após transferência para UTI na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:icu_transfer",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "icu_transfer",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0094",
+      "en": [
+        "extract on ICU transfer in encounter timeline"
+      ],
+      "pt": [
+        "extrair em transferência para UTI na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:icu_transfer",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "icu_transfer",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0095",
+      "en": [
+        "extract recent ICU transfer in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente transferência para UTI na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:icu_transfer",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "icu_transfer",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0096",
+      "en": [
+        "extract at ICU transfer in encounter timeline"
+      ],
+      "pt": [
+        "extrair às transferência para UTI na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:icu_transfer",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "icu_transfer",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0097",
+      "en": [
+        "extract between clinic visit in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre visita ambulatorial na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:clinic_visit",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "clinic_visit",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0098",
+      "en": [
+        "extract before clinic visit in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes visita ambulatorial na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:clinic_visit",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "clinic_visit",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0099",
+      "en": [
+        "extract after clinic visit in encounter timeline"
+      ],
+      "pt": [
+        "extrair após visita ambulatorial na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:clinic_visit",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "clinic_visit",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0100",
+      "en": [
+        "extract on clinic visit in encounter timeline"
+      ],
+      "pt": [
+        "extrair em visita ambulatorial na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:clinic_visit",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "clinic_visit",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0101",
+      "en": [
+        "extract recent clinic visit in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente visita ambulatorial na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:clinic_visit",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "clinic_visit",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0102",
+      "en": [
+        "extract at clinic visit in encounter timeline"
+      ],
+      "pt": [
+        "extrair às visita ambulatorial na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:clinic_visit",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "clinic_visit",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0103",
+      "en": [
+        "extract between televisit in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre teleconsulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:televisit",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "televisit",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0104",
+      "en": [
+        "extract before televisit in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes teleconsulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:televisit",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "televisit",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0105",
+      "en": [
+        "extract after televisit in encounter timeline"
+      ],
+      "pt": [
+        "extrair após teleconsulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:televisit",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "televisit",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0106",
+      "en": [
+        "extract on televisit in encounter timeline"
+      ],
+      "pt": [
+        "extrair em teleconsulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:televisit",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "televisit",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0107",
+      "en": [
+        "extract recent televisit in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente teleconsulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:televisit",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "televisit",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0108",
+      "en": [
+        "extract at televisit in encounter timeline"
+      ],
+      "pt": [
+        "extrair às teleconsulta na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:televisit",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "televisit",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0109",
+      "en": [
+        "extract between disposition in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre encaminhamento na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:disposition",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "disposition",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0110",
+      "en": [
+        "extract before disposition in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes encaminhamento na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:disposition",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "disposition",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0111",
+      "en": [
+        "extract after disposition in encounter timeline"
+      ],
+      "pt": [
+        "extrair após encaminhamento na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:disposition",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "disposition",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0112",
+      "en": [
+        "extract on disposition in encounter timeline"
+      ],
+      "pt": [
+        "extrair em encaminhamento na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:disposition",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "disposition",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0113",
+      "en": [
+        "extract recent disposition in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente encaminhamento na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:disposition",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "disposition",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0114",
+      "en": [
+        "extract at disposition in encounter timeline"
+      ],
+      "pt": [
+        "extrair às encaminhamento na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:disposition",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "disposition",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0115",
+      "en": [
+        "extract between lab timestamp in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre registro temporal do exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_timestamp",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_timestamp",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0116",
+      "en": [
+        "extract before lab timestamp in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes registro temporal do exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_timestamp",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_timestamp",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0117",
+      "en": [
+        "extract after lab timestamp in encounter timeline"
+      ],
+      "pt": [
+        "extrair após registro temporal do exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_timestamp",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_timestamp",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0118",
+      "en": [
+        "extract on lab timestamp in encounter timeline"
+      ],
+      "pt": [
+        "extrair em registro temporal do exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_timestamp",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_timestamp",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0119",
+      "en": [
+        "extract recent lab timestamp in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente registro temporal do exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_timestamp",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_timestamp",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0120",
+      "en": [
+        "extract at lab timestamp in encounter timeline"
+      ],
+      "pt": [
+        "extrair às registro temporal do exame na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:lab_timestamp",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "lab_timestamp",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0121",
+      "en": [
+        "extract between vaccine administration in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre administração de vacina na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vaccine_administration",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vaccine_administration",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0122",
+      "en": [
+        "extract before vaccine administration in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes administração de vacina na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vaccine_administration",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vaccine_administration",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0123",
+      "en": [
+        "extract after vaccine administration in encounter timeline"
+      ],
+      "pt": [
+        "extrair após administração de vacina na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vaccine_administration",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vaccine_administration",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0124",
+      "en": [
+        "extract on vaccine administration in encounter timeline"
+      ],
+      "pt": [
+        "extrair em administração de vacina na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vaccine_administration",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vaccine_administration",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0125",
+      "en": [
+        "extract recent vaccine administration in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente administração de vacina na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vaccine_administration",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vaccine_administration",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0126",
+      "en": [
+        "extract at vaccine administration in encounter timeline"
+      ],
+      "pt": [
+        "extrair às administração de vacina na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:vaccine_administration",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "vaccine_administration",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0127",
+      "en": [
+        "extract between dialysis session in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre sessão de hemodiálise na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dialysis_session",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dialysis_session",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0128",
+      "en": [
+        "extract before dialysis session in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes sessão de hemodiálise na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dialysis_session",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dialysis_session",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0129",
+      "en": [
+        "extract after dialysis session in encounter timeline"
+      ],
+      "pt": [
+        "extrair após sessão de hemodiálise na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dialysis_session",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dialysis_session",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0130",
+      "en": [
+        "extract on dialysis session in encounter timeline"
+      ],
+      "pt": [
+        "extrair em sessão de hemodiálise na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dialysis_session",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dialysis_session",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0131",
+      "en": [
+        "extract recent dialysis session in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente sessão de hemodiálise na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dialysis_session",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dialysis_session",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0132",
+      "en": [
+        "extract at dialysis session in encounter timeline"
+      ],
+      "pt": [
+        "extrair às sessão de hemodiálise na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:dialysis_session",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "dialysis_session",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0133",
+      "en": [
+        "extract between chemotherapy cycle in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre ciclo de quimioterapia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:chemotherapy_cycle",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "chemotherapy_cycle",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0134",
+      "en": [
+        "extract before chemotherapy cycle in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes ciclo de quimioterapia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:chemotherapy_cycle",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "chemotherapy_cycle",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0135",
+      "en": [
+        "extract after chemotherapy cycle in encounter timeline"
+      ],
+      "pt": [
+        "extrair após ciclo de quimioterapia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:chemotherapy_cycle",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "chemotherapy_cycle",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0136",
+      "en": [
+        "extract on chemotherapy cycle in encounter timeline"
+      ],
+      "pt": [
+        "extrair em ciclo de quimioterapia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:chemotherapy_cycle",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "chemotherapy_cycle",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0137",
+      "en": [
+        "extract recent chemotherapy cycle in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente ciclo de quimioterapia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:chemotherapy_cycle",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "chemotherapy_cycle",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0138",
+      "en": [
+        "extract at chemotherapy cycle in encounter timeline"
+      ],
+      "pt": [
+        "extrair às ciclo de quimioterapia na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:chemotherapy_cycle",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "chemotherapy_cycle",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0139",
+      "en": [
+        "extract between radiology contrast in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre uso de contraste na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:radiology_contrast",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "radiology_contrast",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0140",
+      "en": [
+        "extract before radiology contrast in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes uso de contraste na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:radiology_contrast",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "radiology_contrast",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0141",
+      "en": [
+        "extract after radiology contrast in encounter timeline"
+      ],
+      "pt": [
+        "extrair após uso de contraste na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:radiology_contrast",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "radiology_contrast",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0142",
+      "en": [
+        "extract on radiology contrast in encounter timeline"
+      ],
+      "pt": [
+        "extrair em uso de contraste na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:radiology_contrast",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "radiology_contrast",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0143",
+      "en": [
+        "extract recent radiology contrast in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente uso de contraste na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:radiology_contrast",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "radiology_contrast",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0144",
+      "en": [
+        "extract at radiology contrast in encounter timeline"
+      ],
+      "pt": [
+        "extrair às uso de contraste na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:radiology_contrast",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "radiology_contrast",
+        "at"
+      ]
+    },
+    {
+      "id": "MED_TL_0145",
+      "en": [
+        "extract between allied care referral in encounter timeline"
+      ],
+      "pt": [
+        "extrair entre encaminhamento de cuidados na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allied_care_referral",
+        "qualifier:between",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allied_care_referral",
+        "between"
+      ]
+    },
+    {
+      "id": "MED_TL_0146",
+      "en": [
+        "extract before allied care referral in encounter timeline"
+      ],
+      "pt": [
+        "extrair antes encaminhamento de cuidados na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allied_care_referral",
+        "qualifier:before",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allied_care_referral",
+        "before"
+      ]
+    },
+    {
+      "id": "MED_TL_0147",
+      "en": [
+        "extract after allied care referral in encounter timeline"
+      ],
+      "pt": [
+        "extrair após encaminhamento de cuidados na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allied_care_referral",
+        "qualifier:after",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allied_care_referral",
+        "after"
+      ]
+    },
+    {
+      "id": "MED_TL_0148",
+      "en": [
+        "extract on allied care referral in encounter timeline"
+      ],
+      "pt": [
+        "extrair em encaminhamento de cuidados na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allied_care_referral",
+        "qualifier:on",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allied_care_referral",
+        "on"
+      ]
+    },
+    {
+      "id": "MED_TL_0149",
+      "en": [
+        "extract recent allied care referral in encounter timeline"
+      ],
+      "pt": [
+        "extrair recente encaminhamento de cuidados na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allied_care_referral",
+        "qualifier:recent",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allied_care_referral",
+        "recent"
+      ]
+    },
+    {
+      "id": "MED_TL_0150",
+      "en": [
+        "extract at allied care referral in encounter timeline"
+      ],
+      "pt": [
+        "extrair às encaminhamento de cuidados na linha do tempo do encontro"
+      ],
+      "triggers": [
+        "intent:medical_timeline",
+        "domain:medical",
+        "event:allied_care_referral",
+        "qualifier:at",
+        "policy:medical_non_diagnostic_only",
+        "requiresNavigationMode"
+      ],
+      "negatives": [
+        "do_not_diagnose_from_timing_patterns",
+        "do_not_assume_causality_between_events",
+        "no_clinical_cause_inference",
+        "no_treatment_recommendation"
+      ],
+      "requiredContextTerms": [
+        "medical_domain",
+        "encounter_timeline"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:medical:timeline_slot_event",
+        "disambig:medical:timeline_slot_date"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.71
+      },
+      "slotHints": [
+        "eventType",
+        "timelineAnchor",
+        "dateRange",
+        "medicationName"
+      ],
+      "telemetryTags": [
+        "medical",
+        "encounter_timeline_patterns",
+        "allied_care_referral",
+        "at"
+      ]
+    }
+  ]
+}

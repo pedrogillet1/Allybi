@@ -12,6 +12,10 @@ type RuleHelpers = {
   diIncludes: (container: unknown, item: unknown) => boolean;
   diSum: (values: unknown) => number;
   diLog10: (value: unknown) => number;
+  diNumbersMatchSource: (
+    outputNumbers: unknown[],
+    sourceNumbers: unknown[],
+  ) => { magnitudeError: boolean; separatorSwap: boolean; digitTransposition: boolean };
 };
 
 type EvaluationScope = {
@@ -46,6 +50,7 @@ export function evaluateRuleBooleanExpression(params: {
     "diIncludes",
     "diSum",
     "diLog10",
+    "diNumbersMatchSource",
     `return Boolean(${normalizedExpression});`,
   ) as (
     context: Record<string, unknown>,
@@ -63,6 +68,7 @@ export function evaluateRuleBooleanExpression(params: {
     diIncludesFn: RuleHelpers["diIncludes"],
     diSumFn: RuleHelpers["diSum"],
     diLog10Fn: RuleHelpers["diLog10"],
+    diNumbersMatchSourceFn: RuleHelpers["diNumbersMatchSource"],
   ) => boolean;
 
   return evaluator(
@@ -81,5 +87,6 @@ export function evaluateRuleBooleanExpression(params: {
     helpers.diIncludes,
     helpers.diSum,
     helpers.diLog10,
+    helpers.diNumbersMatchSource,
   );
 }

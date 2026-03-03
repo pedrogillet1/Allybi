@@ -133,6 +133,11 @@ export interface GeminiClientConfig {
    * Hard timeout for provider calls (ms).
    */
   timeoutMs: number;
+
+  /**
+   * Timeout for ping() health check (ms).
+   */
+  pingTimeoutMs?: number;
 }
 
 export class GeminiClientService implements LLMClient {
@@ -141,19 +146,26 @@ export class GeminiClientService implements LLMClient {
   constructor(private readonly cfg: GeminiClientConfig) {}
 
   async ping(): Promise<{ ok: boolean; provider: LLMProvider; t: number }> {
-    // Best-effort ping: attempt a tiny call if desired.
-    // Keep deterministic, avoid logging sensitive data.
     const t = Date.now();
     try {
-      // We do not call the provider here to avoid cost.
-      return { ok: true, provider: "google", t };
+      const base = this.cfg.baseUrl.replace(/\/$/, "");
+      const url = `${base}/models?key=${this.cfg.apiKey}`;
+      const ac = new AbortController();
+      const timeout = setTimeout(() => ac.abort(), this.cfg.pingTimeoutMs ?? 5000);
+      try {
+        const res = await fetch(url, { signal: ac.signal });
+        return { ok: res.ok, provider: "google", t };
+      } finally {
+        clearTimeout(timeout);
+      }
     } catch {
       return { ok: false, provider: "google", t };
     }
   }
 
-  async complete(req: LLMRequest): Promise<LLMCompletionResponse> {
+  async complete(req: LLMRequest, signal?: AbortSignal): Promise<LLMCompletionResponse> {
     const ac = new AbortController();
+    if (signal) signal.addEventListener("abort", () => ac.abort(), { once: true });
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
@@ -211,8 +223,9 @@ export class GeminiClientService implements LLMClient {
     config: LLMStreamingConfig;
     hooks?: StreamingHooks;
     initialState?: Partial<StreamState>;
+    signal?: AbortSignal;
   }): Promise<LLMStreamResponse> {
-    const { req, sink, config, hooks, initialState } = params;
+    const { req, sink, config, hooks, initialState, signal } = params;
 
     const state: StreamState = {
       phase: "init",
@@ -234,6 +247,7 @@ export class GeminiClientService implements LLMClient {
     hooks?.onStart?.(state);
 
     const ac = new AbortController();
+    if (signal) signal.addEventListener("abort", () => ac.abort(), { once: true });
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
@@ -629,11 +643,10 @@ export class GeminiClientService implements LLMClient {
         );
         toolCalls.push({
           provider: "google",
+          callId,
           name: p.functionCall.name,
           args: p.functionCall.args ?? {},
         });
-        // Note: Gemini doesn’t always include a call id; we keep deterministic for tracing.
-        void callId;
       }
     }
 

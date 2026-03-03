@@ -1,0 +1,697 @@
+{
+  "_meta": {
+    "id": "di_finance_entities_fin_financing_term_sheet",
+    "version": "2.1.0",
+    "description": "Entity schema for Financing Term Sheet.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_financing_term_sheet",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "canonical": "document_id",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: document_id from table/header context."
+    },
+    {
+      "id": "source_file_name",
+      "canonical": "source_file_name",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: source_file_name from table/header context."
+    },
+    {
+      "id": "extraction_timestamp",
+      "canonical": "extraction_timestamp",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: extraction_timestamp from table/header context."
+    },
+    {
+      "id": "company_name",
+      "canonical": "company_name",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: company_name from table/header context."
+    },
+    {
+      "id": "fiscal_year_end",
+      "canonical": "fiscal_year_end",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: fiscal_year_end from table/header context."
+    },
+    {
+      "id": "fiscal_year_start",
+      "canonical": "fiscal_year_start",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: fiscal_year_start from table/header context."
+    },
+    {
+      "id": "reporting_currency",
+      "canonical": "reporting_currency",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: reporting_currency from table/header context."
+    },
+    {
+      "id": "unit_scale",
+      "canonical": "unit_scale",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: unit_scale from table/header context."
+    },
+    {
+      "id": "period",
+      "canonical": "period",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: period from table/header context."
+    },
+    {
+      "id": "ticker",
+      "canonical": "ticker",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: ticker from table/header context."
+    },
+    {
+      "id": "entity_type",
+      "canonical": "entity_type",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: entity_type from table/header context."
+    },
+    {
+      "id": "auditor_opinion",
+      "canonical": "auditor_opinion",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: auditor_opinion from table/header context."
+    },
+    {
+      "id": "audited_by",
+      "canonical": "audited_by",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: audited_by from table/header context."
+    },
+    {
+      "id": "gross_revenue",
+      "canonical": "gross_revenue",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: gross_revenue from table/header context."
+    },
+    {
+      "id": "net_revenue",
+      "canonical": "net_revenue",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: net_revenue from table/header context."
+    },
+    {
+      "id": "cost_of_goods_sold",
+      "canonical": "cost_of_goods_sold",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: cost_of_goods_sold from table/header context."
+    },
+    {
+      "id": "gross_profit",
+      "canonical": "gross_profit",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: gross_profit from table/header context."
+    },
+    {
+      "id": "operating_expense",
+      "canonical": "operating_expense",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: operating_expense from table/header context."
+    },
+    {
+      "id": "ebitda",
+      "canonical": "ebitda",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: ebitda from table/header context."
+    },
+    {
+      "id": "ebit",
+      "canonical": "ebit",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: ebit from table/header context."
+    },
+    {
+      "id": "ebt",
+      "canonical": "ebt",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: ebt from table/header context."
+    },
+    {
+      "id": "net_income",
+      "canonical": "net_income",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: net_income from table/header context."
+    },
+    {
+      "id": "total_assets",
+      "canonical": "total_assets",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: total_assets from table/header context."
+    },
+    {
+      "id": "total_liabilities",
+      "canonical": "total_liabilities",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: total_liabilities from table/header context."
+    },
+    {
+      "id": "equity",
+      "canonical": "equity",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: equity from table/header context."
+    },
+    {
+      "id": "working_capital",
+      "canonical": "working_capital",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: working_capital from table/header context."
+    },
+    {
+      "id": "current_ratio",
+      "canonical": "current_ratio",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: current_ratio from table/header context."
+    },
+    {
+      "id": "quick_ratio",
+      "canonical": "quick_ratio",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: quick_ratio from table/header context."
+    },
+    {
+      "id": "cash_and_equivalents",
+      "canonical": "cash_and_equivalents",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: cash_and_equivalents from table/header context."
+    },
+    {
+      "id": "cash_operating_activity",
+      "canonical": "cash_operating_activity",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: cash_operating_activity from table/header context."
+    },
+    {
+      "id": "capital_expenditures",
+      "canonical": "capital_expenditures",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: capital_expenditures from table/header context."
+    },
+    {
+      "id": "free_cash_flow",
+      "canonical": "free_cash_flow",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: free_cash_flow from table/header context."
+    },
+    {
+      "id": "revenue_growth",
+      "canonical": "revenue_growth",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: revenue_growth from table/header context."
+    },
+    {
+      "id": "gross_margin",
+      "canonical": "gross_margin",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: gross_margin from table/header context."
+    },
+    {
+      "id": "runway_months",
+      "canonical": "runway_months",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: runway_months from table/header context."
+    },
+    {
+      "id": "burn_rate",
+      "canonical": "burn_rate",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: burn_rate from table/header context."
+    },
+    {
+      "id": "capex_ratio",
+      "canonical": "capex_ratio",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: capex_ratio from table/header context."
+    },
+    {
+      "id": "debt_to_ebitda",
+      "canonical": "debt_to_ebitda",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: debt_to_ebitda from table/header context."
+    },
+    {
+      "id": "net_debt",
+      "canonical": "net_debt",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: net_debt from table/header context."
+    },
+    {
+      "id": "interest_coverage",
+      "canonical": "interest_coverage",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: interest_coverage from table/header context."
+    },
+    {
+      "id": "fx_exposure",
+      "canonical": "fx_exposure",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: fx_exposure from table/header context."
+    },
+    {
+      "id": "hedging_notional",
+      "canonical": "hedging_notional",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "column_header",
+        "unit"
+      ],
+      "notes": "Evidence for fin_financing_term_sheet: hedging_notional from table/header context."
+    }
+  ]
+}

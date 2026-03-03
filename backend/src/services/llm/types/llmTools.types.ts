@@ -264,6 +264,7 @@ export type ProviderToolCall =
     }
   | {
       provider: "google";
+      callId?: string;
       name: string;
       args: unknown;
     }

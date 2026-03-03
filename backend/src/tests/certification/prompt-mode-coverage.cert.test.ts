@@ -14,6 +14,8 @@ function loadPromptBanks() {
     "mode_editing",
     "rag_policy",
     "task_answer_with_sources",
+    "task_plan_generation",
+    "editing_task_prompts",
     "policy_citations",
     "retrieval_prompt",
     "disambiguation_prompt",

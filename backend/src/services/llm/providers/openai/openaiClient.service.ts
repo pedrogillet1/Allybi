@@ -322,10 +322,20 @@ export class OpenAIClientService implements LlmClient {
       { signal, headers } as Parameters<typeof this.client.chat.completions.create>[1],
     );
 
+    // Parse text and finishReason from response
+    const rawObj = raw as Record<string, unknown>;
+    const choices = rawObj.choices as Array<Record<string, unknown>> | undefined;
+    const firstChoice = choices?.[0];
+    const msg = firstChoice?.message as Record<string, unknown> | undefined;
+    const text = typeof msg?.content === "string" ? msg.content : "";
+    const finishReason = (typeof firstChoice?.finish_reason === "string"
+      ? firstChoice.finish_reason
+      : "unknown") as import("../../types/llm.types").LlmFinishReason;
+
     return {
       response: {
-        text: "",
-        finishReason: "unknown",
+        text,
+        finishReason,
         raw,
       },
     };
@@ -360,6 +370,17 @@ export class OpenAIClientService implements LlmClient {
     };
   }
 
+  /** Quick health check using models.list */
+  async ping(): Promise<{ ok: boolean; t: number }> {
+    const t = Date.now();
+    try {
+      await this.client.models.list();
+      return { ok: true, t };
+    } catch {
+      return { ok: false, t };
+    }
+  }
+
   // Optional: expose configured model list (useful for debug pages)
   getAllowedModels(): string[] {
     return [...this.cfg.allowedModels];
@@ -371,3 +392,208 @@ export class OpenAIClientService implements LlmClient {
 }
 
 export default OpenAIClientService;
+
+// ---------------------------------------------------------------------------
+// Adapter: bridges OpenAIClientService (LlmClient) → LLMClient (core interface)
+// ---------------------------------------------------------------------------
+
+import type {
+  LLMClient,
+  LLMRequest as LLMRequestCore,
+  LLMCompletionResponse,
+  LLMStreamResponse,
+} from "../../core/llmClient.interface";
+import type { LLMProvider } from "../../core/llmErrors.types";
+import type {
+  LLMStreamingConfig,
+  StreamSink,
+  StreamState,
+  StreamingHooks,
+} from "../../types/llmStreaming.types";
+
+export class OpenAILLMClientAdapter implements LLMClient {
+  readonly provider: LLMProvider = "openai";
+
+  constructor(private readonly inner: OpenAIClientService) {}
+
+  async ping(): Promise<{ ok: boolean; provider: LLMProvider; t: number }> {
+    const result = await this.inner.ping();
+    return { ok: result.ok, provider: "openai", t: result.t };
+  }
+
+  async complete(req: LLMRequestCore, signal?: AbortSignal): Promise<LLMCompletionResponse> {
+    const llmReq: LlmRequest = {
+      messages: req.messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+      options: {
+        temperature: req.sampling?.temperature,
+        topP: req.sampling?.topP,
+        maxOutputTokens: req.sampling?.maxOutputTokens,
+      },
+      route: {
+        provider: "openai" as LlmProviderId,
+        model: req.model.model as LlmModelId,
+        reason: "unknown" as const,
+      },
+      correlationId: req.traceId,
+    };
+
+    const result = await this.inner.call(llmReq, signal);
+    const raw = result.response.raw as Record<string, unknown> | undefined;
+    const usage = raw?.usage as Record<string, number> | undefined;
+
+    return {
+      traceId: req.traceId,
+      turnId: req.turnId,
+      model: req.model,
+      content: result.response.text || "",
+      finishReason: result.response.finishReason || "unknown",
+      usage: usage
+        ? {
+            promptTokens: usage.prompt_tokens,
+            completionTokens: usage.completion_tokens,
+            totalTokens: usage.total_tokens,
+          }
+        : undefined,
+    };
+  }
+
+  async stream(params: {
+    req: LLMRequestCore;
+    sink: StreamSink;
+    config: LLMStreamingConfig;
+    hooks?: StreamingHooks;
+    initialState?: Partial<StreamState>;
+    signal?: AbortSignal;
+  }): Promise<LLMStreamResponse> {
+    const { req, sink, config, hooks, initialState, signal } = params;
+
+    const state: StreamState = {
+      phase: "init",
+      kind: "answer",
+      traceId: req.traceId,
+      startedAtMs: Date.now(),
+      accumulatedText: "",
+      markers: [],
+      heldMarkers: [],
+      abortRequested: false,
+      ...initialState,
+    };
+
+    // Emit start
+    if (sink.isOpen()) {
+      sink.write({ event: "start", data: { kind: state.kind, t: Date.now(), traceId: state.traceId } });
+      sink.flush?.();
+    }
+    hooks?.onStart?.(state);
+
+    const llmReq: LlmRequest = {
+      messages: req.messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+      options: {
+        temperature: req.sampling?.temperature,
+        topP: req.sampling?.topP,
+        maxOutputTokens: req.sampling?.maxOutputTokens,
+      },
+      route: {
+        provider: "openai" as LlmProviderId,
+        model: req.model.model as LlmModelId,
+        reason: "unknown" as const,
+      },
+      correlationId: req.traceId,
+    };
+
+    try {
+      const streamResult = await this.inner.stream(llmReq, signal);
+      const maxChars = config.chunking?.maxCharsPerDelta ?? 64;
+
+      for await (const chunk of streamResult.stream as AsyncIterable<Record<string, unknown>>) {
+        if (!sink.isOpen()) break;
+
+        const choices = chunk.choices as Array<Record<string, unknown>> | undefined;
+        const delta = (choices?.[0]?.delta as Record<string, unknown> | undefined)?.content;
+
+        if (typeof delta === "string" && delta) {
+          if (!state.firstTokenAtMs) {
+            state.firstTokenAtMs = Date.now();
+            sink.write({ event: "progress", data: { stage: "generation", t: Date.now() } });
+            sink.flush?.();
+            hooks?.onFirstToken?.(state);
+          }
+
+          // Chunk the text
+          for (let i = 0; i < delta.length; i += maxChars) {
+            if (!sink.isOpen()) break;
+            const piece = delta.slice(i, i + maxChars);
+            state.phase = "delta";
+            state.accumulatedText += piece;
+            sink.write({ event: "delta", data: { text: piece } });
+            sink.flush?.();
+            hooks?.onDelta?.({ text: piece }, state);
+          }
+        }
+      }
+
+      // Final event
+      state.phase = "finalizing";
+      if (sink.isOpen()) {
+        const finalEvent = {
+          event: "final" as const,
+          data: {
+            text: state.accumulatedText,
+            kind: state.kind,
+            llm: { provider: "openai" as LLMProvider, model: req.model.model },
+            markers: state.markers,
+            traceId: state.traceId,
+            timings: {
+              startMs: state.startedAtMs,
+              firstTokenMs: state.firstTokenAtMs,
+              endMs: Date.now(),
+            },
+          },
+        };
+        sink.write(finalEvent);
+        sink.flush?.();
+        hooks?.onFinal?.(finalEvent.data, state);
+        sink.close();
+      }
+
+      return {
+        traceId: req.traceId,
+        turnId: req.turnId,
+        model: req.model,
+        finalText: state.accumulatedText,
+        finishReason: "stop",
+      };
+    } catch (e) {
+      if (sink.isOpen()) {
+        const isAbort = e instanceof Error && (e.name === "AbortError" || /abort/i.test(e.message));
+        if (isAbort) {
+          sink.write({ event: "abort", data: { reason: "timeout", t: Date.now(), traceId: state.traceId } });
+        } else {
+          sink.write({
+            event: "error",
+            data: {
+              code: "LLM_GENERATION_FAILED",
+              message: e instanceof Error ? e.message.slice(0, 800) : "unknown_error",
+              traceId: state.traceId,
+              t: Date.now(),
+            },
+          });
+        }
+        sink.flush?.();
+        sink.close();
+      }
+      return {
+        traceId: req.traceId,
+        turnId: req.turnId,
+        model: req.model,
+        finalText: state.accumulatedText,
+      };
+    }
+  }
+}

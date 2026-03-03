@@ -1,0 +1,3523 @@
+{
+  "_meta": {
+    "id": "contact_patterns",
+    "version": "1.3.0",
+    "description": "Cross-domain contact extraction patterns including phone, email, fax, and contact channels with EN/PT variants.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "high",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
+  },
+  "rules": [
+    {
+      "id": "contact_001",
+      "name": "contact_rule_001",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1001",
+        "Fallback main contact channel 001 (phone)",
+        "https://contacts.example.com/phone/001"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 001.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_002",
+      "name": "contact_rule_002",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-002@example-email.com",
+        "Fallback billing contact channel 002 (email)",
+        "https://contacts.example.com/email/002"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 002.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_003",
+      "name": "contact_rule_003",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1003",
+        "Fallback support contact channel 003 (fax)",
+        "https://contacts.example.com/fax/003"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 003.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_004",
+      "name": "contact_rule_004",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-004@example-website.com",
+        "Fallback technical contact channel 004 (website)",
+        "https://contacts.example.com/website/004"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 004.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_005",
+      "name": "contact_rule_005",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-005@example-linkedin.com",
+        "Fallback representative channel 005 (linkedin)",
+        "https://contacts.example.com/linkedin/005"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 005.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_006",
+      "name": "contact_rule_006",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1006",
+        "Fallback main contact channel 006 (phone)",
+        "https://contacts.example.com/phone/006"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 006.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_007",
+      "name": "contact_rule_007",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-007@example-email.com",
+        "Fallback billing contact channel 007 (email)",
+        "https://contacts.example.com/email/007"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 007.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_008",
+      "name": "contact_rule_008",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1008",
+        "Fallback support contact channel 008 (fax)",
+        "https://contacts.example.com/fax/008"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 008.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_009",
+      "name": "contact_rule_009",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-009@example-website.com",
+        "Fallback technical contact channel 009 (website)",
+        "https://contacts.example.com/website/009"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 009.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_010",
+      "name": "contact_rule_010",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-010@example-linkedin.com",
+        "Fallback representative channel 010 (linkedin)",
+        "https://contacts.example.com/linkedin/010"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 010.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_011",
+      "name": "contact_rule_011",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1011",
+        "Fallback main contact channel 011 (phone)",
+        "https://contacts.example.com/phone/011"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 011.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_012",
+      "name": "contact_rule_012",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-012@example-email.com",
+        "Fallback billing contact channel 012 (email)",
+        "https://contacts.example.com/email/012"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 012.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_013",
+      "name": "contact_rule_013",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1013",
+        "Fallback support contact channel 013 (fax)",
+        "https://contacts.example.com/fax/013"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 013.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_014",
+      "name": "contact_rule_014",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-014@example-website.com",
+        "Fallback technical contact channel 014 (website)",
+        "https://contacts.example.com/website/014"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 014.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_015",
+      "name": "contact_rule_015",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-015@example-linkedin.com",
+        "Fallback representative channel 015 (linkedin)",
+        "https://contacts.example.com/linkedin/015"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 015.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_016",
+      "name": "contact_rule_016",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1016",
+        "Fallback main contact channel 016 (phone)",
+        "https://contacts.example.com/phone/016"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 016.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_017",
+      "name": "contact_rule_017",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-017@example-email.com",
+        "Fallback billing contact channel 017 (email)",
+        "https://contacts.example.com/email/017"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 017.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_018",
+      "name": "contact_rule_018",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1018",
+        "Fallback support contact channel 018 (fax)",
+        "https://contacts.example.com/fax/018"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 018.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_019",
+      "name": "contact_rule_019",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-019@example-website.com",
+        "Fallback technical contact channel 019 (website)",
+        "https://contacts.example.com/website/019"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 019.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_020",
+      "name": "contact_rule_020",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-020@example-linkedin.com",
+        "Fallback representative channel 020 (linkedin)",
+        "https://contacts.example.com/linkedin/020"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 020.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_021",
+      "name": "contact_rule_021",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1021",
+        "Fallback main contact channel 021 (phone)",
+        "https://contacts.example.com/phone/021"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 021.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_022",
+      "name": "contact_rule_022",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-022@example-email.com",
+        "Fallback billing contact channel 022 (email)",
+        "https://contacts.example.com/email/022"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 022.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_023",
+      "name": "contact_rule_023",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1023",
+        "Fallback support contact channel 023 (fax)",
+        "https://contacts.example.com/fax/023"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 023.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_024",
+      "name": "contact_rule_024",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-024@example-website.com",
+        "Fallback technical contact channel 024 (website)",
+        "https://contacts.example.com/website/024"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 024.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_025",
+      "name": "contact_rule_025",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-025@example-linkedin.com",
+        "Fallback representative channel 025 (linkedin)",
+        "https://contacts.example.com/linkedin/025"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 025.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_026",
+      "name": "contact_rule_026",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1026",
+        "Fallback main contact channel 026 (phone)",
+        "https://contacts.example.com/phone/026"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 026.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_027",
+      "name": "contact_rule_027",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-027@example-email.com",
+        "Fallback billing contact channel 027 (email)",
+        "https://contacts.example.com/email/027"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 027.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_028",
+      "name": "contact_rule_028",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1028",
+        "Fallback support contact channel 028 (fax)",
+        "https://contacts.example.com/fax/028"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 028.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_029",
+      "name": "contact_rule_029",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-029@example-website.com",
+        "Fallback technical contact channel 029 (website)",
+        "https://contacts.example.com/website/029"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 029.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_030",
+      "name": "contact_rule_030",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-030@example-linkedin.com",
+        "Fallback representative channel 030 (linkedin)",
+        "https://contacts.example.com/linkedin/030"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 030.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_031",
+      "name": "contact_rule_031",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1031",
+        "Fallback main contact channel 031 (phone)",
+        "https://contacts.example.com/phone/031"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 031.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_032",
+      "name": "contact_rule_032",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-032@example-email.com",
+        "Fallback billing contact channel 032 (email)",
+        "https://contacts.example.com/email/032"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 032.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_033",
+      "name": "contact_rule_033",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1033",
+        "Fallback support contact channel 033 (fax)",
+        "https://contacts.example.com/fax/033"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 033.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_034",
+      "name": "contact_rule_034",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-034@example-website.com",
+        "Fallback technical contact channel 034 (website)",
+        "https://contacts.example.com/website/034"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 034.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_035",
+      "name": "contact_rule_035",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-035@example-linkedin.com",
+        "Fallback representative channel 035 (linkedin)",
+        "https://contacts.example.com/linkedin/035"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 035.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_036",
+      "name": "contact_rule_036",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1036",
+        "Fallback main contact channel 036 (phone)",
+        "https://contacts.example.com/phone/036"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 036.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_037",
+      "name": "contact_rule_037",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-037@example-email.com",
+        "Fallback billing contact channel 037 (email)",
+        "https://contacts.example.com/email/037"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 037.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_038",
+      "name": "contact_rule_038",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1038",
+        "Fallback support contact channel 038 (fax)",
+        "https://contacts.example.com/fax/038"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 038.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_039",
+      "name": "contact_rule_039",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-039@example-website.com",
+        "Fallback technical contact channel 039 (website)",
+        "https://contacts.example.com/website/039"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 039.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_040",
+      "name": "contact_rule_040",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-040@example-linkedin.com",
+        "Fallback representative channel 040 (linkedin)",
+        "https://contacts.example.com/linkedin/040"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 040.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_041",
+      "name": "contact_rule_041",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1041",
+        "Fallback main contact channel 041 (phone)",
+        "https://contacts.example.com/phone/041"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 041.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_042",
+      "name": "contact_rule_042",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-042@example-email.com",
+        "Fallback billing contact channel 042 (email)",
+        "https://contacts.example.com/email/042"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 042.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_043",
+      "name": "contact_rule_043",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1043",
+        "Fallback support contact channel 043 (fax)",
+        "https://contacts.example.com/fax/043"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 043.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_044",
+      "name": "contact_rule_044",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-044@example-website.com",
+        "Fallback technical contact channel 044 (website)",
+        "https://contacts.example.com/website/044"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 044.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_045",
+      "name": "contact_rule_045",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-045@example-linkedin.com",
+        "Fallback representative channel 045 (linkedin)",
+        "https://contacts.example.com/linkedin/045"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 045.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_046",
+      "name": "contact_rule_046",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1046",
+        "Fallback main contact channel 046 (phone)",
+        "https://contacts.example.com/phone/046"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 046.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_047",
+      "name": "contact_rule_047",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-047@example-email.com",
+        "Fallback billing contact channel 047 (email)",
+        "https://contacts.example.com/email/047"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 047.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_048",
+      "name": "contact_rule_048",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1048",
+        "Fallback support contact channel 048 (fax)",
+        "https://contacts.example.com/fax/048"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 048.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_049",
+      "name": "contact_rule_049",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-049@example-website.com",
+        "Fallback technical contact channel 049 (website)",
+        "https://contacts.example.com/website/049"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 049.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_050",
+      "name": "contact_rule_050",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-050@example-linkedin.com",
+        "Fallback representative channel 050 (linkedin)",
+        "https://contacts.example.com/linkedin/050"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 050.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_051",
+      "name": "contact_rule_051",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1051",
+        "Fallback main contact channel 051 (phone)",
+        "https://contacts.example.com/phone/051"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 051.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_052",
+      "name": "contact_rule_052",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-052@example-email.com",
+        "Fallback billing contact channel 052 (email)",
+        "https://contacts.example.com/email/052"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 052.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_053",
+      "name": "contact_rule_053",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1053",
+        "Fallback support contact channel 053 (fax)",
+        "https://contacts.example.com/fax/053"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 053.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_054",
+      "name": "contact_rule_054",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-054@example-website.com",
+        "Fallback technical contact channel 054 (website)",
+        "https://contacts.example.com/website/054"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 054.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_055",
+      "name": "contact_rule_055",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-055@example-linkedin.com",
+        "Fallback representative channel 055 (linkedin)",
+        "https://contacts.example.com/linkedin/055"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 055.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_056",
+      "name": "contact_rule_056",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1056",
+        "Fallback main contact channel 056 (phone)",
+        "https://contacts.example.com/phone/056"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 056.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_057",
+      "name": "contact_rule_057",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-057@example-email.com",
+        "Fallback billing contact channel 057 (email)",
+        "https://contacts.example.com/email/057"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 057.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_058",
+      "name": "contact_rule_058",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1058",
+        "Fallback support contact channel 058 (fax)",
+        "https://contacts.example.com/fax/058"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 058.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_059",
+      "name": "contact_rule_059",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-059@example-website.com",
+        "Fallback technical contact channel 059 (website)",
+        "https://contacts.example.com/website/059"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 059.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_060",
+      "name": "contact_rule_060",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-060@example-linkedin.com",
+        "Fallback representative channel 060 (linkedin)",
+        "https://contacts.example.com/linkedin/060"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 060.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_061",
+      "name": "contact_rule_061",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1061",
+        "Fallback main contact channel 061 (phone)",
+        "https://contacts.example.com/phone/061"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 061.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_062",
+      "name": "contact_rule_062",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-062@example-email.com",
+        "Fallback billing contact channel 062 (email)",
+        "https://contacts.example.com/email/062"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 062.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_063",
+      "name": "contact_rule_063",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1063",
+        "Fallback support contact channel 063 (fax)",
+        "https://contacts.example.com/fax/063"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 063.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_064",
+      "name": "contact_rule_064",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-064@example-website.com",
+        "Fallback technical contact channel 064 (website)",
+        "https://contacts.example.com/website/064"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 064.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_065",
+      "name": "contact_rule_065",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-065@example-linkedin.com",
+        "Fallback representative channel 065 (linkedin)",
+        "https://contacts.example.com/linkedin/065"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 065.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_066",
+      "name": "contact_rule_066",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1066",
+        "Fallback main contact channel 066 (phone)",
+        "https://contacts.example.com/phone/066"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 066.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_067",
+      "name": "contact_rule_067",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-067@example-email.com",
+        "Fallback billing contact channel 067 (email)",
+        "https://contacts.example.com/email/067"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 067.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_068",
+      "name": "contact_rule_068",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1068",
+        "Fallback support contact channel 068 (fax)",
+        "https://contacts.example.com/fax/068"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 068.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_069",
+      "name": "contact_rule_069",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-069@example-website.com",
+        "Fallback technical contact channel 069 (website)",
+        "https://contacts.example.com/website/069"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 069.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_070",
+      "name": "contact_rule_070",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-070@example-linkedin.com",
+        "Fallback representative channel 070 (linkedin)",
+        "https://contacts.example.com/linkedin/070"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 070.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_071",
+      "name": "contact_rule_071",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1071",
+        "Fallback main contact channel 071 (phone)",
+        "https://contacts.example.com/phone/071"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 071.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_072",
+      "name": "contact_rule_072",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-072@example-email.com",
+        "Fallback billing contact channel 072 (email)",
+        "https://contacts.example.com/email/072"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 072.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_073",
+      "name": "contact_rule_073",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1073",
+        "Fallback support contact channel 073 (fax)",
+        "https://contacts.example.com/fax/073"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 073.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_074",
+      "name": "contact_rule_074",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-074@example-website.com",
+        "Fallback technical contact channel 074 (website)",
+        "https://contacts.example.com/website/074"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 074.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_075",
+      "name": "contact_rule_075",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-075@example-linkedin.com",
+        "Fallback representative channel 075 (linkedin)",
+        "https://contacts.example.com/linkedin/075"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 075.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_076",
+      "name": "contact_rule_076",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1076",
+        "Fallback main contact channel 076 (phone)",
+        "https://contacts.example.com/phone/076"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 076.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_077",
+      "name": "contact_rule_077",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-077@example-email.com",
+        "Fallback billing contact channel 077 (email)",
+        "https://contacts.example.com/email/077"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 077.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_078",
+      "name": "contact_rule_078",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1078",
+        "Fallback support contact channel 078 (fax)",
+        "https://contacts.example.com/fax/078"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 078.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_079",
+      "name": "contact_rule_079",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-079@example-website.com",
+        "Fallback technical contact channel 079 (website)",
+        "https://contacts.example.com/website/079"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 079.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_080",
+      "name": "contact_rule_080",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-080@example-linkedin.com",
+        "Fallback representative channel 080 (linkedin)",
+        "https://contacts.example.com/linkedin/080"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 080.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_081",
+      "name": "contact_rule_081",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1081",
+        "Fallback main contact channel 081 (phone)",
+        "https://contacts.example.com/phone/081"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 081.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_082",
+      "name": "contact_rule_082",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-082@example-email.com",
+        "Fallback billing contact channel 082 (email)",
+        "https://contacts.example.com/email/082"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 082.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_083",
+      "name": "contact_rule_083",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1083",
+        "Fallback support contact channel 083 (fax)",
+        "https://contacts.example.com/fax/083"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 083.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_084",
+      "name": "contact_rule_084",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-084@example-website.com",
+        "Fallback technical contact channel 084 (website)",
+        "https://contacts.example.com/website/084"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 084.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_085",
+      "name": "contact_rule_085",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-085@example-linkedin.com",
+        "Fallback representative channel 085 (linkedin)",
+        "https://contacts.example.com/linkedin/085"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 085.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_086",
+      "name": "contact_rule_086",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1086",
+        "Fallback main contact channel 086 (phone)",
+        "https://contacts.example.com/phone/086"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 086.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_087",
+      "name": "contact_rule_087",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-087@example-email.com",
+        "Fallback billing contact channel 087 (email)",
+        "https://contacts.example.com/email/087"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 087.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_088",
+      "name": "contact_rule_088",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1088",
+        "Fallback support contact channel 088 (fax)",
+        "https://contacts.example.com/fax/088"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 088.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_089",
+      "name": "contact_rule_089",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-089@example-website.com",
+        "Fallback technical contact channel 089 (website)",
+        "https://contacts.example.com/website/089"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 089.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_090",
+      "name": "contact_rule_090",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-090@example-linkedin.com",
+        "Fallback representative channel 090 (linkedin)",
+        "https://contacts.example.com/linkedin/090"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 090.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_091",
+      "name": "contact_rule_091",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1091",
+        "Fallback main contact channel 091 (phone)",
+        "https://contacts.example.com/phone/091"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 091.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_092",
+      "name": "contact_rule_092",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-092@example-email.com",
+        "Fallback billing contact channel 092 (email)",
+        "https://contacts.example.com/email/092"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 092.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_093",
+      "name": "contact_rule_093",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1093",
+        "Fallback support contact channel 093 (fax)",
+        "https://contacts.example.com/fax/093"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 093.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_094",
+      "name": "contact_rule_094",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-094@example-website.com",
+        "Fallback technical contact channel 094 (website)",
+        "https://contacts.example.com/website/094"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 094.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_095",
+      "name": "contact_rule_095",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-095@example-linkedin.com",
+        "Fallback representative channel 095 (linkedin)",
+        "https://contacts.example.com/linkedin/095"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 095.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_096",
+      "name": "contact_rule_096",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1096",
+        "Fallback main contact channel 096 (phone)",
+        "https://contacts.example.com/phone/096"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 096.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_097",
+      "name": "contact_rule_097",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-097@example-email.com",
+        "Fallback billing contact channel 097 (email)",
+        "https://contacts.example.com/email/097"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 097.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_098",
+      "name": "contact_rule_098",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1098",
+        "Fallback support contact channel 098 (fax)",
+        "https://contacts.example.com/fax/098"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 098.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_099",
+      "name": "contact_rule_099",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-099@example-website.com",
+        "Fallback technical contact channel 099 (website)",
+        "https://contacts.example.com/website/099"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 099.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_100",
+      "name": "contact_rule_100",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-100@example-linkedin.com",
+        "Fallback representative channel 100 (linkedin)",
+        "https://contacts.example.com/linkedin/100"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 100.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_101",
+      "name": "contact_rule_101",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1101",
+        "Fallback main contact channel 101 (phone)",
+        "https://contacts.example.com/phone/101"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 101.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_102",
+      "name": "contact_rule_102",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-102@example-email.com",
+        "Fallback billing contact channel 102 (email)",
+        "https://contacts.example.com/email/102"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 102.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_103",
+      "name": "contact_rule_103",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1103",
+        "Fallback support contact channel 103 (fax)",
+        "https://contacts.example.com/fax/103"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 103.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_104",
+      "name": "contact_rule_104",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-104@example-website.com",
+        "Fallback technical contact channel 104 (website)",
+        "https://contacts.example.com/website/104"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 104.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_105",
+      "name": "contact_rule_105",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-105@example-linkedin.com",
+        "Fallback representative channel 105 (linkedin)",
+        "https://contacts.example.com/linkedin/105"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 105.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_106",
+      "name": "contact_rule_106",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1106",
+        "Fallback main contact channel 106 (phone)",
+        "https://contacts.example.com/phone/106"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 106.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_107",
+      "name": "contact_rule_107",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-107@example-email.com",
+        "Fallback billing contact channel 107 (email)",
+        "https://contacts.example.com/email/107"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 107.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_108",
+      "name": "contact_rule_108",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1108",
+        "Fallback support contact channel 108 (fax)",
+        "https://contacts.example.com/fax/108"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 108.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_109",
+      "name": "contact_rule_109",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-109@example-website.com",
+        "Fallback technical contact channel 109 (website)",
+        "https://contacts.example.com/website/109"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 109.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_110",
+      "name": "contact_rule_110",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-110@example-linkedin.com",
+        "Fallback representative channel 110 (linkedin)",
+        "https://contacts.example.com/linkedin/110"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 110.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_111",
+      "name": "contact_rule_111",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1111",
+        "Fallback main contact channel 111 (phone)",
+        "https://contacts.example.com/phone/111"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 111.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_112",
+      "name": "contact_rule_112",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-112@example-email.com",
+        "Fallback billing contact channel 112 (email)",
+        "https://contacts.example.com/email/112"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 112.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_113",
+      "name": "contact_rule_113",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1113",
+        "Fallback support contact channel 113 (fax)",
+        "https://contacts.example.com/fax/113"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 113.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_114",
+      "name": "contact_rule_114",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-114@example-website.com",
+        "Fallback technical contact channel 114 (website)",
+        "https://contacts.example.com/website/114"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 114.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_115",
+      "name": "contact_rule_115",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-115@example-linkedin.com",
+        "Fallback representative channel 115 (linkedin)",
+        "https://contacts.example.com/linkedin/115"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 115.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_116",
+      "name": "contact_rule_116",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1116",
+        "Fallback main contact channel 116 (phone)",
+        "https://contacts.example.com/phone/116"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 116.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_117",
+      "name": "contact_rule_117",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-117@example-email.com",
+        "Fallback billing contact channel 117 (email)",
+        "https://contacts.example.com/email/117"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 117.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_118",
+      "name": "contact_rule_118",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1118",
+        "Fallback support contact channel 118 (fax)",
+        "https://contacts.example.com/fax/118"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 118.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_119",
+      "name": "contact_rule_119",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-119@example-website.com",
+        "Fallback technical contact channel 119 (website)",
+        "https://contacts.example.com/website/119"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 119.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_120",
+      "name": "contact_rule_120",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-120@example-linkedin.com",
+        "Fallback representative channel 120 (linkedin)",
+        "https://contacts.example.com/linkedin/120"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 120.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_121",
+      "name": "contact_rule_121",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1121",
+        "Fallback main contact channel 121 (phone)",
+        "https://contacts.example.com/phone/121"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 121.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_122",
+      "name": "contact_rule_122",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-122@example-email.com",
+        "Fallback billing contact channel 122 (email)",
+        "https://contacts.example.com/email/122"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 122.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_123",
+      "name": "contact_rule_123",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1123",
+        "Fallback support contact channel 123 (fax)",
+        "https://contacts.example.com/fax/123"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 123.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_124",
+      "name": "contact_rule_124",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-124@example-website.com",
+        "Fallback technical contact channel 124 (website)",
+        "https://contacts.example.com/website/124"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 124.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_125",
+      "name": "contact_rule_125",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-125@example-linkedin.com",
+        "Fallback representative channel 125 (linkedin)",
+        "https://contacts.example.com/linkedin/125"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 125.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_126",
+      "name": "contact_rule_126",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1126",
+        "Fallback main contact channel 126 (phone)",
+        "https://contacts.example.com/phone/126"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 126.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_127",
+      "name": "contact_rule_127",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-127@example-email.com",
+        "Fallback billing contact channel 127 (email)",
+        "https://contacts.example.com/email/127"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 127.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_128",
+      "name": "contact_rule_128",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1128",
+        "Fallback support contact channel 128 (fax)",
+        "https://contacts.example.com/fax/128"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 128.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_129",
+      "name": "contact_rule_129",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-129@example-website.com",
+        "Fallback technical contact channel 129 (website)",
+        "https://contacts.example.com/website/129"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 129.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_130",
+      "name": "contact_rule_130",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-130@example-linkedin.com",
+        "Fallback representative channel 130 (linkedin)",
+        "https://contacts.example.com/linkedin/130"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 130.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_131",
+      "name": "contact_rule_131",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1131",
+        "Fallback main contact channel 131 (phone)",
+        "https://contacts.example.com/phone/131"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for main contact, rule 131.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_132",
+      "name": "contact_rule_132",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-132@example-email.com",
+        "Fallback billing contact channel 132 (email)",
+        "https://contacts.example.com/email/132"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "en",
+      "notes": "Contact extraction for billing contact, rule 132.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_133",
+      "name": "contact_rule_133",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1133",
+        "Fallback support contact channel 133 (fax)",
+        "https://contacts.example.com/fax/133"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for support contact, rule 133.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_134",
+      "name": "contact_rule_134",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-134@example-website.com",
+        "Fallback technical contact channel 134 (website)",
+        "https://contacts.example.com/website/134"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "en",
+      "notes": "Contact extraction for technical contact, rule 134.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_135",
+      "name": "contact_rule_135",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-135@example-linkedin.com",
+        "Fallback representative channel 135 (linkedin)",
+        "https://contacts.example.com/linkedin/135"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "pt",
+      "notes": "Contact extraction for representative, rule 135.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_136",
+      "name": "contact_rule_136",
+      "pattern": "(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "main contact: +1 212-555-1136",
+        "Fallback main contact channel 136 (phone)",
+        "https://contacts.example.com/phone/136"
+      ],
+      "entityType": "contact",
+      "role": "main_contact",
+      "locale": "en",
+      "notes": "Contact extraction for main contact, rule 136.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_137",
+      "name": "contact_rule_137",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "billing contact: contact-137@example-email.com",
+        "Fallback billing contact channel 137 (email)",
+        "https://contacts.example.com/email/137"
+      ],
+      "entityType": "contact",
+      "role": "billing_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for billing contact, rule 137.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_138",
+      "name": "contact_rule_138",
+      "pattern": "(?i)(?:fax|faxes)\\s*[:\\-]?\\s*(?:\\+?\\d{1,3}[\\s-]?)?(?:\\(?\\d{2,4}\\)?[\\s.-]?)?\\d{3,4}[\\s.-]?\\d{4}",
+      "examples": [
+        "support contact: Fax: +44 20-700-1138",
+        "Fallback support contact channel 138 (fax)",
+        "https://contacts.example.com/fax/138"
+      ],
+      "entityType": "contact",
+      "role": "support_contact",
+      "locale": "en",
+      "notes": "Contact extraction for support contact, rule 138.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_139",
+      "name": "contact_rule_139",
+      "pattern": "(?:https?:\\/\\/)?(?:www\\.)?[a-z0-9-]+(?:\\.[a-z0-9-]+)+(?:\\/[a-z0-9._~:/?#\\[\\]@!$&*()+,;=%-]*)?",
+      "examples": [
+        "technical contact: contact-139@example-website.com",
+        "Fallback technical contact channel 139 (website)",
+        "https://contacts.example.com/website/139"
+      ],
+      "entityType": "contact",
+      "role": "technical_contact",
+      "locale": "pt",
+      "notes": "Contact extraction for technical contact, rule 139.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    },
+    {
+      "id": "contact_140",
+      "name": "contact_rule_140",
+      "pattern": "https?:\\/\\/(?:www\\.)?linkedin\\.com\\/in\\/[A-Za-z0-9_-]+",
+      "examples": [
+        "representative: contact-140@example-linkedin.com",
+        "Fallback representative channel 140 (linkedin)",
+        "https://contacts.example.com/linkedin/140"
+      ],
+      "entityType": "contact",
+      "role": "representative",
+      "locale": "en",
+      "notes": "Contact extraction for representative, rule 140.",
+      "normalizationContract": {
+        "type": "contact",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "contact_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:party_reference"
+      }
+    }
+  ]
+}

@@ -1,0 +1,1722 @@
+{
+  "_meta": {
+    "id": "di_finance_tables_fin_annual_report",
+    "version": "2.1.0",
+    "description": "Table signatures for Annual Report.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_annual_report"
+  },
+  "tables": [
+    {
+      "id": "balance_sheet_1",
+      "canonicalName": {
+        "en": "Balance Sheet",
+        "pt": "Balance Sheet"
+      },
+      "section": "document_header",
+      "signaturePatterns": [
+        "\\bbalance\\s+sheet\\b",
+        "\\bbalance_sheet_1\\b",
+        "\\btable\\s+1\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_balance_sheet_01_01",
+        "fn_balance_sheet_01_02",
+        "fn_balance_sheet_01_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Balance Sheet."
+    },
+    {
+      "id": "income_statement_2",
+      "canonicalName": {
+        "en": "Income Statement",
+        "pt": "Income Statement"
+      },
+      "section": "summary",
+      "signaturePatterns": [
+        "\\bincome\\s+statement\\b",
+        "\\bincome_statement_2\\b",
+        "\\btable\\s+2\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_income_statement_02_01",
+        "fn_income_statement_02_02",
+        "fn_income_statement_02_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Income Statement."
+    },
+    {
+      "id": "cash_flow_statement_3",
+      "canonicalName": {
+        "en": "Cash Flow Statement",
+        "pt": "Cash Flow Statement"
+      },
+      "section": "financial_statements",
+      "signaturePatterns": [
+        "\\bcash\\s+flow\\s+statement\\b",
+        "\\bcash_flow_statement_3\\b",
+        "\\btable\\s+3\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cash_flow_statement_03_01",
+        "fn_cash_flow_statement_03_02",
+        "fn_cash_flow_statement_03_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Cash Flow Statement."
+    },
+    {
+      "id": "equity_changes_4",
+      "canonicalName": {
+        "en": "Equity Changes",
+        "pt": "Equity Changes"
+      },
+      "section": "notes",
+      "signaturePatterns": [
+        "\\bequity\\s+changes\\b",
+        "\\bequity_changes_4\\b",
+        "\\btable\\s+4\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_equity_changes_04_01",
+        "fn_equity_changes_04_02",
+        "fn_equity_changes_04_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Equity Changes."
+    },
+    {
+      "id": "revenue_by_segment_5",
+      "canonicalName": {
+        "en": "Revenue by Segment",
+        "pt": "Revenue by Segment"
+      },
+      "section": "ratios",
+      "signaturePatterns": [
+        "\\brevenue\\s+by\\s+segment\\b",
+        "\\brevenue_by_segment_5\\b",
+        "\\btable\\s+5\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_revenue_by_segment_05_01",
+        "fn_revenue_by_segment_05_02",
+        "fn_revenue_by_segment_05_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Revenue by Segment."
+    },
+    {
+      "id": "cost_of_sales_6",
+      "canonicalName": {
+        "en": "Cost of Sales",
+        "pt": "Cost of Sales"
+      },
+      "section": "assumptions",
+      "signaturePatterns": [
+        "\\bcost\\s+of\\s+sales\\b",
+        "\\bcost_of_sales_6\\b",
+        "\\btable\\s+6\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cost_of_sales_06_01",
+        "fn_cost_of_sales_06_02",
+        "fn_cost_of_sales_06_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Cost of Sales."
+    },
+    {
+      "id": "operating_expenses_7",
+      "canonicalName": {
+        "en": "Operating Expenses",
+        "pt": "Operating Expenses"
+      },
+      "section": "disclosures",
+      "signaturePatterns": [
+        "\\boperating\\s+expenses\\b",
+        "\\boperating_expenses_7\\b",
+        "\\btable\\s+7\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_operating_expenses_07_01",
+        "fn_operating_expenses_07_02",
+        "fn_operating_expenses_07_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Operating Expenses."
+    },
+    {
+      "id": "ebitda_bridge_8",
+      "canonicalName": {
+        "en": "EBITDA Bridge",
+        "pt": "EBITDA Bridge"
+      },
+      "section": "risk_disclosure",
+      "signaturePatterns": [
+        "\\bebitda\\s+bridge\\b",
+        "\\bebitda_bridge_8\\b",
+        "\\btable\\s+8\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_ebitda_bridge_08_01",
+        "fn_ebitda_bridge_08_02",
+        "fn_ebitda_bridge_08_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for EBITDA Bridge."
+    },
+    {
+      "id": "debt_schedule_9",
+      "canonicalName": {
+        "en": "Debt Schedule",
+        "pt": "Debt Schedule"
+      },
+      "section": "appendix",
+      "signaturePatterns": [
+        "\\bdebt\\s+schedule\\b",
+        "\\bdebt_schedule_9\\b",
+        "\\btable\\s+9\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_debt_schedule_09_01",
+        "fn_debt_schedule_09_02",
+        "fn_debt_schedule_09_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Debt Schedule."
+    },
+    {
+      "id": "liquidity_covenant_10",
+      "canonicalName": {
+        "en": "Liquidity Covenant",
+        "pt": "Liquidity Covenant"
+      },
+      "section": "management_discussion",
+      "signaturePatterns": [
+        "\\bliquidity\\s+covenant\\b",
+        "\\bliquidity_covenant_10\\b",
+        "\\btable\\s+10\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_liquidity_covenant_10_01",
+        "fn_liquidity_covenant_10_02",
+        "fn_liquidity_covenant_10_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Liquidity Covenant."
+    },
+    {
+      "id": "credit_utilization_11",
+      "canonicalName": {
+        "en": "Credit Utilization",
+        "pt": "Credit Utilization"
+      },
+      "section": "cash_flow_analysis",
+      "signaturePatterns": [
+        "\\bcredit\\s+utilization\\b",
+        "\\bcredit_utilization_11\\b",
+        "\\btable\\s+11\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_credit_utilization_11_01",
+        "fn_credit_utilization_11_02",
+        "fn_credit_utilization_11_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Credit Utilization."
+    },
+    {
+      "id": "fx_exposure_12",
+      "canonicalName": {
+        "en": "FX Exposure",
+        "pt": "FX Exposure"
+      },
+      "section": "balance_sheet",
+      "signaturePatterns": [
+        "\\bfx\\s+exposure\\b",
+        "\\bfx_exposure_12\\b",
+        "\\btable\\s+12\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_fx_exposure_12_01",
+        "fn_fx_exposure_12_02",
+        "fn_fx_exposure_12_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for FX Exposure."
+    },
+    {
+      "id": "cash_burn_13",
+      "canonicalName": {
+        "en": "Cash Burn",
+        "pt": "Cash Burn"
+      },
+      "section": "income_statement",
+      "signaturePatterns": [
+        "\\bcash\\s+burn\\b",
+        "\\bcash_burn_13\\b",
+        "\\btable\\s+13\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cash_burn_13_01",
+        "fn_cash_burn_13_02",
+        "fn_cash_burn_13_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Cash Burn."
+    },
+    {
+      "id": "budget_variance_14",
+      "canonicalName": {
+        "en": "Budget Variance",
+        "pt": "Budget Variance"
+      },
+      "section": "liquidity",
+      "signaturePatterns": [
+        "\\bbudget\\s+variance\\b",
+        "\\bbudget_variance_14\\b",
+        "\\btable\\s+14\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_budget_variance_14_01",
+        "fn_budget_variance_14_02",
+        "fn_budget_variance_14_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Budget Variance."
+    },
+    {
+      "id": "forecast_vs_actual_15",
+      "canonicalName": {
+        "en": "Forecast vs Actual",
+        "pt": "Forecast vs Actual"
+      },
+      "section": "solvency",
+      "signaturePatterns": [
+        "\\bforecast\\s+vs\\s+actual\\b",
+        "\\bforecast_vs_actual_15\\b",
+        "\\btable\\s+15\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_forecast_vs_actual_15_01",
+        "fn_forecast_vs_actual_15_02",
+        "fn_forecast_vs_actual_15_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Forecast vs Actual."
+    },
+    {
+      "id": "aging_receivables_16",
+      "canonicalName": {
+        "en": "Aging Receivables",
+        "pt": "Aging Receivables"
+      },
+      "section": "working_capital",
+      "signaturePatterns": [
+        "\\baging\\s+receivables\\b",
+        "\\baging_receivables_16\\b",
+        "\\btable\\s+16\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_aging_receivables_16_01",
+        "fn_aging_receivables_16_02",
+        "fn_aging_receivables_16_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Aging Receivables."
+    },
+    {
+      "id": "aging_payables_17",
+      "canonicalName": {
+        "en": "Aging Payables",
+        "pt": "Aging Payables"
+      },
+      "section": "revenue_mix",
+      "signaturePatterns": [
+        "\\baging\\s+payables\\b",
+        "\\baging_payables_17\\b",
+        "\\btable\\s+17\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_aging_payables_17_01",
+        "fn_aging_payables_17_02",
+        "fn_aging_payables_17_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Aging Payables."
+    },
+    {
+      "id": "inventory_aging_18",
+      "canonicalName": {
+        "en": "Inventory Aging",
+        "pt": "Inventory Aging"
+      },
+      "section": "expense_breakdown",
+      "signaturePatterns": [
+        "\\binventory\\s+aging\\b",
+        "\\binventory_aging_18\\b",
+        "\\btable\\s+18\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_inventory_aging_18_01",
+        "fn_inventory_aging_18_02",
+        "fn_inventory_aging_18_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Inventory Aging."
+    },
+    {
+      "id": "unit_economics_19",
+      "canonicalName": {
+        "en": "Unit Economics",
+        "pt": "Unit Economics"
+      },
+      "section": "debt_profile",
+      "signaturePatterns": [
+        "\\bunit\\s+economics\\b",
+        "\\bunit_economics_19\\b",
+        "\\btable\\s+19\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_unit_economics_19_01",
+        "fn_unit_economics_19_02",
+        "fn_unit_economics_19_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Unit Economics."
+    },
+    {
+      "id": "kpi_dashboard_20",
+      "canonicalName": {
+        "en": "KPI Dashboard",
+        "pt": "KPI Dashboard"
+      },
+      "section": "covenant_tracking",
+      "signaturePatterns": [
+        "\\bkpi\\s+dashboard\\b",
+        "\\bkpi_dashboard_20\\b",
+        "\\btable\\s+20\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_kpi_dashboard_20_01",
+        "fn_kpi_dashboard_20_02",
+        "fn_kpi_dashboard_20_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for KPI Dashboard."
+    },
+    {
+      "id": "treasury_movements_21",
+      "canonicalName": {
+        "en": "Treasury Movements",
+        "pt": "Treasury Movements"
+      },
+      "section": "tax_position",
+      "signaturePatterns": [
+        "\\btreasury\\s+movements\\b",
+        "\\btreasury_movements_21\\b",
+        "\\btable\\s+21\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_treasury_movements_21_01",
+        "fn_treasury_movements_21_02",
+        "fn_treasury_movements_21_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Treasury Movements."
+    },
+    {
+      "id": "tax_reconciliation_22",
+      "canonicalName": {
+        "en": "Tax Reconciliation",
+        "pt": "Tax Reconciliation"
+      },
+      "section": "shareholder_information",
+      "signaturePatterns": [
+        "\\btax\\s+reconciliation\\b",
+        "\\btax_reconciliation_22\\b",
+        "\\btable\\s+22\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_tax_reconciliation_22_01",
+        "fn_tax_reconciliation_22_02",
+        "fn_tax_reconciliation_22_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Tax Reconciliation."
+    },
+    {
+      "id": "dividend_register_23",
+      "canonicalName": {
+        "en": "Dividend Register",
+        "pt": "Dividend Register"
+      },
+      "section": "market_risk",
+      "signaturePatterns": [
+        "\\bdividend\\s+register\\b",
+        "\\bdividend_register_23\\b",
+        "\\btable\\s+23\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_dividend_register_23_01",
+        "fn_dividend_register_23_02",
+        "fn_dividend_register_23_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Dividend Register."
+    },
+    {
+      "id": "board_pack_summary_24",
+      "canonicalName": {
+        "en": "Board Pack Summary",
+        "pt": "Board Pack Summary"
+      },
+      "section": "credit_risk",
+      "signaturePatterns": [
+        "\\bboard\\s+pack\\s+summary\\b",
+        "\\bboard_pack_summary_24\\b",
+        "\\btable\\s+24\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor",
+          "valor monetario"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ],
+        [
+          "variance",
+          "delta",
+          "mudanca"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_board_pack_summary_24_01",
+        "fn_board_pack_summary_24_02",
+        "fn_board_pack_summary_24_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for Board Pack Summary."
+    }
+  ]
+}

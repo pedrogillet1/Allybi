@@ -17,6 +17,7 @@
 import { randomUUID } from "crypto";
 
 import prisma from "../../config/database";
+import { logger } from "../../utils/logger";
 import { DocumentCryptoService } from "../documents/documentCrypto.service";
 import { DocumentKeyService } from "../documents/documentKey.service";
 import { EncryptionService } from "../security/encryption.service";
@@ -68,7 +69,7 @@ function isFlagEnabled(flagName: string, defaultValue: boolean): boolean {
 
 function buildEmbeddingOperationId(documentId: string): string {
   const compactDocId = String(documentId || "").replace(/[^a-zA-Z0-9_-]/g, "");
-  const suffix = Math.random().toString(36).slice(2, 8);
+  const suffix = randomUUID().slice(0, 8);
   return `op_${Date.now().toString(36)}_${compactDocId.slice(0, 12)}_${suffix}`;
 }
 
@@ -232,9 +233,11 @@ export async function storeDocumentEmbeddings(
   });
 
   if (needsEmbedding.length > 0) {
-    console.log(
-      `🔢 [vectorEmbedding] Generating embeddings for ${needsEmbedding.length}/${usableChunks.length} chunks (doc=${documentId})`,
-    );
+    logger.info("[vectorEmbedding] Generating embeddings", {
+      needsEmbedding: needsEmbedding.length,
+      totalChunks: usableChunks.length,
+      documentId,
+    });
     // Use true batch API — sends all texts in one OpenAI call (up to 256 per batch)
     const texts = needsEmbedding.map((c) => c.content);
     const batchResult = await embeddingService.generateBatchEmbeddings(texts);
@@ -250,9 +253,11 @@ export async function storeDocumentEmbeddings(
       const emb = batchResult.embeddings[j];
       needsEmbedding[j].embedding = emb?.embedding || [];
     }
-    console.log(
-      `✅ [vectorEmbedding] Embeddings generated (${batchResult.totalProcessed} processed, ${batchResult.failedCount} failed, ${batchResult.processingTime}ms)`,
-    );
+    logger.info("[vectorEmbedding] Embeddings generated", {
+      totalProcessed: batchResult.totalProcessed,
+      failedCount: batchResult.failedCount,
+      processingTimeMs: batchResult.processingTime,
+    });
   }
 
   let lastErr: any = null;
@@ -261,9 +266,12 @@ export async function storeDocumentEmbeddings(
     let pineconeUpserted = false;
 
     try {
-      console.log(
-        `💾 [vectorEmbedding] Store ${usableChunks.length} chunks for doc=${documentId} (attempt ${attempt}/${maxRetries})`,
-      );
+      logger.info("[vectorEmbedding] Storing chunks", {
+        chunkCount: usableChunks.length,
+        documentId,
+        attempt,
+        maxRetries,
+      });
 
       // 1) Prepare Pinecone vectors
       const pineconeAvailable =
@@ -372,7 +380,29 @@ export async function storeDocumentEmbeddings(
         };
       });
 
-      // Transaction timeout configurable via env for VPS deployments (default 2 minutes for large docs)
+      // Pinecone upsert FIRST (idempotent — same IDs overwrite).
+      // This ensures Pinecone vectors exist before Postgres rows reference them,
+      // eliminating the window where chunks exist in Postgres without Pinecone vectors.
+      if (pineconeAvailable) {
+        await pineconeService.upsertDocumentEmbeddings(
+          documentId,
+          document.userId,
+          documentMetadata,
+          pineconeChunks.map((c) => ({
+            chunkIndex: c.chunkIndex,
+            content: c.content,
+            embedding: c.embedding,
+            metadata: sanitizePineconeMetadata(c.metadata || {}),
+          })),
+        );
+        pineconeUpserted = true;
+        logger.info("[vectorEmbedding] Pinecone upsert ok", {
+          chunkCount: usableChunks.length,
+          documentId,
+        });
+      }
+
+      // Postgres tx SECOND — if this fails, compensating rollback deletes Pinecone vectors.
       const txTimeout = parseInt(
         process.env.PRISMA_TRANSACTION_TIMEOUT || "120000",
         10,
@@ -406,24 +436,6 @@ export async function storeDocumentEmbeddings(
         },
         { maxWait: 10000, timeout: txTimeout },
       );
-
-      if (pineconeAvailable) {
-        await pineconeService.upsertDocumentEmbeddings(
-          documentId,
-          document.userId,
-          documentMetadata,
-          pineconeChunks.map((c) => ({
-            chunkIndex: c.chunkIndex,
-            content: c.content,
-            embedding: c.embedding,
-            metadata: sanitizePineconeMetadata(c.metadata || {}),
-          })),
-        );
-        pineconeUpserted = true;
-        console.log(
-          `✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`,
-        );
-      }
 
       if (
         pineconeAvailable &&
@@ -474,24 +486,29 @@ export async function storeDocumentEmbeddings(
         },
       });
 
-      console.log(
-        `✅ [vectorEmbedding] Postgres ok: embeddings=${embeddingRecords.length}, chunks=${chunkRecords.length}`,
-      );
+      logger.info("[vectorEmbedding] Postgres ok", {
+        embeddings: embeddingRecords.length,
+        chunks: chunkRecords.length,
+        documentId,
+      });
 
       // Success
       return;
     } catch (err: any) {
       lastErr = err;
-      console.error(
-        `❌ [vectorEmbedding] Attempt ${attempt} failed: ${err?.message || err}`,
-      );
+      logger.error("[vectorEmbedding] Attempt failed", {
+        attempt,
+        documentId,
+        error: err?.message || String(err),
+      });
 
       // Compensating rollback: if Pinecone upsert happened in this attempt, remove vectors by op.
       try {
         if (pineconeUpserted) {
-          console.warn(
-            `🔄 [vectorEmbedding] Rolling back Pinecone vectors for doc=${documentId} op=${operationId}`,
-          );
+          logger.warn("[vectorEmbedding] Rolling back Pinecone vectors", {
+            documentId,
+            operationId,
+          });
           if (
             typeof pineconeService.deleteEmbeddingsByOperationId === "function"
           ) {
@@ -509,14 +526,16 @@ export async function storeDocumentEmbeddings(
           }
         }
       } catch (rollbackErr: any) {
-        console.error(
-          `❌ [vectorEmbedding] Rollback failed (doc may be inconsistent): ${rollbackErr?.message || rollbackErr}`,
-        );
+        logger.error("[vectorEmbedding] Rollback failed (doc may be inconsistent)", {
+          documentId,
+          operationId,
+          error: rollbackErr?.message || String(rollbackErr),
+        });
       }
 
       if (attempt < maxRetries) {
         const backoff = Math.min(8000, 1000 * Math.pow(2, attempt)); // 2s,4s,8s capped
-        console.log(`⏳ [vectorEmbedding] retrying in ${backoff}ms...`);
+        logger.info("[vectorEmbedding] Retrying", { backoffMs: backoff, attempt, documentId });
         await sleep(backoff);
       }
     }
@@ -554,7 +573,7 @@ export async function deleteDocumentEmbeddings(
 ): Promise<void> {
   if (!documentId) return;
 
-  console.log(`🗑️ [vectorEmbedding] Deleting embeddings for doc=${documentId}`);
+  logger.info("[vectorEmbedding] Deleting embeddings", { documentId });
 
   // Best-effort Pinecone delete (don’t block doc deletion if it fails)
   try {
@@ -562,9 +581,10 @@ export async function deleteDocumentEmbeddings(
       await pineconeService.deleteDocumentEmbeddings(documentId);
     }
   } catch (e: any) {
-    console.warn(
-      `⚠️ [vectorEmbedding] Pinecone delete failed: ${e?.message || e}`,
-    );
+    logger.warn("[vectorEmbedding] Pinecone delete failed", {
+      documentId,
+      error: e?.message || String(e),
+    });
   }
 
   // Postgres delete with configurable timeout for VPS (default 2 minutes)
@@ -580,9 +600,7 @@ export async function deleteDocumentEmbeddings(
     { maxWait: 10000, timeout: txTimeout },
   );
 
-  console.log(
-    `✅ [vectorEmbedding] Deleted Pinecone + Postgres rows for doc=${documentId}`,
-  );
+  logger.info("[vectorEmbedding] Deleted Pinecone + Postgres rows", { documentId });
 }
 
 /**

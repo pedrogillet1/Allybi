@@ -1,0 +1,5296 @@
+{
+  "_meta": {
+    "id": "quality_language_lock_triggers",
+    "version": "1.0.0",
+    "description": "Ensures response language consistency and blocks cross-language leakage.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "owner": "quality-guardrails",
+    "lastUpdated": "2026-03-03",
+    "dependsOn": [
+      "query_parser.v1",
+      "safety_gate",
+      "fallback_router_v1"
+    ]
+  },
+  "config": {
+    "deterministic": true,
+    "dedupe": true,
+    "minPatterns": 80,
+    "maxPatterns": 200,
+    "enabled": true
+  },
+  "patterns": [
+    {
+      "id": "QT_LANG_0001",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0002",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0003",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0004",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0005",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0006",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0007",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:contains_mixed_language",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but contains mixed language in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há contains mixed language em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0008",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0009",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0010",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0011",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0012",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0013",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0014",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:system_says_pt_but_user_used_en",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but system says pt but user used en in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há system says pt but user used en em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0015",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0016",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0017",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0018",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0019",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0020",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0021",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked pt then English term included in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked pt then English term included em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0022",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0023",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0024",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0025",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0026",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0027",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0028",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but user asked en then Portuguese term included in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há user asked en then Portuguese term included em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0029",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0030",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0031",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0032",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0033",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0034",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0035",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:translation_drift",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but translation drift in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há translation drift em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0036",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0037",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0038",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0039",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0040",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0041",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0042",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:locale_mismatch",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but locale mismatch in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há locale mismatch em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0043",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in query; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em query; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0044",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in summary; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em summary; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0045",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in table_label; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em table_label; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0046",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in warning; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em warning; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0047",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in action; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em action; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0048",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in error; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em error; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0049",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:en",
+        "issue:fallback_to_default_language",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested EN but fallback to default language in fallback; force output in EN."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou EN, mas há fallback to default language em fallback; forçar saída em EN."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "en",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0050",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0051",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0052",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0053",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0054",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0055",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0056",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:contains_mixed_language",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but contains mixed language in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há contains mixed language em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0057",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0058",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0059",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0060",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0061",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0062",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0063",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:system_says_pt_but_user_used_en",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but system says pt but user used en in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há system says pt but user used en em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0064",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0065",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0066",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0067",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0068",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0069",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0070",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_pt_then_English_term_included",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked pt then English term included in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked pt then English term included em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0071",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0072",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0073",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0074",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0075",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0076",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0077",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:user_asked_en_then_Portuguese_term_included",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but user asked en then Portuguese term included in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há user asked en then Portuguese term included em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0078",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0079",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0080",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0081",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0082",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0083",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0084",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:translation_drift",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but translation drift in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há translation drift em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0085",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0086",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0087",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0088",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0089",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0090",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0091",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:locale_mismatch",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but locale mismatch in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há locale mismatch em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0092",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:query"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in query; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em query; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "query"
+      ]
+    },
+    {
+      "id": "QT_LANG_0093",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:summary"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in summary; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em summary; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "summary"
+      ]
+    },
+    {
+      "id": "QT_LANG_0094",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:table_label"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in table_label; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em table_label; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "table_label"
+      ]
+    },
+    {
+      "id": "QT_LANG_0095",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:warning"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in warning; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em warning; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "warning"
+      ]
+    },
+    {
+      "id": "QT_LANG_0096",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:action"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in action; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em action; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "action"
+      ]
+    },
+    {
+      "id": "QT_LANG_0097",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:error"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in error; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em error; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "error"
+      ]
+    },
+    {
+      "id": "QT_LANG_0098",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "requested_lang:pt",
+        "issue:fallback_to_default_language",
+        "context:fallback"
+      ],
+      "en": [
+        "Language policy check: user requested PT but fallback to default language in fallback; force output in PT."
+      ],
+      "pt": [
+        "Verificação de idioma: usuário solicitou PT, mas há fallback to default language em fallback; forçar saída em PT."
+      ],
+      "negatives": [
+        "do_not_switch_language_mid_answer",
+        "do_not_leak_secondary_language",
+        "do_not_mix_terminology_without_consent"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "high",
+        "explicitness": "high",
+        "baseConfidence": 0.87
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "detectedLanguage",
+        "responseLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock",
+        "pt",
+        "fallback"
+      ]
+    },
+    {
+      "id": "QT_LANG_0099",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0100",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0101",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0102",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0103",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0104",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0105",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0106",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0107",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0108",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0109",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0110",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0111",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0112",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0113",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0114",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0115",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0116",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0117",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0118",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0119",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    },
+    {
+      "id": "QT_LANG_0120",
+      "category": "language_lock",
+      "requiresLanguageLock": true,
+      "triggers": [
+        "guardrail:language_lock",
+        "issue:generic"
+      ],
+      "en": [
+        "Language lock check failed; align full response to the user-requested language."
+      ],
+      "pt": [
+        "Falha no bloqueio de idioma; alinhar a resposta inteira ao idioma solicitado."
+      ],
+      "negatives": [
+        "do_not_mix_languages",
+        "do_not_translate_without_request"
+      ],
+      "requiredContextTerms": [
+        "language_consistency",
+        "locale_match"
+      ],
+      "disambiguationRuleIds": [
+        "disambig:language_pref_confirm"
+      ],
+      "confidenceHints": {
+        "lexicalSignal": "medium",
+        "explicitness": "high",
+        "baseConfidence": 0.89
+      },
+      "slotHints": [
+        "requestedLanguage",
+        "targetLocale"
+      ],
+      "telemetryTags": [
+        "quality",
+        "language_lock"
+      ]
+    }
+  ]
+}

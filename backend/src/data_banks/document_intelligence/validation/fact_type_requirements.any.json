@@ -1,0 +1,105 @@
+{
+  "_meta": {
+    "id": "fact_type_requirements",
+    "version": "1.0.0",
+    "description": "Core fact validation requirements for extraction, citation grounding, and field typing.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "strictTypedFacts": true,
+    "requireEvidenceForFacts": true
+  },
+  "factTypes": [
+    {
+      "id": "fact_type_numeric_amount",
+      "category": "numeric",
+      "requiredEvidenceFields": ["value", "unit", "currency", "period", "sourceCell", "sourceTable"],
+      "checks": ["parseable", "unitPresent", "periodScopeMatch"]
+    },
+    {
+      "id": "fact_type_ratio",
+      "category": "numeric",
+      "requiredEvidenceFields": ["numerator", "denominator", "value", "basis", "period"],
+      "checks": ["divisionByZeroGuard", "sourceHeadersMatch"]
+    },
+    {
+      "id": "fact_type_datetime",
+      "category": "temporal",
+      "requiredEvidenceFields": ["dateText", "normalization", "sourceSection", "sourceCell"],
+      "checks": ["formatCanonicalizable", "timezoneAware"]
+    },
+    {
+      "id": "fact_type_party",
+      "category": "entity",
+      "requiredEvidenceFields": ["name", "role", "sourceSection", "sourceSpan"],
+      "checks": ["exactSpanAlignment", "noSpuriousMerge", "entityTypeMatch"]
+    }
+  ],
+  "rules": [
+    {
+      "id": "FTR_001_missing_unit_or_currency",
+      "trigger": "Numeric fact has no unit or currency while context indicates money/tax/weight/time.",
+      "check": "fact.type == 'numeric' AND fact.kind IN ['amount', 'balance', 'rate', 'tax', 'fee', 'quantity', 'quantity_value'] AND (fact.unit == null || fact.currency == null)",
+      "failureAction": "REQUEST_CLEAER_REPROMPT",
+      "severity": "error",
+      "examples": [
+        "Source: 120,000 in revenue table without unit or currency metadata.",
+        "Source: 1,500 with no currency context in financial statement row."
+      ]
+    },
+    {
+      "id": "FTR_002_missing_period",
+      "trigger": "Fact is period-sensitive but period is absent from extracted evidence.",
+      "check": "fact.periodSensitive == true AND fact.period == null",
+      "failureAction": "BLOCK_AND_REQUEST_PERIOD",
+      "severity": "error",
+      "examples": [
+        "Q3 revenue with no period label in source row.",
+        "Tax line item extracted without reporting period."
+      ]
+    },
+    {
+      "id": "FTR_003_entity_context_missing",
+      "trigger": "Parties/organization fact lacks entity identifier.",
+      "check": "fact.type == 'entity' AND fact.entityId == null",
+      "failureAction": "BLOCK_AND_ASK_QUALIFY",
+      "severity": "warning",
+      "examples": [
+        "Counterparty row extracted without legal name.",
+        "Supplier and vendor identities mixed in summary."
+      ]
+    },
+    {
+      "id": "FTR_004_numeric_range_violation",
+      "trigger": "Parsed numeric fact outside allowed magnitude for declared type.",
+      "check": "fact.type == 'numeric' AND fact.value != null AND fact.expectedRange != null AND (fact.value < fact.expectedRange.min OR fact.value > fact.expectedRange.max)",
+      "failureAction": "REQUEST_REPHRASE_WITH_RANGE",
+      "severity": "warning",
+      "examples": [
+        "Balance reported as -999999999 for cash item without scale note.",
+        "Percent stored as 9000 instead of 90 for 90%."
+      ]
+    },
+    {
+      "id": "FTR_005_spanning_cell_reject",
+      "trigger": "Fact value depends on ambiguous merged table cell with no row/column context.",
+      "check": "fact.sourceCell.isMerged == true AND fact.headerContext == null",
+      "failureAction": "DECLINE_WITH_SPAN_REQUEST",
+      "severity": "warning",
+      "examples": [
+        "Merged row header used as amount without line context.",
+        "Table heading used as fact value."
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "FACT_TYPE_REQUIREMENTS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when fact type rule is missing.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

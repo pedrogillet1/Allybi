@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "id": "numeric_reconciliation_rules",
+    "version": "1.0.0",
+    "description": "Numeric reconciliation and tie-out requirements for answer safety.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultReconcileTolerance": 0.01,
+    "requiredEvidenceDensity": 0.85
+  },
+  "reconciliationModes": [
+    "balance_tie_out",
+    "sum_vs_total",
+    "prior_period_rollforward",
+    "bank_gl_tieout"
+  ],
+  "rules": [
+    {
+      "id": "NRR_001_tieout_bank_formula",
+      "trigger": "bank_reconciliation equation does not hold for same period and currency.",
+      "check": "facts.bookBalance != null AND facts.statementBalance != null AND facts.adjustments != null AND facts.reconciledBalance != null AND Math.abs((bookBalance + adjustments) - statementBalance) > tolerance",
+      "failureAction": "BLOCK_RECONCILIATION",
+      "severity": "error",
+      "examples": [
+        "Book balance 10,000 + adjustments 300 != bank balance 10,100.",
+        "Missing outstanding items in bank tie-out.",
+        "Reconciled amount computed with wrong currency scale."
+      ]
+    },
+    {
+      "id": "NRR_002_sum_total_mismatch",
+      "trigger": "Sum of row amounts and reported total in same table are materially different.",
+      "check": "table.subtotalsCount > 0 AND abs(sum(table.rowTotals) - table.reportedTotal) > defaultReconcileTolerance",
+      "failureAction": "REQUEST_HEADER_VERIFICATION",
+      "severity": "warning",
+      "examples": [
+        "Line items total 98,200 but table total shows 98,000 without rounding note.",
+        "Component sum not equal to declared grand total."
+      ]
+    },
+    {
+      "id": "NRR_003_currency_consistent_tieout",
+      "trigger": "Numeric comparisons cross currencies without explicit FX statement.",
+      "check": "reconciliation.currencyDistinctCount > 1 AND context.fxRateProvided == false",
+      "failureAction": "BLOCK_AND_ASK_FX",
+      "severity": "error"
+    },
+    {
+      "id": "NRR_004_period_scoped_tieout",
+      "trigger": "Reconciliation spans multiple periods without aligned bucket boundaries.",
+      "check": "reconciliation.spansMultiplePeriods == true AND context.periodAligned == false",
+      "failureAction": "ASK_PERIOD_ALIGN",
+      "severity": "warning"
+    },
+    {
+      "id": "NRR_005_rollforward_consistency",
+      "trigger": "Opening + movement != closing in rollforward table.",
+      "check": "rollforward.opening + rollforward.movements != rollforward.closing",
+      "failureAction": "BLOCK_AND_REQUEST_REVIEW",
+      "severity": "error"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "id": "verb_phrase_bank",
+    "version": "1.0.0",
+    "description": "Reusable phrase bank for natural verbing.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "phrases": {
+    "en": [
+      "I confirmed from the source",
+      "I can only confirm the cited values",
+      "There is a clear tie-out here"
+    ],
+    "pt": [
+      "Confirmei pelo documento",
+      "Somente confirmo valores citados",
+      "Aqui ha um fechamento claro"
+    ]
+  },
+  "rules": [
+    {
+      "id": "VPB_001",
+      "trigger": "Phrase repeated too often",
+      "check": "output.verbPhraseRepeatRate > 0.22",
+      "failureAction": "ROTATE_PHRASE"
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

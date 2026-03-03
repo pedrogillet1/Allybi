@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "id": "ambiguity_playbooks",
+    "version": "1.0.0",
+    "description": "Playbook-driven disambiguation for routing and scope decisions.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxQuestions": 3,
+    "requireExplicitResolution": true
+  },
+  "playbooks": [
+    {
+      "id": "AMB_PLAY_DOC_SCOPE",
+      "trigger": "Query has more than one matching document reference",
+      "questions": [
+        "Which document should I use: {{optionA}}, {{optionB}}, or another one?",
+        "Use latest version or a specific period?"
+      ]
+    },
+    {
+      "id": "AMB_PLAY_DOC_PERIOD",
+      "trigger": "Period context is mixed",
+      "questions": [
+        "Should this use one period only or compare across periods?",
+        "Use invoice period or report period?"
+      ]
+    },
+    {
+      "id": "AMB_PLAY_UNIT",
+      "trigger": "Unit is ambiguous or missing",
+      "questions": [
+        "Should I use {{unitA}} or {{unitB}}?",
+        "Should currency be normalized?"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "ABP_001_multi_doc_followup",
+      "trigger": "docCandidatesCount > 1 with active follow-up",
+      "check": "context.docCandidatesCount > 1 && context.followupWithoutScope == true",
+      "failureAction": "ASK_SCOPE_QUESTION"
+    },
+    {
+      "id": "ABP_002_ambiguous_unit",
+      "trigger": "Query has amount with conflicting units",
+      "check": "context.hasAmount == true && context.unitConfidence < 0.72",
+      "failureAction": "ASK_UNIT_CONFIRMATION"
+    }
+  ],
+  "templates": [
+    {
+      "id": "AMBIGUITY_PLAYBOOKS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in ambiguity_playbooks.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

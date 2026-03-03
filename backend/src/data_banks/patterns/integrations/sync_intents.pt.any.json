@@ -1,0 +1,5972 @@
+{
+  "_meta": {
+    "id": "sync_intents_pt",
+    "version": "1.0.0",
+    "description": "sync intents pattern bank for PT connector sync intents with connector-aware isolation.",
+    "languages": [
+      "pt",
+      "any"
+    ],
+    "owner": "connectors-patterning",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/retrieval/retrievalEngine.service.ts",
+      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+    ],
+    "tests": [
+      "sync_pt_positive_1",
+      "sync_pt_negative_1",
+      "sync_pt_missing_slot"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "matching": {
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true
+    },
+    "minPatterns": 120,
+    "maxPatterns": 250
+  },
+  "patterns": [
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0001",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Dropbox agora"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0002",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0003",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Gmail agora"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0004",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0005",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Google Drive agora"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0006",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0007",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Outlook agora"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0008",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0009",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Slack agora"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0010",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0011",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "atualizar Teams agora"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0012",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "consultar atualizações do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0013",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "consultar atualizações do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0014",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "consultar atualizações do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0015",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "consultar atualizações do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0016",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "consultar atualizações do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0017",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "consultar atualizações do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0018",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização completa no Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0019",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização completa no Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0020",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização completa no Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0021",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização completa no Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0022",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização completa no Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0023",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização completa no Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0024",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização parcial do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0025",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização parcial do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0026",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização parcial do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0027",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização parcial do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0028",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização parcial do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0029",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "executar sincronização parcial do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0030",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar anexos dos últimos 7 dias no Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0031",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar anexos dos últimos 7 dias no Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0032",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar anexos dos últimos 7 dias no Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0033",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar anexos dos últimos 7 dias no Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0034",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar anexos dos últimos 7 dias no Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0035",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar anexos dos últimos 7 dias no Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0036",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar faturas da colecao Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0037",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar faturas da colecao Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0038",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar faturas da colecao Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0039",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar faturas da colecao Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0040",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar faturas da colecao Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0041",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar faturas da colecao Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0042",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar novos arquivos do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0043",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar novos arquivos do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0044",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar novos arquivos do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0045",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar novos arquivos do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0046",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar novos arquivos do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0047",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "importar novos arquivos do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0048",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar Dropbox invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0049",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar Gmail invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0050",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar Google Drive invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0051",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0052",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0053",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0054",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0055",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0056",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0057",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens recentes do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0058",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens recentes do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0059",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens recentes do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0060",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens recentes do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0061",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens recentes do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0062",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar mensagens recentes do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0063",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar Outlook invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0064",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar Slack invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0065",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "puxar Teams invoices"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0066",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0067",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0068",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0069",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar meu Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0070",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar meu Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0071",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar meu Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0072",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar meu Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0073",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar meu Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0074",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar meu Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0075",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0076",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0077",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "ressincronizar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0078",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar a colecao Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0079",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar a colecao Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0080",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar a colecao Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0081",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar a colecao Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0082",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar a colecao Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0083",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar a colecao Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0084",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar agora a colecao Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0085",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar agora a colecao Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0086",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar agora a colecao Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0087",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar agora a colecao Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0088",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar agora a colecao Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0089",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar agora a colecao Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0090",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar anexos da semana passada do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0091",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar anexos da semana passada do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0092",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar anexos da semana passada do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0093",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar anexos da semana passada do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0094",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar anexos da semana passada do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0095",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar anexos da semana passada do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0096",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar dados do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0097",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar dados do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0098",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar dados do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0099",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar dados do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0100",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar dados do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0101",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar dados do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0102",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0103",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0104",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0105",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meu Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0106",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meu Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0107",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meu Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0108",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meu Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0109",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meu Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0110",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meu Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0111",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meus dados Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0112",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meus dados Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0113",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meus dados Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0114",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meus dados Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0115",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meus dados Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0116",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar meus dados Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0117",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar mês passado no Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0118",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar mês passado no Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0119",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar mês passado no Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0120",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar mês passado no Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0121",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar mês passado no Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0122",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar mês passado no Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0123",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0124",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar colecao compartilhada do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0125",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar colecao compartilhada do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0126",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar colecao compartilhada do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0127",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar colecao compartilhada do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0128",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar colecao compartilhada do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0129",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar colecao compartilhada do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0130",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar semana passada do Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0131",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar semana passada do Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0132",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar semana passada do Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0133",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar semana passada do Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0134",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar semana passada do Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0135",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar semana passada do Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0136",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0137",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SYNC",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "timeRange",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Qual conector e colecao devo sincronizar e qual período devo usar?",
+      "pt": [
+        "sincronizar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:sync",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "timeRange",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "sync",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SYNC_PT_0138",
+      "intent": "CONNECTORS"
+    }
+  ]
+}

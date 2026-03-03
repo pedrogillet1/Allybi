@@ -24569,6 +24569,72 @@
       "dependsOn": []
     },
     {
+      "id": "llm_global_guards",
+      "category": "prompts",
+      "path": "prompts/llm_global_guards.any.json",
+      "filename": "llm_global_guards.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-03",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "llm_nav_pills_contract",
+      "category": "prompts",
+      "path": "prompts/llm_nav_pills_contract.any.json",
+      "filename": "llm_nav_pills_contract.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-03",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "llm_minimal_safe_prompt",
+      "category": "prompts",
+      "path": "prompts/llm_minimal_safe_prompt.any.json",
+      "filename": "llm_minimal_safe_prompt.any.json",
+      "version": "1.0.0",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-03",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "dependsOn": []
+    },
+    {
       "id": "python_chart_recipes",
       "category": "templates",
       "path": "templates/python_chart_recipes.any.json",

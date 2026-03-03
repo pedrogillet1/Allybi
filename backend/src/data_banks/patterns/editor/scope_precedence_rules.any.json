@@ -1,0 +1,1256 @@
+{
+  "_meta": {
+    "id": "patterns_editor_scope_precedence_rules",
+    "version": "1.0.0",
+    "owner": "editor-patterns",
+    "languages": [
+      "any"
+    ],
+    "description": "Machine-actionable editor scope precedence rules: selection-first, explicit target, semantic resolver, then clarify.",
+    "usedBy": [
+      "editor_scope_resolver",
+      "selection_router",
+      "tests.patternDeterminism"
+    ],
+    "tests": {
+      "positive": [
+        "select range and then apply",
+        "no selection but explicit heading target"
+      ],
+      "negative": [
+        "apply to random area",
+        "resolve without clarifying missing scope"
+      ]
+    },
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "priority",
+    "minPatterns": 40,
+    "maxPatterns": 120
+  },
+  "rules": [
+    {
+      "id": "SP_0001",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 1000,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user gave explicit selection range",
+        "resolve precedence rule editor flow 1"
+      ]
+    },
+    {
+      "id": "SP_0002",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 999,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select from line 4 to 12",
+        "resolve precedence rule editor flow 2"
+      ]
+    },
+    {
+      "id": "SP_0003",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 988,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "explicit range and explicit heading target",
+        "resolve precedence rule editor flow 3"
+      ]
+    },
+    {
+      "id": "SP_0004",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 957,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection, explicit section target",
+        "resolve precedence rule editor flow 4"
+      ]
+    },
+    {
+      "id": "SP_0005",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 956,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select that section",
+        "resolve precedence rule editor flow 5"
+      ]
+    },
+    {
+      "id": "SP_0006",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_RANGE",
+      "priority": 925,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user asked for table under header",
+        "resolve precedence rule editor flow 6"
+      ]
+    },
+    {
+      "id": "SP_0007",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 894,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "selection phrase ambiguous",
+        "select the cells",
+        "resolve precedence rule editor flow 7"
+      ]
+    },
+    {
+      "id": "SP_0008",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 900,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "invalid paragraph selection range",
+        "resolve precedence rule editor flow 8"
+      ]
+    },
+    {
+      "id": "SP_0009",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "REQUIRE_SELECTION",
+      "priority": 879,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection and no anchor provided",
+        "resolve precedence rule editor flow 9"
+      ]
+    },
+    {
+      "id": "SP_0010",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 868,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "editor inferred a selection from prior context",
+        "resolve precedence rule editor flow 10"
+      ]
+    },
+    {
+      "id": "SP_0011",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 997,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user gave explicit selection range",
+        "resolve precedence rule editor flow 11"
+      ]
+    },
+    {
+      "id": "SP_0012",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 996,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select from line 4 to 12",
+        "resolve precedence rule editor flow 12"
+      ]
+    },
+    {
+      "id": "SP_0013",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 985,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "explicit range and explicit heading target",
+        "resolve precedence rule editor flow 13"
+      ]
+    },
+    {
+      "id": "SP_0014",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 954,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection, explicit section target",
+        "resolve precedence rule editor flow 14"
+      ]
+    },
+    {
+      "id": "SP_0015",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 960,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select that section",
+        "resolve precedence rule editor flow 15"
+      ]
+    },
+    {
+      "id": "SP_0016",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_RANGE",
+      "priority": 929,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user asked for table under header",
+        "resolve precedence rule editor flow 16"
+      ]
+    },
+    {
+      "id": "SP_0017",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 898,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "selection phrase ambiguous",
+        "select the cells",
+        "resolve precedence rule editor flow 17"
+      ]
+    },
+    {
+      "id": "SP_0018",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 897,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "invalid paragraph selection range",
+        "resolve precedence rule editor flow 18"
+      ]
+    },
+    {
+      "id": "SP_0019",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "REQUIRE_SELECTION",
+      "priority": 876,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection and no anchor provided",
+        "resolve precedence rule editor flow 19"
+      ]
+    },
+    {
+      "id": "SP_0020",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 865,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "editor inferred a selection from prior context",
+        "resolve precedence rule editor flow 20"
+      ]
+    },
+    {
+      "id": "SP_0021",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 994,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user gave explicit selection range",
+        "resolve precedence rule editor flow 21"
+      ]
+    },
+    {
+      "id": "SP_0022",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 1000,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select from line 4 to 12",
+        "resolve precedence rule editor flow 22"
+      ]
+    },
+    {
+      "id": "SP_0023",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 989,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "explicit range and explicit heading target",
+        "resolve precedence rule editor flow 23"
+      ]
+    },
+    {
+      "id": "SP_0024",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 958,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection, explicit section target",
+        "resolve precedence rule editor flow 24"
+      ]
+    },
+    {
+      "id": "SP_0025",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 957,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select that section",
+        "resolve precedence rule editor flow 25"
+      ]
+    },
+    {
+      "id": "SP_0026",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_RANGE",
+      "priority": 926,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user asked for table under header",
+        "resolve precedence rule editor flow 26"
+      ]
+    },
+    {
+      "id": "SP_0027",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 895,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "selection phrase ambiguous",
+        "select the cells",
+        "resolve precedence rule editor flow 27"
+      ]
+    },
+    {
+      "id": "SP_0028",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 894,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "invalid paragraph selection range",
+        "resolve precedence rule editor flow 28"
+      ]
+    },
+    {
+      "id": "SP_0029",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "REQUIRE_SELECTION",
+      "priority": 880,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection and no anchor provided",
+        "resolve precedence rule editor flow 29"
+      ]
+    },
+    {
+      "id": "SP_0030",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 869,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "editor inferred a selection from prior context",
+        "resolve precedence rule editor flow 30"
+      ]
+    },
+    {
+      "id": "SP_0031",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 998,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user gave explicit selection range",
+        "resolve precedence rule editor flow 31"
+      ]
+    },
+    {
+      "id": "SP_0032",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 997,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select from line 4 to 12",
+        "resolve precedence rule editor flow 32"
+      ]
+    },
+    {
+      "id": "SP_0033",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 986,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "explicit range and explicit heading target",
+        "resolve precedence rule editor flow 33"
+      ]
+    },
+    {
+      "id": "SP_0034",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 955,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection, explicit section target",
+        "resolve precedence rule editor flow 34"
+      ]
+    },
+    {
+      "id": "SP_0035",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 954,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select that section",
+        "resolve precedence rule editor flow 35"
+      ]
+    },
+    {
+      "id": "SP_0036",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_RANGE",
+      "priority": 930,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user asked for table under header",
+        "resolve precedence rule editor flow 36"
+      ]
+    },
+    {
+      "id": "SP_0037",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 899,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "selection phrase ambiguous",
+        "select the cells",
+        "resolve precedence rule editor flow 37"
+      ]
+    },
+    {
+      "id": "SP_0038",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": false,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 898,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "invalid paragraph selection range",
+        "resolve precedence rule editor flow 38"
+      ]
+    },
+    {
+      "id": "SP_0039",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "REQUIRE_SELECTION",
+      "priority": 877,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection and no anchor provided",
+        "resolve precedence rule editor flow 39"
+      ]
+    },
+    {
+      "id": "SP_0040",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": false,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 866,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "editor inferred a selection from prior context",
+        "resolve precedence rule editor flow 40"
+      ]
+    },
+    {
+      "id": "SP_0041",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 995,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "user gave explicit selection range",
+        "resolve precedence rule editor flow 41"
+      ]
+    },
+    {
+      "id": "SP_0042",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": false,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 2,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 994,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select from line 4 to 12",
+        "resolve precedence rule editor flow 42"
+      ]
+    },
+    {
+      "id": "SP_0043",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": true,
+        "hasExplicitSelection": true,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 3,
+        "requiresEditorMode": true
+      },
+      "action": "LOCK_SELECTION",
+      "priority": 990,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "explicit range and explicit heading target",
+        "resolve precedence rule editor flow 43"
+      ]
+    },
+    {
+      "id": "SP_0044",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 4,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 959,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "no selection, explicit section target",
+        "resolve precedence rule editor flow 44"
+      ]
+    },
+    {
+      "id": "SP_0045",
+      "trigger": "editor.scope.precedence",
+      "check": {
+        "sequence": "selection_first",
+        "hasSelection": false,
+        "hasExplicitSelection": false,
+        "hasExplicitTarget": true,
+        "hasSemanticCandidates": true,
+        "isSelectionValid": true,
+        "selectionCount": 1,
+        "requiresEditorMode": true
+      },
+      "action": "RESOLVE_BY_ANCHOR",
+      "priority": 958,
+      "validSelectionDefinition": {
+        "minChars": 1,
+        "maxChars": 50000,
+        "forbidPartial": false,
+        "allowCrossBoundary": true,
+        "supportsTable": true
+      },
+      "examples": [
+        "select that section",
+        "resolve precedence rule editor flow 45"
+      ]
+    }
+  ]
+}

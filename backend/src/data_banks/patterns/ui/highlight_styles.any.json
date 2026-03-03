@@ -1,0 +1,2683 @@
+{
+  "_meta": {
+    "id": "ui_highlight_styles",
+    "version": "1.0.0",
+    "description": "UI highlight style rules with accessibility-safe semantics and hard target limits.",
+    "languages": [
+      "any"
+    ],
+    "owner": "ui-contracts",
+    "usedBy": [
+      "ui_renderer",
+      "editor_highlight_runtime",
+      "tests.patternDeterminism"
+    ],
+    "tests": {
+      "positive": [
+        "paragraph uses yellow underline style",
+        "cell highlights include border overlay fallback",
+        "unsupported target uses selectionTint"
+      ],
+      "negative": [
+        "too many target highlights should fail",
+        "color-only highlight without non-color cue should fail"
+      ]
+    },
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "minPatterns": 40,
+    "maxPatterns": 100
+  },
+  "styles": [
+    {
+      "id": "HS_0001",
+      "styleId": "pulse",
+      "name": "pulse_1",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "2s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 1
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 280
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "amber",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0002",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_2",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "off",
+        "underlineThickness": "3px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 2
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 281
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "blue",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0003",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_3",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.11,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 3
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 282
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "teal",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0004",
+      "styleId": "selectionTint",
+      "name": "selectionTint_4",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.12,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 4
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 283
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "violet",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0005",
+      "styleId": "pulse",
+      "name": "pulse_5",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.13,
+        "pulseSpeed": "6s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 5
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 284
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "gray",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0006",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_6",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.14,
+        "pulseSpeed": "off",
+        "underlineThickness": "4px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 6
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 285
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "amber",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0007",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_7",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.15,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 7
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 286
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "blue",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0008",
+      "styleId": "selectionTint",
+      "name": "selectionTint_8",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 8
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 287
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "teal",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0009",
+      "styleId": "pulse",
+      "name": "pulse_9",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "5s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 9
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 288
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "violet",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0010",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_10",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.11,
+        "pulseSpeed": "off",
+        "underlineThickness": "2px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 1
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 289
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "gray",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0011",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_11",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.12,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 2
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 290
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "amber",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0012",
+      "styleId": "selectionTint",
+      "name": "selectionTint_12",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.13,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 3
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 291
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "blue",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0013",
+      "styleId": "pulse",
+      "name": "pulse_13",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.14,
+        "pulseSpeed": "4s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 4
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 292
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "teal",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0014",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_14",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.15,
+        "pulseSpeed": "off",
+        "underlineThickness": "3px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 5
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 293
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "violet",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0015",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_15",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 6
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 294
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "gray",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0016",
+      "styleId": "selectionTint",
+      "name": "selectionTint_16",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 7
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 295
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "amber",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0017",
+      "styleId": "pulse",
+      "name": "pulse_17",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.11,
+        "pulseSpeed": "3s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 8
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 296
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "blue",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0018",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_18",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.12,
+        "pulseSpeed": "off",
+        "underlineThickness": "4px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 9
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 297
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "teal",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0019",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_19",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.13,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 1
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 298
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "violet",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0020",
+      "styleId": "selectionTint",
+      "name": "selectionTint_20",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.14,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 2
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 299
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "gray",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0021",
+      "styleId": "pulse",
+      "name": "pulse_21",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.15,
+        "pulseSpeed": "2s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 3
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 300
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "amber",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0022",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_22",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "off",
+        "underlineThickness": "2px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 4
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 301
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "blue",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0023",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_23",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 5
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 302
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "teal",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0024",
+      "styleId": "selectionTint",
+      "name": "selectionTint_24",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.11,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 6
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 303
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "violet",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0025",
+      "styleId": "pulse",
+      "name": "pulse_25",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.12,
+        "pulseSpeed": "6s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 7
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 304
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "gray",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0026",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_26",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.13,
+        "pulseSpeed": "off",
+        "underlineThickness": "3px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 8
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 305
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "amber",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0027",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_27",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.14,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 9
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 306
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "blue",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0028",
+      "styleId": "selectionTint",
+      "name": "selectionTint_28",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.15,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 1
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 307
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "teal",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0029",
+      "styleId": "pulse",
+      "name": "pulse_29",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "5s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 2
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 308
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "violet",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0030",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_30",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "off",
+        "underlineThickness": "4px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 3
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 309
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "gray",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0031",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_31",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.11,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 4
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 310
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "amber",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0032",
+      "styleId": "selectionTint",
+      "name": "selectionTint_32",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.12,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 5
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 311
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "blue",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0033",
+      "styleId": "pulse",
+      "name": "pulse_33",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.13,
+        "pulseSpeed": "4s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 6
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 312
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "teal",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0034",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_34",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.14,
+        "pulseSpeed": "off",
+        "underlineThickness": "2px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 7
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 313
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "violet",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0035",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_35",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.15,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 8
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 314
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "gray",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0036",
+      "styleId": "selectionTint",
+      "name": "selectionTint_36",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 9
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 315
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "amber",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0037",
+      "styleId": "pulse",
+      "name": "pulse_37",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "3s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 1
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 316
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "blue",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0038",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_38",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.11,
+        "pulseSpeed": "off",
+        "underlineThickness": "3px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 2
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 317
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "teal",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0039",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_39",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.12,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 3
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 318
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "violet",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0040",
+      "styleId": "selectionTint",
+      "name": "selectionTint_40",
+      "allowedTargets": [
+        "slideElement",
+        "paragraph"
+      ],
+      "maxTargets": 160,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 160,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.13,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 4
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 319
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "gray",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_0041",
+      "styleId": "pulse",
+      "name": "pulse_41",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 200,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 200,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.14,
+        "pulseSpeed": "2s",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 5
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "pulse applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 320
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "amber",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-pulse"
+      }
+    },
+    {
+      "id": "HS_0042",
+      "styleId": "yellowUnderline",
+      "name": "yellowUnderline_42",
+      "allowedTargets": [
+        "heading",
+        "cell"
+      ],
+      "maxTargets": 190,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 190,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 2,
+        "fillOpacity": 0.15,
+        "pulseSpeed": "off",
+        "underlineThickness": "4px",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 6
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.8,
+        "focusIndicator": true,
+        "screenReaderLabel": "yellowUnderline applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 321
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#b8860b",
+        "fillColor": "#fff7cc",
+        "tone": "blue",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-yellowUnderline"
+      }
+    },
+    {
+      "id": "HS_0043",
+      "styleId": "borderOverlay",
+      "name": "borderOverlay_43",
+      "allowedTargets": [
+        "cell",
+        "range"
+      ],
+      "maxTargets": 180,
+      "minTargets": 1,
+      "allowNestedRanges": true,
+      "constraints": {
+        "maxTargets": 180,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": false,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 3,
+        "fillOpacity": 0.09,
+        "pulseSpeed": "off",
+        "borderDash": [
+          2,
+          2
+        ],
+        "layerPriority": 7
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "borderOverlay applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 322
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#e6f0ff",
+        "tone": "teal",
+        "pattern": "diag-stripes",
+        "ariaTag": "ui-highlight-borderOverlay"
+      }
+    },
+    {
+      "id": "HS_0044",
+      "styleId": "selectionTint",
+      "name": "selectionTint_44",
+      "allowedTargets": [
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 170,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 170,
+        "maxTargetDensityPerViewport": 200,
+        "maxRangeLengthChars": 12000,
+        "allowCrossPage": true,
+        "allowCrossSection": true
+      },
+      "rendererHints": {
+        "strokeWidth": 4,
+        "fillOpacity": 0.1,
+        "pulseSpeed": "off",
+        "borderDash": [
+          1,
+          0
+        ],
+        "layerPriority": 8
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "pattern",
+          "underlineOffset",
+          "iconGlyph",
+          "thickness",
+          "animationPulse"
+        ],
+        "contrastRatioMin": 4.7,
+        "focusIndicator": true,
+        "screenReaderLabel": "selectionTint applied",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": false,
+        "allowAnimation": false,
+        "animationDurationMs": 323
+      },
+      "fallbackStyleId": "selectionTint",
+      "styleTokens": {
+        "borderColor": "#2f80ed",
+        "fillColor": "#fff7cc",
+        "tone": "violet",
+        "pattern": "dot",
+        "ariaTag": "ui-highlight-selectionTint"
+      }
+    },
+    {
+      "id": "HS_FALLBACK_0001",
+      "styleId": "selectionTint",
+      "name": "fallback_selectionTint",
+      "allowedTargets": [
+        "paragraph",
+        "heading",
+        "cell",
+        "range",
+        "slideElement"
+      ],
+      "maxTargets": 150,
+      "minTargets": 1,
+      "allowNestedRanges": false,
+      "constraints": {
+        "maxTargets": 150,
+        "maxTargetDensityPerViewport": 150,
+        "maxRangeLengthChars": 6000,
+        "allowCrossPage": false,
+        "allowCrossSection": false,
+        "appliesWhen": "unsupported_target_or_style"
+      },
+      "rendererHints": {
+        "strokeWidth": 1,
+        "fillOpacity": 0.06,
+        "pulseSpeed": "off",
+        "layerPriority": 1
+      },
+      "accessibility": {
+        "avoidColorOnly": true,
+        "colorPurpose": "nonInformationalOnly",
+        "nonColorCues": [
+          "label",
+          "outline",
+          "thickness"
+        ],
+        "contrastRatioMin": 4.5,
+        "focusIndicator": true,
+        "screenReaderLabel": "fallback style selection tint",
+        "supportsHighContrastMode": true
+      },
+      "motionConstraints": {
+        "respectReducedMotion": true,
+        "disablePulseIfReducedMotion": true,
+        "allowAnimation": false,
+        "animationDurationMs": 0
+      },
+      "styleTokens": {
+        "borderColor": "#4a4a4a",
+        "fillColor": "#f0f0f0",
+        "tone": "neutral",
+        "pattern": "solid",
+        "ariaTag": "ui-highlight-selectionTint-fallback"
+      }
+    }
+  ]
+}

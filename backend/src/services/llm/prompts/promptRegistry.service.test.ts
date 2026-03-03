@@ -1,7 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "@jest/globals";
-import { PromptRegistryService } from "./promptRegistry.service";
+import {
+  createDefaultPromptRegistryTelemetry,
+  PromptBankLoadError,
+  PromptBankMissingError,
+  type PromptMetricSink,
+  PromptRegistryService,
+  PromptRoleValidationError,
+  type PromptRegistryTelemetry,
+} from "./promptRegistry.service";
 import { COMPOSE_ANSWER_TEMPLATE_MODES } from "../../../modules/chat/domain/answerModes";
 
 function loadPromptBanks() {
@@ -561,5 +569,242 @@ describe("PromptRegistryService compose_answer mode coverage", () => {
         answerMode: "doc_grounded_single",
       }),
     ).toThrow(/duplicate_layer_id/);
+  });
+
+  test("fails closed with typed missing-bank error for required layer", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources", required: true }],
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        return null as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptBankMissingError);
+  });
+
+  test("reports loader exceptions as typed load error for required bank", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources", required: true }],
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        throw new TypeError("loader exploded");
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptBankLoadError);
+  });
+
+  test("classifies thrown required-bank error as missing when hasBank reports false", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources", required: true }],
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        throw new TypeError("lookup failed");
+      },
+      hasBank(bankId: string): boolean {
+        return bankId === "prompt_registry";
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptBankMissingError);
+  });
+
+  test("classifies thrown required-bank error as load failure when hasBank reports true", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources", required: true }],
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        throw new TypeError("lookup failed");
+      },
+      hasBank(): boolean {
+        return true;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptBankLoadError);
+  });
+
+  test("throws typed invalid-role error when prompt message role is unsupported", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: [
+              {
+                id: "bad_role",
+                priority: 100,
+                when: { answerModes: ["doc_grounded_single"] },
+                messages: [{ role: "assistant", content: { any: "invalid role" } }],
+              },
+            ],
+          } as T;
+        }
+        return { _meta: { id: bankId }, config: { enabled: true } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    expect(() =>
+      service.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow(PromptRoleValidationError);
+  });
+
+  test("trace records actual localized template key for template fallback", () => {
+    const loader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        if (bankId === "task_answer_with_sources") {
+          return {
+            _meta: { id: "task_answer_with_sources", version: "test" },
+            config: { enabled: true },
+            templates: { any: { system: "hello from any" } },
+          } as T;
+        }
+        return { _meta: { id: bankId }, config: { enabled: true } } as T;
+      },
+    };
+    const service = new PromptRegistryService(loader);
+    const bundle = service.buildPrompt("compose_answer", {
+      env: "local",
+      outputLanguage: "pt",
+      answerMode: "doc_grounded_single",
+    });
+    expect(bundle.debug?.selectedTemplateIds ?? []).toContain(
+      "task_answer_with_sources:templates.any",
+    );
+  });
+
+  test("emits telemetry for success and failure paths", () => {
+    const events: string[] = [];
+    const telemetry: PromptRegistryTelemetry = {
+      recordBuildStart() {
+        events.push("start");
+      },
+      recordBuildSuccess() {
+        events.push("success");
+      },
+      recordBuildFailure() {
+        events.push("failure");
+      },
+    };
+    const okService = new PromptRegistryService(loadPromptBanks(), telemetry);
+    okService.buildPrompt("retrieval", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "doc_grounded_single",
+    });
+    expect(events).toEqual(["start", "success"]);
+
+    const badLoader = {
+      getBank<T = any>(bankId: string): T {
+        if (bankId === "prompt_registry") {
+          return {
+            _meta: { id: "prompt_registry", version: "test" },
+            config: { enabled: true },
+            promptFiles: [{ id: "task_answer_with_sources", required: true }],
+            layersByKind: { compose_answer: ["task_answer_with_sources"] },
+          } as T;
+        }
+        throw new Error("boom");
+      },
+    };
+    const failService = new PromptRegistryService(badLoader, telemetry);
+    expect(() =>
+      failService.buildPrompt("compose_answer", {
+        env: "local",
+        outputLanguage: "en",
+        answerMode: "doc_grounded_single",
+      }),
+    ).toThrow();
+    expect(events.slice(-2)).toEqual(["start", "failure"]);
+  });
+
+  test("emits metric sink counters and timings", () => {
+    const calls: Array<{ kind: "inc" | "timing"; metric: string }> = [];
+    const sink: PromptMetricSink = {
+      increment(metric) {
+        calls.push({ kind: "inc", metric });
+      },
+      timing(metric) {
+        calls.push({ kind: "timing", metric });
+      },
+    };
+    const telemetry = createDefaultPromptRegistryTelemetry(sink);
+    const service = new PromptRegistryService(loadPromptBanks(), telemetry);
+    service.buildPrompt("retrieval", {
+      env: "local",
+      outputLanguage: "en",
+      answerMode: "doc_grounded_single",
+    });
+
+    expect(calls.some((c) => c.kind === "inc" && c.metric === "prompt_registry_build_total")).toBe(true);
+    expect(calls.some((c) => c.kind === "timing" && c.metric === "prompt_registry_build_duration_ms")).toBe(true);
   });
 });

@@ -1,0 +1,1338 @@
+{
+  "_meta": {
+    "id": "di_finance_sections_fin_treasury_memo",
+    "version": "2.1.0",
+    "description": "Sections mapping for Treasury Memo.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_treasury_memo"
+  },
+  "sections": [
+    {
+      "id": "document_header_1",
+      "name": {
+        "en": "document header Segment 1",
+        "pt": "document header Segmento 1 1"
+      },
+      "mustHave": true,
+      "order": 1,
+      "headingAnchors": [
+        "document_header 1",
+        "document_header 1",
+        "document header Segment 1",
+        "seção document header Segment 1"
+      ],
+      "confidence": 0.821,
+      "fallbackPatterns": [
+        "\\bdocument_header\\b",
+        "\\bdocument_header_1\\b",
+        "\\bdocument_header\\s+segment\\s+1\\b"
+      ],
+      "description": "Canonical section document_header for fin_treasury_memo"
+    },
+    {
+      "id": "summary_2",
+      "name": {
+        "en": "summary Segment 2",
+        "pt": "summary Segmento 2 2"
+      },
+      "mustHave": true,
+      "order": 2,
+      "headingAnchors": [
+        "summary 2",
+        "summary 2",
+        "summary Segment 2",
+        "seção summary Segment 2"
+      ],
+      "confidence": 0.823,
+      "fallbackPatterns": [
+        "\\bsummary\\b",
+        "\\bsummary_2\\b",
+        "\\bsummary\\s+segment\\s+2\\b"
+      ],
+      "description": "Canonical section summary for fin_treasury_memo"
+    },
+    {
+      "id": "financial_statements_3",
+      "name": {
+        "en": "financial statements Segment 3",
+        "pt": "financial statements Segmento 3 3"
+      },
+      "mustHave": true,
+      "order": 3,
+      "headingAnchors": [
+        "financial_statements 3",
+        "financial_statements 3",
+        "financial statements Segment 3",
+        "seção financial statements Segment 3"
+      ],
+      "confidence": 0.824,
+      "fallbackPatterns": [
+        "\\bfinancial_statements\\b",
+        "\\bfinancial_statements_3\\b",
+        "\\bfinancial_statements\\s+segment\\s+3\\b"
+      ],
+      "description": "Canonical section financial_statements for fin_treasury_memo"
+    },
+    {
+      "id": "notes_4",
+      "name": {
+        "en": "notes Segment 4",
+        "pt": "notes Segmento 4 4"
+      },
+      "mustHave": true,
+      "order": 4,
+      "headingAnchors": [
+        "notes 4",
+        "notes 4",
+        "notes Segment 4",
+        "seção notes Segment 4"
+      ],
+      "confidence": 0.826,
+      "fallbackPatterns": [
+        "\\bnotes\\b",
+        "\\bnotes_4\\b",
+        "\\bnotes\\s+segment\\s+4\\b"
+      ],
+      "description": "Canonical section notes for fin_treasury_memo"
+    },
+    {
+      "id": "ratios_5",
+      "name": {
+        "en": "ratios Segment 5",
+        "pt": "ratios Segmento 5 5"
+      },
+      "mustHave": true,
+      "order": 5,
+      "headingAnchors": [
+        "ratios 5",
+        "ratios 5",
+        "ratios Segment 5",
+        "seção ratios Segment 5"
+      ],
+      "confidence": 0.827,
+      "fallbackPatterns": [
+        "\\bratios\\b",
+        "\\bratios_5\\b",
+        "\\bratios\\s+segment\\s+5\\b"
+      ],
+      "description": "Canonical section ratios for fin_treasury_memo"
+    },
+    {
+      "id": "assumptions_6",
+      "name": {
+        "en": "assumptions Segment 6",
+        "pt": "assumptions Segmento 6 6"
+      },
+      "mustHave": true,
+      "order": 6,
+      "headingAnchors": [
+        "assumptions 6",
+        "assumptions 6",
+        "assumptions Segment 6",
+        "seção assumptions Segment 6"
+      ],
+      "confidence": 0.829,
+      "fallbackPatterns": [
+        "\\bassumptions\\b",
+        "\\bassumptions_6\\b",
+        "\\bassumptions\\s+segment\\s+6\\b"
+      ],
+      "description": "Canonical section assumptions for fin_treasury_memo"
+    },
+    {
+      "id": "disclosures_7",
+      "name": {
+        "en": "disclosures Segment 7",
+        "pt": "disclosures Segmento 7 7"
+      },
+      "mustHave": true,
+      "order": 7,
+      "headingAnchors": [
+        "disclosures 7",
+        "disclosures 7",
+        "disclosures Segment 7",
+        "seção disclosures Segment 7"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\\bdisclosures\\b",
+        "\\bdisclosures_7\\b",
+        "\\bdisclosures\\s+segment\\s+7\\b"
+      ],
+      "description": "Canonical section disclosures for fin_treasury_memo"
+    },
+    {
+      "id": "risk_disclosure_8",
+      "name": {
+        "en": "risk disclosure Segment 8",
+        "pt": "risk disclosure Segmento 8 8"
+      },
+      "mustHave": true,
+      "order": 8,
+      "headingAnchors": [
+        "risk_disclosure 8",
+        "risk_disclosure 8",
+        "risk disclosure Segment 8",
+        "seção risk disclosure Segment 8"
+      ],
+      "confidence": 0.832,
+      "fallbackPatterns": [
+        "\\brisk_disclosure\\b",
+        "\\brisk_disclosure_8\\b",
+        "\\brisk_disclosure\\s+segment\\s+8\\b"
+      ],
+      "description": "Canonical section risk_disclosure for fin_treasury_memo"
+    },
+    {
+      "id": "appendix_9",
+      "name": {
+        "en": "appendix Segment 9",
+        "pt": "appendix Segmento 9 9"
+      },
+      "mustHave": true,
+      "order": 9,
+      "headingAnchors": [
+        "appendix 9",
+        "appendix 9",
+        "appendix Segment 9",
+        "seção appendix Segment 9"
+      ],
+      "confidence": 0.833,
+      "fallbackPatterns": [
+        "\\bappendix\\b",
+        "\\bappendix_9\\b",
+        "\\bappendix\\s+segment\\s+9\\b"
+      ],
+      "description": "Canonical section appendix for fin_treasury_memo"
+    },
+    {
+      "id": "management_discussion_10",
+      "name": {
+        "en": "management discussion Segment 10",
+        "pt": "management discussion Segmento 10 10"
+      },
+      "mustHave": true,
+      "order": 10,
+      "headingAnchors": [
+        "management_discussion 10",
+        "management_discussion 10",
+        "management discussion Segment 10",
+        "seção management discussion Segment 10"
+      ],
+      "confidence": 0.835,
+      "fallbackPatterns": [
+        "\\bmanagement_discussion\\b",
+        "\\bmanagement_discussion_10\\b",
+        "\\bmanagement_discussion\\s+segment\\s+10\\b"
+      ],
+      "description": "Canonical section management_discussion for fin_treasury_memo"
+    },
+    {
+      "id": "cash_flow_analysis_11",
+      "name": {
+        "en": "cash flow analysis Segment 11",
+        "pt": "cash flow analysis Segmento 11 11"
+      },
+      "mustHave": true,
+      "order": 11,
+      "headingAnchors": [
+        "cash_flow_analysis 11",
+        "cash_flow_analysis 11",
+        "cash flow analysis Segment 11",
+        "seção cash flow analysis Segment 11"
+      ],
+      "confidence": 0.836,
+      "fallbackPatterns": [
+        "\\bcash_flow_analysis\\b",
+        "\\bcash_flow_analysis_11\\b",
+        "\\bcash_flow_analysis\\s+segment\\s+11\\b"
+      ],
+      "description": "Canonical section cash_flow_analysis for fin_treasury_memo"
+    },
+    {
+      "id": "balance_sheet_12",
+      "name": {
+        "en": "balance sheet Segment 12",
+        "pt": "balance sheet Segmento 12 12"
+      },
+      "mustHave": true,
+      "order": 12,
+      "headingAnchors": [
+        "balance_sheet 12",
+        "balance_sheet 12",
+        "balance sheet Segment 12",
+        "seção balance sheet Segment 12"
+      ],
+      "confidence": 0.838,
+      "fallbackPatterns": [
+        "\\bbalance_sheet\\b",
+        "\\bbalance_sheet_12\\b",
+        "\\bbalance_sheet\\s+segment\\s+12\\b"
+      ],
+      "description": "Canonical section balance_sheet for fin_treasury_memo"
+    },
+    {
+      "id": "income_statement_13",
+      "name": {
+        "en": "income statement Segment 13",
+        "pt": "income statement Segmento 13 13"
+      },
+      "mustHave": true,
+      "order": 13,
+      "headingAnchors": [
+        "income_statement 13",
+        "income_statement 13",
+        "income statement Segment 13",
+        "seção income statement Segment 13"
+      ],
+      "confidence": 0.839,
+      "fallbackPatterns": [
+        "\\bincome_statement\\b",
+        "\\bincome_statement_13\\b",
+        "\\bincome_statement\\s+segment\\s+13\\b"
+      ],
+      "description": "Canonical section income_statement for fin_treasury_memo"
+    },
+    {
+      "id": "liquidity_14",
+      "name": {
+        "en": "liquidity Segment 14",
+        "pt": "liquidity Segmento 14 14"
+      },
+      "mustHave": true,
+      "order": 14,
+      "headingAnchors": [
+        "liquidity 14",
+        "liquidity 14",
+        "liquidity Segment 14",
+        "seção liquidity Segment 14"
+      ],
+      "confidence": 0.841,
+      "fallbackPatterns": [
+        "\\bliquidity\\b",
+        "\\bliquidity_14\\b",
+        "\\bliquidity\\s+segment\\s+14\\b"
+      ],
+      "description": "Canonical section liquidity for fin_treasury_memo"
+    },
+    {
+      "id": "solvency_15",
+      "name": {
+        "en": "solvency Segment 15",
+        "pt": "solvency Segmento 15 15"
+      },
+      "mustHave": true,
+      "order": 15,
+      "headingAnchors": [
+        "solvency 15",
+        "solvency 15",
+        "solvency Segment 15",
+        "seção solvency Segment 15"
+      ],
+      "confidence": 0.842,
+      "fallbackPatterns": [
+        "\\bsolvency\\b",
+        "\\bsolvency_15\\b",
+        "\\bsolvency\\s+segment\\s+15\\b"
+      ],
+      "description": "Canonical section solvency for fin_treasury_memo"
+    },
+    {
+      "id": "working_capital_16",
+      "name": {
+        "en": "working capital Segment 16",
+        "pt": "working capital Segmento 16 16"
+      },
+      "mustHave": true,
+      "order": 16,
+      "headingAnchors": [
+        "working_capital 16",
+        "working_capital 16",
+        "working capital Segment 16",
+        "seção working capital Segment 16"
+      ],
+      "confidence": 0.844,
+      "fallbackPatterns": [
+        "\\bworking_capital\\b",
+        "\\bworking_capital_16\\b",
+        "\\bworking_capital\\s+segment\\s+16\\b"
+      ],
+      "description": "Canonical section working_capital for fin_treasury_memo"
+    },
+    {
+      "id": "revenue_mix_17",
+      "name": {
+        "en": "revenue mix Segment 17",
+        "pt": "revenue mix Segmento 17 17"
+      },
+      "mustHave": true,
+      "order": 17,
+      "headingAnchors": [
+        "revenue_mix 17",
+        "revenue_mix 17",
+        "revenue mix Segment 17",
+        "seção revenue mix Segment 17"
+      ],
+      "confidence": 0.845,
+      "fallbackPatterns": [
+        "\\brevenue_mix\\b",
+        "\\brevenue_mix_17\\b",
+        "\\brevenue_mix\\s+segment\\s+17\\b"
+      ],
+      "description": "Canonical section revenue_mix for fin_treasury_memo"
+    },
+    {
+      "id": "expense_breakdown_18",
+      "name": {
+        "en": "expense breakdown Segment 18",
+        "pt": "expense breakdown Segmento 18 18"
+      },
+      "mustHave": true,
+      "order": 18,
+      "headingAnchors": [
+        "expense_breakdown 18",
+        "expense_breakdown 18",
+        "expense breakdown Segment 18",
+        "seção expense breakdown Segment 18"
+      ],
+      "confidence": 0.847,
+      "fallbackPatterns": [
+        "\\bexpense_breakdown\\b",
+        "\\bexpense_breakdown_18\\b",
+        "\\bexpense_breakdown\\s+segment\\s+18\\b"
+      ],
+      "description": "Canonical section expense_breakdown for fin_treasury_memo"
+    },
+    {
+      "id": "debt_profile_19",
+      "name": {
+        "en": "debt profile Segment 19",
+        "pt": "debt profile Segmento 19 19"
+      },
+      "mustHave": true,
+      "order": 19,
+      "headingAnchors": [
+        "debt_profile 19",
+        "debt_profile 19",
+        "debt profile Segment 19",
+        "seção debt profile Segment 19"
+      ],
+      "confidence": 0.848,
+      "fallbackPatterns": [
+        "\\bdebt_profile\\b",
+        "\\bdebt_profile_19\\b",
+        "\\bdebt_profile\\s+segment\\s+19\\b"
+      ],
+      "description": "Canonical section debt_profile for fin_treasury_memo"
+    },
+    {
+      "id": "covenant_tracking_20",
+      "name": {
+        "en": "covenant tracking Segment 20",
+        "pt": "covenant tracking Segmento 20 20"
+      },
+      "mustHave": true,
+      "order": 20,
+      "headingAnchors": [
+        "covenant_tracking 20",
+        "covenant_tracking 20",
+        "covenant tracking Segment 20",
+        "seção covenant tracking Segment 20"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\\bcovenant_tracking\\b",
+        "\\bcovenant_tracking_20\\b",
+        "\\bcovenant_tracking\\s+segment\\s+20\\b"
+      ],
+      "description": "Canonical section covenant_tracking for fin_treasury_memo"
+    },
+    {
+      "id": "tax_position_21",
+      "name": {
+        "en": "tax position Segment 21",
+        "pt": "tax position Segmento 21 21"
+      },
+      "mustHave": true,
+      "order": 21,
+      "headingAnchors": [
+        "tax_position 21",
+        "tax_position 21",
+        "tax position Segment 21",
+        "seção tax position Segment 21"
+      ],
+      "confidence": 0.851,
+      "fallbackPatterns": [
+        "\\btax_position\\b",
+        "\\btax_position_21\\b",
+        "\\btax_position\\s+segment\\s+21\\b"
+      ],
+      "description": "Canonical section tax_position for fin_treasury_memo"
+    },
+    {
+      "id": "shareholder_information_22",
+      "name": {
+        "en": "shareholder information Segment 22",
+        "pt": "shareholder information Segmento 22 22"
+      },
+      "mustHave": true,
+      "order": 22,
+      "headingAnchors": [
+        "shareholder_information 22",
+        "shareholder_information 22",
+        "shareholder information Segment 22",
+        "seção shareholder information Segment 22"
+      ],
+      "confidence": 0.853,
+      "fallbackPatterns": [
+        "\\bshareholder_information\\b",
+        "\\bshareholder_information_22\\b",
+        "\\bshareholder_information\\s+segment\\s+22\\b"
+      ],
+      "description": "Canonical section shareholder_information for fin_treasury_memo"
+    },
+    {
+      "id": "market_risk_23",
+      "name": {
+        "en": "market risk Segment 23",
+        "pt": "market risk Segmento 23 23"
+      },
+      "mustHave": true,
+      "order": 23,
+      "headingAnchors": [
+        "market_risk 23",
+        "market_risk 23",
+        "market risk Segment 23",
+        "seção market risk Segment 23"
+      ],
+      "confidence": 0.854,
+      "fallbackPatterns": [
+        "\\bmarket_risk\\b",
+        "\\bmarket_risk_23\\b",
+        "\\bmarket_risk\\s+segment\\s+23\\b"
+      ],
+      "description": "Canonical section market_risk for fin_treasury_memo"
+    },
+    {
+      "id": "credit_risk_24",
+      "name": {
+        "en": "credit risk Segment 24",
+        "pt": "credit risk Segmento 24 24"
+      },
+      "mustHave": true,
+      "order": 24,
+      "headingAnchors": [
+        "credit_risk 24",
+        "credit_risk 24",
+        "credit risk Segment 24",
+        "seção credit risk Segment 24"
+      ],
+      "confidence": 0.856,
+      "fallbackPatterns": [
+        "\\bcredit_risk\\b",
+        "\\bcredit_risk_24\\b",
+        "\\bcredit_risk\\s+segment\\s+24\\b"
+      ],
+      "description": "Canonical section credit_risk for fin_treasury_memo"
+    },
+    {
+      "id": "operating_metrics_25",
+      "name": {
+        "en": "operating metrics Segment 25",
+        "pt": "operating metrics Segmento 25 25"
+      },
+      "mustHave": true,
+      "order": 25,
+      "headingAnchors": [
+        "operating_metrics 25",
+        "operating_metrics 25",
+        "operating metrics Segment 25",
+        "seção operating metrics Segment 25"
+      ],
+      "confidence": 0.857,
+      "fallbackPatterns": [
+        "\\boperating_metrics\\b",
+        "\\boperating_metrics_25\\b",
+        "\\boperating_metrics\\s+segment\\s+25\\b"
+      ],
+      "description": "Canonical section operating_metrics for fin_treasury_memo"
+    },
+    {
+      "id": "cash_management_26",
+      "name": {
+        "en": "cash management Segment 26",
+        "pt": "cash management Segmento 26 26"
+      },
+      "mustHave": true,
+      "order": 26,
+      "headingAnchors": [
+        "cash_management 26",
+        "cash_management 26",
+        "cash management Segment 26",
+        "seção cash management Segment 26"
+      ],
+      "confidence": 0.859,
+      "fallbackPatterns": [
+        "\\bcash_management\\b",
+        "\\bcash_management_26\\b",
+        "\\bcash_management\\s+segment\\s+26\\b"
+      ],
+      "description": "Canonical section cash_management for fin_treasury_memo"
+    },
+    {
+      "id": "portfolio_summary_27",
+      "name": {
+        "en": "portfolio summary Segment 27",
+        "pt": "portfolio summary Segmento 27 27"
+      },
+      "mustHave": true,
+      "order": 27,
+      "headingAnchors": [
+        "portfolio_summary 27",
+        "portfolio_summary 27",
+        "portfolio summary Segment 27",
+        "seção portfolio summary Segment 27"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\\bportfolio_summary\\b",
+        "\\bportfolio_summary_27\\b",
+        "\\bportfolio_summary\\s+segment\\s+27\\b"
+      ],
+      "description": "Canonical section portfolio_summary for fin_treasury_memo"
+    },
+    {
+      "id": "investor_comm_28",
+      "name": {
+        "en": "investor comm Segment 28",
+        "pt": "investor comm Segmento 28 28"
+      },
+      "mustHave": true,
+      "order": 28,
+      "headingAnchors": [
+        "investor_comm 28",
+        "investor_comm 28",
+        "investor comm Segment 28",
+        "seção investor comm Segment 28"
+      ],
+      "confidence": 0.862,
+      "fallbackPatterns": [
+        "\\binvestor_comm\\b",
+        "\\binvestor_comm_28\\b",
+        "\\binvestor_comm\\s+segment\\s+28\\b"
+      ],
+      "description": "Canonical section investor_comm for fin_treasury_memo"
+    },
+    {
+      "id": "board_oversight_29",
+      "name": {
+        "en": "board oversight Segment 29",
+        "pt": "board oversight Segmento 29 29"
+      },
+      "mustHave": true,
+      "order": 29,
+      "headingAnchors": [
+        "board_oversight 29",
+        "board_oversight 29",
+        "board oversight Segment 29",
+        "seção board oversight Segment 29"
+      ],
+      "confidence": 0.863,
+      "fallbackPatterns": [
+        "\\bboard_oversight\\b",
+        "\\bboard_oversight_29\\b",
+        "\\bboard_oversight\\s+segment\\s+29\\b"
+      ],
+      "description": "Canonical section board_oversight for fin_treasury_memo"
+    },
+    {
+      "id": "pipeline_health_30",
+      "name": {
+        "en": "pipeline health Segment 30",
+        "pt": "pipeline health Segmento 30 30"
+      },
+      "mustHave": true,
+      "order": 30,
+      "headingAnchors": [
+        "pipeline_health 30",
+        "pipeline_health 30",
+        "pipeline health Segment 30",
+        "seção pipeline health Segment 30"
+      ],
+      "confidence": 0.865,
+      "fallbackPatterns": [
+        "\\bpipeline_health\\b",
+        "\\bpipeline_health_30\\b",
+        "\\bpipeline_health\\s+segment\\s+30\\b"
+      ],
+      "description": "Canonical section pipeline_health for fin_treasury_memo"
+    },
+    {
+      "id": "esg_disclosure_31",
+      "name": {
+        "en": "esg disclosure Segment 31",
+        "pt": "esg disclosure Segmento 31 31"
+      },
+      "mustHave": false,
+      "order": 31,
+      "headingAnchors": [
+        "esg_disclosure 31",
+        "esg_disclosure 31",
+        "esg disclosure Segment 31",
+        "seção esg disclosure Segment 31"
+      ],
+      "confidence": 0.866,
+      "fallbackPatterns": [
+        "\\besg_disclosure\\b",
+        "\\besg_disclosure_31\\b",
+        "\\besg_disclosure\\s+segment\\s+31\\b"
+      ],
+      "description": "Canonical section esg_disclosure for fin_treasury_memo"
+    },
+    {
+      "id": "audit_findings_32",
+      "name": {
+        "en": "audit findings Segment 32",
+        "pt": "audit findings Segmento 32 32"
+      },
+      "mustHave": false,
+      "order": 32,
+      "headingAnchors": [
+        "audit_findings 32",
+        "audit_findings 32",
+        "audit findings Segment 32",
+        "seção audit findings Segment 32"
+      ],
+      "confidence": 0.868,
+      "fallbackPatterns": [
+        "\\baudit_findings\\b",
+        "\\baudit_findings_32\\b",
+        "\\baudit_findings\\s+segment\\s+32\\b"
+      ],
+      "description": "Canonical section audit_findings for fin_treasury_memo"
+    },
+    {
+      "id": "controls_33",
+      "name": {
+        "en": "controls Segment 33",
+        "pt": "controls Segmento 33 33"
+      },
+      "mustHave": false,
+      "order": 33,
+      "headingAnchors": [
+        "controls 33",
+        "controls 33",
+        "controls Segment 33",
+        "seção controls Segment 33"
+      ],
+      "confidence": 0.869,
+      "fallbackPatterns": [
+        "\\bcontrols\\b",
+        "\\bcontrols_33\\b",
+        "\\bcontrols\\s+segment\\s+33\\b"
+      ],
+      "description": "Canonical section controls for fin_treasury_memo"
+    },
+    {
+      "id": "compliance_34",
+      "name": {
+        "en": "compliance Segment 34",
+        "pt": "compliance Segmento 34 34"
+      },
+      "mustHave": false,
+      "order": 34,
+      "headingAnchors": [
+        "compliance 34",
+        "compliance 34",
+        "compliance Segment 34",
+        "seção compliance Segment 34"
+      ],
+      "confidence": 0.871,
+      "fallbackPatterns": [
+        "\\bcompliance\\b",
+        "\\bcompliance_34\\b",
+        "\\bcompliance\\s+segment\\s+34\\b"
+      ],
+      "description": "Canonical section compliance for fin_treasury_memo"
+    },
+    {
+      "id": "capital_structure_35",
+      "name": {
+        "en": "capital structure Segment 35",
+        "pt": "capital structure Segmento 35 35"
+      },
+      "mustHave": false,
+      "order": 35,
+      "headingAnchors": [
+        "capital_structure 35",
+        "capital_structure 35",
+        "capital structure Segment 35",
+        "seção capital structure Segment 35"
+      ],
+      "confidence": 0.872,
+      "fallbackPatterns": [
+        "\\bcapital_structure\\b",
+        "\\bcapital_structure_35\\b",
+        "\\bcapital_structure\\s+segment\\s+35\\b"
+      ],
+      "description": "Canonical section capital_structure for fin_treasury_memo"
+    },
+    {
+      "id": "treasury_36",
+      "name": {
+        "en": "treasury Segment 36",
+        "pt": "treasury Segmento 36 36"
+      },
+      "mustHave": false,
+      "order": 36,
+      "headingAnchors": [
+        "treasury 36",
+        "treasury 36",
+        "treasury Segment 36",
+        "seção treasury Segment 36"
+      ],
+      "confidence": 0.874,
+      "fallbackPatterns": [
+        "\\btreasury\\b",
+        "\\btreasury_36\\b",
+        "\\btreasury\\s+segment\\s+36\\b"
+      ],
+      "description": "Canonical section treasury for fin_treasury_memo"
+    },
+    {
+      "id": "budget_37",
+      "name": {
+        "en": "budget Segment 37",
+        "pt": "budget Segmento 37 37"
+      },
+      "mustHave": false,
+      "order": 37,
+      "headingAnchors": [
+        "budget 37",
+        "budget 37",
+        "budget Segment 37",
+        "seção budget Segment 37"
+      ],
+      "confidence": 0.875,
+      "fallbackPatterns": [
+        "\\bbudget\\b",
+        "\\bbudget_37\\b",
+        "\\bbudget\\s+segment\\s+37\\b"
+      ],
+      "description": "Canonical section budget for fin_treasury_memo"
+    },
+    {
+      "id": "variance_analysis_38",
+      "name": {
+        "en": "variance analysis Segment 38",
+        "pt": "variance analysis Segmento 38 38"
+      },
+      "mustHave": false,
+      "order": 38,
+      "headingAnchors": [
+        "variance_analysis 38",
+        "variance_analysis 38",
+        "variance analysis Segment 38",
+        "seção variance analysis Segment 38"
+      ],
+      "confidence": 0.877,
+      "fallbackPatterns": [
+        "\\bvariance_analysis\\b",
+        "\\bvariance_analysis_38\\b",
+        "\\bvariance_analysis\\s+segment\\s+38\\b"
+      ],
+      "description": "Canonical section variance_analysis for fin_treasury_memo"
+    },
+    {
+      "id": "forecast_39",
+      "name": {
+        "en": "forecast Segment 39",
+        "pt": "forecast Segmento 39 39"
+      },
+      "mustHave": false,
+      "order": 39,
+      "headingAnchors": [
+        "forecast 39",
+        "forecast 39",
+        "forecast Segment 39",
+        "seção forecast Segment 39"
+      ],
+      "confidence": 0.878,
+      "fallbackPatterns": [
+        "\\bforecast\\b",
+        "\\bforecast_39\\b",
+        "\\bforecast\\s+segment\\s+39\\b"
+      ],
+      "description": "Canonical section forecast for fin_treasury_memo"
+    },
+    {
+      "id": "sensitivity_40",
+      "name": {
+        "en": "sensitivity Segment 40",
+        "pt": "sensitivity Segmento 40 40"
+      },
+      "mustHave": false,
+      "order": 40,
+      "headingAnchors": [
+        "sensitivity 40",
+        "sensitivity 40",
+        "sensitivity Segment 40",
+        "seção sensitivity Segment 40"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\\bsensitivity\\b",
+        "\\bsensitivity_40\\b",
+        "\\bsensitivity\\s+segment\\s+40\\b"
+      ],
+      "description": "Canonical section sensitivity for fin_treasury_memo"
+    },
+    {
+      "id": "hedging_41",
+      "name": {
+        "en": "hedging Segment 41",
+        "pt": "hedging Segmento 41 41"
+      },
+      "mustHave": false,
+      "order": 41,
+      "headingAnchors": [
+        "hedging 41",
+        "hedging 41",
+        "hedging Segment 41",
+        "seção hedging Segment 41"
+      ],
+      "confidence": 0.881,
+      "fallbackPatterns": [
+        "\\bhedging\\b",
+        "\\bhedging_41\\b",
+        "\\bhedging\\s+segment\\s+41\\b"
+      ],
+      "description": "Canonical section hedging for fin_treasury_memo"
+    },
+    {
+      "id": "fx_exposure_42",
+      "name": {
+        "en": "fx exposure Segment 42",
+        "pt": "fx exposure Segmento 42 42"
+      },
+      "mustHave": false,
+      "order": 42,
+      "headingAnchors": [
+        "fx_exposure 42",
+        "fx_exposure 42",
+        "fx exposure Segment 42",
+        "seção fx exposure Segment 42"
+      ],
+      "confidence": 0.883,
+      "fallbackPatterns": [
+        "\\bfx_exposure\\b",
+        "\\bfx_exposure_42\\b",
+        "\\bfx_exposure\\s+segment\\s+42\\b"
+      ],
+      "description": "Canonical section fx_exposure for fin_treasury_memo"
+    },
+    {
+      "id": "counterparty_43",
+      "name": {
+        "en": "counterparty Segment 43",
+        "pt": "counterparty Segmento 43 43"
+      },
+      "mustHave": false,
+      "order": 43,
+      "headingAnchors": [
+        "counterparty 43",
+        "counterparty 43",
+        "counterparty Segment 43",
+        "seção counterparty Segment 43"
+      ],
+      "confidence": 0.884,
+      "fallbackPatterns": [
+        "\\bcounterparty\\b",
+        "\\bcounterparty_43\\b",
+        "\\bcounterparty\\s+segment\\s+43\\b"
+      ],
+      "description": "Canonical section counterparty for fin_treasury_memo"
+    },
+    {
+      "id": "facility_terms_44",
+      "name": {
+        "en": "facility terms Segment 44",
+        "pt": "facility terms Segmento 44 44"
+      },
+      "mustHave": false,
+      "order": 44,
+      "headingAnchors": [
+        "facility_terms 44",
+        "facility_terms 44",
+        "facility terms Segment 44",
+        "seção facility terms Segment 44"
+      ],
+      "confidence": 0.886,
+      "fallbackPatterns": [
+        "\\bfacility_terms\\b",
+        "\\bfacility_terms_44\\b",
+        "\\bfacility_terms\\s+segment\\s+44\\b"
+      ],
+      "description": "Canonical section facility_terms for fin_treasury_memo"
+    },
+    {
+      "id": "cash_forecast_45",
+      "name": {
+        "en": "cash forecast Segment 45",
+        "pt": "cash forecast Segmento 45 45"
+      },
+      "mustHave": false,
+      "order": 45,
+      "headingAnchors": [
+        "cash_forecast 45",
+        "cash_forecast 45",
+        "cash forecast Segment 45",
+        "seção cash forecast Segment 45"
+      ],
+      "confidence": 0.887,
+      "fallbackPatterns": [
+        "\\bcash_forecast\\b",
+        "\\bcash_forecast_45\\b",
+        "\\bcash_forecast\\s+segment\\s+45\\b"
+      ],
+      "description": "Canonical section cash_forecast for fin_treasury_memo"
+    },
+    {
+      "id": "monthly_closing_46",
+      "name": {
+        "en": "monthly closing Segment 46",
+        "pt": "monthly closing Segmento 46 46"
+      },
+      "mustHave": false,
+      "order": 46,
+      "headingAnchors": [
+        "monthly_closing 46",
+        "monthly_closing 46",
+        "monthly closing Segment 46",
+        "seção monthly closing Segment 46"
+      ],
+      "confidence": 0.889,
+      "fallbackPatterns": [
+        "\\bmonthly_closing\\b",
+        "\\bmonthly_closing_46\\b",
+        "\\bmonthly_closing\\s+segment\\s+46\\b"
+      ],
+      "description": "Canonical section monthly_closing for fin_treasury_memo"
+    },
+    {
+      "id": "quarterly_reporting_47",
+      "name": {
+        "en": "quarterly reporting Segment 47",
+        "pt": "quarterly reporting Segmento 47 47"
+      },
+      "mustHave": false,
+      "order": 47,
+      "headingAnchors": [
+        "quarterly_reporting 47",
+        "quarterly_reporting 47",
+        "quarterly reporting Segment 47",
+        "seção quarterly reporting Segment 47"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\\bquarterly_reporting\\b",
+        "\\bquarterly_reporting_47\\b",
+        "\\bquarterly_reporting\\s+segment\\s+47\\b"
+      ],
+      "description": "Canonical section quarterly_reporting for fin_treasury_memo"
+    },
+    {
+      "id": "performance_review_48",
+      "name": {
+        "en": "performance review Segment 48",
+        "pt": "performance review Segmento 48 48"
+      },
+      "mustHave": false,
+      "order": 48,
+      "headingAnchors": [
+        "performance_review 48",
+        "performance_review 48",
+        "performance review Segment 48",
+        "seção performance review Segment 48"
+      ],
+      "confidence": 0.892,
+      "fallbackPatterns": [
+        "\\bperformance_review\\b",
+        "\\bperformance_review_48\\b",
+        "\\bperformance_review\\s+segment\\s+48\\b"
+      ],
+      "description": "Canonical section performance_review for fin_treasury_memo"
+    },
+    {
+      "id": "equity_changes_49",
+      "name": {
+        "en": "equity changes Segment 49",
+        "pt": "equity changes Segmento 49 49"
+      },
+      "mustHave": false,
+      "order": 49,
+      "headingAnchors": [
+        "equity_changes 49",
+        "equity_changes 49",
+        "equity changes Segment 49",
+        "seção equity changes Segment 49"
+      ],
+      "confidence": 0.893,
+      "fallbackPatterns": [
+        "\\bequity_changes\\b",
+        "\\bequity_changes_49\\b",
+        "\\bequity_changes\\s+segment\\s+49\\b"
+      ],
+      "description": "Canonical section equity_changes for fin_treasury_memo"
+    },
+    {
+      "id": "tax_credits_50",
+      "name": {
+        "en": "tax credits Segment 50",
+        "pt": "tax credits Segmento 50 50"
+      },
+      "mustHave": false,
+      "order": 50,
+      "headingAnchors": [
+        "tax_credits 50",
+        "tax_credits 50",
+        "tax credits Segment 50",
+        "seção tax credits Segment 50"
+      ],
+      "confidence": 0.895,
+      "fallbackPatterns": [
+        "\\btax_credits\\b",
+        "\\btax_credits_50\\b",
+        "\\btax_credits\\s+segment\\s+50\\b"
+      ],
+      "description": "Canonical section tax_credits for fin_treasury_memo"
+    },
+    {
+      "id": "dividend_policy_51",
+      "name": {
+        "en": "dividend policy Segment 51",
+        "pt": "dividend policy Segmento 51 51"
+      },
+      "mustHave": false,
+      "order": 51,
+      "headingAnchors": [
+        "dividend_policy 51",
+        "dividend_policy 51",
+        "dividend policy Segment 51",
+        "seção dividend policy Segment 51"
+      ],
+      "confidence": 0.896,
+      "fallbackPatterns": [
+        "\\bdividend_policy\\b",
+        "\\bdividend_policy_51\\b",
+        "\\bdividend_policy\\s+segment\\s+51\\b"
+      ],
+      "description": "Canonical section dividend_policy for fin_treasury_memo"
+    },
+    {
+      "id": "investor_terms_52",
+      "name": {
+        "en": "investor terms Segment 52",
+        "pt": "investor terms Segmento 52 52"
+      },
+      "mustHave": false,
+      "order": 52,
+      "headingAnchors": [
+        "investor_terms 52",
+        "investor_terms 52",
+        "investor terms Segment 52",
+        "seção investor terms Segment 52"
+      ],
+      "confidence": 0.898,
+      "fallbackPatterns": [
+        "\\binvestor_terms\\b",
+        "\\binvestor_terms_52\\b",
+        "\\binvestor_terms\\s+segment\\s+52\\b"
+      ],
+      "description": "Canonical section investor_terms for fin_treasury_memo"
+    },
+    {
+      "id": "kpi_overview_53",
+      "name": {
+        "en": "kpi overview Segment 53",
+        "pt": "kpi overview Segmento 53 53"
+      },
+      "mustHave": false,
+      "order": 53,
+      "headingAnchors": [
+        "kpi_overview 53",
+        "kpi_overview 53",
+        "kpi overview Segment 53",
+        "seção kpi overview Segment 53"
+      ],
+      "confidence": 0.899,
+      "fallbackPatterns": [
+        "\\bkpi_overview\\b",
+        "\\bkpi_overview_53\\b",
+        "\\bkpi_overview\\s+segment\\s+53\\b"
+      ],
+      "description": "Canonical section kpi_overview for fin_treasury_memo"
+    },
+    {
+      "id": "expense_trends_54",
+      "name": {
+        "en": "expense trends Segment 54",
+        "pt": "expense trends Segmento 54 54"
+      },
+      "mustHave": false,
+      "order": 54,
+      "headingAnchors": [
+        "expense_trends 54",
+        "expense_trends 54",
+        "expense trends Segment 54",
+        "seção expense trends Segment 54"
+      ],
+      "confidence": 0.901,
+      "fallbackPatterns": [
+        "\\bexpense_trends\\b",
+        "\\bexpense_trends_54\\b",
+        "\\bexpense_trends\\s+segment\\s+54\\b"
+      ],
+      "description": "Canonical section expense_trends for fin_treasury_memo"
+    },
+    {
+      "id": "unit_economics_55",
+      "name": {
+        "en": "unit economics Segment 55",
+        "pt": "unit economics Segmento 55 55"
+      },
+      "mustHave": false,
+      "order": 55,
+      "headingAnchors": [
+        "unit_economics 55",
+        "unit_economics 55",
+        "unit economics Segment 55",
+        "seção unit economics Segment 55"
+      ],
+      "confidence": 0.902,
+      "fallbackPatterns": [
+        "\\bunit_economics\\b",
+        "\\bunit_economics_55\\b",
+        "\\bunit_economics\\s+segment\\s+55\\b"
+      ],
+      "description": "Canonical section unit_economics for fin_treasury_memo"
+    },
+    {
+      "id": "accrual_timing_56",
+      "name": {
+        "en": "accrual timing Segment 56",
+        "pt": "accrual timing Segmento 56 56"
+      },
+      "mustHave": false,
+      "order": 56,
+      "headingAnchors": [
+        "accrual_timing 56",
+        "accrual_timing 56",
+        "accrual timing Segment 56",
+        "seção accrual timing Segment 56"
+      ],
+      "confidence": 0.904,
+      "fallbackPatterns": [
+        "\\baccrual_timing\\b",
+        "\\baccrual_timing_56\\b",
+        "\\baccrual_timing\\s+segment\\s+56\\b"
+      ],
+      "description": "Canonical section accrual_timing for fin_treasury_memo"
+    },
+    {
+      "id": "aging_57",
+      "name": {
+        "en": "aging Segment 57",
+        "pt": "aging Segmento 57 57"
+      },
+      "mustHave": false,
+      "order": 57,
+      "headingAnchors": [
+        "aging 57",
+        "aging 57",
+        "aging Segment 57",
+        "seção aging Segment 57"
+      ],
+      "confidence": 0.905,
+      "fallbackPatterns": [
+        "\\baging\\b",
+        "\\baging_57\\b",
+        "\\baging\\s+segment\\s+57\\b"
+      ],
+      "description": "Canonical section aging for fin_treasury_memo"
+    },
+    {
+      "id": "payables_58",
+      "name": {
+        "en": "payables Segment 58",
+        "pt": "payables Segmento 58 58"
+      },
+      "mustHave": false,
+      "order": 58,
+      "headingAnchors": [
+        "payables 58",
+        "payables 58",
+        "payables Segment 58",
+        "seção payables Segment 58"
+      ],
+      "confidence": 0.907,
+      "fallbackPatterns": [
+        "\\bpayables\\b",
+        "\\bpayables_58\\b",
+        "\\bpayables\\s+segment\\s+58\\b"
+      ],
+      "description": "Canonical section payables for fin_treasury_memo"
+    },
+    {
+      "id": "receivables_59",
+      "name": {
+        "en": "receivables Segment 59",
+        "pt": "receivables Segmento 59 59"
+      },
+      "mustHave": false,
+      "order": 59,
+      "headingAnchors": [
+        "receivables 59",
+        "receivables 59",
+        "receivables Segment 59",
+        "seção receivables Segment 59"
+      ],
+      "confidence": 0.908,
+      "fallbackPatterns": [
+        "\\breceivables\\b",
+        "\\breceivables_59\\b",
+        "\\breceivables\\s+segment\\s+59\\b"
+      ],
+      "description": "Canonical section receivables for fin_treasury_memo"
+    },
+    {
+      "id": "inventory_60",
+      "name": {
+        "en": "inventory Segment 60",
+        "pt": "inventory Segmento 60 60"
+      },
+      "mustHave": false,
+      "order": 60,
+      "headingAnchors": [
+        "inventory 60",
+        "inventory 60",
+        "inventory Segment 60",
+        "seção inventory Segment 60"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\\binventory\\b",
+        "\\binventory_60\\b",
+        "\\binventory\\s+segment\\s+60\\b"
+      ],
+      "description": "Canonical section inventory for fin_treasury_memo"
+    }
+  ]
+}

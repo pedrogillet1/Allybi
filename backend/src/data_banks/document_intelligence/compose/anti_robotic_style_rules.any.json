@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "id": "anti_robotic_style_rules",
+    "version": "1.0.0",
+    "description": "Humanizing output style rules.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "rules": [
+    {
+      "id": "ARS_001",
+      "trigger": "More than two identical sentence starters",
+      "check": "output.duplicateStarterRatio > 0.2",
+      "failureAction": "REPHRASE_STARTER"
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

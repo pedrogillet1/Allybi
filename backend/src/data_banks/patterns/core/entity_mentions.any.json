@@ -1,0 +1,6859 @@
+{
+  "_meta": {
+    "bankId": "entity_mentions",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_entity_mentions",
+    "description": "Auto-registered bank payload for patterns/core/entity_mentions.any.json"
+  },
+  "patterns": [
+    {
+      "id": "EM_001",
+      "entityType": "company",
+      "en": [
+        "Entity001 Inc"
+      ],
+      "pt": [
+        "Entidade001 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_002",
+      "entityType": "client",
+      "en": [
+        "Entity002 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade002"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_003",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity003"
+      ],
+      "pt": [
+        "Sra. Entidade003"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_004",
+      "entityType": "vendor",
+      "en": [
+        "Entity004 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade004"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_005",
+      "entityType": "property",
+      "en": [
+        "Entity005 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade005"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_006",
+      "entityType": "company",
+      "en": [
+        "Entity006 Inc"
+      ],
+      "pt": [
+        "Entidade006 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_007",
+      "entityType": "client",
+      "en": [
+        "Entity007 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade007"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_008",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1007"
+      ],
+      "pt": [
+        "Paciente ID 1007"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_009",
+      "entityType": "vendor",
+      "en": [
+        "Entity009 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade009"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_010",
+      "entityType": "property",
+      "en": [
+        "Entity010 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade010"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_011",
+      "entityType": "company",
+      "en": [
+        "Entity011 Inc"
+      ],
+      "pt": [
+        "Entidade011 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_012",
+      "entityType": "client",
+      "en": [
+        "Global Entity012"
+      ],
+      "pt": [
+        "Cliente Entidade012 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_013",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity013"
+      ],
+      "pt": [
+        "Paciente Entidade013"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_014",
+      "entityType": "vendor",
+      "en": [
+        "Entity014 Services"
+      ],
+      "pt": [
+        "Empresa Entidade014"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_015",
+      "entityType": "property",
+      "en": [
+        "Building Entity015"
+      ],
+      "pt": [
+        "Predio Entidade015"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_016",
+      "entityType": "company",
+      "en": [
+        "Entity016 Inc"
+      ],
+      "pt": [
+        "Entidade016 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_017",
+      "entityType": "client",
+      "en": [
+        "Client Entity017"
+      ],
+      "pt": [
+        "Cliente Entidade017"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_018",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity018"
+      ],
+      "pt": [
+        "Sr. Entidade018"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_019",
+      "entityType": "vendor",
+      "en": [
+        "Entity019 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade019"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_020",
+      "entityType": "property",
+      "en": [
+        "Facility Entity020"
+      ],
+      "pt": [
+        "Ativo Entidade020"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_021",
+      "entityType": "company",
+      "en": [
+        "Entity021 Inc"
+      ],
+      "pt": [
+        "Entidade021 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_022",
+      "entityType": "client",
+      "en": [
+        "Entity022 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade022"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_023",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity023"
+      ],
+      "pt": [
+        "Sra. Entidade023"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_024",
+      "entityType": "vendor",
+      "en": [
+        "Entity024 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade024"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_025",
+      "entityType": "property",
+      "en": [
+        "Entity025 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade025"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_026",
+      "entityType": "company",
+      "en": [
+        "Entity026 Inc"
+      ],
+      "pt": [
+        "Entidade026 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_027",
+      "entityType": "client",
+      "en": [
+        "Entity027 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade027"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_028",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1027"
+      ],
+      "pt": [
+        "Paciente ID 1027"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_029",
+      "entityType": "vendor",
+      "en": [
+        "Entity029 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade029"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_030",
+      "entityType": "property",
+      "en": [
+        "Entity030 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade030"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_031",
+      "entityType": "company",
+      "en": [
+        "Entity031 Inc"
+      ],
+      "pt": [
+        "Entidade031 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_032",
+      "entityType": "client",
+      "en": [
+        "Global Entity032"
+      ],
+      "pt": [
+        "Cliente Entidade032 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_033",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity033"
+      ],
+      "pt": [
+        "Paciente Entidade033"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_034",
+      "entityType": "vendor",
+      "en": [
+        "Entity034 Services"
+      ],
+      "pt": [
+        "Empresa Entidade034"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_035",
+      "entityType": "property",
+      "en": [
+        "Building Entity035"
+      ],
+      "pt": [
+        "Predio Entidade035"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_036",
+      "entityType": "company",
+      "en": [
+        "Entity036 Inc"
+      ],
+      "pt": [
+        "Entidade036 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_037",
+      "entityType": "client",
+      "en": [
+        "Client Entity037"
+      ],
+      "pt": [
+        "Cliente Entidade037"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_038",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity038"
+      ],
+      "pt": [
+        "Sr. Entidade038"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_039",
+      "entityType": "vendor",
+      "en": [
+        "Entity039 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade039"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_040",
+      "entityType": "property",
+      "en": [
+        "Facility Entity040"
+      ],
+      "pt": [
+        "Ativo Entidade040"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_041",
+      "entityType": "company",
+      "en": [
+        "Entity041 Inc"
+      ],
+      "pt": [
+        "Entidade041 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_042",
+      "entityType": "client",
+      "en": [
+        "Entity042 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade042"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_043",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity043"
+      ],
+      "pt": [
+        "Sra. Entidade043"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_044",
+      "entityType": "vendor",
+      "en": [
+        "Entity044 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade044"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_045",
+      "entityType": "property",
+      "en": [
+        "Entity045 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade045"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_046",
+      "entityType": "company",
+      "en": [
+        "Entity046 Inc"
+      ],
+      "pt": [
+        "Entidade046 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_047",
+      "entityType": "client",
+      "en": [
+        "Entity047 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade047"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_048",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1047"
+      ],
+      "pt": [
+        "Paciente ID 1047"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_049",
+      "entityType": "vendor",
+      "en": [
+        "Entity049 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade049"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_050",
+      "entityType": "property",
+      "en": [
+        "Entity050 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade050"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_051",
+      "entityType": "company",
+      "en": [
+        "Entity051 Inc"
+      ],
+      "pt": [
+        "Entidade051 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_052",
+      "entityType": "client",
+      "en": [
+        "Global Entity052"
+      ],
+      "pt": [
+        "Cliente Entidade052 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_053",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity053"
+      ],
+      "pt": [
+        "Paciente Entidade053"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_054",
+      "entityType": "vendor",
+      "en": [
+        "Entity054 Services"
+      ],
+      "pt": [
+        "Empresa Entidade054"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_055",
+      "entityType": "property",
+      "en": [
+        "Building Entity055"
+      ],
+      "pt": [
+        "Predio Entidade055"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_056",
+      "entityType": "company",
+      "en": [
+        "Entity056 Inc"
+      ],
+      "pt": [
+        "Entidade056 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_057",
+      "entityType": "client",
+      "en": [
+        "Client Entity057"
+      ],
+      "pt": [
+        "Cliente Entidade057"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_058",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity058"
+      ],
+      "pt": [
+        "Sr. Entidade058"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_059",
+      "entityType": "vendor",
+      "en": [
+        "Entity059 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade059"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_060",
+      "entityType": "property",
+      "en": [
+        "Facility Entity060"
+      ],
+      "pt": [
+        "Ativo Entidade060"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_061",
+      "entityType": "company",
+      "en": [
+        "Entity061 Inc"
+      ],
+      "pt": [
+        "Entidade061 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_062",
+      "entityType": "client",
+      "en": [
+        "Entity062 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade062"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_063",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity063"
+      ],
+      "pt": [
+        "Sra. Entidade063"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_064",
+      "entityType": "vendor",
+      "en": [
+        "Entity064 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade064"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_065",
+      "entityType": "property",
+      "en": [
+        "Entity065 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade065"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_066",
+      "entityType": "company",
+      "en": [
+        "Entity066 Inc"
+      ],
+      "pt": [
+        "Entidade066 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_067",
+      "entityType": "client",
+      "en": [
+        "Entity067 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade067"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_068",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1067"
+      ],
+      "pt": [
+        "Paciente ID 1067"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_069",
+      "entityType": "vendor",
+      "en": [
+        "Entity069 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade069"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_070",
+      "entityType": "property",
+      "en": [
+        "Entity070 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade070"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_071",
+      "entityType": "company",
+      "en": [
+        "Entity071 Inc"
+      ],
+      "pt": [
+        "Entidade071 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_072",
+      "entityType": "client",
+      "en": [
+        "Global Entity072"
+      ],
+      "pt": [
+        "Cliente Entidade072 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_073",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity073"
+      ],
+      "pt": [
+        "Paciente Entidade073"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_074",
+      "entityType": "vendor",
+      "en": [
+        "Entity074 Services"
+      ],
+      "pt": [
+        "Empresa Entidade074"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_075",
+      "entityType": "property",
+      "en": [
+        "Building Entity075"
+      ],
+      "pt": [
+        "Predio Entidade075"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_076",
+      "entityType": "company",
+      "en": [
+        "Entity076 Inc"
+      ],
+      "pt": [
+        "Entidade076 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_077",
+      "entityType": "client",
+      "en": [
+        "Client Entity077"
+      ],
+      "pt": [
+        "Cliente Entidade077"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_078",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity078"
+      ],
+      "pt": [
+        "Sr. Entidade078"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_079",
+      "entityType": "vendor",
+      "en": [
+        "Entity079 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade079"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_080",
+      "entityType": "property",
+      "en": [
+        "Facility Entity080"
+      ],
+      "pt": [
+        "Ativo Entidade080"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_081",
+      "entityType": "company",
+      "en": [
+        "Entity081 Inc"
+      ],
+      "pt": [
+        "Entidade081 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_082",
+      "entityType": "client",
+      "en": [
+        "Entity082 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade082"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_083",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity083"
+      ],
+      "pt": [
+        "Sra. Entidade083"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_084",
+      "entityType": "vendor",
+      "en": [
+        "Entity084 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade084"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_085",
+      "entityType": "property",
+      "en": [
+        "Entity085 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade085"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_086",
+      "entityType": "company",
+      "en": [
+        "Entity086 Inc"
+      ],
+      "pt": [
+        "Entidade086 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_087",
+      "entityType": "client",
+      "en": [
+        "Entity087 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade087"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_088",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1087"
+      ],
+      "pt": [
+        "Paciente ID 1087"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_089",
+      "entityType": "vendor",
+      "en": [
+        "Entity089 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade089"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_090",
+      "entityType": "property",
+      "en": [
+        "Entity090 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade090"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_091",
+      "entityType": "company",
+      "en": [
+        "Entity001 Inc"
+      ],
+      "pt": [
+        "Entidade001 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_092",
+      "entityType": "client",
+      "en": [
+        "Global Entity002"
+      ],
+      "pt": [
+        "Cliente Entidade002 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_093",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity003"
+      ],
+      "pt": [
+        "Paciente Entidade003"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_094",
+      "entityType": "vendor",
+      "en": [
+        "Entity004 Services"
+      ],
+      "pt": [
+        "Empresa Entidade004"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_095",
+      "entityType": "property",
+      "en": [
+        "Building Entity005"
+      ],
+      "pt": [
+        "Predio Entidade005"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_096",
+      "entityType": "company",
+      "en": [
+        "Entity006 Inc"
+      ],
+      "pt": [
+        "Entidade006 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_097",
+      "entityType": "client",
+      "en": [
+        "Client Entity007"
+      ],
+      "pt": [
+        "Cliente Entidade007"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_098",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity008"
+      ],
+      "pt": [
+        "Sr. Entidade008"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_099",
+      "entityType": "vendor",
+      "en": [
+        "Entity009 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade009"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_100",
+      "entityType": "property",
+      "en": [
+        "Facility Entity010"
+      ],
+      "pt": [
+        "Ativo Entidade010"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_101",
+      "entityType": "company",
+      "en": [
+        "Entity011 Inc"
+      ],
+      "pt": [
+        "Entidade011 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_102",
+      "entityType": "client",
+      "en": [
+        "Entity012 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade012"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_103",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity013"
+      ],
+      "pt": [
+        "Sra. Entidade013"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_104",
+      "entityType": "vendor",
+      "en": [
+        "Entity014 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade014"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_105",
+      "entityType": "property",
+      "en": [
+        "Entity015 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade015"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_106",
+      "entityType": "company",
+      "en": [
+        "Entity016 Inc"
+      ],
+      "pt": [
+        "Entidade016 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_107",
+      "entityType": "client",
+      "en": [
+        "Entity017 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade017"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_108",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1107"
+      ],
+      "pt": [
+        "Paciente ID 1107"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_109",
+      "entityType": "vendor",
+      "en": [
+        "Entity019 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade019"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_110",
+      "entityType": "property",
+      "en": [
+        "Entity020 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade020"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_111",
+      "entityType": "company",
+      "en": [
+        "Entity021 Inc"
+      ],
+      "pt": [
+        "Entidade021 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_112",
+      "entityType": "client",
+      "en": [
+        "Global Entity022"
+      ],
+      "pt": [
+        "Cliente Entidade022 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_113",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity023"
+      ],
+      "pt": [
+        "Paciente Entidade023"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_114",
+      "entityType": "vendor",
+      "en": [
+        "Entity024 Services"
+      ],
+      "pt": [
+        "Empresa Entidade024"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_115",
+      "entityType": "property",
+      "en": [
+        "Building Entity025"
+      ],
+      "pt": [
+        "Predio Entidade025"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_116",
+      "entityType": "company",
+      "en": [
+        "Entity026 Inc"
+      ],
+      "pt": [
+        "Entidade026 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_117",
+      "entityType": "client",
+      "en": [
+        "Client Entity027"
+      ],
+      "pt": [
+        "Cliente Entidade027"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_118",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity028"
+      ],
+      "pt": [
+        "Sr. Entidade028"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_119",
+      "entityType": "vendor",
+      "en": [
+        "Entity029 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade029"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_120",
+      "entityType": "property",
+      "en": [
+        "Facility Entity030"
+      ],
+      "pt": [
+        "Ativo Entidade030"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_121",
+      "entityType": "company",
+      "en": [
+        "Entity031 Inc"
+      ],
+      "pt": [
+        "Entidade031 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_122",
+      "entityType": "client",
+      "en": [
+        "Entity032 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade032"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_123",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity033"
+      ],
+      "pt": [
+        "Sra. Entidade033"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_124",
+      "entityType": "vendor",
+      "en": [
+        "Entity034 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade034"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_125",
+      "entityType": "property",
+      "en": [
+        "Entity035 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade035"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_126",
+      "entityType": "company",
+      "en": [
+        "Entity036 Inc"
+      ],
+      "pt": [
+        "Entidade036 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_127",
+      "entityType": "client",
+      "en": [
+        "Entity037 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade037"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_128",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1127"
+      ],
+      "pt": [
+        "Paciente ID 1127"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_129",
+      "entityType": "vendor",
+      "en": [
+        "Entity039 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade039"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_130",
+      "entityType": "property",
+      "en": [
+        "Entity040 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade040"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_131",
+      "entityType": "company",
+      "en": [
+        "Entity041 Inc"
+      ],
+      "pt": [
+        "Entidade041 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_132",
+      "entityType": "client",
+      "en": [
+        "Global Entity042"
+      ],
+      "pt": [
+        "Cliente Entidade042 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_133",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity043"
+      ],
+      "pt": [
+        "Paciente Entidade043"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_134",
+      "entityType": "vendor",
+      "en": [
+        "Entity044 Services"
+      ],
+      "pt": [
+        "Empresa Entidade044"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_135",
+      "entityType": "property",
+      "en": [
+        "Building Entity045"
+      ],
+      "pt": [
+        "Predio Entidade045"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_136",
+      "entityType": "company",
+      "en": [
+        "Entity046 Inc"
+      ],
+      "pt": [
+        "Entidade046 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_137",
+      "entityType": "client",
+      "en": [
+        "Client Entity047"
+      ],
+      "pt": [
+        "Cliente Entidade047"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_138",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity048"
+      ],
+      "pt": [
+        "Sr. Entidade048"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_139",
+      "entityType": "vendor",
+      "en": [
+        "Entity049 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade049"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_140",
+      "entityType": "property",
+      "en": [
+        "Facility Entity050"
+      ],
+      "pt": [
+        "Ativo Entidade050"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_141",
+      "entityType": "company",
+      "en": [
+        "Entity051 Inc"
+      ],
+      "pt": [
+        "Entidade051 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_142",
+      "entityType": "client",
+      "en": [
+        "Entity052 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade052"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_143",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity053"
+      ],
+      "pt": [
+        "Sra. Entidade053"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_144",
+      "entityType": "vendor",
+      "en": [
+        "Entity054 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade054"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_145",
+      "entityType": "property",
+      "en": [
+        "Entity055 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade055"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_146",
+      "entityType": "company",
+      "en": [
+        "Entity056 Inc"
+      ],
+      "pt": [
+        "Entidade056 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_147",
+      "entityType": "client",
+      "en": [
+        "Entity057 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade057"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_148",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1147"
+      ],
+      "pt": [
+        "Paciente ID 1147"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_149",
+      "entityType": "vendor",
+      "en": [
+        "Entity059 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade059"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_150",
+      "entityType": "property",
+      "en": [
+        "Entity060 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade060"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_151",
+      "entityType": "company",
+      "en": [
+        "Entity061 Inc"
+      ],
+      "pt": [
+        "Entidade061 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_152",
+      "entityType": "client",
+      "en": [
+        "Global Entity062"
+      ],
+      "pt": [
+        "Cliente Entidade062 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_153",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity063"
+      ],
+      "pt": [
+        "Paciente Entidade063"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_154",
+      "entityType": "vendor",
+      "en": [
+        "Entity064 Services"
+      ],
+      "pt": [
+        "Empresa Entidade064"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_155",
+      "entityType": "property",
+      "en": [
+        "Building Entity065"
+      ],
+      "pt": [
+        "Predio Entidade065"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_156",
+      "entityType": "company",
+      "en": [
+        "Entity066 Inc"
+      ],
+      "pt": [
+        "Entidade066 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_157",
+      "entityType": "client",
+      "en": [
+        "Client Entity067"
+      ],
+      "pt": [
+        "Cliente Entidade067"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_158",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity068"
+      ],
+      "pt": [
+        "Sr. Entidade068"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_159",
+      "entityType": "vendor",
+      "en": [
+        "Entity069 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade069"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_160",
+      "entityType": "property",
+      "en": [
+        "Facility Entity070"
+      ],
+      "pt": [
+        "Ativo Entidade070"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_161",
+      "entityType": "company",
+      "en": [
+        "Entity071 Inc"
+      ],
+      "pt": [
+        "Entidade071 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_162",
+      "entityType": "client",
+      "en": [
+        "Entity072 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade072"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_163",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity073"
+      ],
+      "pt": [
+        "Sra. Entidade073"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_164",
+      "entityType": "vendor",
+      "en": [
+        "Entity074 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade074"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_165",
+      "entityType": "property",
+      "en": [
+        "Entity075 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade075"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_166",
+      "entityType": "company",
+      "en": [
+        "Entity076 Inc"
+      ],
+      "pt": [
+        "Entidade076 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_167",
+      "entityType": "client",
+      "en": [
+        "Entity077 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade077"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_168",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1167"
+      ],
+      "pt": [
+        "Paciente ID 1167"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_169",
+      "entityType": "vendor",
+      "en": [
+        "Entity079 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade079"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_170",
+      "entityType": "property",
+      "en": [
+        "Entity080 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade080"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_171",
+      "entityType": "company",
+      "en": [
+        "Entity081 Inc"
+      ],
+      "pt": [
+        "Entidade081 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_172",
+      "entityType": "client",
+      "en": [
+        "Global Entity082"
+      ],
+      "pt": [
+        "Cliente Entidade082 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_173",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity083"
+      ],
+      "pt": [
+        "Paciente Entidade083"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_174",
+      "entityType": "vendor",
+      "en": [
+        "Entity084 Services"
+      ],
+      "pt": [
+        "Empresa Entidade084"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_175",
+      "entityType": "property",
+      "en": [
+        "Building Entity085"
+      ],
+      "pt": [
+        "Predio Entidade085"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_176",
+      "entityType": "company",
+      "en": [
+        "Entity086 Inc"
+      ],
+      "pt": [
+        "Entidade086 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_177",
+      "entityType": "client",
+      "en": [
+        "Client Entity087"
+      ],
+      "pt": [
+        "Cliente Entidade087"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_178",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity088"
+      ],
+      "pt": [
+        "Sr. Entidade088"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_179",
+      "entityType": "vendor",
+      "en": [
+        "Entity089 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade089"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_180",
+      "entityType": "property",
+      "en": [
+        "Facility Entity090"
+      ],
+      "pt": [
+        "Ativo Entidade090"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_181",
+      "entityType": "company",
+      "en": [
+        "Entity001 Inc"
+      ],
+      "pt": [
+        "Entidade001 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_182",
+      "entityType": "client",
+      "en": [
+        "Entity002 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade002"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_183",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity003"
+      ],
+      "pt": [
+        "Sra. Entidade003"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_184",
+      "entityType": "vendor",
+      "en": [
+        "Entity004 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade004"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_185",
+      "entityType": "property",
+      "en": [
+        "Entity005 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade005"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_186",
+      "entityType": "company",
+      "en": [
+        "Entity006 Inc"
+      ],
+      "pt": [
+        "Entidade006 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_187",
+      "entityType": "client",
+      "en": [
+        "Entity007 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade007"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_188",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1187"
+      ],
+      "pt": [
+        "Paciente ID 1187"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_189",
+      "entityType": "vendor",
+      "en": [
+        "Entity009 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade009"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_190",
+      "entityType": "property",
+      "en": [
+        "Entity010 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade010"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_191",
+      "entityType": "company",
+      "en": [
+        "Entity011 Inc"
+      ],
+      "pt": [
+        "Entidade011 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_192",
+      "entityType": "client",
+      "en": [
+        "Global Entity012"
+      ],
+      "pt": [
+        "Cliente Entidade012 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_193",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity013"
+      ],
+      "pt": [
+        "Paciente Entidade013"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_194",
+      "entityType": "vendor",
+      "en": [
+        "Entity014 Services"
+      ],
+      "pt": [
+        "Empresa Entidade014"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_195",
+      "entityType": "property",
+      "en": [
+        "Building Entity015"
+      ],
+      "pt": [
+        "Predio Entidade015"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_196",
+      "entityType": "company",
+      "en": [
+        "Entity016 Inc"
+      ],
+      "pt": [
+        "Entidade016 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_197",
+      "entityType": "client",
+      "en": [
+        "Client Entity017"
+      ],
+      "pt": [
+        "Cliente Entidade017"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_198",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity018"
+      ],
+      "pt": [
+        "Sr. Entidade018"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_199",
+      "entityType": "vendor",
+      "en": [
+        "Entity019 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade019"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_200",
+      "entityType": "property",
+      "en": [
+        "Facility Entity020"
+      ],
+      "pt": [
+        "Ativo Entidade020"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_201",
+      "entityType": "company",
+      "en": [
+        "Entity021 Inc"
+      ],
+      "pt": [
+        "Entidade021 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_202",
+      "entityType": "client",
+      "en": [
+        "Entity022 Client"
+      ],
+      "pt": [
+        "Consórcio Entidade022"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_203",
+      "entityType": "patient",
+      "en": [
+        "Ms. Entity023"
+      ],
+      "pt": [
+        "Sra. Entidade023"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_204",
+      "entityType": "vendor",
+      "en": [
+        "Entity024 Logistics"
+      ],
+      "pt": [
+        "Prestador Entidade024"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_205",
+      "entityType": "property",
+      "en": [
+        "Entity025 Property"
+      ],
+      "pt": [
+        "Imóvel Entidade025"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_206",
+      "entityType": "company",
+      "en": [
+        "Entity026 Inc"
+      ],
+      "pt": [
+        "Entidade026 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_207",
+      "entityType": "client",
+      "en": [
+        "Entity027 & Associates"
+      ],
+      "pt": [
+        "Grupo Entidade027"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_208",
+      "entityType": "patient",
+      "en": [
+        "Patient ID 1207"
+      ],
+      "pt": [
+        "Paciente ID 1207"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_209",
+      "entityType": "vendor",
+      "en": [
+        "Entity029 Supplier"
+      ],
+      "pt": [
+        "Fornecedor Entidade029"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_210",
+      "entityType": "property",
+      "en": [
+        "Entity030 Estate"
+      ],
+      "pt": [
+        "Propriedade Entidade030"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_211",
+      "entityType": "company",
+      "en": [
+        "Entity031 Inc"
+      ],
+      "pt": [
+        "Entidade031 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_212",
+      "entityType": "client",
+      "en": [
+        "Global Entity032"
+      ],
+      "pt": [
+        "Cliente Entidade032 Sede"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_213",
+      "entityType": "patient",
+      "en": [
+        "Patient Entity033"
+      ],
+      "pt": [
+        "Paciente Entidade033"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_214",
+      "entityType": "vendor",
+      "en": [
+        "Entity034 Services"
+      ],
+      "pt": [
+        "Empresa Entidade034"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_215",
+      "entityType": "property",
+      "en": [
+        "Building Entity035"
+      ],
+      "pt": [
+        "Predio Entidade035"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_216",
+      "entityType": "company",
+      "en": [
+        "Entity036 Inc"
+      ],
+      "pt": [
+        "Entidade036 S.A."
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:company"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid company alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "company_name",
+        "ticker",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "company",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_217",
+      "entityType": "client",
+      "en": [
+        "Client Entity037"
+      ],
+      "pt": [
+        "Cliente Entidade037"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:client"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid client alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "client_name",
+        "client_code",
+        "account_manager"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "client",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_218",
+      "entityType": "patient",
+      "en": [
+        "Mr. Entity038"
+      ],
+      "pt": [
+        "Sr. Entidade038"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:patient"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid patient alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "patient_name",
+        "patient_id",
+        "dob"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "patient",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_219",
+      "entityType": "vendor",
+      "en": [
+        "Entity039 Vendor"
+      ],
+      "pt": [
+        "Serviços Entidade039"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:vendor"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid vendor alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "vendor_name",
+        "vendor_id",
+        "contract_scope"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "vendor",
+        "surface_forms"
+      ]
+    },
+    {
+      "id": "EM_220",
+      "entityType": "property",
+      "en": [
+        "Facility Entity040"
+      ],
+      "pt": [
+        "Ativo Entidade040"
+      ],
+      "triggers": [
+        "entity:mention",
+        "entity_type:property"
+      ],
+      "negatives": [
+        "entity with no concrete identifier",
+        "invalid property alias",
+        "generic placeholder token"
+      ],
+      "slotHints": [
+        "entityId",
+        "entityRole",
+        "property_name",
+        "property_id",
+        "jurisdiction"
+      ],
+      "telemetryTags": [
+        "entity_mentions",
+        "property",
+        "surface_forms"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

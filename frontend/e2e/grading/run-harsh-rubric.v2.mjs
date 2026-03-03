@@ -21,6 +21,7 @@ function parseArgs(argv) {
     expectedLanguage: 'pt',
     writeLatest: true,
     runId: null,
+    requireMultiModel: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -30,6 +31,7 @@ function parseArgs(argv) {
     else if (arg === '--expected-language') out.expectedLanguage = argv[++i];
     else if (arg === '--no-write-latest') out.writeLatest = false;
     else if (arg === '--run-id') out.runId = argv[++i];
+    else if (arg === '--require-multi-model') out.requireMultiModel = true;
   }
   return out;
 }
@@ -349,6 +351,26 @@ function normalizeResults(dataset) {
     rows: results.map((row, idx) => {
       const query = String(row.query || row.message || '').trim();
       const responseText = String(row.assistantText || row.response || row.answer || '').trim();
+      const rawAssistantTelemetry =
+        row.assistantTelemetry && typeof row.assistantTelemetry === 'object'
+          ? row.assistantTelemetry
+          : null;
+      const assistantTelemetry = rawAssistantTelemetry
+        ? {
+            provider:
+              typeof rawAssistantTelemetry.provider === 'string'
+                ? rawAssistantTelemetry.provider
+                : null,
+            model:
+              typeof rawAssistantTelemetry.model === 'string'
+                ? rawAssistantTelemetry.model
+                : null,
+            finishReason:
+              typeof rawAssistantTelemetry.finishReason === 'string'
+                ? rawAssistantTelemetry.finishReason
+                : null,
+          }
+        : null;
       const rawSources = Array.isArray(row.sources) ? row.sources : [];
       const rawAttachments = Array.isArray(row.attachments) ? row.attachments : [];
       const sourceDocIds = Array.from(
@@ -387,6 +409,7 @@ function normalizeResults(dataset) {
         truncated: row.truncated === true,
         truncation: row.truncation ?? null,
         latencyMs: Number(row.latencyMs || row.durationMs || 0),
+        assistantTelemetry,
       };
     }),
   };
@@ -897,6 +920,7 @@ function summarize(scoredRows) {
   const gateFails = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0 };
   const gateSkips = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0 };
   const issueCounts = new Map();
+  const modelUsage = new Map();
 
   for (const row of scoredRows) {
     if (row.hardFail) hardFailCount += 1;
@@ -912,6 +936,11 @@ function summarize(scoredRows) {
     for (const issue of row.issues) {
       issueCounts.set(issue, (issueCounts.get(issue) || 0) + 1);
     }
+
+    const provider = String(row?.assistantTelemetry?.provider || 'unknown').trim() || 'unknown';
+    const model = String(row?.assistantTelemetry?.model || 'unknown').trim() || 'unknown';
+    const key = `${provider}::${model}`;
+    modelUsage.set(key, (modelUsage.get(key) || 0) + 1);
   }
 
   const n = Math.max(1, scoredRows.length);
@@ -931,6 +960,16 @@ function summarize(scoredRows) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10)
     .map(([issue, count]) => ({ issue, count }));
+  const modelUsageRows = [...modelUsage.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([providerModel, count]) => ({ providerModel, count }));
+  const knownModelUsageRows = modelUsageRows.filter(
+    (entry) => entry.providerModel !== 'unknown::unknown',
+  );
+  const uniqueKnownModels = new Set(
+    knownModelUsageRows.map((entry) => entry.providerModel),
+  ).size;
+  const singleModelMonopoly = uniqueKnownModels === 1;
 
   const verdict = !overallHardFail && finalScore >= 95 ? 'GO' : 'NO_GO';
 
@@ -944,6 +983,9 @@ function summarize(scoredRows) {
     avgCategories,
     verdict,
     topIssues,
+    modelUsage: modelUsageRows,
+    uniqueKnownModels,
+    singleModelMonopoly,
     passCount: scoredRows.filter((r) => r.status === 'PASS').length,
     partialCount: scoredRows.filter((r) => r.status === 'PARTIAL').length,
     failCount: scoredRows.filter((r) => r.status === 'FAIL').length,
@@ -998,6 +1040,16 @@ function renderMarkdown(result) {
   md += `- PASS: ${summary.passCount}\n`;
   md += `- PARTIAL: ${summary.partialCount}\n`;
   md += `- FAIL: ${summary.failCount}\n\n`;
+
+  md += `## Model Usage\n\n`;
+  md += `- Unique Known Models: ${summary.uniqueKnownModels}\n`;
+  md += `- Single Model Monopoly: ${summary.singleModelMonopoly ? 'yes' : 'no'}\n\n`;
+  md += `| Provider::Model | Count |\n`;
+  md += `|---|---:|\n`;
+  for (const row of summary.modelUsage || []) {
+    md += `| ${row.providerModel} | ${row.count} |\n`;
+  }
+  md += '\n';
 
   md += `## Top Issues\n\n`;
   for (const issue of summary.topIssues) {
@@ -1099,6 +1151,12 @@ function main() {
   console.log(`[harsh-rubric] pack=${opts.pack} total=${scoredRows.length} final=${summary.finalScore} verdict=${summary.verdict}`);
   if (summary.overallHardFail) {
     console.error('[harsh-rubric] hard gates failed');
+    process.exit(1);
+  }
+  if (opts.requireMultiModel && summary.uniqueKnownModels < 2) {
+    console.error(
+      `[harsh-rubric] orchestration failure: expected multi-model usage but observed ${summary.uniqueKnownModels} known model(s)`,
+    );
     process.exit(1);
   }
   if (summary.finalScore < 95) {

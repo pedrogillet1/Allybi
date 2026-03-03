@@ -1,0 +1,3243 @@
+{
+  "_meta": {
+    "id": "identifier_patterns_v6735c929",
+    "version": "1.3.0",
+    "description": "Cross-domain identifier extraction with EN/PT and locale-aware normalization notes.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "medium",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
+  },
+  "rules": [
+    {
+      "id": "ident_001",
+      "name": "identifier_rule_1",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 1.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_002",
+      "name": "identifier_rule_2",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 2.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_003",
+      "name": "identifier_rule_3",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 3.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_004",
+      "name": "identifier_rule_4",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 4.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_005",
+      "name": "identifier_rule_5",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 5.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_006",
+      "name": "identifier_rule_6",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 6.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_007",
+      "name": "identifier_rule_7",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 7.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_008",
+      "name": "identifier_rule_8",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 8.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_009",
+      "name": "identifier_rule_9",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 9.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_010",
+      "name": "identifier_rule_10",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 10.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_011",
+      "name": "identifier_rule_11",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 11.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_012",
+      "name": "identifier_rule_12",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 12.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_013",
+      "name": "identifier_rule_13",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 13.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_014",
+      "name": "identifier_rule_14",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 14.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_015",
+      "name": "identifier_rule_15",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 15.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_016",
+      "name": "identifier_rule_16",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 16.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_017",
+      "name": "identifier_rule_17",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 17.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_018",
+      "name": "identifier_rule_18",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 18.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_019",
+      "name": "identifier_rule_19",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 19.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_020",
+      "name": "identifier_rule_20",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 20.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_021",
+      "name": "identifier_rule_21",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 21.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_022",
+      "name": "identifier_rule_22",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 22.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_023",
+      "name": "identifier_rule_23",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 23.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_024",
+      "name": "identifier_rule_24",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 24.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_025",
+      "name": "identifier_rule_25",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 25.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_026",
+      "name": "identifier_rule_26",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 26.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_027",
+      "name": "identifier_rule_27",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 27.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_028",
+      "name": "identifier_rule_28",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 28.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_029",
+      "name": "identifier_rule_29",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 29.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_030",
+      "name": "identifier_rule_30",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 30.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_031",
+      "name": "identifier_rule_31",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 31.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_032",
+      "name": "identifier_rule_32",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 32.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_033",
+      "name": "identifier_rule_33",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 33.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_034",
+      "name": "identifier_rule_34",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 34.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_035",
+      "name": "identifier_rule_35",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 35.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_036",
+      "name": "identifier_rule_36",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 36.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_037",
+      "name": "identifier_rule_37",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 37.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_038",
+      "name": "identifier_rule_38",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 38.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_039",
+      "name": "identifier_rule_39",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 39.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_040",
+      "name": "identifier_rule_40",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 40.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_041",
+      "name": "identifier_rule_41",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 41.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_042",
+      "name": "identifier_rule_42",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 42.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_043",
+      "name": "identifier_rule_43",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 43.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_044",
+      "name": "identifier_rule_44",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 44.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_045",
+      "name": "identifier_rule_45",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 45.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_046",
+      "name": "identifier_rule_46",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 46.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_047",
+      "name": "identifier_rule_47",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 47.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_048",
+      "name": "identifier_rule_48",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 48.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_049",
+      "name": "identifier_rule_49",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 49.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_050",
+      "name": "identifier_rule_50",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 50.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_051",
+      "name": "identifier_rule_51",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 51.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_052",
+      "name": "identifier_rule_52",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 52.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_053",
+      "name": "identifier_rule_53",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 53.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_054",
+      "name": "identifier_rule_54",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 54.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_055",
+      "name": "identifier_rule_55",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 55.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_056",
+      "name": "identifier_rule_56",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 56.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_057",
+      "name": "identifier_rule_57",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 57.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_058",
+      "name": "identifier_rule_58",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 58.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_059",
+      "name": "identifier_rule_59",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 59.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_060",
+      "name": "identifier_rule_60",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 60.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_061",
+      "name": "identifier_rule_61",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 61.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_062",
+      "name": "identifier_rule_62",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 62.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_063",
+      "name": "identifier_rule_63",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 63.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_064",
+      "name": "identifier_rule_64",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 64.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_065",
+      "name": "identifier_rule_65",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 65.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_066",
+      "name": "identifier_rule_66",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 66.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_067",
+      "name": "identifier_rule_67",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 67.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_068",
+      "name": "identifier_rule_68",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 68.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_069",
+      "name": "identifier_rule_69",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 69.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_070",
+      "name": "identifier_rule_70",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 70.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_071",
+      "name": "identifier_rule_71",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 71.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_072",
+      "name": "identifier_rule_72",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 72.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_073",
+      "name": "identifier_rule_73",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 73.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_074",
+      "name": "identifier_rule_74",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 74.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_075",
+      "name": "identifier_rule_75",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 75.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_076",
+      "name": "identifier_rule_76",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 76.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_077",
+      "name": "identifier_rule_77",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 77.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_078",
+      "name": "identifier_rule_78",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 78.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_079",
+      "name": "identifier_rule_79",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 79.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_080",
+      "name": "identifier_rule_80",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 80.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_081",
+      "name": "identifier_rule_81",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 81.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_082",
+      "name": "identifier_rule_82",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 82.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_083",
+      "name": "identifier_rule_83",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 83.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_084",
+      "name": "identifier_rule_84",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 84.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_085",
+      "name": "identifier_rule_85",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 85.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_086",
+      "name": "identifier_rule_86",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 86.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_087",
+      "name": "identifier_rule_87",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 87.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_088",
+      "name": "identifier_rule_88",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 88.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_089",
+      "name": "identifier_rule_89",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 89.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_090",
+      "name": "identifier_rule_90",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 90.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_091",
+      "name": "identifier_rule_91",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 91.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_092",
+      "name": "identifier_rule_92",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 92.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_093",
+      "name": "identifier_rule_93",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 93.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_094",
+      "name": "identifier_rule_94",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 94.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_095",
+      "name": "identifier_rule_95",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 95.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_096",
+      "name": "identifier_rule_96",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 96.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_097",
+      "name": "identifier_rule_97",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 97.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_098",
+      "name": "identifier_rule_98",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 98.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_099",
+      "name": "identifier_rule_99",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 99.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_100",
+      "name": "identifier_rule_100",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 100.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_101",
+      "name": "identifier_rule_101",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 101.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_102",
+      "name": "identifier_rule_102",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 102.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_103",
+      "name": "identifier_rule_103",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 103.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_104",
+      "name": "identifier_rule_104",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 104.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_105",
+      "name": "identifier_rule_105",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 105.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_106",
+      "name": "identifier_rule_106",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 106.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_107",
+      "name": "identifier_rule_107",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 107.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_108",
+      "name": "identifier_rule_108",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 108.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_109",
+      "name": "identifier_rule_109",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 109.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_110",
+      "name": "identifier_rule_110",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 110.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_111",
+      "name": "identifier_rule_111",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 111.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_112",
+      "name": "identifier_rule_112",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 112.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_113",
+      "name": "identifier_rule_113",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 113.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_114",
+      "name": "identifier_rule_114",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 114.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_115",
+      "name": "identifier_rule_115",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 115.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_116",
+      "name": "identifier_rule_116",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 116.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_117",
+      "name": "identifier_rule_117",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 117.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_118",
+      "name": "identifier_rule_118",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 118.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_119",
+      "name": "identifier_rule_119",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 119.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_120",
+      "name": "identifier_rule_120",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 120.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_121",
+      "name": "identifier_rule_121",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 121.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_122",
+      "name": "identifier_rule_122",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 122.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_123",
+      "name": "identifier_rule_123",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 123.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_124",
+      "name": "identifier_rule_124",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 124.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_125",
+      "name": "identifier_rule_125",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 125.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_126",
+      "name": "identifier_rule_126",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 126.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_127",
+      "name": "identifier_rule_127",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 127.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_128",
+      "name": "identifier_rule_128",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 128.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_129",
+      "name": "identifier_rule_129",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 129.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_130",
+      "name": "identifier_rule_130",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 130.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_131",
+      "name": "identifier_rule_131",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 131.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_132",
+      "name": "identifier_rule_132",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 132.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_133",
+      "name": "identifier_rule_133",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 133.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_134",
+      "name": "identifier_rule_134",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 134.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_135",
+      "name": "identifier_rule_135",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 135.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_136",
+      "name": "identifier_rule_136",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 136.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_137",
+      "name": "identifier_rule_137",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 137.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_138",
+      "name": "identifier_rule_138",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 138.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_139",
+      "name": "identifier_rule_139",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 139.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_140",
+      "name": "identifier_rule_140",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 140.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    }
+  ]
+}

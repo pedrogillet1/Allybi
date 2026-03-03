@@ -193,7 +193,7 @@ export interface LLMClient {
   ping?(): Promise<{ ok: boolean; provider: LLMProvider; t: number }>;
 
   /** Non-streamed completion */
-  complete(req: LLMRequest): Promise<LLMCompletionResponse>;
+  complete(req: LLMRequest, signal?: AbortSignal): Promise<LLMCompletionResponse>;
 
   /**
    * Streamed completion:
@@ -217,6 +217,9 @@ export interface LLMClient {
 
     /** Optional: initial stream state, if orchestrator pre-allocates */
     initialState?: Partial<StreamState>;
+
+    /** Optional abort signal for caller-driven cancellation */
+    signal?: AbortSignal;
   }): Promise<LLMStreamResponse>;
 
   /**

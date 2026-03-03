@@ -1,0 +1,65 @@
+{
+  "_meta": {
+    "id": "table_cell_evidence_rules",
+    "version": "1.0.0",
+    "description": "Context guarantees before using individual table cell values in responses.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requireHeaderAndRowContext": true
+  },
+  "rules": [
+    {
+      "id": "TCER_001_missing_header",
+      "trigger": "Cell fact extracted without column header context.",
+      "check": "tableCell.columnHeader == null",
+      "failureAction": "ASK_HEADER_CONTEXT",
+      "severity": "error",
+      "examples": [
+        "Uses a number from a table with missing column name.",
+        "Row total copied without associated period column."
+      ]
+    },
+    {
+      "id": "TCER_002_missing_row_label",
+      "trigger": "Cell fact extracted without row label context.",
+      "check": "tableCell.rowLabel == null",
+      "failureAction": "REQUEST_ROW_CONTEXT",
+      "severity": "error",
+      "examples": [
+        "Value used without metric line identifier.",
+        "Amount presented without row context in line-item table."
+      ]
+    },
+    {
+      "id": "TCER_003_merged_cell_guard",
+      "trigger": "Cell comes from merged spans and lacks unwrapped value.",
+      "check": "tableCell.isMerged == true AND tableCell.rawTextNormalized == null",
+      "failureAction": "BLOCK_AND_UNMERGE_OR_SKIP",
+      "severity": "warning"
+    },
+    {
+      "id": "TCER_004_total_row_override",
+      "trigger": "Total row used as atomic metric without subtotal context.",
+      "check": "tableCell.isTotal == true AND output.useAsRawAtomic == true",
+      "failureAction": "MARK_AS_AGGREGATE",
+      "severity": "warning"
+    },
+    {
+      "id": "TCER_005_negative_sign_provenance",
+      "trigger": "Negative sign pattern indicates debit/credit but no sign policy is provided.",
+      "check": "tableCell.signPattern in ['()', '-'] AND output.signConvention == null",
+      "failureAction": "REQUEST_SIGN_CONVENTION",
+      "severity": "error"
+    },
+    {
+      "id": "TCER_006_currency_scale_guard",
+      "trigger": "Cell has multiplier suffix (k, m) and value used without scale expansion.",
+      "check": "tableCell.scaleSuffix != null AND output.scaleExpanded == false",
+      "failureAction": "APPLY_SCALE_EXPLANATION",
+      "severity": "warning"
+    }
+  ]
+}

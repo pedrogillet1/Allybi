@@ -1,0 +1,6938 @@
+{
+  "_meta": {
+    "id": "send_intents_en",
+    "version": "1.0.0",
+    "description": "send intents pattern bank for EN connector send intents with connector-aware isolation.",
+    "languages": [
+      "en",
+      "any"
+    ],
+    "owner": "connectors-patterning",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/retrieval/retrievalEngine.service.ts",
+      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+    ],
+    "tests": [
+      "send_en_positive_1",
+      "send_en_negative_1",
+      "send_en_missing_slot"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "matching": {
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true
+    },
+    "minPatterns": 120,
+    "maxPatterns": 250
+  },
+  "patterns": [
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "broadcast update to Dropbox workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0001",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "broadcast update to Gmail workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0002",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "broadcast update to Google Drive workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0003",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "broadcast update to Outlook workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0004",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "broadcast update to Slack workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0005",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "broadcast update to Teams workspace"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0006",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this attachment through Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0007",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this attachment through Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0008",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this attachment through Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0009",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this attachment through Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0010",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this attachment through Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0011",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this attachment through Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0012",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0013",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0014",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0015",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0016",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0017",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "email this from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0018",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export latest report as PDF in Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0019",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export latest report as PDF in Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0020",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export latest report as PDF in Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0021",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export latest report as PDF in Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0022",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export latest report as PDF in Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0023",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export latest report as PDF in Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0024",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this as PDF to Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0025",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this as PDF to Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0026",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this as PDF to Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0027",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this as PDF to Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0028",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this as PDF to Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0029",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this as PDF to Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0030",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this workspace as PDF to Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0031",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this workspace as PDF to Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0032",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this workspace as PDF to Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0033",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this workspace as PDF to Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0034",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this workspace as PDF to Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0035",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "export this workspace as PDF to Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0036",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in #incidents on Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0037",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in #incidents on Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0038",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in #incidents on Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0039",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in #incidents on Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0040",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in #incidents on Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0041",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in #incidents on Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0042",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in teams channel via Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0043",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in teams channel via Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0044",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in teams channel via Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0045",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in teams channel via Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0046",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in teams channel via Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0047",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post in teams channel via Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0048",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post update in Dropbox channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0049",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post update in Gmail channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0050",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post update in Google Drive channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0051",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post update in Outlook channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0052",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post update in Slack channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0053",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "post update in Teams channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0054",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send as attachment through Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0055",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send as attachment through Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0056",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send as attachment through Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0057",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send as attachment through Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0058",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send as attachment through Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0059",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send as attachment through Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0060",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send Dropbox draft for review"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0061",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send follow-up using Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0062",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send follow-up using Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0063",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send follow-up using Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0064",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send follow-up using Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0065",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send follow-up using Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0066",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send follow-up using Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0067",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send Gmail draft for review"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0068",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send Google Drive draft for review"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0069",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send invoice report by Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0070",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send invoice report by Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0071",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send invoice report by Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0072",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send invoice report by Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0073",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send invoice report by Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0074",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send invoice report by Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0075",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send my notes through Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0076",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send my notes through Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0077",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send my notes through Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0078",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send my notes through Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0079",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send my notes through Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0080",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send my notes through Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0081",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send Outlook draft for review"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0082",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send Slack draft for review"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0083",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send Teams draft for review"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0084",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send the report via Dropbox to finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0085",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send the report via Gmail to finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0086",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send the report via Google Drive to finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0087",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send the report via Outlook to finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0088",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send the report via Slack to finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0089",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send the report via Teams to finance"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0090",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to my manager using Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0091",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to my manager using Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0092",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to my manager using Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0093",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to my manager using Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0094",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to my manager using Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0095",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to my manager using Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0096",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to sales via Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0097",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to sales via Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0098",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to sales via Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0099",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to sales via Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0100",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to sales via Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0101",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this to sales via Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0102",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this via Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0103",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this via Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0104",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this via Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0105",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this via Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0106",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this via Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0107",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "send this via Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0108",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share current message using Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0109",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share current message using Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0110",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share current message using Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0111",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share current message using Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0112",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share current message using Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0113",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share current message using Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0114",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share Dropbox workspace with client"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0115",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share Gmail workspace with client"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0116",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share Google Drive workspace with client"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0117",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share Outlook workspace with client"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0118",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share Slack workspace with client"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0119",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share Teams workspace with client"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0120",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share that with Ana on Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0121",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share that with Ana on Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0122",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share that with Ana on Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0123",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share that with Ana on Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0124",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share that with Ana on Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0125",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share that with Ana on Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0126",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this draft with legal on Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0127",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this draft with legal on Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0128",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this draft with legal on Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0129",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this draft with legal on Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0130",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this draft with legal on Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0131",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this draft with legal on Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0132",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this workspace from Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0133",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this workspace from Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0134",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this workspace from Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0135",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this workspace from Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0136",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this workspace from Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0137",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this workspace from Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0138",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this message in Dropbox channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0139",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this message in Gmail channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0140",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this message in Google Drive channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0141",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this message in Outlook channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0142",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this message in Slack channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0143",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this message in Teams channel"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0144",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this with team on Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0145",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this with team on Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0146",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this with team on Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:drive"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0147",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this with team on Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0148",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this with team on Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:slack"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0149",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEND",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "askOneQuestionTemplate": "Who should receive this and where should it be sent or shared?",
+      "en": [
+        "share this with team on Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:send",
+        "connector:teams"
+      ],
+      "negatives": [
+        "not a document question",
+        "do_not_open_or_edit_local_file",
+        "do_not_summarize_or_analyze_files",
+        "avoid_file_navigation_or_read_ops",
+        "ignore_content_editing_requests",
+        "ignore_document_section_questions",
+        "ignore_local_file_navigation",
+        "ignore_open_file_navigation_requests",
+        "ignore_find_file_requests",
+        "ignore_document_summarization_requests"
+      ],
+      "slotHints": [
+        "recipient",
+        "channel",
+        "query",
+        "folder"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "en",
+        "send",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEND_EN_0150",
+      "intent": "CONNECTORS"
+    }
+  ]
+}

@@ -15,8 +15,12 @@
       "determinism": "Pure lookup; no runtime heuristics"
     }
   },
+  "defaults": {
+    "draft": { "provider": "gemini", "model": "gemini-2.5-flash" },
+    "final": { "provider": "openai", "model": "gpt-5.2" }
+  },
   "providers": {
-    "google": {
+    "gemini": {
       "displayName": "Google Gemini",
       "capabilities": {
         "text": true,
@@ -39,6 +43,10 @@
       "models": {
         "gemini-2.5-flash": {
           "tier": "flash",
+          "supportsStreaming": true,
+          "supportsTools": true,
+          "maxOutputTokens": 8192,
+          "maxInputTokens": 1048576,
           "capabilities": {
             "lowLatency": true,
             "bestFor": [
@@ -77,6 +85,10 @@
       "models": {
         "gpt-5.2": {
           "tier": "authority",
+          "supportsStreaming": true,
+          "supportsTools": true,
+          "maxOutputTokens": 16384,
+          "maxInputTokens": 128000,
           "capabilities": {
             "bestFor": [
               "final_compose_high_stakes",
@@ -90,6 +102,10 @@
         },
         "gpt-5-mini": {
           "tier": "precision",
+          "supportsStreaming": true,
+          "supportsTools": true,
+          "maxOutputTokens": 16384,
+          "maxInputTokens": 128000,
           "capabilities": {
             "bestFor": [
               "final_compose_medium_stakes",

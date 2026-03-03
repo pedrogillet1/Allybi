@@ -1,0 +1,82 @@
+name: Runtime SLO Gates
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - "backend/src/modules/chat/runtime/**"
+      - "backend/src/services/core/retrieval/**"
+      - "backend/src/services/core/banks/**"
+      - "backend/src/services/llm/core/**"
+      - "backend/scripts/runtime-slo/**"
+      - "backend/notes/RUNTIME_SLO_BASELINE.json"
+      - ".github/workflows/runtime-slo-gates.yml"
+  push:
+    branches: [ main, develop ]
+    paths:
+      - "backend/src/modules/chat/runtime/**"
+      - "backend/src/services/core/retrieval/**"
+      - "backend/src/services/core/banks/**"
+      - "backend/src/services/llm/core/**"
+      - "backend/scripts/runtime-slo/**"
+      - "backend/notes/RUNTIME_SLO_BASELINE.json"
+      - ".github/workflows/runtime-slo-gates.yml"
+  workflow_dispatch:
+
+jobs:
+  runtime-slo:
+    name: Runtime latency + reliability budget gate
+    if: ${{ secrets.RUNTIME_SLO_API_BASE != '' && secrets.RUNTIME_SLO_TEST_EMAIL != '' && secrets.RUNTIME_SLO_TEST_PASSWORD != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run E2E query pack for runtime SLO sample
+        run: |
+          node frontend/e2e/run-query-pack.mjs \
+            --base "${{ secrets.RUNTIME_SLO_API_BASE }}" \
+            --email "${{ secrets.RUNTIME_SLO_TEST_EMAIL }}" \
+            --password "${{ secrets.RUNTIME_SLO_TEST_PASSWORD }}" \
+            --pack "frontend/e2e/query-packs/test1-bilingual-100.json" \
+            --out "frontend/e2e/reports/latest/runtime_slo_results.json" \
+            --max-queries 40 \
+            --quiet
+
+      - name: Build runtime SLO report
+        working-directory: ./backend
+        run: |
+          node scripts/runtime-slo/generate-runtime-slo-report.mjs \
+            --input ../frontend/e2e/reports/latest/runtime_slo_results.json \
+            --out-json reports/runtime-slo/runtime-slo-report.json \
+            --out-md reports/runtime-slo/runtime-slo-report.md
+
+      - name: Assert runtime SLO budgets
+        working-directory: ./backend
+        run: |
+          node scripts/runtime-slo/assert-runtime-slo.mjs \
+            --report reports/runtime-slo/runtime-slo-report.json \
+            --baseline notes/RUNTIME_SLO_BASELINE.json \
+            --out reports/runtime-slo/runtime-slo-gate.json
+
+      - name: Upload runtime SLO artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-slo-reports
+          path: |
+            frontend/e2e/reports/latest/runtime_slo_results.json
+            backend/reports/runtime-slo/runtime-slo-report.json
+            backend/reports/runtime-slo/runtime-slo-report.md
+            backend/reports/runtime-slo/runtime-slo-gate.json
+          retention-days: 14

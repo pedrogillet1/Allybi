@@ -1,0 +1,4629 @@
+{
+  "_meta": {
+    "bankId": "aggregation_patterns",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_aggregation_patterns",
+    "description": "Auto-registered bank payload for patterns/core/aggregation_patterns.any.json"
+  },
+  "patterns": [
+    {
+      "id": "AG_001",
+      "mode": "topN",
+      "en": [
+        "top 4 revenue by client"
+      ],
+      "pt": [
+        "top 4 revenue by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_002",
+      "mode": "topN",
+      "en": [
+        "top 5 expenses by vendor"
+      ],
+      "pt": [
+        "top 5 expenses by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_003",
+      "mode": "topN",
+      "en": [
+        "top 6 cash by region"
+      ],
+      "pt": [
+        "top 6 cash by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_004",
+      "mode": "topN",
+      "en": [
+        "top 7 margin by department"
+      ],
+      "pt": [
+        "top 7 margin by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_005",
+      "mode": "topN",
+      "en": [
+        "top 8 occupancy by product"
+      ],
+      "pt": [
+        "top 8 occupancy by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_006",
+      "mode": "topN",
+      "en": [
+        "top 9 errors by document type"
+      ],
+      "pt": [
+        "top 9 errors by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_007",
+      "mode": "topN",
+      "en": [
+        "top 10 requests by client"
+      ],
+      "pt": [
+        "top 10 requests by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_008",
+      "mode": "topN",
+      "en": [
+        "top 11 risk by vendor"
+      ],
+      "pt": [
+        "top 11 risk by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_009",
+      "mode": "topN",
+      "en": [
+        "top 12 forecast error by region"
+      ],
+      "pt": [
+        "top 12 forecast error by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_010",
+      "mode": "topN",
+      "en": [
+        "top 13 variance by department"
+      ],
+      "pt": [
+        "top 13 variance by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_011",
+      "mode": "topN",
+      "en": [
+        "top 14 volume by product"
+      ],
+      "pt": [
+        "top 14 volume by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_012",
+      "mode": "topN",
+      "en": [
+        "top 15 revenue by document type"
+      ],
+      "pt": [
+        "top 15 revenue by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_013",
+      "mode": "topN",
+      "en": [
+        "top 16 expenses by client"
+      ],
+      "pt": [
+        "top 16 expenses by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_014",
+      "mode": "topN",
+      "en": [
+        "top 17 cash by vendor"
+      ],
+      "pt": [
+        "top 17 cash by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_015",
+      "mode": "topN",
+      "en": [
+        "top 18 margin by region"
+      ],
+      "pt": [
+        "top 18 margin by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_016",
+      "mode": "topN",
+      "en": [
+        "top 19 occupancy by department"
+      ],
+      "pt": [
+        "top 19 occupancy by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_017",
+      "mode": "topN",
+      "en": [
+        "top 20 errors by product"
+      ],
+      "pt": [
+        "top 20 errors by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_018",
+      "mode": "topN",
+      "en": [
+        "top 21 requests by document type"
+      ],
+      "pt": [
+        "top 21 requests by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_019",
+      "mode": "topN",
+      "en": [
+        "top 22 risk by client"
+      ],
+      "pt": [
+        "top 22 risk by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_020",
+      "mode": "topN",
+      "en": [
+        "top 3 forecast error by vendor"
+      ],
+      "pt": [
+        "top 3 forecast error by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_021",
+      "mode": "topN",
+      "en": [
+        "top 4 variance by region"
+      ],
+      "pt": [
+        "top 4 variance by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_022",
+      "mode": "topN",
+      "en": [
+        "top 5 volume by department"
+      ],
+      "pt": [
+        "top 5 volume by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_023",
+      "mode": "topN",
+      "en": [
+        "top 6 revenue by product"
+      ],
+      "pt": [
+        "top 6 revenue by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_024",
+      "mode": "topN",
+      "en": [
+        "top 7 expenses by document type"
+      ],
+      "pt": [
+        "top 7 expenses by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_025",
+      "mode": "topN",
+      "en": [
+        "top 8 cash by client"
+      ],
+      "pt": [
+        "top 8 cash by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_026",
+      "mode": "topN",
+      "en": [
+        "top 9 margin by vendor"
+      ],
+      "pt": [
+        "top 9 margin by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_027",
+      "mode": "topN",
+      "en": [
+        "top 10 occupancy by region"
+      ],
+      "pt": [
+        "top 10 occupancy by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_028",
+      "mode": "topN",
+      "en": [
+        "top 11 errors by department"
+      ],
+      "pt": [
+        "top 11 errors by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_029",
+      "mode": "topN",
+      "en": [
+        "top 12 requests by product"
+      ],
+      "pt": [
+        "top 12 requests by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_030",
+      "mode": "topN",
+      "en": [
+        "top 13 risk by document type"
+      ],
+      "pt": [
+        "top 13 risk by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:topN"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "top_n"
+      ]
+    },
+    {
+      "id": "AG_031",
+      "mode": "rank",
+      "en": [
+        "rank 2 forecast error across month"
+      ],
+      "pt": [
+        "rankear 2 forecast error por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_032",
+      "mode": "rank",
+      "en": [
+        "rank 3 variance across quarter"
+      ],
+      "pt": [
+        "rankear 3 variance por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_033",
+      "mode": "rank",
+      "en": [
+        "rank 4 volume across fiscal year"
+      ],
+      "pt": [
+        "rankear 4 volume por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_034",
+      "mode": "rank",
+      "en": [
+        "rank 5 revenue across rolling 3-month"
+      ],
+      "pt": [
+        "rankear 5 revenue por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_035",
+      "mode": "rank",
+      "en": [
+        "rank 6 expenses across rolling 12-month"
+      ],
+      "pt": [
+        "rankear 6 expenses por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_036",
+      "mode": "rank",
+      "en": [
+        "rank 7 cash across ytd"
+      ],
+      "pt": [
+        "rankear 7 cash por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_037",
+      "mode": "rank",
+      "en": [
+        "rank 8 margin across month"
+      ],
+      "pt": [
+        "rankear 8 margin por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_038",
+      "mode": "rank",
+      "en": [
+        "rank 9 occupancy across quarter"
+      ],
+      "pt": [
+        "rankear 9 occupancy por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_039",
+      "mode": "rank",
+      "en": [
+        "rank 10 errors across fiscal year"
+      ],
+      "pt": [
+        "rankear 10 errors por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_040",
+      "mode": "rank",
+      "en": [
+        "rank 11 requests across rolling 3-month"
+      ],
+      "pt": [
+        "rankear 11 requests por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_041",
+      "mode": "rank",
+      "en": [
+        "rank 12 risk across rolling 12-month"
+      ],
+      "pt": [
+        "rankear 12 risk por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_042",
+      "mode": "rank",
+      "en": [
+        "rank 13 forecast error across ytd"
+      ],
+      "pt": [
+        "rankear 13 forecast error por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_043",
+      "mode": "rank",
+      "en": [
+        "rank 14 variance across month"
+      ],
+      "pt": [
+        "rankear 14 variance por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_044",
+      "mode": "rank",
+      "en": [
+        "rank 15 volume across quarter"
+      ],
+      "pt": [
+        "rankear 15 volume por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_045",
+      "mode": "rank",
+      "en": [
+        "rank 1 revenue across fiscal year"
+      ],
+      "pt": [
+        "rankear 1 revenue por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_046",
+      "mode": "rank",
+      "en": [
+        "rank 2 expenses across rolling 3-month"
+      ],
+      "pt": [
+        "rankear 2 expenses por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_047",
+      "mode": "rank",
+      "en": [
+        "rank 3 cash across rolling 12-month"
+      ],
+      "pt": [
+        "rankear 3 cash por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_048",
+      "mode": "rank",
+      "en": [
+        "rank 4 margin across ytd"
+      ],
+      "pt": [
+        "rankear 4 margin por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_049",
+      "mode": "rank",
+      "en": [
+        "rank 5 occupancy across month"
+      ],
+      "pt": [
+        "rankear 5 occupancy por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_050",
+      "mode": "rank",
+      "en": [
+        "rank 6 errors across quarter"
+      ],
+      "pt": [
+        "rankear 6 errors por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_051",
+      "mode": "rank",
+      "en": [
+        "rank 7 requests across fiscal year"
+      ],
+      "pt": [
+        "rankear 7 requests por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_052",
+      "mode": "rank",
+      "en": [
+        "rank 8 risk across rolling 3-month"
+      ],
+      "pt": [
+        "rankear 8 risk por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_053",
+      "mode": "rank",
+      "en": [
+        "rank 9 forecast error across rolling 12-month"
+      ],
+      "pt": [
+        "rankear 9 forecast error por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_054",
+      "mode": "rank",
+      "en": [
+        "rank 10 variance across ytd"
+      ],
+      "pt": [
+        "rankear 10 variance por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_055",
+      "mode": "rank",
+      "en": [
+        "rank 11 volume across month"
+      ],
+      "pt": [
+        "rankear 11 volume por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rank"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rank"
+      ]
+    },
+    {
+      "id": "AG_056",
+      "mode": "group_by",
+      "en": [
+        "group revenue by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar revenue by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_057",
+      "mode": "group_by",
+      "en": [
+        "group expenses by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar expenses by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_058",
+      "mode": "group_by",
+      "en": [
+        "group cash by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar cash by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_059",
+      "mode": "group_by",
+      "en": [
+        "group margin by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar margin by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_060",
+      "mode": "group_by",
+      "en": [
+        "group occupancy by document type by ytd"
+      ],
+      "pt": [
+        "agrupar occupancy by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_061",
+      "mode": "group_by",
+      "en": [
+        "group errors by client by month"
+      ],
+      "pt": [
+        "agrupar errors by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_062",
+      "mode": "group_by",
+      "en": [
+        "group requests by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar requests by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_063",
+      "mode": "group_by",
+      "en": [
+        "group risk by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar risk by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_064",
+      "mode": "group_by",
+      "en": [
+        "group forecast error by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar forecast error by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_065",
+      "mode": "group_by",
+      "en": [
+        "group variance by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar variance by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_066",
+      "mode": "group_by",
+      "en": [
+        "group volume by document type by ytd"
+      ],
+      "pt": [
+        "agrupar volume by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_067",
+      "mode": "group_by",
+      "en": [
+        "group revenue by client by month"
+      ],
+      "pt": [
+        "agrupar revenue by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_068",
+      "mode": "group_by",
+      "en": [
+        "group expenses by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar expenses by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_069",
+      "mode": "group_by",
+      "en": [
+        "group cash by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar cash by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_070",
+      "mode": "group_by",
+      "en": [
+        "group margin by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar margin by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_071",
+      "mode": "group_by",
+      "en": [
+        "group occupancy by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar occupancy by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_072",
+      "mode": "group_by",
+      "en": [
+        "group errors by document type by ytd"
+      ],
+      "pt": [
+        "agrupar errors by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_073",
+      "mode": "group_by",
+      "en": [
+        "group requests by client by month"
+      ],
+      "pt": [
+        "agrupar requests by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_074",
+      "mode": "group_by",
+      "en": [
+        "group risk by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar risk by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_075",
+      "mode": "group_by",
+      "en": [
+        "group forecast error by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar forecast error by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_076",
+      "mode": "group_by",
+      "en": [
+        "group variance by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar variance by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_077",
+      "mode": "group_by",
+      "en": [
+        "group volume by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar volume by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_078",
+      "mode": "group_by",
+      "en": [
+        "group revenue by document type by ytd"
+      ],
+      "pt": [
+        "agrupar revenue by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_079",
+      "mode": "group_by",
+      "en": [
+        "group expenses by client by month"
+      ],
+      "pt": [
+        "agrupar expenses by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_080",
+      "mode": "group_by",
+      "en": [
+        "group cash by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar cash by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_081",
+      "mode": "group_by",
+      "en": [
+        "group margin by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar margin by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_082",
+      "mode": "group_by",
+      "en": [
+        "group occupancy by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar occupancy by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_083",
+      "mode": "group_by",
+      "en": [
+        "group errors by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar errors by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_084",
+      "mode": "group_by",
+      "en": [
+        "group requests by document type by ytd"
+      ],
+      "pt": [
+        "agrupar requests by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_085",
+      "mode": "group_by",
+      "en": [
+        "group risk by client by month"
+      ],
+      "pt": [
+        "agrupar risk by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_086",
+      "mode": "group_by",
+      "en": [
+        "group forecast error by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar forecast error by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_087",
+      "mode": "group_by",
+      "en": [
+        "group variance by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar variance by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_088",
+      "mode": "group_by",
+      "en": [
+        "group volume by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar volume by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_089",
+      "mode": "group_by",
+      "en": [
+        "group revenue by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar revenue by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_090",
+      "mode": "group_by",
+      "en": [
+        "group expenses by document type by ytd"
+      ],
+      "pt": [
+        "agrupar expenses by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_091",
+      "mode": "group_by",
+      "en": [
+        "group cash by client by month"
+      ],
+      "pt": [
+        "agrupar cash by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_092",
+      "mode": "group_by",
+      "en": [
+        "group margin by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar margin by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_093",
+      "mode": "group_by",
+      "en": [
+        "group occupancy by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar occupancy by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_094",
+      "mode": "group_by",
+      "en": [
+        "group errors by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar errors by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_095",
+      "mode": "group_by",
+      "en": [
+        "group requests by product by rolling 12-month"
+      ],
+      "pt": [
+        "agrupar requests by product por rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_096",
+      "mode": "group_by",
+      "en": [
+        "group risk by document type by ytd"
+      ],
+      "pt": [
+        "agrupar risk by document type por ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_097",
+      "mode": "group_by",
+      "en": [
+        "group forecast error by client by month"
+      ],
+      "pt": [
+        "agrupar forecast error by client por month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_098",
+      "mode": "group_by",
+      "en": [
+        "group variance by vendor by quarter"
+      ],
+      "pt": [
+        "agrupar variance by vendor por quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_099",
+      "mode": "group_by",
+      "en": [
+        "group volume by region by fiscal year"
+      ],
+      "pt": [
+        "agrupar volume by region por fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_100",
+      "mode": "group_by",
+      "en": [
+        "group revenue by department by rolling 3-month"
+      ],
+      "pt": [
+        "agrupar revenue by department por rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:group_by"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "group_by"
+      ]
+    },
+    {
+      "id": "AG_101",
+      "mode": "trend",
+      "en": [
+        "compute trend of expenses over rolling 12-month"
+      ],
+      "pt": [
+        "calcular tendência de expenses no(a) rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_102",
+      "mode": "trend",
+      "en": [
+        "compute trend of cash over ytd"
+      ],
+      "pt": [
+        "calcular tendência de cash no(a) ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_103",
+      "mode": "trend",
+      "en": [
+        "compute trend of margin over month"
+      ],
+      "pt": [
+        "calcular tendência de margin no(a) month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_104",
+      "mode": "trend",
+      "en": [
+        "compute trend of occupancy over quarter"
+      ],
+      "pt": [
+        "calcular tendência de occupancy no(a) quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_105",
+      "mode": "trend",
+      "en": [
+        "compute trend of errors over fiscal year"
+      ],
+      "pt": [
+        "calcular tendência de errors no(a) fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_106",
+      "mode": "trend",
+      "en": [
+        "compute trend of requests over rolling 3-month"
+      ],
+      "pt": [
+        "calcular tendência de requests no(a) rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_107",
+      "mode": "trend",
+      "en": [
+        "compute trend of risk over rolling 12-month"
+      ],
+      "pt": [
+        "calcular tendência de risk no(a) rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_108",
+      "mode": "trend",
+      "en": [
+        "compute trend of forecast error over ytd"
+      ],
+      "pt": [
+        "calcular tendência de forecast error no(a) ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_109",
+      "mode": "trend",
+      "en": [
+        "compute trend of variance over month"
+      ],
+      "pt": [
+        "calcular tendência de variance no(a) month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_110",
+      "mode": "trend",
+      "en": [
+        "compute trend of volume over quarter"
+      ],
+      "pt": [
+        "calcular tendência de volume no(a) quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_111",
+      "mode": "trend",
+      "en": [
+        "compute trend of revenue over fiscal year"
+      ],
+      "pt": [
+        "calcular tendência de revenue no(a) fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_112",
+      "mode": "trend",
+      "en": [
+        "compute trend of expenses over rolling 3-month"
+      ],
+      "pt": [
+        "calcular tendência de expenses no(a) rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_113",
+      "mode": "trend",
+      "en": [
+        "compute trend of cash over rolling 12-month"
+      ],
+      "pt": [
+        "calcular tendência de cash no(a) rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_114",
+      "mode": "trend",
+      "en": [
+        "compute trend of margin over ytd"
+      ],
+      "pt": [
+        "calcular tendência de margin no(a) ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_115",
+      "mode": "trend",
+      "en": [
+        "compute trend of occupancy over month"
+      ],
+      "pt": [
+        "calcular tendência de occupancy no(a) month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_116",
+      "mode": "trend",
+      "en": [
+        "compute trend of errors over quarter"
+      ],
+      "pt": [
+        "calcular tendência de errors no(a) quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_117",
+      "mode": "trend",
+      "en": [
+        "compute trend of requests over fiscal year"
+      ],
+      "pt": [
+        "calcular tendência de requests no(a) fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_118",
+      "mode": "trend",
+      "en": [
+        "compute trend of risk over rolling 3-month"
+      ],
+      "pt": [
+        "calcular tendência de risk no(a) rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_119",
+      "mode": "trend",
+      "en": [
+        "compute trend of forecast error over rolling 12-month"
+      ],
+      "pt": [
+        "calcular tendência de forecast error no(a) rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_120",
+      "mode": "trend",
+      "en": [
+        "compute trend of variance over ytd"
+      ],
+      "pt": [
+        "calcular tendência de variance no(a) ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_121",
+      "mode": "trend",
+      "en": [
+        "compute trend of volume over month"
+      ],
+      "pt": [
+        "calcular tendência de volume no(a) month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_122",
+      "mode": "trend",
+      "en": [
+        "compute trend of revenue over quarter"
+      ],
+      "pt": [
+        "calcular tendência de revenue no(a) quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_123",
+      "mode": "trend",
+      "en": [
+        "compute trend of expenses over fiscal year"
+      ],
+      "pt": [
+        "calcular tendência de expenses no(a) fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_124",
+      "mode": "trend",
+      "en": [
+        "compute trend of cash over rolling 3-month"
+      ],
+      "pt": [
+        "calcular tendência de cash no(a) rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_125",
+      "mode": "trend",
+      "en": [
+        "compute trend of margin over rolling 12-month"
+      ],
+      "pt": [
+        "calcular tendência de margin no(a) rolling 12-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_126",
+      "mode": "trend",
+      "en": [
+        "compute trend of occupancy over ytd"
+      ],
+      "pt": [
+        "calcular tendência de occupancy no(a) ytd"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_127",
+      "mode": "trend",
+      "en": [
+        "compute trend of errors over month"
+      ],
+      "pt": [
+        "calcular tendência de errors no(a) month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_128",
+      "mode": "trend",
+      "en": [
+        "compute trend of requests over quarter"
+      ],
+      "pt": [
+        "calcular tendência de requests no(a) quarter"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_129",
+      "mode": "trend",
+      "en": [
+        "compute trend of risk over fiscal year"
+      ],
+      "pt": [
+        "calcular tendência de risk no(a) fiscal year"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_130",
+      "mode": "trend",
+      "en": [
+        "compute trend of forecast error over rolling 3-month"
+      ],
+      "pt": [
+        "calcular tendência de forecast error no(a) rolling 3-month"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:trend"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "trend"
+      ]
+    },
+    {
+      "id": "AG_131",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 12-month rolling variance"
+      ],
+      "pt": [
+        "calcular rolling 12-month deslizante de variance"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_132",
+      "mode": "rolling",
+      "en": [
+        "calculate ytd rolling volume"
+      ],
+      "pt": [
+        "calcular ytd deslizante de volume"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_133",
+      "mode": "rolling",
+      "en": [
+        "calculate month rolling revenue"
+      ],
+      "pt": [
+        "calcular month deslizante de revenue"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_134",
+      "mode": "rolling",
+      "en": [
+        "calculate quarter rolling expenses"
+      ],
+      "pt": [
+        "calcular quarter deslizante de expenses"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_135",
+      "mode": "rolling",
+      "en": [
+        "calculate fiscal year rolling cash"
+      ],
+      "pt": [
+        "calcular fiscal year deslizante de cash"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_136",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 3-month rolling margin"
+      ],
+      "pt": [
+        "calcular rolling 3-month deslizante de margin"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_137",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 12-month rolling occupancy"
+      ],
+      "pt": [
+        "calcular rolling 12-month deslizante de occupancy"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_138",
+      "mode": "rolling",
+      "en": [
+        "calculate ytd rolling errors"
+      ],
+      "pt": [
+        "calcular ytd deslizante de errors"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_139",
+      "mode": "rolling",
+      "en": [
+        "calculate month rolling requests"
+      ],
+      "pt": [
+        "calcular month deslizante de requests"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_140",
+      "mode": "rolling",
+      "en": [
+        "calculate quarter rolling risk"
+      ],
+      "pt": [
+        "calcular quarter deslizante de risk"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_141",
+      "mode": "rolling",
+      "en": [
+        "calculate fiscal year rolling forecast error"
+      ],
+      "pt": [
+        "calcular fiscal year deslizante de forecast error"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_142",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 3-month rolling variance"
+      ],
+      "pt": [
+        "calcular rolling 3-month deslizante de variance"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_143",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 12-month rolling volume"
+      ],
+      "pt": [
+        "calcular rolling 12-month deslizante de volume"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_144",
+      "mode": "rolling",
+      "en": [
+        "calculate ytd rolling revenue"
+      ],
+      "pt": [
+        "calcular ytd deslizante de revenue"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_145",
+      "mode": "rolling",
+      "en": [
+        "calculate month rolling expenses"
+      ],
+      "pt": [
+        "calcular month deslizante de expenses"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_146",
+      "mode": "rolling",
+      "en": [
+        "calculate quarter rolling cash"
+      ],
+      "pt": [
+        "calcular quarter deslizante de cash"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_147",
+      "mode": "rolling",
+      "en": [
+        "calculate fiscal year rolling margin"
+      ],
+      "pt": [
+        "calcular fiscal year deslizante de margin"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_148",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 3-month rolling occupancy"
+      ],
+      "pt": [
+        "calcular rolling 3-month deslizante de occupancy"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_149",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 12-month rolling errors"
+      ],
+      "pt": [
+        "calcular rolling 12-month deslizante de errors"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_150",
+      "mode": "rolling",
+      "en": [
+        "calculate ytd rolling requests"
+      ],
+      "pt": [
+        "calcular ytd deslizante de requests"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_151",
+      "mode": "rolling",
+      "en": [
+        "calculate month rolling risk"
+      ],
+      "pt": [
+        "calcular month deslizante de risk"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_152",
+      "mode": "rolling",
+      "en": [
+        "calculate quarter rolling forecast error"
+      ],
+      "pt": [
+        "calcular quarter deslizante de forecast error"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_153",
+      "mode": "rolling",
+      "en": [
+        "calculate fiscal year rolling variance"
+      ],
+      "pt": [
+        "calcular fiscal year deslizante de variance"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_154",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 3-month rolling volume"
+      ],
+      "pt": [
+        "calcular rolling 3-month deslizante de volume"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_155",
+      "mode": "rolling",
+      "en": [
+        "calculate rolling 12-month rolling revenue"
+      ],
+      "pt": [
+        "calcular rolling 12-month deslizante de revenue"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:rolling"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "rolling"
+      ]
+    },
+    {
+      "id": "AG_156",
+      "mode": "variance",
+      "en": [
+        "compare expenses variance by by document type"
+      ],
+      "pt": [
+        "comparar variação de expenses por by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_157",
+      "mode": "variance",
+      "en": [
+        "compare cash variance by by client"
+      ],
+      "pt": [
+        "comparar variação de cash por by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_158",
+      "mode": "variance",
+      "en": [
+        "compare margin variance by by vendor"
+      ],
+      "pt": [
+        "comparar variação de margin por by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_159",
+      "mode": "variance",
+      "en": [
+        "compare occupancy variance by by region"
+      ],
+      "pt": [
+        "comparar variação de occupancy por by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_160",
+      "mode": "variance",
+      "en": [
+        "compare errors variance by by department"
+      ],
+      "pt": [
+        "comparar variação de errors por by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_161",
+      "mode": "variance",
+      "en": [
+        "compare requests variance by by product"
+      ],
+      "pt": [
+        "comparar variação de requests por by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_162",
+      "mode": "variance",
+      "en": [
+        "compare risk variance by by document type"
+      ],
+      "pt": [
+        "comparar variação de risk por by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_163",
+      "mode": "variance",
+      "en": [
+        "compare forecast error variance by by client"
+      ],
+      "pt": [
+        "comparar variação de forecast error por by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_164",
+      "mode": "variance",
+      "en": [
+        "compare variance variance by by vendor"
+      ],
+      "pt": [
+        "comparar variação de variance por by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_165",
+      "mode": "variance",
+      "en": [
+        "compare volume variance by by region"
+      ],
+      "pt": [
+        "comparar variação de volume por by region"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_166",
+      "mode": "variance",
+      "en": [
+        "compare revenue variance by by department"
+      ],
+      "pt": [
+        "comparar variação de revenue por by department"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_167",
+      "mode": "variance",
+      "en": [
+        "compare expenses variance by by product"
+      ],
+      "pt": [
+        "comparar variação de expenses por by product"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_168",
+      "mode": "variance",
+      "en": [
+        "compare cash variance by by document type"
+      ],
+      "pt": [
+        "comparar variação de cash por by document type"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_169",
+      "mode": "variance",
+      "en": [
+        "compare margin variance by by client"
+      ],
+      "pt": [
+        "comparar variação de margin por by client"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    },
+    {
+      "id": "AG_170",
+      "mode": "variance",
+      "en": [
+        "compare occupancy variance by by vendor"
+      ],
+      "pt": [
+        "comparar variação de occupancy por by vendor"
+      ],
+      "triggers": [
+        "aggregation",
+        "mode:variance"
+      ],
+      "negatives": [
+        "aggregation without metric",
+        "missing bucket definition"
+      ],
+      "slotHints": [
+        "aggregateField",
+        "groupField",
+        "timeWindow"
+      ],
+      "telemetryTags": [
+        "aggregation",
+        "variance"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

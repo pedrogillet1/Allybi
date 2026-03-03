@@ -1,0 +1,453 @@
+{
+  "_meta": {
+    "id": "everyday_doc_type_aliases",
+    "version": "2.0.0",
+    "description": "Alias bank for everyday document types.",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "minAliasConfidence": 0.72,
+    "caseInsensitive": true
+  },
+  "domain": "everyday",
+  "aliases": [
+    {
+      "phrase": "phone bill",
+      "normalized": "phone bill",
+      "docTypeIds": [
+        "every_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "carrier",
+        "formatHint": "phone_statement_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.94,
+      "examples": [
+        "Show me my phone bill",
+        "Find the most recent mobile bill"
+      ]
+    },
+    {
+      "phrase": "conta de telefone",
+      "normalized": "conta de telefone",
+      "docTypeIds": [
+        "every_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "carrier",
+        "formatHint": "phone_statement_pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "Abra a conta de telefone",
+        "Procurar última fatura do celular"
+      ]
+    },
+    {
+      "phrase": "internet bill",
+      "normalized": "internet bill",
+      "docTypeIds": [
+        "every_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly_cycle",
+        "entityHint": "internet_provider",
+        "formatHint": "internet_statement_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Find internet bill",
+        "Show latest broadband invoice"
+      ]
+    },
+    {
+      "phrase": "conta de internet",
+      "normalized": "conta de internet",
+      "docTypeIds": [
+        "every_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly_cycle",
+        "entityHint": "internet_provider",
+        "formatHint": "internet_statement_pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Abrir conta de internet",
+        "Procurar fatura de internet"
+      ]
+    },
+    {
+      "phrase": "electricity bill",
+      "normalized": "electricity bill",
+      "docTypeIds": [
+        "every_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_month",
+        "entityHint": "utility_company",
+        "formatHint": "utility_statement",
+        "languageHint": "en"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "Show electricity bill",
+        "Find utility electricity charge statement"
+      ]
+    },
+    {
+      "phrase": "conta de energia",
+      "normalized": "conta de energia",
+      "docTypeIds": [
+        "every_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_month",
+        "entityHint": "utility_company",
+        "formatHint": "utility_statement",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Abrir conta de energia",
+        "Procurar a conta de luz"
+      ]
+    },
+    {
+      "phrase": "rent receipt",
+      "normalized": "rent receipt",
+      "docTypeIds": [
+        "every_rent_receipt"
+      ],
+      "hints": {
+        "periodHint": "payment_month",
+        "entityHint": "landlord",
+        "formatHint": "payment_receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Show rent receipt",
+        "Find current rental payment proof"
+      ]
+    },
+    {
+      "phrase": "recibo de aluguel",
+      "normalized": "recibo de aluguel",
+      "docTypeIds": [
+        "every_rent_receipt"
+      ],
+      "hints": {
+        "periodHint": "payment_month",
+        "entityHint": "landlord",
+        "formatHint": "payment_receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Abrir recibo de aluguel",
+        "Encontrar comprovante de aluguel"
+      ]
+    },
+    {
+      "phrase": "retail receipt",
+      "normalized": "retail receipt",
+      "docTypeIds": [
+        "every_retail_receipt"
+      ],
+      "hints": {
+        "periodHint": "purchase_date",
+        "entityHint": "merchant",
+        "formatHint": "store_receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Find retail receipt",
+        "Show purchase receipt"
+      ]
+    },
+    {
+      "phrase": "nota de compra",
+      "normalized": "nota de compra",
+      "docTypeIds": [
+        "every_retail_receipt"
+      ],
+      "hints": {
+        "periodHint": "purchase_date",
+        "entityHint": "merchant",
+        "formatHint": "store_receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Abrir nota de compra",
+        "Procurar cupom de venda"
+      ]
+    },
+    {
+      "phrase": "invoice",
+      "normalized": "invoice",
+      "docTypeIds": [
+        "every_invoice"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "vendor",
+        "formatHint": "invoice_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "Find invoice",
+        "Show supplier invoice"
+      ]
+    },
+    {
+      "phrase": "fatura",
+      "normalized": "fatura",
+      "docTypeIds": [
+        "every_invoice"
+      ],
+      "hints": {
+        "periodHint": "billing_cycle",
+        "entityHint": "vendor",
+        "formatHint": "invoice_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "Abrir fatura",
+        "Procurar fatura do fornecedor"
+      ]
+    },
+    {
+      "phrase": "tax return",
+      "normalized": "tax return",
+      "docTypeIds": [
+        "every_tax_return"
+      ],
+      "hints": {
+        "periodHint": "tax_year",
+        "entityHint": "taxpayer",
+        "formatHint": "tax_packet",
+        "languageHint": "en"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Find tax return",
+        "Show filed tax return"
+      ]
+    },
+    {
+      "phrase": "declaração de renda",
+      "normalized": "declaracao de renda",
+      "docTypeIds": [
+        "every_tax_return"
+      ],
+      "hints": {
+        "periodHint": "tax_year",
+        "entityHint": "taxpayer",
+        "formatHint": "tax_packet",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Abrir declaração de renda",
+        "Procurar retorno de imposto"
+      ]
+    },
+    {
+      "phrase": "tax notice",
+      "normalized": "tax notice",
+      "docTypeIds": [
+        "every_tax_notice"
+      ],
+      "hints": {
+        "periodHint": "assessment_period",
+        "entityHint": "tax_authority",
+        "formatHint": "assessment_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Show tax notice",
+        "Find tax assessment notice"
+      ]
+    },
+    {
+      "phrase": "notificação de tributos",
+      "normalized": "notificacao de tributos",
+      "docTypeIds": [
+        "every_tax_notice"
+      ],
+      "hints": {
+        "periodHint": "assessment_period",
+        "entityHint": "tax_authority",
+        "formatHint": "assessment_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.91,
+      "examples": [
+        "Abrir notificação de tributos",
+        "Encontrar documento de lançamento fiscal"
+      ]
+    },
+    {
+      "phrase": "bank statement",
+      "normalized": "bank statement",
+      "docTypeIds": [
+        "every_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "statement_period",
+        "entityHint": "bank",
+        "formatHint": "bank_statement_pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "Get bank statement",
+        "Fetch latest account statement"
+      ]
+    },
+    {
+      "phrase": "extrato bancário",
+      "normalized": "extrato bancario",
+      "docTypeIds": [
+        "every_bank_statement"
+      ],
+      "hints": {
+        "periodHint": "statement_period",
+        "entityHint": "bank",
+        "formatHint": "bank_statement_pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.93,
+      "examples": [
+        "Abrir extrato bancário",
+        "Verificar extrato da conta"
+      ]
+    },
+    {
+      "phrase": "insurance policy",
+      "normalized": "insurance policy",
+      "docTypeIds": [
+        "every_insurance_policy"
+      ],
+      "hints": {
+        "periodHint": "coverage_period",
+        "entityHint": "insurer",
+        "formatHint": "insurance_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Find insurance policy",
+        "Show policy contract"
+      ]
+    },
+    {
+      "phrase": "apólice de seguro",
+      "normalized": "apolice de seguro",
+      "docTypeIds": [
+        "every_insurance_policy"
+      ],
+      "hints": {
+        "periodHint": "coverage_period",
+        "entityHint": "insurer",
+        "formatHint": "insurance_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "Abrir apólice de seguro",
+        "Procurar apólice vigente"
+      ]
+    },
+    {
+      "phrase": "insurance claim",
+      "normalized": "insurance claim",
+      "docTypeIds": [
+        "every_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_lifecycle",
+        "entityHint": "claimant",
+        "formatHint": "claim_packet",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "Find insurance claim",
+        "Show insurance claim status"
+      ]
+    },
+    {
+      "phrase": "reclamação de seguro",
+      "normalized": "reclamacao de seguro",
+      "docTypeIds": [
+        "every_insurance_claim"
+      ],
+      "hints": {
+        "periodHint": "claim_lifecycle",
+        "entityHint": "claimant",
+        "formatHint": "claim_packet",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "Encontrar reclamação de seguro",
+        "Abrir o sinistro"
+      ]
+    },
+    {
+      "phrase": "identity document",
+      "normalized": "identity document",
+      "docTypeIds": [
+        "every_identity_document"
+      ],
+      "hints": {
+        "periodHint": "validity_period",
+        "entityHint": "holder",
+        "formatHint": "id_document",
+        "languageHint": "en"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Find identity document",
+        "Locate passport or driver license"
+      ]
+    },
+    {
+      "phrase": "documento de identidade",
+      "normalized": "documento de identidade",
+      "docTypeIds": [
+        "every_identity_document"
+      ],
+      "hints": {
+        "periodHint": "validity_period",
+        "entityHint": "holder",
+        "formatHint": "id_document",
+        "languageHint": "pt"
+      },
+      "confidence": 0.92,
+      "examples": [
+        "Abrir documento de identidade",
+        "Encontrar passaporte"
+      ]
+    }
+  ]
+}

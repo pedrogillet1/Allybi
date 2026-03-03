@@ -1,0 +1,311 @@
+{
+  "_meta": {
+    "id": "di_diacritic_equivalence",
+    "bankId": "di_diacritic_equivalence",
+    "version": "2.0.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "description": "Diacritic and ligature equivalence for retrieval-safe matching."
+  },
+  "config": {
+    "enabled": true,
+    "mode": "normalization",
+    "preserveCase": true,
+    "includeLigatures": true
+  },
+  "mapping": [
+    {
+      "id": "deq_001",
+      "base": "a",
+      "equivalents": [
+        "á",
+        "à",
+        "â",
+        "ã",
+        "ä",
+        "å",
+        "ā",
+        "ă",
+        "ą",
+        "ă"
+      ],
+      "aliases": [
+        "a"
+      ]
+    },
+    {
+      "id": "deq_002",
+      "base": "e",
+      "equivalents": [
+        "é",
+        "è",
+        "ê",
+        "ë",
+        "ē",
+        "ę",
+        "ė"
+      ],
+      "aliases": [
+        "e"
+      ]
+    },
+    {
+      "id": "deq_003",
+      "base": "i",
+      "equivalents": [
+        "í",
+        "ì",
+        "î",
+        "ï",
+        "ī",
+        "į"
+      ],
+      "aliases": [
+        "i"
+      ]
+    },
+    {
+      "id": "deq_004",
+      "base": "o",
+      "equivalents": [
+        "ó",
+        "ò",
+        "ô",
+        "ö",
+        "õ",
+        "ō",
+        "ø"
+      ],
+      "aliases": [
+        "o"
+      ]
+    },
+    {
+      "id": "deq_005",
+      "base": "u",
+      "equivalents": [
+        "ú",
+        "ù",
+        "û",
+        "ü",
+        "ū",
+        "ů"
+      ],
+      "aliases": [
+        "u"
+      ]
+    },
+    {
+      "id": "deq_006",
+      "base": "c",
+      "equivalents": [
+        "ç",
+        "ć",
+        "č",
+        "ĉ"
+      ],
+      "aliases": [
+        "c"
+      ]
+    },
+    {
+      "id": "deq_007",
+      "base": "n",
+      "equivalents": [
+        "ñ",
+        "ń",
+        "ň",
+        "ņ"
+      ],
+      "aliases": [
+        "n"
+      ]
+    },
+    {
+      "id": "deq_008",
+      "base": "y",
+      "equivalents": [
+        "ý",
+        "ÿ"
+      ],
+      "aliases": [
+        "y"
+      ]
+    },
+    {
+      "id": "deq_009",
+      "base": "ss",
+      "equivalents": [
+        "ß",
+        "ẞ"
+      ],
+      "aliases": [
+        "ss"
+      ]
+    },
+    {
+      "id": "deq_010",
+      "base": "ae",
+      "equivalents": [
+        "æ"
+      ],
+      "aliases": [
+        "ae"
+      ]
+    },
+    {
+      "id": "deq_011",
+      "base": "oe",
+      "equivalents": [
+        "œ"
+      ],
+      "aliases": [
+        "oe"
+      ]
+    },
+    {
+      "id": "deq_012",
+      "base": "A",
+      "equivalents": [
+        "Á",
+        "À",
+        "Â",
+        "Ä",
+        "Ã",
+        "Å",
+        "Ā",
+        "Ă",
+        "Ą"
+      ],
+      "aliases": [
+        "A"
+      ]
+    },
+    {
+      "id": "deq_013",
+      "base": "E",
+      "equivalents": [
+        "É",
+        "È",
+        "Ê",
+        "Ë",
+        "Ē",
+        "Ę",
+        "Ė"
+      ],
+      "aliases": [
+        "E"
+      ]
+    },
+    {
+      "id": "deq_014",
+      "base": "I",
+      "equivalents": [
+        "Í",
+        "Ì",
+        "Î",
+        "Ï",
+        "Ī",
+        "Į"
+      ],
+      "aliases": [
+        "I"
+      ]
+    },
+    {
+      "id": "deq_015",
+      "base": "O",
+      "equivalents": [
+        "Ó",
+        "Ò",
+        "Ô",
+        "Ö",
+        "Õ",
+        "Ō",
+        "Ø"
+      ],
+      "aliases": [
+        "O"
+      ]
+    },
+    {
+      "id": "deq_016",
+      "base": "U",
+      "equivalents": [
+        "Ú",
+        "Ù",
+        "Û",
+        "Ü",
+        "Ū",
+        "Ů"
+      ],
+      "aliases": [
+        "U"
+      ]
+    },
+    {
+      "id": "deq_017",
+      "base": "C",
+      "equivalents": [
+        "Ç",
+        "Ć",
+        "Č",
+        "Ĉ"
+      ],
+      "aliases": [
+        "C"
+      ]
+    },
+    {
+      "id": "deq_018",
+      "base": "N",
+      "equivalents": [
+        "Ñ",
+        "Ń",
+        "Ň",
+        "Ņ"
+      ],
+      "aliases": [
+        "N"
+      ]
+    },
+    {
+      "id": "deq_019",
+      "base": "Y",
+      "equivalents": [
+        "Ý",
+        "Ÿ"
+      ],
+      "aliases": [
+        "Y"
+      ]
+    },
+    {
+      "id": "deq_020",
+      "base": "ss",
+      "equivalents": [
+        "ﬃ",
+        "ﬁ",
+        "ﬄ"
+      ],
+      "aliases": [
+        "s"
+      ]
+    }
+  ],
+  "rules": {
+    "foldCase": true,
+    "normalizeApostrophe": true,
+    "preserveCombining": false,
+    "normalizeLigatures": true
+  },
+  "negativePatterns": [
+    "(?i)\\b[\\u00c0-\\u017F]x\\b",
+    "(?i)\\u200b",
+    "(?i)\\x00"
+  ]
+}

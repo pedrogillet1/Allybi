@@ -1,0 +1,404 @@
+{
+  "_meta": {
+    "id": "di_stopwords_and_noise",
+    "bankId": "di_stopwords_and_noise",
+    "version": "2.1.0",
+    "owner": "document_intelligence",
+    "languages": [
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03",
+    "description": "Retrieval-safe stopword, boilerplate, and noise-filtering rules for document extraction."
+  },
+  "config": {
+    "enabled": true,
+    "mode": "retrieval-safe",
+    "maxConsecutiveNoiseTokens": 6,
+    "preserveIdentifiers": true,
+    "preserveNumbers": true,
+    "preserveDates": true,
+    "preserveMoneyLike": true,
+    "minInformationDensity": 0.22
+  },
+  "stopwords": {
+    "en": [
+      "a",
+      "an",
+      "and",
+      "are",
+      "as",
+      "at",
+      "be",
+      "but",
+      "by",
+      "for",
+      "if",
+      "in",
+      "into",
+      "is",
+      "it",
+      "of",
+      "on",
+      "or",
+      "so",
+      "that",
+      "the",
+      "this",
+      "to",
+      "was",
+      "were",
+      "with",
+      "you",
+      "there",
+      "their",
+      "from",
+      "we",
+      "our",
+      "not",
+      "no",
+      "yes",
+      "very",
+      "also",
+      "each",
+      "other",
+      "any",
+      "all",
+      "here",
+      "page",
+      "figure",
+      "table"
+    ],
+    "pt": [
+      "a",
+      "e",
+      "de",
+      "da",
+      "do",
+      "dos",
+      "das",
+      "em",
+      "para",
+      "por",
+      "que",
+      "se",
+      "sem",
+      "ou",
+      "com",
+      "como",
+      "na",
+      "no",
+      "nos",
+      "num",
+      "uma",
+      "um",
+      "os",
+      "as",
+      "mais",
+      "muito",
+      "pelo",
+      "pela",
+      "pode",
+      "podem",
+      "foi",
+      "são",
+      "ser",
+      "esta",
+      "este",
+      "essas",
+      "esses",
+      "esta",
+      "esse",
+      "quando",
+      "onde",
+      "porque"
+    ]
+  },
+  "globalStopwords": {
+    "en": [
+      "page",
+      "pages",
+      "invoice",
+      "statement",
+      "document",
+      "report",
+      "documento",
+      "pagina",
+      "fatura",
+      "pdf"
+    ],
+    "pt": [
+      "pagina",
+      "página",
+      "documento",
+      "relatorio",
+      "fatura",
+      "comprovante",
+      "assinatura"
+    ]
+  },
+  "noisePhrases": [
+    {
+      "id": "swp_001",
+      "phrase": "page",
+      "mode": "prefix",
+      "scope": "ocr_footer",
+      "weight": -0.23,
+      "reason": "Paginating boilerplate"
+    },
+    {
+      "id": "swp_002",
+      "phrase": "confidential",
+      "mode": "drop_if_redundant",
+      "scope": "header",
+      "weight": -0.18,
+      "reason": "Watermark noise"
+    },
+    {
+      "id": "swp_003",
+      "phrase": "all rights reserved",
+      "mode": "whole_match",
+      "scope": "footer",
+      "weight": -0.22,
+      "reason": "Copyright footer boilerplate"
+    },
+    {
+      "id": "swp_004",
+      "phrase": "private and confidential",
+      "mode": "whole_match",
+      "scope": "full_doc",
+      "weight": -0.2,
+      "reason": "Access-control note"
+    },
+    {
+      "id": "swp_005",
+      "phrase": "termo de uso",
+      "mode": "substring",
+      "scope": "footer",
+      "weight": -0.16,
+      "reason": "PT policy boilerplate"
+    },
+    {
+      "id": "swp_006",
+      "phrase": "politica de privacidade",
+      "mode": "substring",
+      "scope": "footer",
+      "weight": -0.16,
+      "reason": "PT policy boilerplate"
+    },
+    {
+      "id": "swp_007",
+      "phrase": "do not distribute",
+      "mode": "whole_match",
+      "scope": "header",
+      "weight": -0.19,
+      "reason": "Access-control note"
+    },
+    {
+      "id": "swp_008",
+      "phrase": "copyright",
+      "mode": "substring",
+      "scope": "footer",
+      "weight": -0.14,
+      "reason": "Legal footer noise"
+    },
+    {
+      "id": "swp_009",
+      "phrase": "copy of",
+      "mode": "substring",
+      "scope": "header",
+      "weight": -0.12,
+      "reason": "Introductory boilerplate"
+    },
+    {
+      "id": "swp_010",
+      "phrase": "copia de",
+      "mode": "substring",
+      "scope": "header",
+      "weight": -0.15,
+      "reason": "PT boilerplate"
+    },
+    {
+      "id": "swp_011",
+      "phrase": "doctopage",
+      "mode": "substring",
+      "scope": "ocr",
+      "weight": -0.3,
+      "reason": "OCR artifact"
+    },
+    {
+      "id": "swp_012",
+      "phrase": "pagina",
+      "mode": "substring",
+      "scope": "footer",
+      "weight": -0.12,
+      "reason": "PT page label"
+    },
+    {
+      "id": "swp_013",
+      "phrase": "page number",
+      "mode": "substring",
+      "scope": "footer",
+      "weight": -0.18,
+      "reason": "Pagination noise"
+    },
+    {
+      "id": "swp_014",
+      "phrase": "document id",
+      "mode": "contextual",
+      "scope": "header",
+      "weight": 0.08,
+      "reason": "Useful anchor when explicit identifier follows"
+    },
+    {
+      "id": "swp_015",
+      "phrase": "statement of",
+      "mode": "drop_if_short",
+      "scope": "finance",
+      "weight": -0.06,
+      "reason": "Reduce boilerplate around report titles"
+    }
+  ],
+  "noisePatterns": [
+    {
+      "id": "snp_001",
+      "pattern": "(?i)^(?:page|página)\\s+\\d+\\s*(?:of|de)?\\s*\\d*$",
+      "reason": "Stand-alone pagination artifacts",
+      "scope": "full_doc",
+      "weight": -0.7
+    },
+    {
+      "id": "snp_002",
+      "pattern": "(?i)\\b(?:for internal use only|uso exclusivo interno)\\b",
+      "reason": "Internal-only stamps",
+      "scope": "footer",
+      "weight": -0.45
+    },
+    {
+      "id": "snp_003",
+      "pattern": "(?i)\\b(?:all rights reserved|todos os direitos reservados)\\b",
+      "reason": "Footer legal boilerplate",
+      "scope": "footer",
+      "weight": -0.44
+    },
+    {
+      "id": "snp_004",
+      "pattern": "(?i)\\b(?:scan copy|scanned by|digital signature)\\b",
+      "reason": "Scanner/system signature noise",
+      "scope": "header",
+      "weight": -0.24
+    },
+    {
+      "id": "snp_005",
+      "pattern": "(?i)\\b(?:\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{2,4})\\b",
+      "reason": "Date-like text that should be preserved",
+      "scope": "preserve",
+      "weight": 0.21
+    },
+    {
+      "id": "snp_006",
+      "pattern": "(?i)\\b(?:r\\$\\s*\\d|\\$\\s*\\d|\\bUSD\\b|\\bEUR\\b)\\s*[0-9]",
+      "reason": "Money-like keep with evidence",
+      "scope": "preserve",
+      "weight": 0.31
+    },
+    {
+      "id": "snp_007",
+      "pattern": "(?i)\\b(?:cpf|cnpj|n[\\.]?\\s*cpf|n\\.?\\s*cnpj)\\b",
+      "reason": "Identifier anchors should be preserved",
+      "scope": "preserve",
+      "weight": 0.35
+    },
+    {
+      "id": "snp_008",
+      "pattern": "(?i)\\b(?:agreement|contrato|clause|art\\.?\\s*\\d+)\\b",
+      "reason": "Legal section words can be informative",
+      "scope": "preserve",
+      "weight": 0.12
+    }
+  ],
+  "preservePatterns": [
+    {
+      "id": "pr_001",
+      "pattern": "(?i)\\b(?:id|identificador|account|conta|documento|processo|processs*number)\\b",
+      "weight": 0.2,
+      "reason": "Core retrieval anchors"
+    },
+    {
+      "id": "pr_002",
+      "pattern": "(?i)\\b(?:\\d{4}[-/]\\d{2}[-/]\\d{2})\\b",
+      "weight": 0.27,
+      "reason": "Date anchors preserved for evidence"
+    },
+    {
+      "id": "pr_003",
+      "pattern": "(?i)\\b(?:\\$|\\u20ac|R\\$)\\s*[0-9]+(?:[.,][0-9]{2})?\\b",
+      "weight": 0.2,
+      "reason": "Currency anchors preserved"
+    }
+  ],
+  "retrievalFilters": {
+    "enabled": true,
+    "perDocumentTypeProfiles": {
+      "finance": {
+        "stopAtRatio": 0.35,
+        "allowedNoiseShare": 0.16,
+        "allowlistTokens": [
+          "statement",
+          "balance",
+          "saldo",
+          "amount",
+          "valor",
+          "total",
+          "fatura",
+          "invoice"
+        ]
+      },
+      "legal": {
+        "stopAtRatio": 0.3,
+        "allowedNoiseShare": 0.2,
+        "allowlistTokens": [
+          "clause",
+          "article",
+          "paragraph",
+          "termo",
+          "contrato",
+          "acordo",
+          "judge"
+        ]
+      },
+      "medical": {
+        "stopAtRatio": 0.34,
+        "allowedNoiseShare": 0.17,
+        "allowlistTokens": [
+          "diagnostic",
+          "diagnostico",
+          "encounter",
+          "patient",
+          "paciente",
+          "history",
+          "clia"
+        ]
+      }
+    },
+    "globalProfile": {
+      "stopAtRatio": 0.32,
+      "allowedNoiseShare": 0.18,
+      "requireNonStopwordToken": true
+    }
+  },
+  "examples": [
+    {
+      "input": "Page 3 of 10",
+      "result": "{drop pagination, keep ids and money}"
+    },
+    {
+      "input": "Invoice Total 12/03/2026 Amount R$ 1.500,25",
+      "result": "{keep date and currency, drop only boilerplate connectors}"
+    },
+    {
+      "input": "Página 2 de 4 - Política de Privacidade",
+      "result": "{drop policy phrase, preserve document identifiers}"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "id": "openers",
+    "version": "1.0.0",
+    "description": "Openers for natural, grounded responses.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true
+  },
+  "openers": [
+    {
+      "id": "OPN_001",
+      "intent": "extract",
+      "language": "en",
+      "text": "I found relevant evidence from {{document}} and can summarize it safely."
+    },
+    {
+      "id": "OPN_002",
+      "intent": "extract",
+      "language": "pt",
+      "text": "Encontrei evidencias relevantes em {{document}} e posso resumir com seguranca."
+    },
+    {
+      "id": "OPN_003",
+      "intent": "compare",
+      "language": "en",
+      "text": "I compared the selected documents and validated the overlap points."
+    }
+  ]
+}

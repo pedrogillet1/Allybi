@@ -1,0 +1,6007 @@
+{
+  "_meta": {
+    "bankId": "patterns_editor_anchor_resolution_patterns",
+    "version": "1.0.0",
+    "owner": "editor-patterns-team",
+    "languages": [
+      "en"
+    ],
+    "dependsOn": [
+      "patterns_editor_highlight_intents_en",
+      "patterns_editor_locate_target_phrases"
+    ],
+    "usedBy": [
+      "editor_router",
+      "retrieval_router"
+    ],
+    "tests": {
+      "positive": [
+        "locate between Revenue Recognition and Definitions",
+        "table under KPI section",
+        "paragraph starting with The company shall",
+        "under Payment Terms section"
+      ],
+      "negative": [
+        "list all files in the folder",
+        "apply formatting to row 10",
+        "summarize the report"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_editor_anchor_resolution_patterns",
+    "description": "Anchor-resolution patterns for under/between/starting-with and table-relative navigation"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "minPatterns": 120
+  },
+  "patterns": [
+    {
+      "id": "ARP_0001",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under KPI section"
+      ],
+      "pt": [
+        "vá para a seção sob KPI section"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under KPI section",
+        "take me to the paragraph under KPI section"
+      ]
+    },
+    {
+      "id": "ARP_0002",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after KPI section"
+      ],
+      "pt": [
+        "me leva ao item logo após KPI section"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after KPI section?",
+        "jump to the row after KPI section"
+      ]
+    },
+    {
+      "id": "ARP_0003",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Payment Terms"
+      ],
+      "pt": [
+        "vá para a seção sob Payment Terms"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Payment Terms",
+        "take me to the paragraph under Payment Terms"
+      ]
+    },
+    {
+      "id": "ARP_0004",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Payment Terms"
+      ],
+      "pt": [
+        "me leva ao item logo após Payment Terms"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Payment Terms?",
+        "jump to the row after Payment Terms"
+      ]
+    },
+    {
+      "id": "ARP_0005",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Definitions"
+      ],
+      "pt": [
+        "vá para a seção sob Definitions"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Definitions",
+        "take me to the paragraph under Definitions"
+      ]
+    },
+    {
+      "id": "ARP_0006",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Definitions"
+      ],
+      "pt": [
+        "me leva ao item logo após Definitions"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Definitions?",
+        "jump to the row after Definitions"
+      ]
+    },
+    {
+      "id": "ARP_0007",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Risk Factors"
+      ],
+      "pt": [
+        "vá para a seção sob Risk Factors"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Risk Factors",
+        "take me to the paragraph under Risk Factors"
+      ]
+    },
+    {
+      "id": "ARP_0008",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Risk Factors"
+      ],
+      "pt": [
+        "me leva ao item logo após Risk Factors"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Risk Factors?",
+        "jump to the row after Risk Factors"
+      ]
+    },
+    {
+      "id": "ARP_0009",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Revenue Recognition"
+      ],
+      "pt": [
+        "vá para a seção sob Revenue Recognition"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Revenue Recognition",
+        "take me to the paragraph under Revenue Recognition"
+      ]
+    },
+    {
+      "id": "ARP_0010",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Revenue Recognition"
+      ],
+      "pt": [
+        "me leva ao item logo após Revenue Recognition"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Revenue Recognition?",
+        "jump to the row after Revenue Recognition"
+      ]
+    },
+    {
+      "id": "ARP_0011",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Scope of Work"
+      ],
+      "pt": [
+        "vá para a seção sob Scope of Work"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Scope of Work",
+        "take me to the paragraph under Scope of Work"
+      ]
+    },
+    {
+      "id": "ARP_0012",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Scope of Work"
+      ],
+      "pt": [
+        "me leva ao item logo após Scope of Work"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Scope of Work?",
+        "jump to the row after Scope of Work"
+      ]
+    },
+    {
+      "id": "ARP_0013",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Appendix"
+      ],
+      "pt": [
+        "vá para a seção sob Appendix"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Appendix",
+        "take me to the paragraph under Appendix"
+      ]
+    },
+    {
+      "id": "ARP_0014",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Appendix"
+      ],
+      "pt": [
+        "me leva ao item logo após Appendix"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Appendix?",
+        "jump to the row after Appendix"
+      ]
+    },
+    {
+      "id": "ARP_0015",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Termination"
+      ],
+      "pt": [
+        "vá para a seção sob Termination"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Termination",
+        "take me to the paragraph under Termination"
+      ]
+    },
+    {
+      "id": "ARP_0016",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Termination"
+      ],
+      "pt": [
+        "me leva ao item logo após Termination"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Termination?",
+        "jump to the row after Termination"
+      ]
+    },
+    {
+      "id": "ARP_0017",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Tax Section"
+      ],
+      "pt": [
+        "vá para a seção sob Tax Section"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Tax Section",
+        "take me to the paragraph under Tax Section"
+      ]
+    },
+    {
+      "id": "ARP_0018",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Tax Section"
+      ],
+      "pt": [
+        "me leva ao item logo após Tax Section"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Tax Section?",
+        "jump to the row after Tax Section"
+      ]
+    },
+    {
+      "id": "ARP_0019",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Confidentiality"
+      ],
+      "pt": [
+        "vá para a seção sob Confidentiality"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Confidentiality",
+        "take me to the paragraph under Confidentiality"
+      ]
+    },
+    {
+      "id": "ARP_0020",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Confidentiality"
+      ],
+      "pt": [
+        "me leva ao item logo após Confidentiality"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Confidentiality?",
+        "jump to the row after Confidentiality"
+      ]
+    },
+    {
+      "id": "ARP_0021",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Service Levels"
+      ],
+      "pt": [
+        "vá para a seção sob Service Levels"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Service Levels",
+        "take me to the paragraph under Service Levels"
+      ]
+    },
+    {
+      "id": "ARP_0022",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Service Levels"
+      ],
+      "pt": [
+        "me leva ao item logo após Service Levels"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Service Levels?",
+        "jump to the row after Service Levels"
+      ]
+    },
+    {
+      "id": "ARP_0023",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Indemnity"
+      ],
+      "pt": [
+        "vá para a seção sob Indemnity"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Indemnity",
+        "take me to the paragraph under Indemnity"
+      ]
+    },
+    {
+      "id": "ARP_0024",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Indemnity"
+      ],
+      "pt": [
+        "me leva ao item logo após Indemnity"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Indemnity?",
+        "jump to the row after Indemnity"
+      ]
+    },
+    {
+      "id": "ARP_0025",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Insurance"
+      ],
+      "pt": [
+        "vá para a seção sob Insurance"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Insurance",
+        "take me to the paragraph under Insurance"
+      ]
+    },
+    {
+      "id": "ARP_0026",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Insurance"
+      ],
+      "pt": [
+        "me leva ao item logo após Insurance"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Insurance?",
+        "jump to the row after Insurance"
+      ]
+    },
+    {
+      "id": "ARP_0027",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Governing Law"
+      ],
+      "pt": [
+        "vá para a seção sob Governing Law"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Governing Law",
+        "take me to the paragraph under Governing Law"
+      ]
+    },
+    {
+      "id": "ARP_0028",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Governing Law"
+      ],
+      "pt": [
+        "me leva ao item logo após Governing Law"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Governing Law?",
+        "jump to the row after Governing Law"
+      ]
+    },
+    {
+      "id": "ARP_0029",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Dispute Resolution"
+      ],
+      "pt": [
+        "vá para a seção sob Dispute Resolution"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Dispute Resolution",
+        "take me to the paragraph under Dispute Resolution"
+      ]
+    },
+    {
+      "id": "ARP_0030",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Dispute Resolution"
+      ],
+      "pt": [
+        "me leva ao item logo após Dispute Resolution"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Dispute Resolution?",
+        "jump to the row after Dispute Resolution"
+      ]
+    },
+    {
+      "id": "ARP_0031",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Project Timeline"
+      ],
+      "pt": [
+        "vá para a seção sob Project Timeline"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Project Timeline",
+        "take me to the paragraph under Project Timeline"
+      ]
+    },
+    {
+      "id": "ARP_0032",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Project Timeline"
+      ],
+      "pt": [
+        "me leva ao item logo após Project Timeline"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Project Timeline?",
+        "jump to the row after Project Timeline"
+      ]
+    },
+    {
+      "id": "ARP_0033",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Budget Summary"
+      ],
+      "pt": [
+        "vá para a seção sob Budget Summary"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Budget Summary",
+        "take me to the paragraph under Budget Summary"
+      ]
+    },
+    {
+      "id": "ARP_0034",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Budget Summary"
+      ],
+      "pt": [
+        "me leva ao item logo após Budget Summary"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Budget Summary?",
+        "jump to the row after Budget Summary"
+      ]
+    },
+    {
+      "id": "ARP_0035",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Net Sales"
+      ],
+      "pt": [
+        "vá para a seção sob Net Sales"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Net Sales",
+        "take me to the paragraph under Net Sales"
+      ]
+    },
+    {
+      "id": "ARP_0036",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Net Sales"
+      ],
+      "pt": [
+        "me leva ao item logo após Net Sales"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Net Sales?",
+        "jump to the row after Net Sales"
+      ]
+    },
+    {
+      "id": "ARP_0037",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under EBITDA"
+      ],
+      "pt": [
+        "vá para a seção sob EBITDA"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under EBITDA",
+        "take me to the paragraph under EBITDA"
+      ]
+    },
+    {
+      "id": "ARP_0038",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after EBITDA"
+      ],
+      "pt": [
+        "me leva ao item logo após EBITDA"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after EBITDA?",
+        "jump to the row after EBITDA"
+      ]
+    },
+    {
+      "id": "ARP_0039",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Capex"
+      ],
+      "pt": [
+        "vá para a seção sob Capex"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Capex",
+        "take me to the paragraph under Capex"
+      ]
+    },
+    {
+      "id": "ARP_0040",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Capex"
+      ],
+      "pt": [
+        "me leva ao item logo após Capex"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Capex?",
+        "jump to the row after Capex"
+      ]
+    },
+    {
+      "id": "ARP_0041",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under OPEX"
+      ],
+      "pt": [
+        "vá para a seção sob OPEX"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under OPEX",
+        "take me to the paragraph under OPEX"
+      ]
+    },
+    {
+      "id": "ARP_0042",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after OPEX"
+      ],
+      "pt": [
+        "me leva ao item logo após OPEX"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after OPEX?",
+        "jump to the row after OPEX"
+      ]
+    },
+    {
+      "id": "ARP_0043",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Balance Sheet"
+      ],
+      "pt": [
+        "vá para a seção sob Balance Sheet"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Balance Sheet",
+        "take me to the paragraph under Balance Sheet"
+      ]
+    },
+    {
+      "id": "ARP_0044",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Balance Sheet"
+      ],
+      "pt": [
+        "me leva ao item logo após Balance Sheet"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Balance Sheet?",
+        "jump to the row after Balance Sheet"
+      ]
+    },
+    {
+      "id": "ARP_0045",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under P&L"
+      ],
+      "pt": [
+        "vá para a seção sob P&L"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under P&L",
+        "take me to the paragraph under P&L"
+      ]
+    },
+    {
+      "id": "ARP_0046",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after P&L"
+      ],
+      "pt": [
+        "me leva ao item logo após P&L"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after P&L?",
+        "jump to the row after P&L"
+      ]
+    },
+    {
+      "id": "ARP_0047",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Cash Flow"
+      ],
+      "pt": [
+        "vá para a seção sob Cash Flow"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Cash Flow",
+        "take me to the paragraph under Cash Flow"
+      ]
+    },
+    {
+      "id": "ARP_0048",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Cash Flow"
+      ],
+      "pt": [
+        "me leva ao item logo após Cash Flow"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Cash Flow?",
+        "jump to the row after Cash Flow"
+      ]
+    },
+    {
+      "id": "ARP_0049",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Variance Commentary"
+      ],
+      "pt": [
+        "vá para a seção sob Variance Commentary"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Variance Commentary",
+        "take me to the paragraph under Variance Commentary"
+      ]
+    },
+    {
+      "id": "ARP_0050",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Variance Commentary"
+      ],
+      "pt": [
+        "me leva ao item logo após Variance Commentary"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Variance Commentary?",
+        "jump to the row after Variance Commentary"
+      ]
+    },
+    {
+      "id": "ARP_0051",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the section under Legal Notices"
+      ],
+      "pt": [
+        "vá para a seção sob Legal Notices"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:under",
+        "target:paragraph",
+        "regex:(?i)\b(under|under the|abaixo de|sob)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_general_summary"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "sectionScope"
+      ],
+      "confidence": 0.89,
+      "examples": [
+        "highlight the paragraph under Legal Notices",
+        "take me to the paragraph under Legal Notices"
+      ]
+    },
+    {
+      "id": "ARP_0052",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "slideElement",
+      "en": [
+        "take me to the item right after Legal Notices"
+      ],
+      "pt": [
+        "me leva ao item logo após Legal Notices"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:after",
+        "target:slideElement",
+        "regex:(?i)\b(after|right after|logo após|depois de)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_global_section_requests"
+      ],
+      "slotHints": [
+        "anchorTitle",
+        "targetType",
+        "scopeDirection"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "what is the paragraph after Legal Notices?",
+        "jump to the row after Legal Notices"
+      ]
+    },
+    {
+      "id": "ARP_0053",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between KPI section and Payment Terms"
+      ],
+      "pt": [
+        "localize entre KPI section e Payment Terms"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between KPI section and Payment Terms",
+        "highlight text between KPI section and Payment Terms"
+      ]
+    },
+    {
+      "id": "ARP_0054",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Payment Terms and Definitions"
+      ],
+      "pt": [
+        "localize entre Payment Terms e Definitions"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Payment Terms and Definitions",
+        "highlight text between Payment Terms and Definitions"
+      ]
+    },
+    {
+      "id": "ARP_0055",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Definitions and Risk Factors"
+      ],
+      "pt": [
+        "localize entre Definitions e Risk Factors"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Definitions and Risk Factors",
+        "highlight text between Definitions and Risk Factors"
+      ]
+    },
+    {
+      "id": "ARP_0056",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Risk Factors and Revenue Recognition"
+      ],
+      "pt": [
+        "localize entre Risk Factors e Revenue Recognition"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Risk Factors and Revenue Recognition",
+        "highlight text between Risk Factors and Revenue Recognition"
+      ]
+    },
+    {
+      "id": "ARP_0057",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Revenue Recognition and Scope of Work"
+      ],
+      "pt": [
+        "localize entre Revenue Recognition e Scope of Work"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Revenue Recognition and Scope of Work",
+        "highlight text between Revenue Recognition and Scope of Work"
+      ]
+    },
+    {
+      "id": "ARP_0058",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Scope of Work and Appendix"
+      ],
+      "pt": [
+        "localize entre Scope of Work e Appendix"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Scope of Work and Appendix",
+        "highlight text between Scope of Work and Appendix"
+      ]
+    },
+    {
+      "id": "ARP_0059",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Appendix and Termination"
+      ],
+      "pt": [
+        "localize entre Appendix e Termination"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Appendix and Termination",
+        "highlight text between Appendix and Termination"
+      ]
+    },
+    {
+      "id": "ARP_0060",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Termination and Tax Section"
+      ],
+      "pt": [
+        "localize entre Termination e Tax Section"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Termination and Tax Section",
+        "highlight text between Termination and Tax Section"
+      ]
+    },
+    {
+      "id": "ARP_0061",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Tax Section and Confidentiality"
+      ],
+      "pt": [
+        "localize entre Tax Section e Confidentiality"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Tax Section and Confidentiality",
+        "highlight text between Tax Section and Confidentiality"
+      ]
+    },
+    {
+      "id": "ARP_0062",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Confidentiality and Service Levels"
+      ],
+      "pt": [
+        "localize entre Confidentiality e Service Levels"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Confidentiality and Service Levels",
+        "highlight text between Confidentiality and Service Levels"
+      ]
+    },
+    {
+      "id": "ARP_0063",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Service Levels and Indemnity"
+      ],
+      "pt": [
+        "localize entre Service Levels e Indemnity"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Service Levels and Indemnity",
+        "highlight text between Service Levels and Indemnity"
+      ]
+    },
+    {
+      "id": "ARP_0064",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Indemnity and Insurance"
+      ],
+      "pt": [
+        "localize entre Indemnity e Insurance"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Indemnity and Insurance",
+        "highlight text between Indemnity and Insurance"
+      ]
+    },
+    {
+      "id": "ARP_0065",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Insurance and Governing Law"
+      ],
+      "pt": [
+        "localize entre Insurance e Governing Law"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Insurance and Governing Law",
+        "highlight text between Insurance and Governing Law"
+      ]
+    },
+    {
+      "id": "ARP_0066",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Governing Law and Dispute Resolution"
+      ],
+      "pt": [
+        "localize entre Governing Law e Dispute Resolution"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Governing Law and Dispute Resolution",
+        "highlight text between Governing Law and Dispute Resolution"
+      ]
+    },
+    {
+      "id": "ARP_0067",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Dispute Resolution and Project Timeline"
+      ],
+      "pt": [
+        "localize entre Dispute Resolution e Project Timeline"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Dispute Resolution and Project Timeline",
+        "highlight text between Dispute Resolution and Project Timeline"
+      ]
+    },
+    {
+      "id": "ARP_0068",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Project Timeline and Budget Summary"
+      ],
+      "pt": [
+        "localize entre Project Timeline e Budget Summary"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Project Timeline and Budget Summary",
+        "highlight text between Project Timeline and Budget Summary"
+      ]
+    },
+    {
+      "id": "ARP_0069",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Budget Summary and Net Sales"
+      ],
+      "pt": [
+        "localize entre Budget Summary e Net Sales"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Budget Summary and Net Sales",
+        "highlight text between Budget Summary and Net Sales"
+      ]
+    },
+    {
+      "id": "ARP_0070",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Net Sales and EBITDA"
+      ],
+      "pt": [
+        "localize entre Net Sales e EBITDA"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Net Sales and EBITDA",
+        "highlight text between Net Sales and EBITDA"
+      ]
+    },
+    {
+      "id": "ARP_0071",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between EBITDA and Capex"
+      ],
+      "pt": [
+        "localize entre EBITDA e Capex"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between EBITDA and Capex",
+        "highlight text between EBITDA and Capex"
+      ]
+    },
+    {
+      "id": "ARP_0072",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Capex and OPEX"
+      ],
+      "pt": [
+        "localize entre Capex e OPEX"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Capex and OPEX",
+        "highlight text between Capex and OPEX"
+      ]
+    },
+    {
+      "id": "ARP_0073",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between OPEX and Balance Sheet"
+      ],
+      "pt": [
+        "localize entre OPEX e Balance Sheet"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between OPEX and Balance Sheet",
+        "highlight text between OPEX and Balance Sheet"
+      ]
+    },
+    {
+      "id": "ARP_0074",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Balance Sheet and P&L"
+      ],
+      "pt": [
+        "localize entre Balance Sheet e P&L"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Balance Sheet and P&L",
+        "highlight text between Balance Sheet and P&L"
+      ]
+    },
+    {
+      "id": "ARP_0075",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between P&L and Cash Flow"
+      ],
+      "pt": [
+        "localize entre P&L e Cash Flow"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between P&L and Cash Flow",
+        "highlight text between P&L and Cash Flow"
+      ]
+    },
+    {
+      "id": "ARP_0076",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Cash Flow and Variance Commentary"
+      ],
+      "pt": [
+        "localize entre Cash Flow e Variance Commentary"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Cash Flow and Variance Commentary",
+        "highlight text between Cash Flow and Variance Commentary"
+      ]
+    },
+    {
+      "id": "ARP_0077",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "section",
+      "en": [
+        "locate anything between Variance Commentary and Legal Notices"
+      ],
+      "pt": [
+        "localize entre Variance Commentary e Legal Notices"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:between",
+        "target:section",
+        "regex:(?i)\b(between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_cross_document_scope"
+      ],
+      "slotHints": [
+        "anchorStart",
+        "anchorEnd",
+        "targetType"
+      ],
+      "confidence": 0.86,
+      "examples": [
+        "take me to section between Variance Commentary and Legal Notices",
+        "highlight text between Variance Commentary and Legal Notices"
+      ]
+    },
+    {
+      "id": "ARP_0078",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Revenue increased by\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Revenue increased by\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Revenue increased by\"?",
+        "highlight paragraph that starts with \"Revenue increased by\""
+      ]
+    },
+    {
+      "id": "ARP_0079",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Total net sales\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Total net sales\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Total net sales\"?",
+        "highlight paragraph that starts with \"Total net sales\""
+      ]
+    },
+    {
+      "id": "ARP_0080",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"The company shall\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"The company shall\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"The company shall\"?",
+        "highlight paragraph that starts with \"The company shall\""
+      ]
+    },
+    {
+      "id": "ARP_0081",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Payment is due\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Payment is due\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Payment is due\"?",
+        "highlight paragraph that starts with \"Payment is due\""
+      ]
+    },
+    {
+      "id": "ARP_0082",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Any dispute under\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Any dispute under\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Any dispute under\"?",
+        "highlight paragraph that starts with \"Any dispute under\""
+      ]
+    },
+    {
+      "id": "ARP_0083",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Force majeure\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Force majeure\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Force majeure\"?",
+        "highlight paragraph that starts with \"Force majeure\""
+      ]
+    },
+    {
+      "id": "ARP_0084",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"At the end of\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"At the end of\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"At the end of\"?",
+        "highlight paragraph that starts with \"At the end of\""
+      ]
+    },
+    {
+      "id": "ARP_0085",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Subject to\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Subject to\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Subject to\"?",
+        "highlight paragraph that starts with \"Subject to\""
+      ]
+    },
+    {
+      "id": "ARP_0086",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"Notwithstanding\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"Notwithstanding\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"Notwithstanding\"?",
+        "highlight paragraph that starts with \"Notwithstanding\""
+      ]
+    },
+    {
+      "id": "ARP_0087",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "paragraph",
+      "en": [
+        "jump to the paragraph starting with \"As of\""
+      ],
+      "pt": [
+        "va para o parágrafo começando com \"As of\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:starts_with",
+        "target:paragraph",
+        "regex:\\b(starting with|starting|começando|começa)\\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "anchorText",
+        "targetType",
+        "quoteStart"
+      ],
+      "confidence": 0.88,
+      "examples": [
+        "where exactly does it say \"As of\"?",
+        "highlight paragraph that starts with \"As of\""
+      ]
+    },
+    {
+      "id": "ARP_0088",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Revenue by Month"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Revenue by Month"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Revenue by Month?",
+        "highlight the table under Revenue by Month"
+      ]
+    },
+    {
+      "id": "ARP_0089",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Revenue by Month and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Revenue by Month e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Revenue by Month and KPI rollup",
+        "show table between Revenue by Month and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0090",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Expense by Department"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Expense by Department"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Expense by Department?",
+        "highlight the table under Expense by Department"
+      ]
+    },
+    {
+      "id": "ARP_0091",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Expense by Department and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Expense by Department e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Expense by Department and KPI rollup",
+        "show table between Expense by Department and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0092",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under KPI rollup"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de KPI rollup"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under KPI rollup?",
+        "highlight the table under KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0093",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between KPI rollup and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre KPI rollup e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between KPI rollup and KPI rollup",
+        "show table between KPI rollup and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0094",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Margin Bridge"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Margin Bridge"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Margin Bridge?",
+        "highlight the table under Margin Bridge"
+      ]
+    },
+    {
+      "id": "ARP_0095",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Margin Bridge and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Margin Bridge e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Margin Bridge and KPI rollup",
+        "show table between Margin Bridge and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0096",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Customer Aging"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Customer Aging"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Customer Aging?",
+        "highlight the table under Customer Aging"
+      ]
+    },
+    {
+      "id": "ARP_0097",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Customer Aging and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Customer Aging e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Customer Aging and KPI rollup",
+        "show table between Customer Aging and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0098",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Stock movement"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Stock movement"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Stock movement?",
+        "highlight the table under Stock movement"
+      ]
+    },
+    {
+      "id": "ARP_0099",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Stock movement and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Stock movement e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Stock movement and KPI rollup",
+        "show table between Stock movement and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0100",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under FX Sensitivity"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de FX Sensitivity"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under FX Sensitivity?",
+        "highlight the table under FX Sensitivity"
+      ]
+    },
+    {
+      "id": "ARP_0101",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between FX Sensitivity and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre FX Sensitivity e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between FX Sensitivity and KPI rollup",
+        "show table between FX Sensitivity and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0102",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Pipeline Forecast"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Pipeline Forecast"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Pipeline Forecast?",
+        "highlight the table under Pipeline Forecast"
+      ]
+    },
+    {
+      "id": "ARP_0103",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Pipeline Forecast and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Pipeline Forecast e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Pipeline Forecast and KPI rollup",
+        "show table between Pipeline Forecast and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0104",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Inventory by Region"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Inventory by Region"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Inventory by Region?",
+        "highlight the table under Inventory by Region"
+      ]
+    },
+    {
+      "id": "ARP_0105",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Inventory by Region and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Inventory by Region e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Inventory by Region and KPI rollup",
+        "show table between Inventory by Region and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0106",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "open the table under Compliance Matrix"
+      ],
+      "pt": [
+        "abrir a tabela embaixo de Compliance Matrix"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_under_section",
+        "target:table",
+        "regex:(?i)\b(table|tabela|under|abaixo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_random_numbers"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "tableAnchorType"
+      ],
+      "confidence": 0.9,
+      "examples": [
+        "where is the table under Compliance Matrix?",
+        "highlight the table under Compliance Matrix"
+      ]
+    },
+    {
+      "id": "ARP_0107",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "table",
+      "en": [
+        "table between Compliance Matrix and \"KPI rollup\""
+      ],
+      "pt": [
+        "tabela entre Compliance Matrix e \"KPI rollup\""
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:table_between",
+        "target:table",
+        "regex:(?i)\b(table|tabela|between|entre)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document",
+        "do_not_match_heading_only_requests"
+      ],
+      "slotHints": [
+        "tableAnchor",
+        "targetType",
+        "anchorEnd"
+      ],
+      "confidence": 0.87,
+      "examples": [
+        "locate table between Compliance Matrix and KPI rollup",
+        "show table between Compliance Matrix and KPI rollup"
+      ]
+    },
+    {
+      "id": "ARP_0108",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Total"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Total"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Total row",
+        "take me to row labeled Total"
+      ]
+    },
+    {
+      "id": "ARP_0109",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Grand Total"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Grand Total"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Grand Total row",
+        "take me to row labeled Grand Total"
+      ]
+    },
+    {
+      "id": "ARP_0110",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Subtotal"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Subtotal"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Subtotal row",
+        "take me to row labeled Subtotal"
+      ]
+    },
+    {
+      "id": "ARP_0111",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Revenue"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Revenue"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Revenue row",
+        "take me to row labeled Revenue"
+      ]
+    },
+    {
+      "id": "ARP_0112",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Net Income"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Net Income"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Net Income row",
+        "take me to row labeled Net Income"
+      ]
+    },
+    {
+      "id": "ARP_0113",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Cash"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Cash"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Cash row",
+        "take me to row labeled Cash"
+      ]
+    },
+    {
+      "id": "ARP_0114",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Assets"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Assets"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Assets row",
+        "take me to row labeled Assets"
+      ]
+    },
+    {
+      "id": "ARP_0115",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Liabilities"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Liabilities"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Liabilities row",
+        "take me to row labeled Liabilities"
+      ]
+    },
+    {
+      "id": "ARP_0116",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label Equity"
+      ],
+      "pt": [
+        "mostrar linha com rótulo Equity"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the Equity row",
+        "take me to row labeled Equity"
+      ]
+    },
+    {
+      "id": "ARP_0117",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "row",
+      "en": [
+        "show me row with label CAPEX"
+      ],
+      "pt": [
+        "mostrar linha com rótulo CAPEX"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:row_under",
+        "target:row",
+        "regex:(?i)\b(row|linha|label|rótulo)\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "rowLabel",
+        "targetType",
+        "worksheet"
+      ],
+      "confidence": 0.85,
+      "examples": [
+        "highlight the CAPEX row",
+        "take me to row labeled CAPEX"
+      ]
+    },
+    {
+      "id": "ARP_0118",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell A1 under row total"
+      ],
+      "pt": [
+        "pular para a célula A1 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell A1",
+        "where is A1 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0119",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell B2 under row total"
+      ],
+      "pt": [
+        "pular para a célula B2 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell B2",
+        "where is B2 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0120",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell C3 under row total"
+      ],
+      "pt": [
+        "pular para a célula C3 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell C3",
+        "where is C3 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0121",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell D10 under row total"
+      ],
+      "pt": [
+        "pular para a célula D10 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell D10",
+        "where is D10 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0122",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell F20 under row total"
+      ],
+      "pt": [
+        "pular para a célula F20 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell F20",
+        "where is F20 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0123",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell J1 under row total"
+      ],
+      "pt": [
+        "pular para a célula J1 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell J1",
+        "where is J1 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0124",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell N4 under row total"
+      ],
+      "pt": [
+        "pular para a célula N4 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell N4",
+        "where is N4 under total row"
+      ]
+    },
+    {
+      "id": "ARP_0125",
+      "language": "en",
+      "intent": "anchor_resolution",
+      "targetType": "cell",
+      "en": [
+        "jump to cell AA12 under row total"
+      ],
+      "pt": [
+        "pular para a célula AA12 sob o total da linha"
+      ],
+      "triggers": [
+        "intent:editor_anchor",
+        "resolve:cell_within_range",
+        "target:cell",
+        "regex:(?i)\b[A-Z]{1,3}[0-9]{1,5}\b"
+      ],
+      "negatives": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "negativeTriggers": [
+        "not a summarization request",
+        "do not summarize",
+        "do not extract values only",
+        "do not quote without locating anchor first",
+        "do not apply or undo edits",
+        "do not list directory contents",
+        "do not draft new document"
+      ],
+      "slotHints": [
+        "cellA1",
+        "targetType",
+        "rangeA1"
+      ],
+      "confidence": 0.91,
+      "examples": [
+        "highlight the cell AA12",
+        "where is AA12 under total row"
+      ]
+    }
+  ]
+}

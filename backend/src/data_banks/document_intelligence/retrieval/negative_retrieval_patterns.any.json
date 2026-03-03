@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "id": "negative_retrieval_patterns",
+    "version": "1.0.0",
+    "description": "Negative retrieval filters for non-evidence candidates.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "dropNoSource": true,
+    "dropPlaceholders": true
+  },
+  "patterns": [
+    {
+      "id": "NRC_001",
+      "regex": "lorem ipsum|placeholder|sample text",
+      "action": "DROP_CANDIDATE",
+      "severity": "high"
+    }
+  ],
+  "rules": [
+    {
+      "id": "NRC_101",
+      "trigger": "Candidate has no source span",
+      "check": "candidate.hasSourceSpan == false",
+      "failureAction": "DROP_CANDIDATE"
+    },
+    {
+      "id": "NRC_102",
+      "trigger": "Low confidence exact table-only snippet",
+      "check": "candidate.type == 'table' && candidate.textConfidence < 0.34",
+      "failureAction": "DOWNRANK_CANDIDATE"
+    }
+  ],
+  "templates": [
+    {
+      "id": "NEGATIVE_RETRIEVAL_PATTERNS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in negative_retrieval_patterns.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

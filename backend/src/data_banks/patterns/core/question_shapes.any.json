@@ -1,0 +1,3869 @@
+{
+  "_meta": {
+    "bankId": "question_shapes",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_question_shapes",
+    "description": "Auto-registered bank payload for patterns/core/question_shapes.any.json"
+  },
+  "patterns": [
+    {
+      "id": "QS_001",
+      "shape": "wh",
+      "en": [
+        "What is the total by region?"
+      ],
+      "pt": [
+        "Pode me dizer the total by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_total"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_002",
+      "shape": "wh",
+      "en": [
+        "What are the trend for this entity?"
+      ],
+      "pt": [
+        "Pode me dizer the trend for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_trend"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_003",
+      "shape": "wh",
+      "en": [
+        "Which the ranking for period end?"
+      ],
+      "pt": [
+        "Quais the ranking for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_ranking"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_004",
+      "shape": "wh",
+      "en": [
+        "Who the reconciliation result for selected documents?"
+      ],
+      "pt": [
+        "Quem the reconciliation result for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_reconciliation_result"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_005",
+      "shape": "wh",
+      "en": [
+        "When the compliance status with assumptions?"
+      ],
+      "pt": [
+        "Quando the compliance status with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_compliance_status"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_006",
+      "shape": "wh",
+      "en": [
+        "Where the exception list with numeric rounding rules?"
+      ],
+      "pt": [
+        "Onde the exception list with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_exception_list"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_007",
+      "shape": "wh",
+      "en": [
+        "Why the latest update by region?"
+      ],
+      "pt": [
+        "Por que the latest update by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_latest_update"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_008",
+      "shape": "wh",
+      "en": [
+        "How the source citation for this entity?"
+      ],
+      "pt": [
+        "Como the source citation for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_source_citation"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_009",
+      "shape": "wh",
+      "en": [
+        "Could you tell me the total for period end?"
+      ],
+      "pt": [
+        "Pode me dizer the total for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_total"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_010",
+      "shape": "wh",
+      "en": [
+        "What is the trend for selected documents?"
+      ],
+      "pt": [
+        "Pode me dizer the trend for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_trend"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_011",
+      "shape": "wh",
+      "en": [
+        "What are the ranking with assumptions?"
+      ],
+      "pt": [
+        "Pode me dizer the ranking with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_ranking"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_012",
+      "shape": "wh",
+      "en": [
+        "Which the reconciliation result with numeric rounding rules?"
+      ],
+      "pt": [
+        "Quais the reconciliation result with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_reconciliation_result"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_013",
+      "shape": "wh",
+      "en": [
+        "Who the compliance status by region?"
+      ],
+      "pt": [
+        "Quem the compliance status by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_compliance_status"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_014",
+      "shape": "wh",
+      "en": [
+        "When the exception list for this entity?"
+      ],
+      "pt": [
+        "Quando the exception list for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_exception_list"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_015",
+      "shape": "wh",
+      "en": [
+        "Where the latest update for period end?"
+      ],
+      "pt": [
+        "Onde the latest update for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_latest_update"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_016",
+      "shape": "wh",
+      "en": [
+        "Why the source citation for selected documents?"
+      ],
+      "pt": [
+        "Por que the source citation for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_source_citation"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_017",
+      "shape": "wh",
+      "en": [
+        "How the total with assumptions?"
+      ],
+      "pt": [
+        "Como the total with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_total"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_018",
+      "shape": "wh",
+      "en": [
+        "Could you tell me the trend with numeric rounding rules?"
+      ],
+      "pt": [
+        "Pode me dizer the trend with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_trend"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_019",
+      "shape": "wh",
+      "en": [
+        "What is the ranking by region?"
+      ],
+      "pt": [
+        "Pode me dizer the ranking by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_ranking"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_020",
+      "shape": "wh",
+      "en": [
+        "What are the reconciliation result for this entity?"
+      ],
+      "pt": [
+        "Pode me dizer the reconciliation result for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_reconciliation_result"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_021",
+      "shape": "wh",
+      "en": [
+        "Which the compliance status for period end?"
+      ],
+      "pt": [
+        "Quais the compliance status for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_compliance_status"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_022",
+      "shape": "wh",
+      "en": [
+        "Who the exception list for selected documents?"
+      ],
+      "pt": [
+        "Quem the exception list for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_exception_list"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_023",
+      "shape": "wh",
+      "en": [
+        "When the latest update with assumptions?"
+      ],
+      "pt": [
+        "Quando the latest update with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_latest_update"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_024",
+      "shape": "wh",
+      "en": [
+        "Where the source citation with numeric rounding rules?"
+      ],
+      "pt": [
+        "Onde the source citation with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_source_citation"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_025",
+      "shape": "wh",
+      "en": [
+        "Why the total by region?"
+      ],
+      "pt": [
+        "Por que the total by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_total"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_026",
+      "shape": "wh",
+      "en": [
+        "How the trend for this entity?"
+      ],
+      "pt": [
+        "Como the trend for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_trend"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_027",
+      "shape": "wh",
+      "en": [
+        "Could you tell me the ranking for period end?"
+      ],
+      "pt": [
+        "Pode me dizer the ranking for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_ranking"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_028",
+      "shape": "wh",
+      "en": [
+        "What is the reconciliation result for selected documents?"
+      ],
+      "pt": [
+        "Pode me dizer the reconciliation result for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_reconciliation_result"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_029",
+      "shape": "wh",
+      "en": [
+        "What are the compliance status with assumptions?"
+      ],
+      "pt": [
+        "Pode me dizer the compliance status with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_compliance_status"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_030",
+      "shape": "wh",
+      "en": [
+        "Which the exception list with numeric rounding rules?"
+      ],
+      "pt": [
+        "Quais the exception list with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_exception_list"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_031",
+      "shape": "wh",
+      "en": [
+        "Who the latest update by region?"
+      ],
+      "pt": [
+        "Quem the latest update by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_latest_update"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_032",
+      "shape": "wh",
+      "en": [
+        "When the source citation for this entity?"
+      ],
+      "pt": [
+        "Quando the source citation for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_source_citation"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_033",
+      "shape": "wh",
+      "en": [
+        "Where the total for period end?"
+      ],
+      "pt": [
+        "Onde the total for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_total"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_034",
+      "shape": "wh",
+      "en": [
+        "Why the trend for selected documents?"
+      ],
+      "pt": [
+        "Por que the trend for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_trend"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_035",
+      "shape": "wh",
+      "en": [
+        "How the ranking with assumptions?"
+      ],
+      "pt": [
+        "Como the ranking with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_ranking"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_036",
+      "shape": "wh",
+      "en": [
+        "Could you tell me the reconciliation result with numeric rounding rules?"
+      ],
+      "pt": [
+        "Pode me dizer the reconciliation result with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_reconciliation_result"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_037",
+      "shape": "wh",
+      "en": [
+        "What is the compliance status by region?"
+      ],
+      "pt": [
+        "Pode me dizer the compliance status by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_compliance_status"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_038",
+      "shape": "wh",
+      "en": [
+        "What are the exception list for this entity?"
+      ],
+      "pt": [
+        "Pode me dizer the exception list for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_exception_list"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_039",
+      "shape": "wh",
+      "en": [
+        "Which the latest update for period end?"
+      ],
+      "pt": [
+        "Quais the latest update for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_latest_update"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_040",
+      "shape": "wh",
+      "en": [
+        "Who the source citation for selected documents?"
+      ],
+      "pt": [
+        "Quem the source citation for selected documents?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_source_citation"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_041",
+      "shape": "wh",
+      "en": [
+        "When the total with assumptions?"
+      ],
+      "pt": [
+        "Quando the total with assumptions?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_total"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_042",
+      "shape": "wh",
+      "en": [
+        "Where the trend with numeric rounding rules?"
+      ],
+      "pt": [
+        "Onde the trend with numeric rounding rules?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_trend"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_043",
+      "shape": "wh",
+      "en": [
+        "Why the ranking by region?"
+      ],
+      "pt": [
+        "Por que the ranking by region?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_ranking"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_044",
+      "shape": "wh",
+      "en": [
+        "How the reconciliation result for this entity?"
+      ],
+      "pt": [
+        "Como the reconciliation result for this entity?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_reconciliation_result"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_045",
+      "shape": "wh",
+      "en": [
+        "Could you tell me the compliance status for period end?"
+      ],
+      "pt": [
+        "Pode me dizer the compliance status for period end?"
+      ],
+      "triggers": [
+        "shape:wh",
+        "slot:objective:the_compliance_status"
+      ],
+      "negatives": [
+        "missing wh anchor",
+        "not a question-like phrase"
+      ],
+      "slotHints": [
+        "question_target",
+        "expected_format",
+        "section_hint"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "wh"
+      ]
+    },
+    {
+      "id": "QS_046",
+      "shape": "imperative",
+      "en": [
+        "list top figures 46"
+      ],
+      "pt": [
+        "mostre top figures 46"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:top_figures"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_047",
+      "shape": "imperative",
+      "en": [
+        "show table rows 47"
+      ],
+      "pt": [
+        "mostre table rows 47"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:table_rows"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_048",
+      "shape": "imperative",
+      "en": [
+        "extract section snippets 48"
+      ],
+      "pt": [
+        "extraia section snippets 48"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:section_snippets"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_049",
+      "shape": "imperative",
+      "en": [
+        "calculate entities 49"
+      ],
+      "pt": [
+        "calcule entities 49"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:entities"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_050",
+      "shape": "imperative",
+      "en": [
+        "summarize timeline 50"
+      ],
+      "pt": [
+        "resuma timeline 50"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:timeline"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_051",
+      "shape": "imperative",
+      "en": [
+        "compare pricing items 51"
+      ],
+      "pt": [
+        "compare pricing items 51"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:pricing_items"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_052",
+      "shape": "imperative",
+      "en": [
+        "analyze variance deltas 52"
+      ],
+      "pt": [
+        "mostre variance deltas 52"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:variance_deltas"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_053",
+      "shape": "imperative",
+      "en": [
+        "validate reconciliation lines 53"
+      ],
+      "pt": [
+        "mostre reconciliation lines 53"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:reconciliation_lines"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_054",
+      "shape": "imperative",
+      "en": [
+        "render top figures 54"
+      ],
+      "pt": [
+        "mostre top figures 54"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:top_figures"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_055",
+      "shape": "imperative",
+      "en": [
+        "flag table rows 55"
+      ],
+      "pt": [
+        "mostre table rows 55"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:table_rows"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_056",
+      "shape": "imperative",
+      "en": [
+        "list section snippets 56"
+      ],
+      "pt": [
+        "mostre section snippets 56"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:section_snippets"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_057",
+      "shape": "imperative",
+      "en": [
+        "show entities 57"
+      ],
+      "pt": [
+        "mostre entities 57"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:entities"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_058",
+      "shape": "imperative",
+      "en": [
+        "extract timeline 58"
+      ],
+      "pt": [
+        "extraia timeline 58"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:timeline"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_059",
+      "shape": "imperative",
+      "en": [
+        "calculate pricing items 59"
+      ],
+      "pt": [
+        "calcule pricing items 59"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:pricing_items"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_060",
+      "shape": "imperative",
+      "en": [
+        "summarize variance deltas 60"
+      ],
+      "pt": [
+        "resuma variance deltas 60"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:variance_deltas"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_061",
+      "shape": "imperative",
+      "en": [
+        "compare reconciliation lines 61"
+      ],
+      "pt": [
+        "compare reconciliation lines 61"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:reconciliation_lines"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_062",
+      "shape": "imperative",
+      "en": [
+        "analyze top figures 62"
+      ],
+      "pt": [
+        "mostre top figures 62"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:top_figures"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_063",
+      "shape": "imperative",
+      "en": [
+        "validate table rows 63"
+      ],
+      "pt": [
+        "mostre table rows 63"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:table_rows"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_064",
+      "shape": "imperative",
+      "en": [
+        "render section snippets 64"
+      ],
+      "pt": [
+        "mostre section snippets 64"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:section_snippets"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_065",
+      "shape": "imperative",
+      "en": [
+        "flag entities 65"
+      ],
+      "pt": [
+        "mostre entities 65"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:entities"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_066",
+      "shape": "imperative",
+      "en": [
+        "list timeline 66"
+      ],
+      "pt": [
+        "mostre timeline 66"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:timeline"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_067",
+      "shape": "imperative",
+      "en": [
+        "show pricing items 67"
+      ],
+      "pt": [
+        "mostre pricing items 67"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:pricing_items"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_068",
+      "shape": "imperative",
+      "en": [
+        "extract variance deltas 68"
+      ],
+      "pt": [
+        "extraia variance deltas 68"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:variance_deltas"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_069",
+      "shape": "imperative",
+      "en": [
+        "calculate reconciliation lines 69"
+      ],
+      "pt": [
+        "calcule reconciliation lines 69"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:reconciliation_lines"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_070",
+      "shape": "imperative",
+      "en": [
+        "summarize top figures 70"
+      ],
+      "pt": [
+        "resuma top figures 70"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:top_figures"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_071",
+      "shape": "imperative",
+      "en": [
+        "compare table rows 71"
+      ],
+      "pt": [
+        "compare table rows 71"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:table_rows"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_072",
+      "shape": "imperative",
+      "en": [
+        "analyze section snippets 72"
+      ],
+      "pt": [
+        "mostre section snippets 72"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:section_snippets"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_073",
+      "shape": "imperative",
+      "en": [
+        "validate entities 73"
+      ],
+      "pt": [
+        "mostre entities 73"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:entities"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_074",
+      "shape": "imperative",
+      "en": [
+        "render timeline 74"
+      ],
+      "pt": [
+        "mostre timeline 74"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:timeline"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_075",
+      "shape": "imperative",
+      "en": [
+        "flag pricing items 75"
+      ],
+      "pt": [
+        "mostre pricing items 75"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:pricing_items"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_076",
+      "shape": "imperative",
+      "en": [
+        "list variance deltas 76"
+      ],
+      "pt": [
+        "mostre variance deltas 76"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:variance_deltas"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_077",
+      "shape": "imperative",
+      "en": [
+        "show reconciliation lines 77"
+      ],
+      "pt": [
+        "mostre reconciliation lines 77"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:reconciliation_lines"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_078",
+      "shape": "imperative",
+      "en": [
+        "extract top figures 78"
+      ],
+      "pt": [
+        "extraia top figures 78"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:top_figures"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_079",
+      "shape": "imperative",
+      "en": [
+        "calculate table rows 79"
+      ],
+      "pt": [
+        "calcule table rows 79"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:table_rows"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_080",
+      "shape": "imperative",
+      "en": [
+        "summarize section snippets 80"
+      ],
+      "pt": [
+        "resuma section snippets 80"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:section_snippets"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_081",
+      "shape": "imperative",
+      "en": [
+        "compare entities 81"
+      ],
+      "pt": [
+        "compare entities 81"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:entities"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_082",
+      "shape": "imperative",
+      "en": [
+        "analyze timeline 82"
+      ],
+      "pt": [
+        "mostre timeline 82"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:timeline"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_083",
+      "shape": "imperative",
+      "en": [
+        "validate pricing items 83"
+      ],
+      "pt": [
+        "mostre pricing items 83"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:pricing_items"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_084",
+      "shape": "imperative",
+      "en": [
+        "render variance deltas 84"
+      ],
+      "pt": [
+        "mostre variance deltas 84"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:variance_deltas"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_085",
+      "shape": "imperative",
+      "en": [
+        "flag reconciliation lines 85"
+      ],
+      "pt": [
+        "mostre reconciliation lines 85"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:reconciliation_lines"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_086",
+      "shape": "imperative",
+      "en": [
+        "list top figures 86"
+      ],
+      "pt": [
+        "mostre top figures 86"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:top_figures"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_087",
+      "shape": "imperative",
+      "en": [
+        "show table rows 87"
+      ],
+      "pt": [
+        "mostre table rows 87"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:table_rows"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_088",
+      "shape": "imperative",
+      "en": [
+        "extract section snippets 88"
+      ],
+      "pt": [
+        "extraia section snippets 88"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:section_snippets"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_089",
+      "shape": "imperative",
+      "en": [
+        "calculate entities 89"
+      ],
+      "pt": [
+        "calcule entities 89"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:entities"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_090",
+      "shape": "imperative",
+      "en": [
+        "summarize timeline 90"
+      ],
+      "pt": [
+        "resuma timeline 90"
+      ],
+      "triggers": [
+        "shape:imperative",
+        "slot:target:timeline"
+      ],
+      "negatives": [
+        "no imperative marker",
+        "unclear action requirement"
+      ],
+      "slotHints": [
+        "verb",
+        "target_block",
+        "scope"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "imperative"
+      ]
+    },
+    {
+      "id": "QS_091",
+      "shape": "multi_step",
+      "en": [
+        "First, show by region and then the total"
+      ],
+      "pt": [
+        "First, mostre by region e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_092",
+      "shape": "multi_step",
+      "en": [
+        "Then, compare for this entity and then the trend"
+      ],
+      "pt": [
+        "Então, compare for this entity e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_093",
+      "shape": "multi_step",
+      "en": [
+        "Next, summarize for period end and then the ranking"
+      ],
+      "pt": [
+        "Em seguida, resuma for period end e então the ranking"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_094",
+      "shape": "multi_step",
+      "en": [
+        "After that, validate for selected documents and then the reconciliation result"
+      ],
+      "pt": [
+        "Depois disso, valide for selected documents e então the reconciliation result"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_095",
+      "shape": "multi_step",
+      "en": [
+        "Finally, check with assumptions and then the compliance status"
+      ],
+      "pt": [
+        "Finalmente, verifique with assumptions e então the compliance status"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_096",
+      "shape": "multi_step",
+      "en": [
+        "Also, calculate with numeric rounding rules and then the exception list"
+      ],
+      "pt": [
+        "Também, calcule with numeric rounding rules e então the exception list"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_097",
+      "shape": "multi_step",
+      "en": [
+        "After this, show by region and then the latest update"
+      ],
+      "pt": [
+        "After this, mostre by region e então the latest update"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_098",
+      "shape": "multi_step",
+      "en": [
+        "In parallel, compare for this entity and then the source citation"
+      ],
+      "pt": [
+        "In parallel, compare for this entity e então the source citation"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_099",
+      "shape": "multi_step",
+      "en": [
+        "Once done, summarize for period end and then the total"
+      ],
+      "pt": [
+        "Quando terminar, resuma for period end e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_100",
+      "shape": "multi_step",
+      "en": [
+        "Later, validate for selected documents and then the trend"
+      ],
+      "pt": [
+        "Later, valide for selected documents e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_101",
+      "shape": "multi_step",
+      "en": [
+        "First, check with assumptions and then the ranking"
+      ],
+      "pt": [
+        "First, verifique with assumptions e então the ranking"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_102",
+      "shape": "multi_step",
+      "en": [
+        "Then, calculate with numeric rounding rules and then the reconciliation result"
+      ],
+      "pt": [
+        "Então, calcule with numeric rounding rules e então the reconciliation result"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_103",
+      "shape": "multi_step",
+      "en": [
+        "Next, show by region and then the compliance status"
+      ],
+      "pt": [
+        "Em seguida, mostre by region e então the compliance status"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_104",
+      "shape": "multi_step",
+      "en": [
+        "After that, compare for this entity and then the exception list"
+      ],
+      "pt": [
+        "Depois disso, compare for this entity e então the exception list"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_105",
+      "shape": "multi_step",
+      "en": [
+        "Finally, summarize for period end and then the latest update"
+      ],
+      "pt": [
+        "Finalmente, resuma for period end e então the latest update"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_106",
+      "shape": "multi_step",
+      "en": [
+        "Also, validate for selected documents and then the source citation"
+      ],
+      "pt": [
+        "Também, valide for selected documents e então the source citation"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_107",
+      "shape": "multi_step",
+      "en": [
+        "After this, check with assumptions and then the total"
+      ],
+      "pt": [
+        "After this, verifique with assumptions e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_108",
+      "shape": "multi_step",
+      "en": [
+        "In parallel, calculate with numeric rounding rules and then the trend"
+      ],
+      "pt": [
+        "In parallel, calcule with numeric rounding rules e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_109",
+      "shape": "multi_step",
+      "en": [
+        "Once done, show by region and then the ranking"
+      ],
+      "pt": [
+        "Quando terminar, mostre by region e então the ranking"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_110",
+      "shape": "multi_step",
+      "en": [
+        "Later, compare for this entity and then the reconciliation result"
+      ],
+      "pt": [
+        "Later, compare for this entity e então the reconciliation result"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_111",
+      "shape": "multi_step",
+      "en": [
+        "First, summarize for period end and then the compliance status"
+      ],
+      "pt": [
+        "First, resuma for period end e então the compliance status"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_112",
+      "shape": "multi_step",
+      "en": [
+        "Then, validate for selected documents and then the exception list"
+      ],
+      "pt": [
+        "Então, valide for selected documents e então the exception list"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_113",
+      "shape": "multi_step",
+      "en": [
+        "Next, check with assumptions and then the latest update"
+      ],
+      "pt": [
+        "Em seguida, verifique with assumptions e então the latest update"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_114",
+      "shape": "multi_step",
+      "en": [
+        "After that, calculate with numeric rounding rules and then the source citation"
+      ],
+      "pt": [
+        "Depois disso, calcule with numeric rounding rules e então the source citation"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_115",
+      "shape": "multi_step",
+      "en": [
+        "Finally, show by region and then the total"
+      ],
+      "pt": [
+        "Finalmente, mostre by region e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_116",
+      "shape": "multi_step",
+      "en": [
+        "Also, compare for this entity and then the trend"
+      ],
+      "pt": [
+        "Também, compare for this entity e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_117",
+      "shape": "multi_step",
+      "en": [
+        "After this, summarize for period end and then the ranking"
+      ],
+      "pt": [
+        "After this, resuma for period end e então the ranking"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_118",
+      "shape": "multi_step",
+      "en": [
+        "In parallel, validate for selected documents and then the reconciliation result"
+      ],
+      "pt": [
+        "In parallel, valide for selected documents e então the reconciliation result"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_119",
+      "shape": "multi_step",
+      "en": [
+        "Once done, check with assumptions and then the compliance status"
+      ],
+      "pt": [
+        "Quando terminar, verifique with assumptions e então the compliance status"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_120",
+      "shape": "multi_step",
+      "en": [
+        "Later, calculate with numeric rounding rules and then the exception list"
+      ],
+      "pt": [
+        "Later, calcule with numeric rounding rules e então the exception list"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_121",
+      "shape": "multi_step",
+      "en": [
+        "First, show by region and then the latest update"
+      ],
+      "pt": [
+        "First, mostre by region e então the latest update"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_122",
+      "shape": "multi_step",
+      "en": [
+        "Then, compare for this entity and then the source citation"
+      ],
+      "pt": [
+        "Então, compare for this entity e então the source citation"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_123",
+      "shape": "multi_step",
+      "en": [
+        "Next, summarize for period end and then the total"
+      ],
+      "pt": [
+        "Em seguida, resuma for period end e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_124",
+      "shape": "multi_step",
+      "en": [
+        "After that, validate for selected documents and then the trend"
+      ],
+      "pt": [
+        "Depois disso, valide for selected documents e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_125",
+      "shape": "multi_step",
+      "en": [
+        "Finally, check with assumptions and then the ranking"
+      ],
+      "pt": [
+        "Finalmente, verifique with assumptions e então the ranking"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_126",
+      "shape": "multi_step",
+      "en": [
+        "Also, calculate with numeric rounding rules and then the reconciliation result"
+      ],
+      "pt": [
+        "Também, calcule with numeric rounding rules e então the reconciliation result"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_127",
+      "shape": "multi_step",
+      "en": [
+        "After this, show by region and then the compliance status"
+      ],
+      "pt": [
+        "After this, mostre by region e então the compliance status"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_128",
+      "shape": "multi_step",
+      "en": [
+        "In parallel, compare for this entity and then the exception list"
+      ],
+      "pt": [
+        "In parallel, compare for this entity e então the exception list"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_129",
+      "shape": "multi_step",
+      "en": [
+        "Once done, summarize for period end and then the latest update"
+      ],
+      "pt": [
+        "Quando terminar, resuma for period end e então the latest update"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_130",
+      "shape": "multi_step",
+      "en": [
+        "Later, validate for selected documents and then the source citation"
+      ],
+      "pt": [
+        "Later, valide for selected documents e então the source citation"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_131",
+      "shape": "multi_step",
+      "en": [
+        "First, check with assumptions and then the total"
+      ],
+      "pt": [
+        "First, verifique with assumptions e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_132",
+      "shape": "multi_step",
+      "en": [
+        "Then, calculate with numeric rounding rules and then the trend"
+      ],
+      "pt": [
+        "Então, calcule with numeric rounding rules e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_133",
+      "shape": "multi_step",
+      "en": [
+        "Next, show by region and then the ranking"
+      ],
+      "pt": [
+        "Em seguida, mostre by region e então the ranking"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_134",
+      "shape": "multi_step",
+      "en": [
+        "After that, compare for this entity and then the reconciliation result"
+      ],
+      "pt": [
+        "Depois disso, compare for this entity e então the reconciliation result"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_135",
+      "shape": "multi_step",
+      "en": [
+        "Finally, summarize for period end and then the compliance status"
+      ],
+      "pt": [
+        "Finalmente, resuma for period end e então the compliance status"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:summarize"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_136",
+      "shape": "multi_step",
+      "en": [
+        "Also, validate for selected documents and then the exception list"
+      ],
+      "pt": [
+        "Também, valide for selected documents e então the exception list"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:validate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_137",
+      "shape": "multi_step",
+      "en": [
+        "After this, check with assumptions and then the latest update"
+      ],
+      "pt": [
+        "After this, verifique with assumptions e então the latest update"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:check"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_138",
+      "shape": "multi_step",
+      "en": [
+        "In parallel, calculate with numeric rounding rules and then the source citation"
+      ],
+      "pt": [
+        "In parallel, calcule with numeric rounding rules e então the source citation"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:calculate"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_139",
+      "shape": "multi_step",
+      "en": [
+        "Once done, show by region and then the total"
+      ],
+      "pt": [
+        "Quando terminar, mostre by region e então the total"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:show"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    },
+    {
+      "id": "QS_140",
+      "shape": "multi_step",
+      "en": [
+        "Later, compare for this entity and then the trend"
+      ],
+      "pt": [
+        "Later, compare for this entity e então the trend"
+      ],
+      "triggers": [
+        "shape:multi_step",
+        "intent_sequence:chained",
+        "slot:step:compare"
+      ],
+      "negatives": [
+        "missing step boundaries",
+        "implicit chaining without transition"
+      ],
+      "slotHints": [
+        "step_index",
+        "joiner",
+        "sub_intent"
+      ],
+      "telemetryTags": [
+        "question_shapes",
+        "multi_step"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}

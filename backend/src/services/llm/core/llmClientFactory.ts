@@ -20,10 +20,13 @@ import {
   GeminiClientService,
   type GeminiClientConfig,
 } from "../providers/gemini/geminiClient.service";
-import { OpenAIClientService } from "../providers/openai/openaiClient.service";
+import { OpenAIClientService, OpenAILLMClientAdapter } from "../providers/openai/openaiClient.service";
 import { LocalClientService } from "../providers/local/localClient.service";
 import type { OpenAIProviderConfig } from "../providers/openai/openaiConfig";
-import type { LocalProviderConfig } from "../providers/local/localConfig";
+import type { LocalProviderConfig, LocalConfig } from "../providers/local/localConfig";
+import { ResilienceLLMClient } from "../resilience/resilienceLlmClient.decorator";
+import { Semaphore } from "../resilience/semaphore";
+import { CircuitBreaker } from "../resilience/circuitBreaker";
 
 export type LLMClientKey = "openai" | "google" | "local";
 
@@ -47,6 +50,18 @@ export interface LLMClientFactoryConfig {
   prebuilt?: Partial<Record<LLMClientKey, LLMClient>>;
 }
 
+function envInt(key: string, fallback: number): number {
+  const v = Number(process.env[key]);
+  return Number.isFinite(v) && v > 0 ? Math.floor(v) : fallback;
+}
+
+function wrapWithResilience(raw: LLMClient, name: string, concurrency: number): LLMClient {
+  return new ResilienceLLMClient(raw, {
+    semaphore: new Semaphore(concurrency),
+    circuitBreaker: new CircuitBreaker(`llm:${name}`),
+  });
+}
+
 export class LLMClientFactory {
   private readonly clients = new Map<LLMClientKey, LLMClient>();
   private readonly defaultProvider: LLMClientKey;
@@ -59,7 +74,7 @@ export class LLMClientFactory {
   /**
    * Deterministic initialization:
    * - Use prebuilt clients first (if any)
-   * - Otherwise build enabled providers from config
+   * - Otherwise build enabled providers from config, wrapped with resilience
    */
   private init(): void {
     // 1) Prebuilt (test-friendly)
@@ -73,23 +88,20 @@ export class LLMClientFactory {
     const p = this.cfg.providers;
 
     if (!this.clients.has("openai") && p.openai?.enabled) {
-      // OpenAIClientService implements LlmClient (types/llm.types), not LLMClient (core).
-      // An adapter is needed for full parity; for now, cast to allow factory storage.
-      this.clients.set(
-        "openai",
-        new OpenAIClientService(p.openai.config as Partial<ConstructorParameters<typeof OpenAIClientService>[0]>) as unknown as LLMClient,
+      const raw = new OpenAILLMClientAdapter(
+        new OpenAIClientService(p.openai.config as Partial<ConstructorParameters<typeof OpenAIClientService>[0]>),
       );
+      this.clients.set("openai", wrapWithResilience(raw, "openai", envInt("OPENAI_MAX_CONCURRENT", 8)));
     }
 
     if (!this.clients.has("google") && p.google?.enabled) {
-      this.clients.set(
-        "google",
-        new GeminiClientService(p.google.config as GeminiClientConfig),
-      );
+      const raw = new GeminiClientService(p.google.config as GeminiClientConfig);
+      this.clients.set("google", wrapWithResilience(raw, "google", envInt("GEMINI_CONCURRENCY", 6)));
     }
 
     if (!this.clients.has("local") && p.local?.enabled) {
-      this.clients.set("local", new LocalClientService(p.local.config as Partial<ConstructorParameters<typeof LocalClientService>[0]>));
+      const raw = new LocalClientService(p.local.config as LocalConfig | undefined);
+      this.clients.set("local", wrapWithResilience(raw, "local", envInt("LOCAL_LLM_CONCURRENCY", 2)));
     }
   }
 

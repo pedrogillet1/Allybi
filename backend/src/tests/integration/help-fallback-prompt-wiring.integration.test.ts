@@ -14,6 +14,7 @@ function createPromptLoader() {
     "system_base",
     "mode_chat",
     "fallback_prompt",
+    "policy_citations",
   ];
   const banks = Object.fromEntries(
     bankIds.map((bankId) => [

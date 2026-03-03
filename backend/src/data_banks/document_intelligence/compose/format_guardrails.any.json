@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "id": "format_guardrails",
+    "version": "1.0.0",
+    "description": "Output-format controls for concise, safe, and complete rendering.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "maxRowsPerTableChunk": 140,
+    "allowMarkdown": true
+  },
+  "rules": [
+    {
+      "id": "FG_001",
+      "trigger": "Table has rows omitted",
+      "check": "output.format == 'table' && output.rowsDropped > 0",
+      "failureAction": "PAGINATE_WITH_CONTINUATION"
+    },
+    {
+      "id": "FG_002",
+      "trigger": "Long output with weak evidence",
+      "check": "output.wordCount > 420 && output.evidenceDensity < 0.15",
+      "failureAction": "CONDENSE"
+    }
+  ],
+  "templates": [
+    {
+      "id": "FORMAT_GUARDRAILS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in format_guardrails.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

@@ -371,4 +371,410 @@ describe("LlmGatewayService retrieval-plan producer", () => {
     const buildInput = (builder.build as jest.Mock).mock.calls[0]?.[0];
     expect(buildInput?.signals?.disallowJsonOutput).toBe(true);
   });
+
+  test("executes routed provider/model instead of static gateway defaults", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-5",
+        turnId: "turn-5",
+        model: { provider: "openai", model: "gpt-5-mini" },
+        content: "openai",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-5",
+        turnId: "turn-5",
+        model: { provider: "openai", model: "gpt-5-mini" },
+        finalText: "",
+      })),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => ({
+        traceId: "trace-5",
+        turnId: "turn-5",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        content: "google",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-5",
+        turnId: "turn-5",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        finalText: "",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "gemini",
+        model: "gemini-2.5-flash",
+        reason: "fast_path",
+        stage: "draft",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => []),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5-mini",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    const out = await gateway.generate({
+      traceId: "trace-5",
+      userId: "u1",
+      conversationId: "c1",
+      messages: [{ role: "user", content: "hello" }],
+    });
+
+    expect((googleClient.complete as jest.Mock).mock.calls).toHaveLength(1);
+    expect((openaiClient.complete as jest.Mock).mock.calls).toHaveLength(0);
+    const req = (googleClient.complete as jest.Mock).mock.calls[0]?.[0];
+    expect(req.model.provider).toBe("google");
+    expect(req.model.model).toBe("gemini-2.5-flash");
+    expect(out.telemetry?.provider).toBe("google");
+    expect(out.telemetry?.model).toBe("gemini-2.5-flash");
+  });
+
+  test("falls back to next routed candidate when primary provider fails", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => {
+        throw new Error("openai down");
+      }),
+      stream: jest.fn(async () => ({
+        traceId: "trace-6",
+        turnId: "turn-6",
+        model: { provider: "openai", model: "gpt-5.2" },
+        finalText: "",
+      })),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => ({
+        traceId: "trace-6",
+        turnId: "turn-6",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        content: "fallback-ok",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-6",
+        turnId: "turn-6",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        finalText: "",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: {},
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: false, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5-mini",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    const out = await gateway.generate({
+      traceId: "trace-6",
+      userId: "u1",
+      conversationId: "c1",
+      messages: [{ role: "user", content: "hello" }],
+    });
+
+    expect((openaiClient.complete as jest.Mock).mock.calls).toHaveLength(1);
+    expect((googleClient.complete as jest.Mock).mock.calls).toHaveLength(1);
+    expect(out.text).toBe("fallback-ok");
+    expect(out.telemetry?.fallbackUsed).toBe(true);
+    expect(out.telemetry?.executedProvider).toBe("google");
+    expect(out.telemetry?.executedModel).toBe("gemini-2.5-flash");
+    expect(out.telemetry?.attemptCount).toBe(2);
+  });
+
+  test("stream falls back when primary fails before emitting events", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-7",
+        turnId: "turn-7",
+        model: { provider: "openai", model: "gpt-5.2" },
+        content: "unused",
+      })),
+      stream: jest.fn(async () => {
+        throw new Error("openai stream down");
+      }),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => ({
+        traceId: "trace-7",
+        turnId: "turn-7",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        content: "unused",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-7",
+        turnId: "turn-7",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        finalText: "stream-fallback-ok",
+        finishReason: "stop",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: { requireStreaming: true },
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: true, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5-mini",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    const sinkEvents: unknown[] = [];
+    let sinkClosed = false;
+    const out = await gateway.stream({
+      traceId: "trace-7",
+      userId: "u1",
+      conversationId: "c1",
+      messages: [{ role: "user", content: "hello stream" }],
+      sink: {
+        transport: "inproc",
+        write(event) {
+          sinkEvents.push(event);
+        },
+        close() {
+          sinkClosed = true;
+        },
+        isOpen() {
+          return !sinkClosed;
+        },
+      },
+      streamingConfig: {
+        markerHold: { enabled: true, flushAt: "final", maxBufferedMarkers: 16 },
+      },
+    });
+
+    expect((openaiClient.stream as jest.Mock).mock.calls).toHaveLength(1);
+    expect((googleClient.stream as jest.Mock).mock.calls).toHaveLength(1);
+    expect(out.finalText).toBe("stream-fallback-ok");
+    expect(out.telemetry?.fallbackUsed).toBe(true);
+    expect(out.telemetry?.executedProvider).toBe("google");
+    expect(out.telemetry?.attemptCount).toBe(2);
+    expect(sinkEvents).toHaveLength(0);
+  });
+
+  test("stream does not retry after emitting any stream events", async () => {
+    const openaiClient: LLMClient = {
+      provider: "openai",
+      complete: jest.fn(async () => ({
+        traceId: "trace-8",
+        turnId: "turn-8",
+        model: { provider: "openai", model: "gpt-5.2" },
+        content: "unused",
+      })),
+      stream: jest.fn(async ({ sink }) => {
+        sink.write({
+          event: "start",
+          data: { kind: "answer", t: Date.now(), traceId: "trace-8" },
+        });
+        throw new Error("openai stream interrupted");
+      }),
+    };
+    const googleClient: LLMClient = {
+      provider: "google",
+      complete: jest.fn(async () => ({
+        traceId: "trace-8",
+        turnId: "turn-8",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        content: "unused",
+      })),
+      stream: jest.fn(async () => ({
+        traceId: "trace-8",
+        turnId: "turn-8",
+        model: { provider: "google", model: "gemini-2.5-flash" },
+        finalText: "should-not-run",
+      })),
+    };
+    const router: any = {
+      route: jest.fn(() => ({
+        provider: "openai",
+        model: "gpt-5.2",
+        reason: "quality_finish",
+        stage: "final",
+        constraints: { requireStreaming: true },
+      })),
+      listFallbackTargets: jest.fn(() => [
+        { provider: "gemini", model: "gemini-2.5-flash" },
+      ]),
+    };
+    const builder: any = {
+      build: jest.fn((input: any) => ({
+        route: input.route,
+        messages: [{ role: "system", content: "compose" }],
+        options: { stream: true, maxOutputTokens: 256 },
+        kodaMeta: {
+          promptType: "compose_answer",
+          promptTrace: {
+            orderedPrompts: [
+              {
+                bankId: "compose_prompt",
+                version: "1.0.0",
+                templateId: "compose_prompt:templates.en",
+                hash: "h",
+              },
+            ],
+          },
+        },
+      })),
+    };
+
+    const gateway = new LlmGatewayService(
+      openaiClient,
+      router,
+      builder,
+      {
+        env: "local",
+        provider: "openai",
+        modelId: "gpt-5-mini",
+      },
+      {
+        resolve(provider) {
+          if (provider === "google") return googleClient;
+          return null;
+        },
+      },
+    );
+
+    await expect(
+      gateway.stream({
+        traceId: "trace-8",
+        userId: "u1",
+        conversationId: "c1",
+        messages: [{ role: "user", content: "hello stream" }],
+        sink: {
+          transport: "inproc",
+          write() {},
+          close() {},
+          isOpen() {
+            return true;
+          },
+        },
+        streamingConfig: {
+          markerHold: { enabled: true, flushAt: "final", maxBufferedMarkers: 16 },
+        },
+      }),
+    ).rejects.toThrow("openai stream interrupted");
+    expect((openaiClient.stream as jest.Mock).mock.calls).toHaveLength(1);
+    expect((googleClient.stream as jest.Mock).mock.calls).toHaveLength(0);
+  });
 });

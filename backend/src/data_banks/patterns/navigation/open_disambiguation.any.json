@@ -1,0 +1,4162 @@
+{
+  "_meta": {
+    "id": "open_disambiguation",
+    "version": "1.0.0",
+    "description": "Navigation disambiguation rules for open/list/tree/locate operations: auto-open for one hit, one-question pills for multiple hits, nearest suggestions on zero matches.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "owner": "navigation-patterning",
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requiresNavigationMode": true,
+    "deterministic": true,
+    "oneQuestionPolicy": true
+  },
+  "rules": [
+    {
+      "id": "OD_0001",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "open_doc candidate-count zero -> nearest",
+        "zero results for open_doc branch 1",
+        "apply nearest disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com zero candidato(s) -> nearest",
+        "ramo zero para open_doc variante 1",
+        "aplicar desambiguação nearest para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0002",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "open_doc candidate-count zero -> nearest",
+        "zero results for open_doc branch 2",
+        "apply nearest disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com zero candidato(s) -> nearest",
+        "ramo zero para open_doc variante 2",
+        "aplicar desambiguação nearest para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0003",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "open_doc candidate-count zero -> nearest",
+        "zero results for open_doc branch 3",
+        "apply nearest disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com zero candidato(s) -> nearest",
+        "ramo zero para open_doc variante 3",
+        "aplicar desambiguação nearest para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0004",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "open_doc candidate-count single -> auto",
+        "single results for open_doc branch 1",
+        "apply auto_open disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com single candidato(s) -> auto",
+        "ramo single para open_doc variante 1",
+        "aplicar desambiguação auto_open para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0005",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "open_doc candidate-count single -> auto",
+        "single results for open_doc branch 2",
+        "apply auto_open disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com single candidato(s) -> auto",
+        "ramo single para open_doc variante 2",
+        "aplicar desambiguação auto_open para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0006",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "open_doc candidate-count single -> auto",
+        "single results for open_doc branch 3",
+        "apply auto_open disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com single candidato(s) -> auto",
+        "ramo single para open_doc variante 3",
+        "aplicar desambiguação auto_open para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0007",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "open_doc candidate-count few -> ask",
+        "few results for open_doc branch 1",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com few candidato(s) -> ask",
+        "ramo few para open_doc variante 1",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0008",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "open_doc candidate-count few -> ask",
+        "few results for open_doc branch 2",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com few candidato(s) -> ask",
+        "ramo few para open_doc variante 2",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0009",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "open_doc candidate-count few -> ask",
+        "few results for open_doc branch 3",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com few candidato(s) -> ask",
+        "ramo few para open_doc variante 3",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0010",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "open_doc candidate-count few -> ask",
+        "few results for open_doc branch 4",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com few candidato(s) -> ask",
+        "ramo few para open_doc variante 4",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0011",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "open_doc candidate-count some -> ask",
+        "some results for open_doc branch 1",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com some candidato(s) -> ask",
+        "ramo some para open_doc variante 1",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0012",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "open_doc candidate-count some -> ask",
+        "some results for open_doc branch 2",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com some candidato(s) -> ask",
+        "ramo some para open_doc variante 2",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0013",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "open_doc candidate-count some -> ask",
+        "some results for open_doc branch 3",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com some candidato(s) -> ask",
+        "ramo some para open_doc variante 3",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0014",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "open_doc candidate-count some -> ask",
+        "some results for open_doc branch 4",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com some candidato(s) -> ask",
+        "ramo some para open_doc variante 4",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0015",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "open_doc candidate-count many -> ask",
+        "many results for open_doc branch 1",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com many candidato(s) -> ask",
+        "ramo many para open_doc variante 1",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0016",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "open_doc candidate-count many -> ask",
+        "many results for open_doc branch 2",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com many candidato(s) -> ask",
+        "ramo many para open_doc variante 2",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0017",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "open_doc candidate-count many -> ask",
+        "many results for open_doc branch 3",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com many candidato(s) -> ask",
+        "ramo many para open_doc variante 3",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0018",
+      "intent": "open_doc",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "open_doc candidate-count many -> ask",
+        "many results for open_doc branch 4",
+        "apply ask_single_question disambiguation for open_doc"
+      ],
+      "pt": [
+        "open_doc com many candidato(s) -> ask",
+        "ramo many para open_doc variante 4",
+        "aplicar desambiguação ask_single_question para open_doc"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "open_doc",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0019",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "list_folder candidate-count zero -> nearest",
+        "zero results for list_folder branch 1",
+        "apply nearest disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com zero candidato(s) -> nearest",
+        "ramo zero para list_folder variante 1",
+        "aplicar desambiguação nearest para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0020",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "list_folder candidate-count zero -> nearest",
+        "zero results for list_folder branch 2",
+        "apply nearest disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com zero candidato(s) -> nearest",
+        "ramo zero para list_folder variante 2",
+        "aplicar desambiguação nearest para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0021",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "list_folder candidate-count zero -> nearest",
+        "zero results for list_folder branch 3",
+        "apply nearest disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com zero candidato(s) -> nearest",
+        "ramo zero para list_folder variante 3",
+        "aplicar desambiguação nearest para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0022",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "list_folder candidate-count single -> auto",
+        "single results for list_folder branch 1",
+        "apply auto_open disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com single candidato(s) -> auto",
+        "ramo single para list_folder variante 1",
+        "aplicar desambiguação auto_open para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0023",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "list_folder candidate-count single -> auto",
+        "single results for list_folder branch 2",
+        "apply auto_open disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com single candidato(s) -> auto",
+        "ramo single para list_folder variante 2",
+        "aplicar desambiguação auto_open para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0024",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "list_folder candidate-count single -> auto",
+        "single results for list_folder branch 3",
+        "apply auto_open disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com single candidato(s) -> auto",
+        "ramo single para list_folder variante 3",
+        "aplicar desambiguação auto_open para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0025",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "list_folder candidate-count few -> ask",
+        "few results for list_folder branch 1",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com few candidato(s) -> ask",
+        "ramo few para list_folder variante 1",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0026",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "list_folder candidate-count few -> ask",
+        "few results for list_folder branch 2",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com few candidato(s) -> ask",
+        "ramo few para list_folder variante 2",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0027",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "list_folder candidate-count few -> ask",
+        "few results for list_folder branch 3",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com few candidato(s) -> ask",
+        "ramo few para list_folder variante 3",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0028",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "list_folder candidate-count few -> ask",
+        "few results for list_folder branch 4",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com few candidato(s) -> ask",
+        "ramo few para list_folder variante 4",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0029",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "list_folder candidate-count some -> ask",
+        "some results for list_folder branch 1",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com some candidato(s) -> ask",
+        "ramo some para list_folder variante 1",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0030",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "list_folder candidate-count some -> ask",
+        "some results for list_folder branch 2",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com some candidato(s) -> ask",
+        "ramo some para list_folder variante 2",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0031",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "list_folder candidate-count some -> ask",
+        "some results for list_folder branch 3",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com some candidato(s) -> ask",
+        "ramo some para list_folder variante 3",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0032",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "list_folder candidate-count some -> ask",
+        "some results for list_folder branch 4",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com some candidato(s) -> ask",
+        "ramo some para list_folder variante 4",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0033",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "list_folder candidate-count many -> ask",
+        "many results for list_folder branch 1",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com many candidato(s) -> ask",
+        "ramo many para list_folder variante 1",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0034",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "list_folder candidate-count many -> ask",
+        "many results for list_folder branch 2",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com many candidato(s) -> ask",
+        "ramo many para list_folder variante 2",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0035",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "list_folder candidate-count many -> ask",
+        "many results for list_folder branch 3",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com many candidato(s) -> ask",
+        "ramo many para list_folder variante 3",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0036",
+      "intent": "list_folder",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "list_folder candidate-count many -> ask",
+        "many results for list_folder branch 4",
+        "apply ask_single_question disambiguation for list_folder"
+      ],
+      "pt": [
+        "list_folder com many candidato(s) -> ask",
+        "ramo many para list_folder variante 4",
+        "aplicar desambiguação ask_single_question para list_folder"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "list_folder",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0037",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "show_tree candidate-count zero -> nearest",
+        "zero results for show_tree branch 1",
+        "apply nearest disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com zero candidato(s) -> nearest",
+        "ramo zero para show_tree variante 1",
+        "aplicar desambiguação nearest para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0038",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "show_tree candidate-count zero -> nearest",
+        "zero results for show_tree branch 2",
+        "apply nearest disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com zero candidato(s) -> nearest",
+        "ramo zero para show_tree variante 2",
+        "aplicar desambiguação nearest para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0039",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "show_tree candidate-count zero -> nearest",
+        "zero results for show_tree branch 3",
+        "apply nearest disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com zero candidato(s) -> nearest",
+        "ramo zero para show_tree variante 3",
+        "aplicar desambiguação nearest para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0040",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "show_tree candidate-count single -> auto",
+        "single results for show_tree branch 1",
+        "apply auto_open disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com single candidato(s) -> auto",
+        "ramo single para show_tree variante 1",
+        "aplicar desambiguação auto_open para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0041",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "show_tree candidate-count single -> auto",
+        "single results for show_tree branch 2",
+        "apply auto_open disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com single candidato(s) -> auto",
+        "ramo single para show_tree variante 2",
+        "aplicar desambiguação auto_open para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0042",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "show_tree candidate-count single -> auto",
+        "single results for show_tree branch 3",
+        "apply auto_open disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com single candidato(s) -> auto",
+        "ramo single para show_tree variante 3",
+        "aplicar desambiguação auto_open para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0043",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "show_tree candidate-count few -> ask",
+        "few results for show_tree branch 1",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com few candidato(s) -> ask",
+        "ramo few para show_tree variante 1",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0044",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "show_tree candidate-count few -> ask",
+        "few results for show_tree branch 2",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com few candidato(s) -> ask",
+        "ramo few para show_tree variante 2",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0045",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "show_tree candidate-count few -> ask",
+        "few results for show_tree branch 3",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com few candidato(s) -> ask",
+        "ramo few para show_tree variante 3",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0046",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "show_tree candidate-count few -> ask",
+        "few results for show_tree branch 4",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com few candidato(s) -> ask",
+        "ramo few para show_tree variante 4",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0047",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "show_tree candidate-count some -> ask",
+        "some results for show_tree branch 1",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com some candidato(s) -> ask",
+        "ramo some para show_tree variante 1",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0048",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "show_tree candidate-count some -> ask",
+        "some results for show_tree branch 2",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com some candidato(s) -> ask",
+        "ramo some para show_tree variante 2",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0049",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "show_tree candidate-count some -> ask",
+        "some results for show_tree branch 3",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com some candidato(s) -> ask",
+        "ramo some para show_tree variante 3",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0050",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "show_tree candidate-count some -> ask",
+        "some results for show_tree branch 4",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com some candidato(s) -> ask",
+        "ramo some para show_tree variante 4",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0051",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "show_tree candidate-count many -> ask",
+        "many results for show_tree branch 1",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com many candidato(s) -> ask",
+        "ramo many para show_tree variante 1",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0052",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "show_tree candidate-count many -> ask",
+        "many results for show_tree branch 2",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com many candidato(s) -> ask",
+        "ramo many para show_tree variante 2",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0053",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "show_tree candidate-count many -> ask",
+        "many results for show_tree branch 3",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com many candidato(s) -> ask",
+        "ramo many para show_tree variante 3",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0054",
+      "intent": "show_tree",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "show_tree candidate-count many -> ask",
+        "many results for show_tree branch 4",
+        "apply ask_single_question disambiguation for show_tree"
+      ],
+      "pt": [
+        "show_tree com many candidato(s) -> ask",
+        "ramo many para show_tree variante 4",
+        "aplicar desambiguação ask_single_question para show_tree"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "show_tree",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0055",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "locate_file candidate-count zero -> nearest",
+        "zero results for locate_file branch 1",
+        "apply nearest disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com zero candidato(s) -> nearest",
+        "ramo zero para locate_file variante 1",
+        "aplicar desambiguação nearest para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0056",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "locate_file candidate-count zero -> nearest",
+        "zero results for locate_file branch 2",
+        "apply nearest disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com zero candidato(s) -> nearest",
+        "ramo zero para locate_file variante 2",
+        "aplicar desambiguação nearest para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0057",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "locate_file candidate-count zero -> nearest",
+        "zero results for locate_file branch 3",
+        "apply nearest disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com zero candidato(s) -> nearest",
+        "ramo zero para locate_file variante 3",
+        "aplicar desambiguação nearest para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0058",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "locate_file candidate-count single -> auto",
+        "single results for locate_file branch 1",
+        "apply auto_open disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com single candidato(s) -> auto",
+        "ramo single para locate_file variante 1",
+        "aplicar desambiguação auto_open para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0059",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "locate_file candidate-count single -> auto",
+        "single results for locate_file branch 2",
+        "apply auto_open disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com single candidato(s) -> auto",
+        "ramo single para locate_file variante 2",
+        "aplicar desambiguação auto_open para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0060",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "locate_file candidate-count single -> auto",
+        "single results for locate_file branch 3",
+        "apply auto_open disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com single candidato(s) -> auto",
+        "ramo single para locate_file variante 3",
+        "aplicar desambiguação auto_open para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0061",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "locate_file candidate-count few -> ask",
+        "few results for locate_file branch 1",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com few candidato(s) -> ask",
+        "ramo few para locate_file variante 1",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0062",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "locate_file candidate-count few -> ask",
+        "few results for locate_file branch 2",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com few candidato(s) -> ask",
+        "ramo few para locate_file variante 2",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0063",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "locate_file candidate-count few -> ask",
+        "few results for locate_file branch 3",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com few candidato(s) -> ask",
+        "ramo few para locate_file variante 3",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0064",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "locate_file candidate-count few -> ask",
+        "few results for locate_file branch 4",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com few candidato(s) -> ask",
+        "ramo few para locate_file variante 4",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0065",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "locate_file candidate-count some -> ask",
+        "some results for locate_file branch 1",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com some candidato(s) -> ask",
+        "ramo some para locate_file variante 1",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0066",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "locate_file candidate-count some -> ask",
+        "some results for locate_file branch 2",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com some candidato(s) -> ask",
+        "ramo some para locate_file variante 2",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0067",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "locate_file candidate-count some -> ask",
+        "some results for locate_file branch 3",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com some candidato(s) -> ask",
+        "ramo some para locate_file variante 3",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0068",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "locate_file candidate-count some -> ask",
+        "some results for locate_file branch 4",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com some candidato(s) -> ask",
+        "ramo some para locate_file variante 4",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0069",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "locate_file candidate-count many -> ask",
+        "many results for locate_file branch 1",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com many candidato(s) -> ask",
+        "ramo many para locate_file variante 1",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0070",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "locate_file candidate-count many -> ask",
+        "many results for locate_file branch 2",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com many candidato(s) -> ask",
+        "ramo many para locate_file variante 2",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0071",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "locate_file candidate-count many -> ask",
+        "many results for locate_file branch 3",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com many candidato(s) -> ask",
+        "ramo many para locate_file variante 3",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0072",
+      "intent": "locate_file",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "locate_file candidate-count many -> ask",
+        "many results for locate_file branch 4",
+        "apply ask_single_question disambiguation for locate_file"
+      ],
+      "pt": [
+        "locate_file com many candidato(s) -> ask",
+        "ramo many para locate_file variante 4",
+        "aplicar desambiguação ask_single_question para locate_file"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "locate_file",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0073",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "duplicates candidate-count zero -> nearest",
+        "zero results for duplicates branch 1",
+        "apply nearest disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com zero candidato(s) -> nearest",
+        "ramo zero para duplicates variante 1",
+        "aplicar desambiguação nearest para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0074",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "duplicates candidate-count zero -> nearest",
+        "zero results for duplicates branch 2",
+        "apply nearest disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com zero candidato(s) -> nearest",
+        "ramo zero para duplicates variante 2",
+        "aplicar desambiguação nearest para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0075",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "nearest",
+      "candidateRange": {
+        "min": 0,
+        "max": 0
+      },
+      "en": [
+        "duplicates candidate-count zero -> nearest",
+        "zero results for duplicates branch 3",
+        "apply nearest disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com zero candidato(s) -> nearest",
+        "ramo zero para duplicates variante 3",
+        "aplicar desambiguação nearest para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 0,
+          "max": 0
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "nearest"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.nearest_matches",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": false,
+        "nearestMatches": true,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0076",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "duplicates candidate-count single -> auto",
+        "single results for duplicates branch 1",
+        "apply auto_open disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com single candidato(s) -> auto",
+        "ramo single para duplicates variante 1",
+        "aplicar desambiguação auto_open para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0077",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "duplicates candidate-count single -> auto",
+        "single results for duplicates branch 2",
+        "apply auto_open disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com single candidato(s) -> auto",
+        "ramo single para duplicates variante 2",
+        "aplicar desambiguação auto_open para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0078",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "auto_open",
+      "candidateRange": {
+        "min": 1,
+        "max": 1
+      },
+      "en": [
+        "duplicates candidate-count single -> auto",
+        "single results for duplicates branch 3",
+        "apply auto_open disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com single candidato(s) -> auto",
+        "ramo single para duplicates variante 3",
+        "aplicar desambiguação auto_open para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 1,
+          "max": 1
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "auto_open"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.auto_open_single",
+      "controls": {
+        "askSingleQuestion": false,
+        "showPills": false,
+        "autoOpenSingle": true,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0079",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "duplicates candidate-count few -> ask",
+        "few results for duplicates branch 1",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com few candidato(s) -> ask",
+        "ramo few para duplicates variante 1",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0080",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "duplicates candidate-count few -> ask",
+        "few results for duplicates branch 2",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com few candidato(s) -> ask",
+        "ramo few para duplicates variante 2",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0081",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "duplicates candidate-count few -> ask",
+        "few results for duplicates branch 3",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com few candidato(s) -> ask",
+        "ramo few para duplicates variante 3",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0082",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 2,
+        "max": 4
+      },
+      "en": [
+        "duplicates candidate-count few -> ask",
+        "few results for duplicates branch 4",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com few candidato(s) -> ask",
+        "ramo few para duplicates variante 4",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 2,
+          "max": 4
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_small",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0083",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "duplicates candidate-count some -> ask",
+        "some results for duplicates branch 1",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com some candidato(s) -> ask",
+        "ramo some para duplicates variante 1",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0084",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "duplicates candidate-count some -> ask",
+        "some results for duplicates branch 2",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com some candidato(s) -> ask",
+        "ramo some para duplicates variante 2",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0085",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "duplicates candidate-count some -> ask",
+        "some results for duplicates branch 3",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com some candidato(s) -> ask",
+        "ramo some para duplicates variante 3",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0086",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 5,
+        "max": 10
+      },
+      "en": [
+        "duplicates candidate-count some -> ask",
+        "some results for duplicates branch 4",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com some candidato(s) -> ask",
+        "ramo some para duplicates variante 4",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 5,
+          "max": 10
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_medium",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 4
+      }
+    },
+    {
+      "id": "OD_0087",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "duplicates candidate-count many -> ask",
+        "many results for duplicates branch 1",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com many candidato(s) -> ask",
+        "ramo many para duplicates variante 1",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0088",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "duplicates candidate-count many -> ask",
+        "many results for duplicates branch 2",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com many candidato(s) -> ask",
+        "ramo many para duplicates variante 2",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0089",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "duplicates candidate-count many -> ask",
+        "many results for duplicates branch 3",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com many candidato(s) -> ask",
+        "ramo many para duplicates variante 3",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    },
+    {
+      "id": "OD_0090",
+      "intent": "duplicates",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "behavior": "ask_single_question",
+      "candidateRange": {
+        "min": 11,
+        "max": 50
+      },
+      "en": [
+        "duplicates candidate-count many -> ask",
+        "many results for duplicates branch 4",
+        "apply ask_single_question disambiguation for duplicates"
+      ],
+      "pt": [
+        "duplicates com many candidato(s) -> ask",
+        "ramo many para duplicates variante 4",
+        "aplicar desambiguação ask_single_question para duplicates"
+      ],
+      "conditions": {
+        "candidateCount": {
+          "min": 11,
+          "max": 50
+        },
+        "answerMode": "navigation",
+        "intent": "duplicates",
+        "strategy": "ask_single_question"
+      },
+      "disambiguationTemplateId": "nav.disambiguation.ask_single_question_many",
+      "controls": {
+        "askSingleQuestion": true,
+        "showPills": true,
+        "autoOpenSingle": false,
+        "nearestMatches": false,
+        "maxPills": 5
+      }
+    }
+  ]
+}

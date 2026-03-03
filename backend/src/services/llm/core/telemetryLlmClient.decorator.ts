@@ -49,6 +49,17 @@ function mapStage(purpose?: string): PipelineStage {
   }
 }
 
+function extractErrorCode(err: unknown): string {
+  if (err && typeof err === "object") {
+    const e = err as Record<string, unknown>;
+    if (typeof e.code === "string" && e.code) return e.code;
+    // Check for CircuitOpenError
+    if (e.name === "CircuitOpenError") return "CIRCUIT_OPEN";
+    if (typeof e.message === "string") return e.message.slice(0, 100);
+  }
+  return "UNKNOWN";
+}
+
 export class TelemetryLLMClient implements LLMClient {
   readonly provider: LLMProvider;
 
@@ -60,26 +71,29 @@ export class TelemetryLLMClient implements LLMClient {
   }
 
   async ping() {
-    return (
-      this.inner.ping?.() ?? {
+    const startMs = Date.now();
+    try {
+      const result = await (this.inner.ping?.() ?? Promise.resolve({
         ok: true,
         provider: this.provider,
         t: Date.now(),
-      }
-    );
+      }));
+      return result;
+    } catch {
+      return { ok: false, provider: this.provider, t: Date.now() };
+    }
   }
 
-  async complete(req: LLMRequest): Promise<LLMCompletionResponse> {
+  async complete(req: LLMRequest, signal?: AbortSignal): Promise<LLMCompletionResponse> {
     const startMs = Date.now();
     let response: LLMCompletionResponse | undefined;
     let errorCode: string | undefined;
 
     try {
-      response = await this.inner.complete(req);
+      response = await this.inner.complete(req, signal);
       return response;
     } catch (err: unknown) {
-      const e = err as Record<string, unknown>;
-      errorCode = String(e.code || (e.message as string)?.slice(0, 100) || "UNKNOWN");
+      errorCode = extractErrorCode(err);
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
@@ -109,6 +123,7 @@ export class TelemetryLLMClient implements LLMClient {
     config: LLMStreamingConfig;
     hooks?: StreamingHooks;
     initialState?: Partial<StreamState>;
+    signal?: AbortSignal;
   }): Promise<LLMStreamResponse> {
     const startMs = Date.now();
     let firstTokenMs: number | null = null;
@@ -144,8 +159,7 @@ export class TelemetryLLMClient implements LLMClient {
       });
       return response;
     } catch (err: unknown) {
-      const e = err as Record<string, unknown>;
-      errorCode = String(e.code || (e.message as string)?.slice(0, 100) || "UNKNOWN");
+      errorCode = extractErrorCode(err);
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;

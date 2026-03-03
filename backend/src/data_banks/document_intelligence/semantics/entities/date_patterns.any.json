@@ -1,0 +1,2963 @@
+{
+  "_meta": {
+    "id": "date_patterns_vf6e34b10",
+    "version": "1.3.0",
+    "description": "Cross-domain date extraction patterns with deep EN/PT and locale-aware normalization notes.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "high",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
+  },
+  "rules": [
+    {
+      "id": "date_001",
+      "name": "date_rule_1",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 1.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_002",
+      "name": "date_rule_2",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 2.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_003",
+      "name": "date_rule_3",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 3.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_004",
+      "name": "date_rule_4",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 4.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_005",
+      "name": "date_rule_5",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 5.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_006",
+      "name": "date_rule_6",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 6.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_007",
+      "name": "date_rule_7",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 7.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_008",
+      "name": "date_rule_8",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 8.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_009",
+      "name": "date_rule_9",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 9.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_010",
+      "name": "date_rule_10",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 10.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_011",
+      "name": "date_rule_11",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 11.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_012",
+      "name": "date_rule_12",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 12.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_013",
+      "name": "date_rule_13",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 13.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_014",
+      "name": "date_rule_14",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 14.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_015",
+      "name": "date_rule_15",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 15.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_016",
+      "name": "date_rule_16",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 16.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_017",
+      "name": "date_rule_17",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 17.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_018",
+      "name": "date_rule_18",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 18.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_019",
+      "name": "date_rule_19",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 19.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_020",
+      "name": "date_rule_20",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 20.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_021",
+      "name": "date_rule_21",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 21.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_022",
+      "name": "date_rule_22",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 22.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_023",
+      "name": "date_rule_23",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 23.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_024",
+      "name": "date_rule_24",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 24.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_025",
+      "name": "date_rule_25",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 25.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_026",
+      "name": "date_rule_26",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 26.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_027",
+      "name": "date_rule_27",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 27.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_028",
+      "name": "date_rule_28",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 28.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_029",
+      "name": "date_rule_29",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 29.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_030",
+      "name": "date_rule_30",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 30.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_031",
+      "name": "date_rule_31",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 31.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_032",
+      "name": "date_rule_32",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 32.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_033",
+      "name": "date_rule_33",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 33.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_034",
+      "name": "date_rule_34",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 34.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_035",
+      "name": "date_rule_35",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 35.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_036",
+      "name": "date_rule_36",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 36.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_037",
+      "name": "date_rule_37",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 37.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_038",
+      "name": "date_rule_38",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 38.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_039",
+      "name": "date_rule_39",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 39.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_040",
+      "name": "date_rule_40",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 40.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_041",
+      "name": "date_rule_41",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 41.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_042",
+      "name": "date_rule_42",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 42.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_043",
+      "name": "date_rule_43",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 43.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_044",
+      "name": "date_rule_44",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 44.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_045",
+      "name": "date_rule_45",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 45.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_046",
+      "name": "date_rule_46",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 46.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_047",
+      "name": "date_rule_47",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 47.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_048",
+      "name": "date_rule_48",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 48.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_049",
+      "name": "date_rule_49",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 49.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_050",
+      "name": "date_rule_50",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 50.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_051",
+      "name": "date_rule_51",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 51.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_052",
+      "name": "date_rule_52",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 52.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_053",
+      "name": "date_rule_53",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 53.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_054",
+      "name": "date_rule_54",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 54.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_055",
+      "name": "date_rule_55",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 55.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_056",
+      "name": "date_rule_56",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 56.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_057",
+      "name": "date_rule_57",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 57.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_058",
+      "name": "date_rule_58",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 58.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_059",
+      "name": "date_rule_59",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 59.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_060",
+      "name": "date_rule_60",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 60.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_061",
+      "name": "date_rule_61",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 61.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_062",
+      "name": "date_rule_62",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 62.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_063",
+      "name": "date_rule_63",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 63.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_064",
+      "name": "date_rule_64",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 64.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_065",
+      "name": "date_rule_65",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 65.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_066",
+      "name": "date_rule_66",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 66.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_067",
+      "name": "date_rule_67",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 67.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_068",
+      "name": "date_rule_68",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 68.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_069",
+      "name": "date_rule_69",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 69.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_070",
+      "name": "date_rule_70",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 70.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_071",
+      "name": "date_rule_71",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 71.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_072",
+      "name": "date_rule_72",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 72.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_073",
+      "name": "date_rule_73",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 73.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_074",
+      "name": "date_rule_74",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 74.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_075",
+      "name": "date_rule_75",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 75.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_076",
+      "name": "date_rule_76",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 76.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_077",
+      "name": "date_rule_77",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 77.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_078",
+      "name": "date_rule_78",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 78.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_079",
+      "name": "date_rule_79",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 79.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_080",
+      "name": "date_rule_80",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 80.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_081",
+      "name": "date_rule_81",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 81.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_082",
+      "name": "date_rule_82",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 82.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_083",
+      "name": "date_rule_83",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 83.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_084",
+      "name": "date_rule_84",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 84.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_085",
+      "name": "date_rule_85",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 85.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_086",
+      "name": "date_rule_86",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 86.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_087",
+      "name": "date_rule_87",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 87.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_088",
+      "name": "date_rule_88",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 88.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_089",
+      "name": "date_rule_89",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 89.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_090",
+      "name": "date_rule_90",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 90.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_091",
+      "name": "date_rule_91",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 91.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_092",
+      "name": "date_rule_92",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 92.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_093",
+      "name": "date_rule_93",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 93.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_094",
+      "name": "date_rule_94",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 94.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_095",
+      "name": "date_rule_95",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 95.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_096",
+      "name": "date_rule_96",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 96.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_097",
+      "name": "date_rule_97",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 97.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_098",
+      "name": "date_rule_98",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 98.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_099",
+      "name": "date_rule_99",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 99.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_100",
+      "name": "date_rule_100",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 100.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_101",
+      "name": "date_rule_101",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 101.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_102",
+      "name": "date_rule_102",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 102.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_103",
+      "name": "date_rule_103",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 103.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_104",
+      "name": "date_rule_104",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 104.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_105",
+      "name": "date_rule_105",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 105.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_106",
+      "name": "date_rule_106",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 106.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_107",
+      "name": "date_rule_107",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 107.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_108",
+      "name": "date_rule_108",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 108.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_109",
+      "name": "date_rule_109",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 109.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_110",
+      "name": "date_rule_110",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 110.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_111",
+      "name": "date_rule_111",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 111.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_112",
+      "name": "date_rule_112",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 112.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_113",
+      "name": "date_rule_113",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 113.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_114",
+      "name": "date_rule_114",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 114.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_115",
+      "name": "date_rule_115",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 115.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_116",
+      "name": "date_rule_116",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 116.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_117",
+      "name": "date_rule_117",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 117.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_118",
+      "name": "date_rule_118",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 118.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_119",
+      "name": "date_rule_119",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 119.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_120",
+      "name": "date_rule_120",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 120.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_121",
+      "name": "date_rule_121",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 121.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_122",
+      "name": "date_rule_122",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 122.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_123",
+      "name": "date_rule_123",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 123.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_124",
+      "name": "date_rule_124",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 124.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_125",
+      "name": "date_rule_125",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 125.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_126",
+      "name": "date_rule_126",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 126.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_127",
+      "name": "date_rule_127",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 127.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_128",
+      "name": "date_rule_128",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 128.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_129",
+      "name": "date_rule_129",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 129.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_130",
+      "name": "date_rule_130",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 130.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_131",
+      "name": "date_rule_131",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 131.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_132",
+      "name": "date_rule_132",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "en",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 132.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_133",
+      "name": "date_rule_133",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 133.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_134",
+      "name": "date_rule_134",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 134.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_135",
+      "name": "date_rule_135",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "pt",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 135.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_136",
+      "name": "date_rule_136",
+      "pattern": "\\bd{1,2}\\/d{1,2}\\/d{4}\b",
+      "locale": "en",
+      "examples": [
+        "31/12/2026"
+      ],
+      "normalization": "DD/MM/YYYY",
+      "notes": "Date normalization for DD/MM/YYYY; rule 136.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_137",
+      "name": "date_rule_137",
+      "pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{1,2},s*d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "March 03, 2026"
+      ],
+      "normalization": "MMM DD, YYYY",
+      "notes": "Date normalization for MMM DD, YYYY; rule 137.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_138",
+      "name": "date_rule_138",
+      "pattern": "\\bd{1,2}s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*s+d{4}\b",
+      "locale": "en",
+      "examples": [
+        "03 Mar 2026"
+      ],
+      "normalization": "DD MMM YYYY",
+      "notes": "Date normalization for DD MMM YYYY; rule 138.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_139",
+      "name": "date_rule_139",
+      "pattern": "\\bd{1,2}/d{4}\b",
+      "locale": "pt",
+      "examples": [
+        "03/2026"
+      ],
+      "normalization": "MM/YYYY",
+      "notes": "Date normalization for MM/YYYY; rule 139.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    },
+    {
+      "id": "date_140",
+      "name": "date_rule_140",
+      "pattern": "\\bd{4}-d{2}-d{2}\b",
+      "locale": "en",
+      "examples": [
+        "2026-03-03"
+      ],
+      "normalization": "YYYY-MM-DD",
+      "notes": "Date normalization for YYYY-MM-DD; rule 140.",
+      "normalizationContract": {
+        "type": "temporal",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "date_locale"
+        ],
+        "curationReason": "signals:typed_temporal"
+      }
+    }
+  ]
+}

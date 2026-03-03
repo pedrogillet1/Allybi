@@ -272,6 +272,11 @@ const DEFAULT_BUILDER_POLICY: BuilderRuntimePolicy = {
 
 let builderPolicyCache: BuilderRuntimePolicy | null | undefined;
 
+/** Clear builder policy cache (for test teardown). */
+export function clearBuilderPolicyCache(): void {
+  builderPolicyCache = undefined;
+}
+
 function asPositiveInt(
   value: unknown,
   fallback: number,

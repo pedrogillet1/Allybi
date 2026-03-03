@@ -1,0 +1,6054 @@
+{
+  "_meta": {
+    "id": "search_intents_pt",
+    "version": "1.0.0",
+    "description": "search intents pattern bank for PT connector search intents with connector-aware isolation.",
+    "languages": [
+      "pt",
+      "any"
+    ],
+    "owner": "connectors-patterning",
+    "usedBy": [
+      "services/chat/turnRoutePolicy.service.ts",
+      "services/core/retrieval/retrievalEngine.service.ts",
+      "modules/chat/runtime/CentralizedChatRuntimeDelegate.ts"
+    ],
+    "tests": [
+      "search_pt_positive_1",
+      "search_pt_negative_1",
+      "search_pt_missing_slot"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "id",
+    "matching": {
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true
+    },
+    "minPatterns": 120,
+    "maxPatterns": 250
+  },
+  "patterns": [
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Dropbox sobre orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0001",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Dropbox sobre riscos"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0002",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Gmail sobre orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0003",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Gmail sobre riscos"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0004",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Google Drive sobre orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0005",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Google Drive sobre riscos"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0006",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Outlook sobre orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0007",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Outlook sobre riscos"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0008",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Slack sobre orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0009",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Slack sobre riscos"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0010",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Teams sobre orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0011",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar conversa no Teams sobre riscos"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0012",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Dropbox anexos de fatura"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0013",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Gmail anexos de fatura"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0014",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Google Drive anexos de fatura"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0015",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Outlook anexos de fatura"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0016",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Slack anexos de fatura"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0017",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Teams anexos de fatura"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0018",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Slack por incidente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0019",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Slack por problema de deploy"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0020",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Dropbox sobre alterações de política"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0021",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Dropbox sobre problema de cliente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0022",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Gmail sobre alterações de política"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0023",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Gmail sobre problema de cliente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0024",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Google Drive sobre alterações de política"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0025",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Google Drive sobre problema de cliente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0026",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Outlook sobre alterações de política"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0027",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Outlook sobre problema de cliente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0028",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Slack sobre alterações de política"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0029",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Slack sobre problema de cliente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0030",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Teams sobre alterações de política"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0031",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar Teams sobre problema de cliente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0032",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar a mensagem do Dropbox sobre conformidade"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0033",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar a mensagem do Gmail sobre conformidade"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0034",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar a mensagem do Google Drive sobre conformidade"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0035",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar a mensagem do Outlook sobre conformidade"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0036",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar a mensagem do Slack sobre conformidade"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0037",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar a mensagem do Teams sobre conformidade"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0038",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Dropbox sobre estratégia"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0039",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Gmail sobre estratégia"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0040",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Google Drive sobre estratégia"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0041",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Outlook sobre estratégia"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0042",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Slack sobre estratégia"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0043",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Teams sobre estratégia"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0044",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Dropbox menções de queda"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0045",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Gmail menções de queda"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0046",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Google Drive menções de queda"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0047",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "localizar o email da Ana sobre incidente no Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0048",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email da Ana sobre incidente no Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0049",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email da Ana sobre incidente no Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0050",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email da Ana sobre incidente no Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0051",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email da Ana sobre incidente no Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0052",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email da Ana sobre incidente no Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0053",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email do financeiro sobre horas extras no Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0054",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email do financeiro sobre horas extras no Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0055",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email do financeiro sobre horas extras no Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0056",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email do financeiro sobre horas extras no Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0057",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email do financeiro sobre horas extras no Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0058",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar o email do financeiro sobre horas extras no Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0059",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Outlook menções de queda"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0060",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Slack menções de queda"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0061",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Teams menções de queda"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0062",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no dropbox para proposta"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0063",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Gmail para proposta"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0064",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Google Drive para proposta"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0065",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no outlook para proposta"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0066",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Slack para proposta"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0067",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar mensagens no Teams para proposta"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0068",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar caixa do Dropbox da semana passada"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0069",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar caixa do Gmail da semana passada"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0070",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar caixa do Google Drive da semana passada"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0071",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar caixa do Outlook da semana passada"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0072",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar caixa do Slack da semana passada"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0073",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar caixa do Teams da semana passada"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0074",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Dropbox"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0075",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Dropbox para faturas"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0076",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Dropbox plano de migração"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0077",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar emails Dropbox do financeiro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0078",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar emails Gmail do financeiro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0079",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar emails Google Drive do financeiro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0080",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar emails Outlook do financeiro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0081",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar emails Slack do financeiro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0082",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar emails Teams do financeiro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0083",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Gmail"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0084",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Gmail para faturas"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0085",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Gmail plano de migração"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0086",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Google Drive"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0087",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Google Drive para faturas"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0088",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Google Drive plano de migração"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0089",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar na colecao Dropbox por orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0090",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar na colecao Gmail por orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0091",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar na colecao Google Drive por orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0092",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar na colecao Outlook por orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0093",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar na colecao Slack por orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0094",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar na colecao Teams por orçamento"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0095",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Outlook"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0096",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Outlook para faturas"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0097",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Outlook plano de migração"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0098",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Slack"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0099",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Slack para faturas"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0100",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Slack plano de migração"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0101",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Teams"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0102",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Teams para faturas"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0103",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "pesquisar Teams plano de migração"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0104",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Dropbox alertas de segurança"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0105",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Gmail alertas de segurança"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0106",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Google Drive alertas de segurança"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0107",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Outlook alertas de segurança"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0108",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Slack alertas de segurança"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0109",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar em Teams alertas de segurança"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0110",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar mensagens do Dropbox de Pedro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0111",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar mensagens do Gmail de Pedro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0112",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar mensagens do Google Drive de Pedro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0113",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar mensagens do Outlook de Pedro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0114",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar mensagens do Slack de Pedro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0115",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar mensagens do Teams de Pedro"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0116",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Dropbox a atualização mais recente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0117",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "dropbox",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Dropbox relatório Q4"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:dropbox"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "dropbox",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0118",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Gmail a atualização mais recente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0119",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "gmail",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Gmail relatório Q4"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:gmail"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "gmail",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0120",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Google Drive a atualização mais recente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0121",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "drive",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Google Drive relatório Q4"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:drive"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "drive",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0122",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Outlook a atualização mais recente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0123",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "outlook",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Outlook relatório Q4"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:outlook"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "outlook",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0124",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Slack a atualização mais recente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0125",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "slack",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Slack relatório Q4"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:slack"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "slack",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0126",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Teams a atualização mais recente"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0127",
+      "intent": "CONNECTORS"
+    },
+    {
+      "operation": "SEARCH",
+      "connectorHint": "teams",
+      "requiredSlots": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "askOneQuestionTemplate": "Qual é o remetente, o canal, o termo de busca, a pasta e o intervalo de tempo?",
+      "pt": [
+        "consultar no Teams relatório Q4"
+      ],
+      "triggers": [
+        "intent:CONNECTORS",
+        "operation:search",
+        "connector:teams"
+      ],
+      "negatives": [
+        "não é pergunta sobre documento",
+        "não usar para abrir_ou_editar_arquivos",
+        "não resumir_ou_analisar_documentos",
+        "evitar navegação de arquivos",
+        "ignorar solicitações de edição de conteúdo",
+        "ignorar perguntas de seção de documento",
+        "ignore_local_file_navigation",
+        "ignorar_navegação_ou_abertura_de_arquivos",
+        "ignorar_pedir_busca_de_documento",
+        "ignorar_requisições_de_resumo_de_documento",
+        "ignorar_edição_de_conteúdo_de_arquivos"
+      ],
+      "slotHints": [
+        "query",
+        "channel",
+        "folder",
+        "timeRange"
+      ],
+      "telemetryTags": [
+        "connectors",
+        "pt",
+        "search",
+        "teams",
+        "pattern_match"
+      ],
+      "id": "SEAR_PT_0128",
+      "intent": "CONNECTORS"
+    }
+  ]
+}

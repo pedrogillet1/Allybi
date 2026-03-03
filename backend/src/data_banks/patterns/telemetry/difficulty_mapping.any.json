@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "id": "marketing_difficulty_mapping",
+    "version": "1.0.0",
+    "description": "Difficulty bands for marketing discovery query complexity and evidence requirements.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true
+  },
+  "levels": [
+    {
+      "difficulty": "easy",
+      "tokenRange": [
+        0,
+        6
+      ],
+      "hints": [
+        "single_metric",
+        "single_entity",
+        "single_scope"
+      ],
+      "expectedEvidenceCost": "low",
+      "allowedLatencyMs": 300
+    },
+    {
+      "difficulty": "moderate",
+      "tokenRange": [
+        7,
+        20
+      ],
+      "hints": [
+        "time_scope",
+        "single_join"
+      ],
+      "expectedEvidenceCost": "medium",
+      "allowedLatencyMs": 700
+    },
+    {
+      "difficulty": "advanced",
+      "tokenRange": [
+        21,
+        40
+      ],
+      "hints": [
+        "cross_doc",
+        "multi_metric",
+        "qualification_required"
+      ],
+      "expectedEvidenceCost": "high",
+      "allowedLatencyMs": 1400
+    },
+    {
+      "difficulty": "expert",
+      "tokenRange": [
+        41,
+        999
+      ],
+      "hints": [
+        "multi_step",
+        "ambiguity_resolution",
+        "risk_checks"
+      ],
+      "expectedEvidenceCost": "highest",
+      "allowedLatencyMs": 2500
+    }
+  ]
+}

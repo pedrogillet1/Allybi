@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "id": "contradiction_policy",
+    "version": "1.0.0",
+    "description": "Policy for handling internal contradictions and mutually-exclusive source signals.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requireContradictionResolution": true
+  },
+  "contradictionChecks": [
+    {
+      "id": "CP_001_cross_statement_conflict",
+      "trigger": "Two supported source statements disagree on a core numeric value.",
+      "check": "sourceValuesByStatement.hasConflict == true",
+      "failureAction": "REQUEST_RESOLUTION_OR_LIST_BOTH",
+      "severity": "high",
+      "resolution": "presentBothWithSourceLabels",
+      "examples": [
+        "Doc A says 120,000 and doc B says 118,000 for same metric/period.",
+        "Opening balance differs by 2k across statement pages."
+      ]
+    },
+    {
+      "id": "CP_002_sign_swap_conflict",
+      "trigger": "One fact indicates debit positive while another indicates credit for same row.",
+      "check": "factPair.signConventionConflict == true",
+      "failureAction": "DECLINE_WITH_CONVENTION_QUESTION",
+      "severity": "error",
+      "examples": [
+        "Row labeled Expense appears positive in one pass and negative in another.",
+        "Revenue row sign interpretation conflict."
+      ]
+    },
+    {
+      "id": "CP_003_entity_conflict",
+      "trigger": "Parties differ between headings and body for same metric.",
+      "check": "row.entityFromHeader != row.entityFromBody",
+      "failureAction": "BLOCK_AND_ASK_ENTITY_CONFIRMATION",
+      "severity": "warning",
+      "examples": [
+        "Header says Subsidiary A, body values belong to Subsidiary B.",
+        "Party name drift inside same section."
+      ]
+    }
+  ],
+  "escalations": [
+    {
+      "id": "CP_001",
+      "when": "contradictions >= 1 AND confidence < 0.8",
+      "action": "ASK_DISAMBIGUATION_QUESTION"
+    },
+    {
+      "id": "CP_002",
+      "when": "criticalContradiction == true",
+      "action": "BLOCK_AND_RETURN_CLARIFICATION"
+    }
+  ],
+  "templates": [
+    {
+      "id": "CONTRADICTION_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a contradiction policy rule is missing.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ]
+}

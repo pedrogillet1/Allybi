@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "id": "unsafe_inference_rules",
+    "version": "1.0.0",
+    "description": "Prevents inference and extrapolation beyond provided evidence.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "allowEstimatedFallback": false
+  },
+  "rules": [
+    {
+      "id": "UIR_001_missing_table_context_inference",
+      "trigger": "Numeric answer inferred from row trend without explicit line value.",
+      "check": "output.answerMethod == 'inferred' AND output.supportedByTableCell == false",
+      "failureAction": "BLOCK_AND_REQUEST_CITED_VALUE",
+      "severity": "error",
+      "examples": [
+        "Says the value rose without row citation.",
+        "Forecast implied from a single partial row."
+      ]
+    },
+    {
+      "id": "UIR_002_cross_document_inference_without_lock",
+      "trigger": "Inference combines values from different documents without explicit comparison mode.",
+      "check": "context.comparisonAcrossDocs == true AND context.docLockActive == false",
+      "failureAction": "ASK_DOC_SCOPE_OR_RETURN_PER_DOC",
+      "severity": "warning"
+    },
+    {
+      "id": "UIR_003_default_unit_inference",
+      "trigger": "Units inferred from locale rather than explicit source.",
+      "check": "fact.type == 'numeric' AND fact.unit == null AND context.valueLocale == 'ambiguous'",
+      "failureAction": "ASK_UNIT_OR_DISCLAIMER",
+      "severity": "error"
+    },
+    {
+      "id": "UIR_004_entity_inference_without_mention",
+      "trigger": "Entity treated as present based on pronoun/implicit reference only.",
+      "check": "fact.entity == 'implicit' AND context.requiresExplicitEntity == true",
+      "failureAction": "REQUEST_ENTITY_CLARIFICATION",
+      "severity": "warning"
+    },
+    {
+      "id": "UIR_005_temporal_interpolation",
+      "trigger": "Gap-filled trend values returned for non-periodic data.",
+      "check": "output.generatedTrendModel == true AND context.sourceGapFilled == false",
+      "failureAction": "DECLINE_WITH_NO_INTERPOLATION",
+      "severity": "warning"
+    }
+  ]
+}

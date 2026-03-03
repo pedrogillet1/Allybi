@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "id": "transition_phrases",
+    "version": "1.0.0",
+    "description": "Transition phrases for smoother responses.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "phrases": {
+    "en": [
+      "Then",
+      "Next",
+      "Now",
+      "Also"
+    ],
+    "pt": [
+      "Em seguida",
+      "Depois",
+      "Agora",
+      "Tambem"
+    ]
+  },
+  "config": {
+    "enabled": true
+  }
+}

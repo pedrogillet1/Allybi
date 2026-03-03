@@ -1,0 +1,3235 @@
+{
+  "_meta": {
+    "id": "nav_failure_recovery",
+    "version": "1.0.0",
+    "description": "Recovery coverage for navigation failures: not found, permission denied, multiple matches, with single-question disambiguation.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "owner": "navigation-patterning",
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requiresNavigationMode": true,
+    "deterministic": true,
+    "oneQuestionOnly": true
+  },
+  "patterns": [
+    {
+      "id": "NFR_0001",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "document",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No document was found. Show nearest document matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum document foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "document"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0002",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "document",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to document is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao document negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "document"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0003",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "document",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple documents found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários documents encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "document"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0004",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "document",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple documents found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários documents encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "document"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0005",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "document",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple documents found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários documents encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "document"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0006",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "folder",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No folder was found. Show nearest folder matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum folder foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "folder"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0007",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "folder",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to folder is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao folder negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "folder"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0008",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "folder",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple folders found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários folders encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "folder"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0009",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "folder",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple folders found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários folders encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "folder"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0010",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "folder",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple folders found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários folders encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "folder"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0011",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "spreadsheet",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No spreadsheet was found. Show nearest spreadsheet matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum spreadsheet foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "spreadsheet"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0012",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "spreadsheet",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to spreadsheet is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao spreadsheet negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "spreadsheet"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0013",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "spreadsheet",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple spreadsheets found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários spreadsheets encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "spreadsheet"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0014",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "spreadsheet",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple spreadsheets found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários spreadsheets encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "spreadsheet"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0015",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "spreadsheet",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple spreadsheets found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários spreadsheets encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "spreadsheet"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0016",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "presentation",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No presentation was found. Show nearest presentation matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum presentation foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "presentation"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0017",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "presentation",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to presentation is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao presentation negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "presentation"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0018",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "presentation",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple presentations found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários presentations encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "presentation"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0019",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "presentation",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple presentations found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários presentations encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "presentation"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0020",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "presentation",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple presentations found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários presentations encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "presentation"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0021",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "invoice",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No invoice was found. Show nearest invoice matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum invoice foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "invoice"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0022",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "invoice",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to invoice is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao invoice negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "invoice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0023",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "invoice",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple invoices found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários invoices encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "invoice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0024",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "invoice",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple invoices found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários invoices encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "invoice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0025",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "invoice",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple invoices found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários invoices encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "invoice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0026",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "receipt",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No receipt was found. Show nearest receipt matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum receipt foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "receipt"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0027",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "receipt",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to receipt is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao receipt negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "receipt"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0028",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "receipt",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple receipts found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários receipts encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "receipt"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0029",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "receipt",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple receipts found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários receipts encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "receipt"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0030",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "receipt",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple receipts found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários receipts encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "receipt"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0031",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "contract",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No contract was found. Show nearest contract matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum contract foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "contract"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0032",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "contract",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to contract is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao contract negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "contract"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0033",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "contract",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple contracts found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários contracts encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "contract"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0034",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "contract",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple contracts found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários contracts encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "contract"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0035",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "contract",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple contracts found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários contracts encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "contract"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0036",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "policy",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No policy was found. Show nearest policy matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum policy foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "policy"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0037",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "policy",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to policy is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao policy negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "policy"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0038",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "policy",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple policys found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários policys encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "policy"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0039",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "policy",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple policys found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários policys encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "policy"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0040",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "policy",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple policys found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários policys encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "policy"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0041",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "claim",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No claim was found. Show nearest claim matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum claim foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "claim"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0042",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "claim",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to claim is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao claim negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0043",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "claim",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple claims found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários claims encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0044",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "claim",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple claims found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários claims encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0045",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "claim",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple claims found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários claims encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0046",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "ledger",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No ledger was found. Show nearest ledger matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum ledger foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "ledger"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0047",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "ledger",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to ledger is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao ledger negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "ledger"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0048",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "ledger",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple ledgers found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários ledgers encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "ledger"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0049",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "ledger",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple ledgers found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários ledgers encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "ledger"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0050",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "ledger",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple ledgers found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários ledgers encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "ledger"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0051",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "statement",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No statement was found. Show nearest statement matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum statement foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "statement"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0052",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "statement",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to statement is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao statement negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "statement"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0053",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "statement",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple statements found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários statements encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "statement"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0054",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "statement",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple statements found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários statements encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "statement"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0055",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "statement",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple statements found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários statements encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "statement"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0056",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "legal memo",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No legal memo was found. Show nearest legal memo matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum legal memo foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "legal memo"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0057",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "legal memo",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to legal memo is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao legal memo negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "legal memo"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0058",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "legal memo",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple legal memos found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários legal memos encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "legal memo"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0059",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "legal memo",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple legal memos found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários legal memos encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "legal memo"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0060",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "legal memo",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple legal memos found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários legal memos encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "legal memo"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0061",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "medical report",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No medical report was found. Show nearest medical report matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum medical report foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "medical report"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0062",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "medical report",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to medical report is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao medical report negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "medical report"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0063",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "medical report",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple medical reports found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários medical reports encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "medical report"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0064",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "medical report",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple medical reports found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários medical reports encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "medical report"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0065",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "medical report",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple medical reports found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários medical reports encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "medical report"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0066",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "tax filing",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No tax filing was found. Show nearest tax filing matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum tax filing foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "tax filing"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0067",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "tax filing",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to tax filing is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao tax filing negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "tax filing"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0068",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "tax filing",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple tax filings found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários tax filings encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "tax filing"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0069",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "tax filing",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple tax filings found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários tax filings encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "tax filing"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0070",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "tax filing",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple tax filings found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários tax filings encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "tax filing"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0071",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "rent notice",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No rent notice was found. Show nearest rent notice matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum rent notice foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "rent notice"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0072",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "rent notice",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to rent notice is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao rent notice negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "rent notice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0073",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "rent notice",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple rent notices found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários rent notices encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "rent notice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0074",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "rent notice",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple rent notices found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários rent notices encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "rent notice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0075",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "rent notice",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple rent notices found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários rent notices encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "rent notice"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0076",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "identity file",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No identity file was found. Show nearest identity file matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum identity file foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "identity file"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0077",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "identity file",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to identity file is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao identity file negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "identity file"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0078",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "identity file",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple identity files found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários identity files encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "identity file"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0079",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "identity file",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple identity files found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários identity files encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "identity file"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0080",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "identity file",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple identity files found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários identity files encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "identity file"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0081",
+      "category": "not_found",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "insurance claim",
+      "disambiguationTemplateId": "nav.recovery.nearest_matches",
+      "en": [
+        "No insurance claim was found. Show nearest insurance claim matches and ask follow-up only if needed."
+      ],
+      "pt": [
+        "Nenhum insurance claim foi encontrado. Mostre os mais próximos e faça pergunta de continuidade se necessário."
+      ],
+      "action": {
+        "mode": "nearest_matches",
+        "topN": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "eq",
+        "value": 0,
+        "scope": "insurance claim"
+      },
+      "controls": {
+        "askQuestion": false,
+        "askSingleQuestion": false
+      }
+    },
+    {
+      "id": "NFR_0082",
+      "category": "permission_denied",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "insurance claim",
+      "disambiguationTemplateId": "nav.recovery.permission_retry",
+      "en": [
+        "Access to insurance claim is denied. Ask one concise question for another allowed scope."
+      ],
+      "pt": [
+        "Acesso ao insurance claim negado. Faça uma pergunta única sobre escopo alternativo permitido."
+      ],
+      "action": {
+        "mode": "request_permission_or_alternate",
+        "alternatives": [
+          "scope_lock",
+          "adjacent_folder",
+          "metadata_preview"
+        ]
+      },
+      "condition": {
+        "type": "access",
+        "value": "permission_denied",
+        "scope": "insurance claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0083",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "insurance claim",
+      "disambiguationTemplateId": "nav.recovery.choose_one_1",
+      "en": [
+        "Multiple insurance claims found. Ask one pill question and rank top 3 options."
+      ],
+      "pt": [
+        "Vários insurance claims encontrados. Faça uma pergunta com botões e mantenha as 3 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 3
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "insurance claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0084",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "insurance claim",
+      "disambiguationTemplateId": "nav.recovery.choose_one_2",
+      "en": [
+        "Multiple insurance claims found. Ask one pill question and rank top 4 options."
+      ],
+      "pt": [
+        "Vários insurance claims encontrados. Faça uma pergunta com botões e mantenha as 4 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 4
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "insurance claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    },
+    {
+      "id": "NFR_0085",
+      "category": "multiple_matches",
+      "requiresNavigationMode": true,
+      "contextGates": {
+        "all": [
+          {
+            "path": "answerMode",
+            "op": "eq",
+            "value": "navigation"
+          }
+        ]
+      },
+      "scenario": "insurance claim",
+      "disambiguationTemplateId": "nav.recovery.choose_one_3",
+      "en": [
+        "Multiple insurance claims found. Ask one pill question and rank top 5 options."
+      ],
+      "pt": [
+        "Vários insurance claims encontrados. Faça uma pergunta com botões e mantenha as 5 melhores opções."
+      ],
+      "action": {
+        "mode": "ask_single_question",
+        "showPills": true,
+        "maxOptions": 5
+      },
+      "condition": {
+        "type": "candidate_count",
+        "relation": "gte",
+        "min": 2,
+        "max": 20,
+        "scope": "insurance claim"
+      },
+      "controls": {
+        "askQuestion": true,
+        "askSingleQuestion": true
+      }
+    }
+  ]
+}

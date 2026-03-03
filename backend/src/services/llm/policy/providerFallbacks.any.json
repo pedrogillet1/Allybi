@@ -1,37 +1,33 @@
 {
   "_meta": {
-    "id": "provider_fallbacks",
-    "version": "1.0.0",
-    "description": "Fallback chains for LLM provider failures",
-    "lastUpdated": "2025-01-01"
+    "id": "providerFallbacks",
+    "version": "2.0.0",
+    "description": "Fallback chains for LLM provider failures (when/try schema)",
+    "lastUpdated": "2026-03-03"
   },
+  "config": { "enabled": true },
   "fallbacks": [
     {
-      "primary": "gemini",
-      "fallbacks": ["openai", "local"],
-      "conditions": {
-        "onError": true,
-        "onTimeout": true,
-        "onRateLimit": true
-      }
+      "when": { "provider": "gemini" },
+      "try": [
+        { "provider": "openai", "model": "gpt-5-mini" },
+        { "provider": "openai", "model": "gpt-5.2" },
+        { "provider": "local", "model": "local-default" }
+      ]
     },
     {
-      "primary": "openai",
-      "fallbacks": ["gemini", "local"],
-      "conditions": {
-        "onError": true,
-        "onTimeout": true,
-        "onRateLimit": true
-      }
+      "when": { "provider": "openai" },
+      "try": [
+        { "provider": "gemini", "model": "gemini-2.5-flash" },
+        { "provider": "local", "model": "local-default" }
+      ]
     },
     {
-      "primary": "local",
-      "fallbacks": ["gemini", "openai"],
-      "conditions": {
-        "onError": true,
-        "onTimeout": false,
-        "onRateLimit": false
-      }
+      "when": { "provider": "local" },
+      "try": [
+        { "provider": "gemini", "model": "gemini-2.5-flash" },
+        { "provider": "openai", "model": "gpt-5-mini" }
+      ]
     }
   ]
 }

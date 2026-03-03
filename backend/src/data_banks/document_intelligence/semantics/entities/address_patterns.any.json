@@ -1,0 +1,3383 @@
+{
+  "_meta": {
+    "id": "address_patterns",
+    "version": "1.3.0",
+    "description": "Cross-domain address extraction patterns with EN/PT variants and robust locale-aware examples.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "normalizationContract": {
+      "version": "2.0.0",
+      "requireRuleNormalizationContract": true,
+      "defaultLocaleSensitivity": "high",
+      "requireCurationReason": true,
+      "requireConfidenceModel": true
+    }
+  },
+  "rules": [
+    {
+      "id": "address_001",
+      "name": "address_rule_001",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Street|\\s+street)\\b.*?,?\\s*(?:Apt\\s*101|101)?,?\\s*(?:New York|CA|USA)\\b",
+      "examples": [
+        "101 Street Apt 1, New York CA",
+        "101 Street New York, USA",
+        "101 street Apt 1 - New York, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 001.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_002",
+      "name": "address_rule_002",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenue|\\s+avenue)\\b.*?,?\\s*(?:Suite\\s*102|102)?,?\\s*(?:Boston|NY|United States)\\b",
+      "examples": [
+        "102 Avenue Suite 2, Boston NY",
+        "102 Avenue Boston, United States",
+        "102 avenue Suite 2 - Boston, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 002.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_003",
+      "name": "address_rule_003",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Road|\\s+road)\\b.*?,?\\s*(?:Unit\\s*103|103)?,?\\s*(?:Miami|TX|Brazil)\\b",
+      "examples": [
+        "103 Road Unit 3, Miami TX",
+        "103 Road Miami, Brazil",
+        "103 road Unit 3 - Miami, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 003.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_004",
+      "name": "address_rule_004",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Boulevard|\\s+boulevard)\\b.*?,?\\s*(?:Floor\\s*104|104)?,?\\s*(?:Lisbon|MA|Portugal)\\b",
+      "examples": [
+        "104 Boulevard Floor 4, Lisbon MA",
+        "104 Boulevard Lisbon, Portugal",
+        "104 boulevard Floor 4 - Lisbon, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 004.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_005",
+      "name": "address_rule_005",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Drive|\\s+drive)\\b.*?,?\\s*(?:Bloco\\s*105|105)?,?\\s*(?:Porto|SP|UK)\\b",
+      "examples": [
+        "105 Drive Bloco 5, Porto SP",
+        "105 Drive Porto, UK",
+        "105 drive Bloco 5 - Porto, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 005.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_006",
+      "name": "address_rule_006",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Lane|\\s+lane)\\b.*?,?\\s*(?:Loja\\s*106|106)?,?\\s*(?:Sao Paulo|RJ|Canada)\\b",
+      "examples": [
+        "106 Lane Loja 6, Sao Paulo RJ",
+        "106 Lane Sao Paulo, Canada",
+        "106 lane Loja 6 - Sao Paulo, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 006.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_007",
+      "name": "address_rule_007",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Plaza|\\s+plaza)\\b.*?,?\\s*(?:Apt\\s*107|107)?,?\\s*(?:Campinas|Lisbon District|Spain)\\b",
+      "examples": [
+        "107 Plaza Apt 7, Campinas Lisbon District",
+        "107 Plaza Campinas, Spain",
+        "107 plaza Apt 7 - Campinas, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 007.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_008",
+      "name": "address_rule_008",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Court|\\s+court)\\b.*?,?\\s*(?:Suite\\s*108|108)?,?\\s*(?:London|Los Angeles County|Italy)\\b",
+      "examples": [
+        "108 Court Suite 8, London Los Angeles County",
+        "108 Court London, Italy",
+        "108 court Suite 8 - London, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 008.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_009",
+      "name": "address_rule_009",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Circle|\\s+circle)\\b.*?,?\\s*(?:Unit\\s*109|109)?,?\\s*(?:Berlin|Middlesex|USA)\\b",
+      "examples": [
+        "109 Circle Unit 9, Berlin Middlesex",
+        "109 Circle Berlin, USA",
+        "109 circle Unit 9 - Berlin, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 009.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_010",
+      "name": "address_rule_010",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Way|\\s+way)\\b.*?,?\\s*(?:Floor\\s*110|110)?,?\\s*(?:Madrid|Ontario|United States)\\b",
+      "examples": [
+        "110 Way Floor 10, Madrid Ontario",
+        "110 Way Madrid, United States",
+        "110 way Floor 10 - Madrid, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 010.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_011",
+      "name": "address_rule_011",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Alley|\\s+alley)\\b.*?,?\\s*(?:Bloco\\s*111|111)?,?\\s*(?:Paris|California|Brazil)\\b",
+      "examples": [
+        "111 Alley Bloco 11, Paris California",
+        "111 Alley Paris, Brazil",
+        "111 alley Bloco 11 - Paris, California"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 011.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_012",
+      "name": "address_rule_012",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Place|\\s+place)\\b.*?,?\\s*(?:Loja\\s*112|112)?,?\\s*(?:Rome|CA|Portugal)\\b",
+      "examples": [
+        "112 Place Loja 12, Rome CA",
+        "112 Place Rome, Portugal",
+        "112 place Loja 12 - Rome, CA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 012.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_013",
+      "name": "address_rule_013",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Terrace|\\s+terrace)\\b.*?,?\\s*(?:Apt\\s*113|113)?,?\\s*(?:Prague|NY|UK)\\b",
+      "examples": [
+        "113 Terrace Apt 13, Prague NY",
+        "113 Terrace Prague, UK",
+        "113 terrace Apt 13 - Prague, NY"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 013.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_014",
+      "name": "address_rule_014",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Highway|\\s+highway)\\b.*?,?\\s*(?:Suite\\s*114|114)?,?\\s*(?:Austin|TX|Canada)\\b",
+      "examples": [
+        "114 Highway Suite 14, Austin TX",
+        "114 Highway Austin, Canada",
+        "114 highway Suite 14 - Austin, TX"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 014.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_015",
+      "name": "address_rule_015",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Freeway|\\s+freeway)\\b.*?,?\\s*(?:Unit\\s*115|115)?,?\\s*(?:Toronto|MA|Spain)\\b",
+      "examples": [
+        "115 Freeway Unit 15, Toronto MA",
+        "115 Freeway Toronto, Spain",
+        "115 freeway Unit 15 - Toronto, MA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 015.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_016",
+      "name": "address_rule_016",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rua|\\s+rua)\\b.*?,?\\s*(?:Floor\\s*116|116)?,?\\s*(?:New York|SP|Italy)\\b",
+      "examples": [
+        "116 Rua Floor 16, New York SP",
+        "116 Rua New York, Italy",
+        "116 rua Floor 16 - New York, SP"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 016.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_017",
+      "name": "address_rule_017",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenida|\\s+avenida)\\b.*?,?\\s*(?:Bloco\\s*117|117)?,?\\s*(?:Boston|RJ|USA)\\b",
+      "examples": [
+        "117 Avenida Bloco 17, Boston RJ",
+        "117 Avenida Boston, USA",
+        "117 avenida Bloco 17 - Boston, RJ"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 017.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_018",
+      "name": "address_rule_018",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Travessa|\\s+travessa)\\b.*?,?\\s*(?:Loja\\s*118|118)?,?\\s*(?:Miami|Lisbon District|United States)\\b",
+      "examples": [
+        "118 Travessa Loja 18, Miami Lisbon District",
+        "118 Travessa Miami, United States",
+        "118 travessa Loja 18 - Miami, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 018.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_019",
+      "name": "address_rule_019",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Ramal|\\s+ramal)\\b.*?,?\\s*(?:Apt\\s*119|119)?,?\\s*(?:Lisbon|Los Angeles County|Brazil)\\b",
+      "examples": [
+        "119 Ramal Apt 19, Lisbon Los Angeles County",
+        "119 Ramal Lisbon, Brazil",
+        "119 ramal Apt 19 - Lisbon, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 019.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_020",
+      "name": "address_rule_020",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rodovia|\\s+rodovia)\\b.*?,?\\s*(?:Suite\\s*120|120)?,?\\s*(?:Porto|Middlesex|Portugal)\\b",
+      "examples": [
+        "120 Rodovia Suite 20, Porto Middlesex",
+        "120 Rodovia Porto, Portugal",
+        "120 rodovia Suite 20 - Porto, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 020.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_021",
+      "name": "address_rule_021",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Estrada|\\s+estrada)\\b.*?,?\\s*(?:Unit\\s*121|121)?,?\\s*(?:Sao Paulo|Ontario|UK)\\b",
+      "examples": [
+        "121 Estrada Unit 21, Sao Paulo Ontario",
+        "121 Estrada Sao Paulo, UK",
+        "121 estrada Unit 21 - Sao Paulo, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 021.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_022",
+      "name": "address_rule_022",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Viela|\\s+viela)\\b.*?,?\\s*(?:Floor\\s*122|122)?,?\\s*(?:Campinas|California|Canada)\\b",
+      "examples": [
+        "122 Viela Floor 22, Campinas California",
+        "122 Viela Campinas, Canada",
+        "122 viela Floor 22 - Campinas, California"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 022.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_023",
+      "name": "address_rule_023",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Praca|\\s+praca)\\b.*?,?\\s*(?:Bloco\\s*123|123)?,?\\s*(?:London|CA|Spain)\\b",
+      "examples": [
+        "123 Praca Bloco 23, London CA",
+        "123 Praca London, Spain",
+        "123 praca Bloco 23 - London, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 023.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_024",
+      "name": "address_rule_024",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Largo|\\s+largo)\\b.*?,?\\s*(?:Loja\\s*124|124)?,?\\s*(?:Berlin|NY|Italy)\\b",
+      "examples": [
+        "124 Largo Loja 24, Berlin NY",
+        "124 Largo Berlin, Italy",
+        "124 largo Loja 24 - Berlin, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 024.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_025",
+      "name": "address_rule_025",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Passagem|\\s+passagem)\\b.*?,?\\s*(?:Apt\\s*125|125)?,?\\s*(?:Madrid|TX|USA)\\b",
+      "examples": [
+        "125 Passagem Apt 25, Madrid TX",
+        "125 Passagem Madrid, USA",
+        "125 passagem Apt 25 - Madrid, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 025.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_026",
+      "name": "address_rule_026",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Street|\\s+street)\\b.*?,?\\s*(?:Suite\\s*126|126)?,?\\s*(?:Paris|MA|United States)\\b",
+      "examples": [
+        "126 Street Suite 26, Paris MA",
+        "126 Street Paris, United States",
+        "126 street Suite 26 - Paris, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 026.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_027",
+      "name": "address_rule_027",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenue|\\s+avenue)\\b.*?,?\\s*(?:Unit\\s*127|127)?,?\\s*(?:Rome|SP|Brazil)\\b",
+      "examples": [
+        "127 Avenue Unit 27, Rome SP",
+        "127 Avenue Rome, Brazil",
+        "127 avenue Unit 27 - Rome, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 027.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_028",
+      "name": "address_rule_028",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Road|\\s+road)\\b.*?,?\\s*(?:Floor\\s*128|128)?,?\\s*(?:Prague|RJ|Portugal)\\b",
+      "examples": [
+        "128 Road Floor 28, Prague RJ",
+        "128 Road Prague, Portugal",
+        "128 road Floor 28 - Prague, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 028.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_029",
+      "name": "address_rule_029",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Boulevard|\\s+boulevard)\\b.*?,?\\s*(?:Bloco\\s*129|129)?,?\\s*(?:Austin|Lisbon District|UK)\\b",
+      "examples": [
+        "129 Boulevard Bloco 29, Austin Lisbon District",
+        "129 Boulevard Austin, UK",
+        "129 boulevard Bloco 29 - Austin, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 029.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_030",
+      "name": "address_rule_030",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Drive|\\s+drive)\\b.*?,?\\s*(?:Loja\\s*130|130)?,?\\s*(?:Toronto|Los Angeles County|Canada)\\b",
+      "examples": [
+        "130 Drive Loja 30, Toronto Los Angeles County",
+        "130 Drive Toronto, Canada",
+        "130 drive Loja 30 - Toronto, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 030.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_031",
+      "name": "address_rule_031",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Lane|\\s+lane)\\b.*?,?\\s*(?:Apt\\s*131|131)?,?\\s*(?:New York|Middlesex|Spain)\\b",
+      "examples": [
+        "131 Lane Apt 31, New York Middlesex",
+        "131 Lane New York, Spain",
+        "131 lane Apt 31 - New York, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 031.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_032",
+      "name": "address_rule_032",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Plaza|\\s+plaza)\\b.*?,?\\s*(?:Suite\\s*132|132)?,?\\s*(?:Boston|Ontario|Italy)\\b",
+      "examples": [
+        "132 Plaza Suite 32, Boston Ontario",
+        "132 Plaza Boston, Italy",
+        "132 plaza Suite 32 - Boston, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 032.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_033",
+      "name": "address_rule_033",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Court|\\s+court)\\b.*?,?\\s*(?:Unit\\s*133|133)?,?\\s*(?:Miami|California|USA)\\b",
+      "examples": [
+        "133 Court Unit 33, Miami California",
+        "133 Court Miami, USA",
+        "133 court Unit 33 - Miami, California"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 033.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_034",
+      "name": "address_rule_034",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Circle|\\s+circle)\\b.*?,?\\s*(?:Floor\\s*134|134)?,?\\s*(?:Lisbon|CA|United States)\\b",
+      "examples": [
+        "134 Circle Floor 34, Lisbon CA",
+        "134 Circle Lisbon, United States",
+        "134 circle Floor 34 - Lisbon, CA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 034.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_035",
+      "name": "address_rule_035",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Way|\\s+way)\\b.*?,?\\s*(?:Bloco\\s*135|135)?,?\\s*(?:Porto|NY|Brazil)\\b",
+      "examples": [
+        "135 Way Bloco 35, Porto NY",
+        "135 Way Porto, Brazil",
+        "135 way Bloco 35 - Porto, NY"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 035.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_036",
+      "name": "address_rule_036",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Alley|\\s+alley)\\b.*?,?\\s*(?:Loja\\s*136|136)?,?\\s*(?:Sao Paulo|TX|Portugal)\\b",
+      "examples": [
+        "136 Alley Loja 36, Sao Paulo TX",
+        "136 Alley Sao Paulo, Portugal",
+        "136 alley Loja 36 - Sao Paulo, TX"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 036.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_037",
+      "name": "address_rule_037",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Place|\\s+place)\\b.*?,?\\s*(?:Apt\\s*137|137)?,?\\s*(?:Campinas|MA|UK)\\b",
+      "examples": [
+        "137 Place Apt 37, Campinas MA",
+        "137 Place Campinas, UK",
+        "137 place Apt 37 - Campinas, MA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 037.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_038",
+      "name": "address_rule_038",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Terrace|\\s+terrace)\\b.*?,?\\s*(?:Suite\\s*138|138)?,?\\s*(?:London|SP|Canada)\\b",
+      "examples": [
+        "138 Terrace Suite 38, London SP",
+        "138 Terrace London, Canada",
+        "138 terrace Suite 38 - London, SP"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 038.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_039",
+      "name": "address_rule_039",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Highway|\\s+highway)\\b.*?,?\\s*(?:Unit\\s*139|139)?,?\\s*(?:Berlin|RJ|Spain)\\b",
+      "examples": [
+        "139 Highway Unit 39, Berlin RJ",
+        "139 Highway Berlin, Spain",
+        "139 highway Unit 39 - Berlin, RJ"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 039.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_040",
+      "name": "address_rule_040",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Freeway|\\s+freeway)\\b.*?,?\\s*(?:Floor\\s*140|140)?,?\\s*(?:Madrid|Lisbon District|Italy)\\b",
+      "examples": [
+        "140 Freeway Floor 40, Madrid Lisbon District",
+        "140 Freeway Madrid, Italy",
+        "140 freeway Floor 40 - Madrid, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 040.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_041",
+      "name": "address_rule_041",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rua|\\s+rua)\\b.*?,?\\s*(?:Bloco\\s*141|141)?,?\\s*(?:Paris|Los Angeles County|USA)\\b",
+      "examples": [
+        "141 Rua Bloco 41, Paris Los Angeles County",
+        "141 Rua Paris, USA",
+        "141 rua Bloco 41 - Paris, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 041.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_042",
+      "name": "address_rule_042",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenida|\\s+avenida)\\b.*?,?\\s*(?:Loja\\s*142|142)?,?\\s*(?:Rome|Middlesex|United States)\\b",
+      "examples": [
+        "142 Avenida Loja 42, Rome Middlesex",
+        "142 Avenida Rome, United States",
+        "142 avenida Loja 42 - Rome, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 042.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_043",
+      "name": "address_rule_043",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Travessa|\\s+travessa)\\b.*?,?\\s*(?:Apt\\s*143|143)?,?\\s*(?:Prague|Ontario|Brazil)\\b",
+      "examples": [
+        "143 Travessa Apt 43, Prague Ontario",
+        "143 Travessa Prague, Brazil",
+        "143 travessa Apt 43 - Prague, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 043.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_044",
+      "name": "address_rule_044",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Ramal|\\s+ramal)\\b.*?,?\\s*(?:Suite\\s*144|144)?,?\\s*(?:Austin|California|Portugal)\\b",
+      "examples": [
+        "144 Ramal Suite 44, Austin California",
+        "144 Ramal Austin, Portugal",
+        "144 ramal Suite 44 - Austin, California"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 044.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_045",
+      "name": "address_rule_045",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rodovia|\\s+rodovia)\\b.*?,?\\s*(?:Unit\\s*145|145)?,?\\s*(?:Toronto|CA|UK)\\b",
+      "examples": [
+        "145 Rodovia Unit 45, Toronto CA",
+        "145 Rodovia Toronto, UK",
+        "145 rodovia Unit 45 - Toronto, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 045.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_046",
+      "name": "address_rule_046",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Estrada|\\s+estrada)\\b.*?,?\\s*(?:Floor\\s*146|146)?,?\\s*(?:New York|NY|Canada)\\b",
+      "examples": [
+        "146 Estrada Floor 46, New York NY",
+        "146 Estrada New York, Canada",
+        "146 estrada Floor 46 - New York, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 046.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_047",
+      "name": "address_rule_047",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Viela|\\s+viela)\\b.*?,?\\s*(?:Bloco\\s*147|147)?,?\\s*(?:Boston|TX|Spain)\\b",
+      "examples": [
+        "147 Viela Bloco 47, Boston TX",
+        "147 Viela Boston, Spain",
+        "147 viela Bloco 47 - Boston, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 047.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_048",
+      "name": "address_rule_048",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Praca|\\s+praca)\\b.*?,?\\s*(?:Loja\\s*148|148)?,?\\s*(?:Miami|MA|Italy)\\b",
+      "examples": [
+        "148 Praca Loja 48, Miami MA",
+        "148 Praca Miami, Italy",
+        "148 praca Loja 48 - Miami, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 048.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_049",
+      "name": "address_rule_049",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Largo|\\s+largo)\\b.*?,?\\s*(?:Apt\\s*149|149)?,?\\s*(?:Lisbon|SP|USA)\\b",
+      "examples": [
+        "149 Largo Apt 49, Lisbon SP",
+        "149 Largo Lisbon, USA",
+        "149 largo Apt 49 - Lisbon, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 049.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_050",
+      "name": "address_rule_050",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Passagem|\\s+passagem)\\b.*?,?\\s*(?:Suite\\s*150|150)?,?\\s*(?:Porto|RJ|United States)\\b",
+      "examples": [
+        "150 Passagem Suite 50, Porto RJ",
+        "150 Passagem Porto, United States",
+        "150 passagem Suite 50 - Porto, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 050.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_051",
+      "name": "address_rule_051",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Street|\\s+street)\\b.*?,?\\s*(?:Unit\\s*151|151)?,?\\s*(?:Sao Paulo|Lisbon District|Brazil)\\b",
+      "examples": [
+        "151 Street Unit 51, Sao Paulo Lisbon District",
+        "151 Street Sao Paulo, Brazil",
+        "151 street Unit 51 - Sao Paulo, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 051.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_052",
+      "name": "address_rule_052",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenue|\\s+avenue)\\b.*?,?\\s*(?:Floor\\s*152|152)?,?\\s*(?:Campinas|Los Angeles County|Portugal)\\b",
+      "examples": [
+        "152 Avenue Floor 52, Campinas Los Angeles County",
+        "152 Avenue Campinas, Portugal",
+        "152 avenue Floor 52 - Campinas, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 052.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_053",
+      "name": "address_rule_053",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Road|\\s+road)\\b.*?,?\\s*(?:Bloco\\s*153|153)?,?\\s*(?:London|Middlesex|UK)\\b",
+      "examples": [
+        "153 Road Bloco 53, London Middlesex",
+        "153 Road London, UK",
+        "153 road Bloco 53 - London, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 053.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_054",
+      "name": "address_rule_054",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Boulevard|\\s+boulevard)\\b.*?,?\\s*(?:Loja\\s*154|154)?,?\\s*(?:Berlin|Ontario|Canada)\\b",
+      "examples": [
+        "154 Boulevard Loja 54, Berlin Ontario",
+        "154 Boulevard Berlin, Canada",
+        "154 boulevard Loja 54 - Berlin, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 054.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_055",
+      "name": "address_rule_055",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Drive|\\s+drive)\\b.*?,?\\s*(?:Apt\\s*155|155)?,?\\s*(?:Madrid|California|Spain)\\b",
+      "examples": [
+        "155 Drive Apt 55, Madrid California",
+        "155 Drive Madrid, Spain",
+        "155 drive Apt 55 - Madrid, California"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 055.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_056",
+      "name": "address_rule_056",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Lane|\\s+lane)\\b.*?,?\\s*(?:Suite\\s*156|156)?,?\\s*(?:Paris|CA|Italy)\\b",
+      "examples": [
+        "156 Lane Suite 56, Paris CA",
+        "156 Lane Paris, Italy",
+        "156 lane Suite 56 - Paris, CA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 056.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_057",
+      "name": "address_rule_057",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Plaza|\\s+plaza)\\b.*?,?\\s*(?:Unit\\s*157|157)?,?\\s*(?:Rome|NY|USA)\\b",
+      "examples": [
+        "157 Plaza Unit 57, Rome NY",
+        "157 Plaza Rome, USA",
+        "157 plaza Unit 57 - Rome, NY"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 057.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_058",
+      "name": "address_rule_058",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Court|\\s+court)\\b.*?,?\\s*(?:Floor\\s*158|158)?,?\\s*(?:Prague|TX|United States)\\b",
+      "examples": [
+        "158 Court Floor 58, Prague TX",
+        "158 Court Prague, United States",
+        "158 court Floor 58 - Prague, TX"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 058.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_059",
+      "name": "address_rule_059",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Circle|\\s+circle)\\b.*?,?\\s*(?:Bloco\\s*159|159)?,?\\s*(?:Austin|MA|Brazil)\\b",
+      "examples": [
+        "159 Circle Bloco 59, Austin MA",
+        "159 Circle Austin, Brazil",
+        "159 circle Bloco 59 - Austin, MA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 059.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_060",
+      "name": "address_rule_060",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Way|\\s+way)\\b.*?,?\\s*(?:Loja\\s*160|160)?,?\\s*(?:Toronto|SP|Portugal)\\b",
+      "examples": [
+        "160 Way Loja 60, Toronto SP",
+        "160 Way Toronto, Portugal",
+        "160 way Loja 60 - Toronto, SP"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 060.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_061",
+      "name": "address_rule_061",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Alley|\\s+alley)\\b.*?,?\\s*(?:Apt\\s*161|161)?,?\\s*(?:New York|RJ|UK)\\b",
+      "examples": [
+        "161 Alley Apt 61, New York RJ",
+        "161 Alley New York, UK",
+        "161 alley Apt 61 - New York, RJ"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 061.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_062",
+      "name": "address_rule_062",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Place|\\s+place)\\b.*?,?\\s*(?:Suite\\s*162|162)?,?\\s*(?:Boston|Lisbon District|Canada)\\b",
+      "examples": [
+        "162 Place Suite 62, Boston Lisbon District",
+        "162 Place Boston, Canada",
+        "162 place Suite 62 - Boston, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 062.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_063",
+      "name": "address_rule_063",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Terrace|\\s+terrace)\\b.*?,?\\s*(?:Unit\\s*163|163)?,?\\s*(?:Miami|Los Angeles County|Spain)\\b",
+      "examples": [
+        "163 Terrace Unit 63, Miami Los Angeles County",
+        "163 Terrace Miami, Spain",
+        "163 terrace Unit 63 - Miami, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 063.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_064",
+      "name": "address_rule_064",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Highway|\\s+highway)\\b.*?,?\\s*(?:Floor\\s*164|164)?,?\\s*(?:Lisbon|Middlesex|Italy)\\b",
+      "examples": [
+        "164 Highway Floor 64, Lisbon Middlesex",
+        "164 Highway Lisbon, Italy",
+        "164 highway Floor 64 - Lisbon, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 064.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_065",
+      "name": "address_rule_065",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Freeway|\\s+freeway)\\b.*?,?\\s*(?:Bloco\\s*165|165)?,?\\s*(?:Porto|Ontario|USA)\\b",
+      "examples": [
+        "165 Freeway Bloco 65, Porto Ontario",
+        "165 Freeway Porto, USA",
+        "165 freeway Bloco 65 - Porto, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 065.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_066",
+      "name": "address_rule_066",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rua|\\s+rua)\\b.*?,?\\s*(?:Loja\\s*166|166)?,?\\s*(?:Sao Paulo|California|United States)\\b",
+      "examples": [
+        "166 Rua Loja 66, Sao Paulo California",
+        "166 Rua Sao Paulo, United States",
+        "166 rua Loja 66 - Sao Paulo, California"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 066.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_067",
+      "name": "address_rule_067",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenida|\\s+avenida)\\b.*?,?\\s*(?:Apt\\s*167|167)?,?\\s*(?:Campinas|CA|Brazil)\\b",
+      "examples": [
+        "167 Avenida Apt 67, Campinas CA",
+        "167 Avenida Campinas, Brazil",
+        "167 avenida Apt 67 - Campinas, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 067.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_068",
+      "name": "address_rule_068",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Travessa|\\s+travessa)\\b.*?,?\\s*(?:Suite\\s*168|168)?,?\\s*(?:London|NY|Portugal)\\b",
+      "examples": [
+        "168 Travessa Suite 68, London NY",
+        "168 Travessa London, Portugal",
+        "168 travessa Suite 68 - London, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 068.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_069",
+      "name": "address_rule_069",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Ramal|\\s+ramal)\\b.*?,?\\s*(?:Unit\\s*169|169)?,?\\s*(?:Berlin|TX|UK)\\b",
+      "examples": [
+        "169 Ramal Unit 69, Berlin TX",
+        "169 Ramal Berlin, UK",
+        "169 ramal Unit 69 - Berlin, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 069.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_070",
+      "name": "address_rule_070",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rodovia|\\s+rodovia)\\b.*?,?\\s*(?:Floor\\s*170|170)?,?\\s*(?:Madrid|MA|Canada)\\b",
+      "examples": [
+        "170 Rodovia Floor 70, Madrid MA",
+        "170 Rodovia Madrid, Canada",
+        "170 rodovia Floor 70 - Madrid, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 070.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_071",
+      "name": "address_rule_071",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Estrada|\\s+estrada)\\b.*?,?\\s*(?:Bloco\\s*171|171)?,?\\s*(?:Paris|SP|Spain)\\b",
+      "examples": [
+        "171 Estrada Bloco 71, Paris SP",
+        "171 Estrada Paris, Spain",
+        "171 estrada Bloco 71 - Paris, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 071.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_072",
+      "name": "address_rule_072",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Viela|\\s+viela)\\b.*?,?\\s*(?:Loja\\s*172|172)?,?\\s*(?:Rome|RJ|Italy)\\b",
+      "examples": [
+        "172 Viela Loja 72, Rome RJ",
+        "172 Viela Rome, Italy",
+        "172 viela Loja 72 - Rome, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 072.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_073",
+      "name": "address_rule_073",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Praca|\\s+praca)\\b.*?,?\\s*(?:Apt\\s*173|173)?,?\\s*(?:Prague|Lisbon District|USA)\\b",
+      "examples": [
+        "173 Praca Apt 73, Prague Lisbon District",
+        "173 Praca Prague, USA",
+        "173 praca Apt 73 - Prague, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 073.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_074",
+      "name": "address_rule_074",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Largo|\\s+largo)\\b.*?,?\\s*(?:Suite\\s*174|174)?,?\\s*(?:Austin|Los Angeles County|United States)\\b",
+      "examples": [
+        "174 Largo Suite 74, Austin Los Angeles County",
+        "174 Largo Austin, United States",
+        "174 largo Suite 74 - Austin, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 074.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_075",
+      "name": "address_rule_075",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Passagem|\\s+passagem)\\b.*?,?\\s*(?:Unit\\s*175|175)?,?\\s*(?:Toronto|Middlesex|Brazil)\\b",
+      "examples": [
+        "175 Passagem Unit 75, Toronto Middlesex",
+        "175 Passagem Toronto, Brazil",
+        "175 passagem Unit 75 - Toronto, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 075.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_076",
+      "name": "address_rule_076",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Street|\\s+street)\\b.*?,?\\s*(?:Floor\\s*176|176)?,?\\s*(?:New York|Ontario|Portugal)\\b",
+      "examples": [
+        "176 Street Floor 76, New York Ontario",
+        "176 Street New York, Portugal",
+        "176 street Floor 76 - New York, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 076.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_077",
+      "name": "address_rule_077",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenue|\\s+avenue)\\b.*?,?\\s*(?:Bloco\\s*177|177)?,?\\s*(?:Boston|California|UK)\\b",
+      "examples": [
+        "177 Avenue Bloco 77, Boston California",
+        "177 Avenue Boston, UK",
+        "177 avenue Bloco 77 - Boston, California"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 077.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_078",
+      "name": "address_rule_078",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Road|\\s+road)\\b.*?,?\\s*(?:Loja\\s*178|178)?,?\\s*(?:Miami|CA|Canada)\\b",
+      "examples": [
+        "178 Road Loja 78, Miami CA",
+        "178 Road Miami, Canada",
+        "178 road Loja 78 - Miami, CA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 078.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_079",
+      "name": "address_rule_079",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Boulevard|\\s+boulevard)\\b.*?,?\\s*(?:Apt\\s*179|179)?,?\\s*(?:Lisbon|NY|Spain)\\b",
+      "examples": [
+        "179 Boulevard Apt 79, Lisbon NY",
+        "179 Boulevard Lisbon, Spain",
+        "179 boulevard Apt 79 - Lisbon, NY"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 079.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_080",
+      "name": "address_rule_080",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Drive|\\s+drive)\\b.*?,?\\s*(?:Suite\\s*180|180)?,?\\s*(?:Porto|TX|Italy)\\b",
+      "examples": [
+        "180 Drive Suite 80, Porto TX",
+        "180 Drive Porto, Italy",
+        "180 drive Suite 80 - Porto, TX"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 080.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_081",
+      "name": "address_rule_081",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Lane|\\s+lane)\\b.*?,?\\s*(?:Unit\\s*181|181)?,?\\s*(?:Sao Paulo|MA|USA)\\b",
+      "examples": [
+        "181 Lane Unit 81, Sao Paulo MA",
+        "181 Lane Sao Paulo, USA",
+        "181 lane Unit 81 - Sao Paulo, MA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 081.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_082",
+      "name": "address_rule_082",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Plaza|\\s+plaza)\\b.*?,?\\s*(?:Floor\\s*182|182)?,?\\s*(?:Campinas|SP|United States)\\b",
+      "examples": [
+        "182 Plaza Floor 82, Campinas SP",
+        "182 Plaza Campinas, United States",
+        "182 plaza Floor 82 - Campinas, SP"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 082.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_083",
+      "name": "address_rule_083",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Court|\\s+court)\\b.*?,?\\s*(?:Bloco\\s*183|183)?,?\\s*(?:London|RJ|Brazil)\\b",
+      "examples": [
+        "183 Court Bloco 83, London RJ",
+        "183 Court London, Brazil",
+        "183 court Bloco 83 - London, RJ"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 083.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_084",
+      "name": "address_rule_084",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Circle|\\s+circle)\\b.*?,?\\s*(?:Loja\\s*184|184)?,?\\s*(?:Berlin|Lisbon District|Portugal)\\b",
+      "examples": [
+        "184 Circle Loja 84, Berlin Lisbon District",
+        "184 Circle Berlin, Portugal",
+        "184 circle Loja 84 - Berlin, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 084.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_085",
+      "name": "address_rule_085",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Way|\\s+way)\\b.*?,?\\s*(?:Apt\\s*185|185)?,?\\s*(?:Madrid|Los Angeles County|UK)\\b",
+      "examples": [
+        "185 Way Apt 85, Madrid Los Angeles County",
+        "185 Way Madrid, UK",
+        "185 way Apt 85 - Madrid, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 085.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_086",
+      "name": "address_rule_086",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Alley|\\s+alley)\\b.*?,?\\s*(?:Suite\\s*186|186)?,?\\s*(?:Paris|Middlesex|Canada)\\b",
+      "examples": [
+        "186 Alley Suite 86, Paris Middlesex",
+        "186 Alley Paris, Canada",
+        "186 alley Suite 86 - Paris, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 086.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_087",
+      "name": "address_rule_087",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Place|\\s+place)\\b.*?,?\\s*(?:Unit\\s*187|187)?,?\\s*(?:Rome|Ontario|Spain)\\b",
+      "examples": [
+        "187 Place Unit 87, Rome Ontario",
+        "187 Place Rome, Spain",
+        "187 place Unit 87 - Rome, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 087.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_088",
+      "name": "address_rule_088",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Terrace|\\s+terrace)\\b.*?,?\\s*(?:Floor\\s*188|188)?,?\\s*(?:Prague|California|Italy)\\b",
+      "examples": [
+        "188 Terrace Floor 88, Prague California",
+        "188 Terrace Prague, Italy",
+        "188 terrace Floor 88 - Prague, California"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 088.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_089",
+      "name": "address_rule_089",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Highway|\\s+highway)\\b.*?,?\\s*(?:Bloco\\s*189|189)?,?\\s*(?:Austin|CA|USA)\\b",
+      "examples": [
+        "189 Highway Bloco 89, Austin CA",
+        "189 Highway Austin, USA",
+        "189 highway Bloco 89 - Austin, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 089.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_090",
+      "name": "address_rule_090",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Freeway|\\s+freeway)\\b.*?,?\\s*(?:Loja\\s*190|190)?,?\\s*(?:Toronto|NY|United States)\\b",
+      "examples": [
+        "190 Freeway Loja 90, Toronto NY",
+        "190 Freeway Toronto, United States",
+        "190 freeway Loja 90 - Toronto, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 090.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_091",
+      "name": "address_rule_091",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rua|\\s+rua)\\b.*?,?\\s*(?:Apt\\s*191|191)?,?\\s*(?:New York|TX|Brazil)\\b",
+      "examples": [
+        "191 Rua Apt 91, New York TX",
+        "191 Rua New York, Brazil",
+        "191 rua Apt 91 - New York, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 091.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_092",
+      "name": "address_rule_092",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenida|\\s+avenida)\\b.*?,?\\s*(?:Suite\\s*192|192)?,?\\s*(?:Boston|MA|Portugal)\\b",
+      "examples": [
+        "192 Avenida Suite 92, Boston MA",
+        "192 Avenida Boston, Portugal",
+        "192 avenida Suite 92 - Boston, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 092.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_093",
+      "name": "address_rule_093",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Travessa|\\s+travessa)\\b.*?,?\\s*(?:Unit\\s*193|193)?,?\\s*(?:Miami|SP|UK)\\b",
+      "examples": [
+        "193 Travessa Unit 93, Miami SP",
+        "193 Travessa Miami, UK",
+        "193 travessa Unit 93 - Miami, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 093.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_094",
+      "name": "address_rule_094",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Ramal|\\s+ramal)\\b.*?,?\\s*(?:Floor\\s*194|194)?,?\\s*(?:Lisbon|RJ|Canada)\\b",
+      "examples": [
+        "194 Ramal Floor 94, Lisbon RJ",
+        "194 Ramal Lisbon, Canada",
+        "194 ramal Floor 94 - Lisbon, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 094.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_095",
+      "name": "address_rule_095",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rodovia|\\s+rodovia)\\b.*?,?\\s*(?:Bloco\\s*195|195)?,?\\s*(?:Porto|Lisbon District|Spain)\\b",
+      "examples": [
+        "195 Rodovia Bloco 95, Porto Lisbon District",
+        "195 Rodovia Porto, Spain",
+        "195 rodovia Bloco 95 - Porto, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 095.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_096",
+      "name": "address_rule_096",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Estrada|\\s+estrada)\\b.*?,?\\s*(?:Loja\\s*196|196)?,?\\s*(?:Sao Paulo|Los Angeles County|Italy)\\b",
+      "examples": [
+        "196 Estrada Loja 96, Sao Paulo Los Angeles County",
+        "196 Estrada Sao Paulo, Italy",
+        "196 estrada Loja 96 - Sao Paulo, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 096.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_097",
+      "name": "address_rule_097",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Viela|\\s+viela)\\b.*?,?\\s*(?:Apt\\s*197|197)?,?\\s*(?:Campinas|Middlesex|USA)\\b",
+      "examples": [
+        "197 Viela Apt 97, Campinas Middlesex",
+        "197 Viela Campinas, USA",
+        "197 viela Apt 97 - Campinas, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 097.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_098",
+      "name": "address_rule_098",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Praca|\\s+praca)\\b.*?,?\\s*(?:Suite\\s*198|198)?,?\\s*(?:London|Ontario|United States)\\b",
+      "examples": [
+        "198 Praca Suite 98, London Ontario",
+        "198 Praca London, United States",
+        "198 praca Suite 98 - London, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 098.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_099",
+      "name": "address_rule_099",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Largo|\\s+largo)\\b.*?,?\\s*(?:Unit\\s*199|199)?,?\\s*(?:Berlin|California|Brazil)\\b",
+      "examples": [
+        "199 Largo Unit 99, Berlin California",
+        "199 Largo Berlin, Brazil",
+        "199 largo Unit 99 - Berlin, California"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 099.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_100",
+      "name": "address_rule_100",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Passagem|\\s+passagem)\\b.*?,?\\s*(?:Floor\\s*200|200)?,?\\s*(?:Madrid|CA|Portugal)\\b",
+      "examples": [
+        "200 Passagem Floor 100, Madrid CA",
+        "200 Passagem Madrid, Portugal",
+        "200 passagem Floor 100 - Madrid, CA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 100.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_101",
+      "name": "address_rule_101",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Street|\\s+street)\\b.*?,?\\s*(?:Bloco\\s*201|201)?,?\\s*(?:Paris|NY|UK)\\b",
+      "examples": [
+        "201 Street Bloco 101, Paris NY",
+        "201 Street Paris, UK",
+        "201 street Bloco 101 - Paris, NY"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 101.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_102",
+      "name": "address_rule_102",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenue|\\s+avenue)\\b.*?,?\\s*(?:Loja\\s*202|202)?,?\\s*(?:Rome|TX|Canada)\\b",
+      "examples": [
+        "202 Avenue Loja 102, Rome TX",
+        "202 Avenue Rome, Canada",
+        "202 avenue Loja 102 - Rome, TX"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 102.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_103",
+      "name": "address_rule_103",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Road|\\s+road)\\b.*?,?\\s*(?:Apt\\s*203|203)?,?\\s*(?:Prague|MA|Spain)\\b",
+      "examples": [
+        "203 Road Apt 103, Prague MA",
+        "203 Road Prague, Spain",
+        "203 road Apt 103 - Prague, MA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 103.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_104",
+      "name": "address_rule_104",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Boulevard|\\s+boulevard)\\b.*?,?\\s*(?:Suite\\s*204|204)?,?\\s*(?:Austin|SP|Italy)\\b",
+      "examples": [
+        "204 Boulevard Suite 104, Austin SP",
+        "204 Boulevard Austin, Italy",
+        "204 boulevard Suite 104 - Austin, SP"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 104.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_105",
+      "name": "address_rule_105",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Drive|\\s+drive)\\b.*?,?\\s*(?:Unit\\s*205|205)?,?\\s*(?:Toronto|RJ|USA)\\b",
+      "examples": [
+        "205 Drive Unit 105, Toronto RJ",
+        "205 Drive Toronto, USA",
+        "205 drive Unit 105 - Toronto, RJ"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 105.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_106",
+      "name": "address_rule_106",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Lane|\\s+lane)\\b.*?,?\\s*(?:Floor\\s*206|206)?,?\\s*(?:New York|Lisbon District|United States)\\b",
+      "examples": [
+        "206 Lane Floor 106, New York Lisbon District",
+        "206 Lane New York, United States",
+        "206 lane Floor 106 - New York, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 106.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_107",
+      "name": "address_rule_107",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Plaza|\\s+plaza)\\b.*?,?\\s*(?:Bloco\\s*207|207)?,?\\s*(?:Boston|Los Angeles County|Brazil)\\b",
+      "examples": [
+        "207 Plaza Bloco 107, Boston Los Angeles County",
+        "207 Plaza Boston, Brazil",
+        "207 plaza Bloco 107 - Boston, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 107.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_108",
+      "name": "address_rule_108",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Court|\\s+court)\\b.*?,?\\s*(?:Loja\\s*208|208)?,?\\s*(?:Miami|Middlesex|Portugal)\\b",
+      "examples": [
+        "208 Court Loja 108, Miami Middlesex",
+        "208 Court Miami, Portugal",
+        "208 court Loja 108 - Miami, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 108.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_109",
+      "name": "address_rule_109",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Circle|\\s+circle)\\b.*?,?\\s*(?:Apt\\s*209|209)?,?\\s*(?:Lisbon|Ontario|UK)\\b",
+      "examples": [
+        "209 Circle Apt 109, Lisbon Ontario",
+        "209 Circle Lisbon, UK",
+        "209 circle Apt 109 - Lisbon, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 109.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_110",
+      "name": "address_rule_110",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Way|\\s+way)\\b.*?,?\\s*(?:Suite\\s*210|210)?,?\\s*(?:Porto|California|Canada)\\b",
+      "examples": [
+        "210 Way Suite 110, Porto California",
+        "210 Way Porto, Canada",
+        "210 way Suite 110 - Porto, California"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 110.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_111",
+      "name": "address_rule_111",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Alley|\\s+alley)\\b.*?,?\\s*(?:Unit\\s*211|211)?,?\\s*(?:Sao Paulo|CA|Spain)\\b",
+      "examples": [
+        "211 Alley Unit 111, Sao Paulo CA",
+        "211 Alley Sao Paulo, Spain",
+        "211 alley Unit 111 - Sao Paulo, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 111.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_112",
+      "name": "address_rule_112",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Place|\\s+place)\\b.*?,?\\s*(?:Floor\\s*212|212)?,?\\s*(?:Campinas|NY|Italy)\\b",
+      "examples": [
+        "212 Place Floor 112, Campinas NY",
+        "212 Place Campinas, Italy",
+        "212 place Floor 112 - Campinas, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 112.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_113",
+      "name": "address_rule_113",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Terrace|\\s+terrace)\\b.*?,?\\s*(?:Bloco\\s*213|213)?,?\\s*(?:London|TX|USA)\\b",
+      "examples": [
+        "213 Terrace Bloco 113, London TX",
+        "213 Terrace London, USA",
+        "213 terrace Bloco 113 - London, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 113.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_114",
+      "name": "address_rule_114",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Highway|\\s+highway)\\b.*?,?\\s*(?:Loja\\s*214|214)?,?\\s*(?:Berlin|MA|United States)\\b",
+      "examples": [
+        "214 Highway Loja 114, Berlin MA",
+        "214 Highway Berlin, United States",
+        "214 highway Loja 114 - Berlin, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 114.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_115",
+      "name": "address_rule_115",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Freeway|\\s+freeway)\\b.*?,?\\s*(?:Apt\\s*215|215)?,?\\s*(?:Madrid|SP|Brazil)\\b",
+      "examples": [
+        "215 Freeway Apt 115, Madrid SP",
+        "215 Freeway Madrid, Brazil",
+        "215 freeway Apt 115 - Madrid, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 115.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_116",
+      "name": "address_rule_116",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rua|\\s+rua)\\b.*?,?\\s*(?:Suite\\s*216|216)?,?\\s*(?:Paris|RJ|Portugal)\\b",
+      "examples": [
+        "216 Rua Suite 116, Paris RJ",
+        "216 Rua Paris, Portugal",
+        "216 rua Suite 116 - Paris, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 116.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_117",
+      "name": "address_rule_117",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenida|\\s+avenida)\\b.*?,?\\s*(?:Unit\\s*217|217)?,?\\s*(?:Rome|Lisbon District|UK)\\b",
+      "examples": [
+        "217 Avenida Unit 117, Rome Lisbon District",
+        "217 Avenida Rome, UK",
+        "217 avenida Unit 117 - Rome, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 117.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_118",
+      "name": "address_rule_118",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Travessa|\\s+travessa)\\b.*?,?\\s*(?:Floor\\s*218|218)?,?\\s*(?:Prague|Los Angeles County|Canada)\\b",
+      "examples": [
+        "218 Travessa Floor 118, Prague Los Angeles County",
+        "218 Travessa Prague, Canada",
+        "218 travessa Floor 118 - Prague, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 118.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_119",
+      "name": "address_rule_119",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Ramal|\\s+ramal)\\b.*?,?\\s*(?:Bloco\\s*219|219)?,?\\s*(?:Austin|Middlesex|Spain)\\b",
+      "examples": [
+        "219 Ramal Bloco 119, Austin Middlesex",
+        "219 Ramal Austin, Spain",
+        "219 ramal Bloco 119 - Austin, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 119.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_120",
+      "name": "address_rule_120",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Rodovia|\\s+rodovia)\\b.*?,?\\s*(?:Loja\\s*220|220)?,?\\s*(?:Toronto|Ontario|Italy)\\b",
+      "examples": [
+        "220 Rodovia Loja 120, Toronto Ontario",
+        "220 Rodovia Toronto, Italy",
+        "220 rodovia Loja 120 - Toronto, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 120.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_121",
+      "name": "address_rule_121",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Estrada|\\s+estrada)\\b.*?,?\\s*(?:Apt\\s*221|221)?,?\\s*(?:New York|California|USA)\\b",
+      "examples": [
+        "221 Estrada Apt 121, New York California",
+        "221 Estrada New York, USA",
+        "221 estrada Apt 121 - New York, California"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 121.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_122",
+      "name": "address_rule_122",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Viela|\\s+viela)\\b.*?,?\\s*(?:Suite\\s*222|222)?,?\\s*(?:Boston|CA|United States)\\b",
+      "examples": [
+        "222 Viela Suite 122, Boston CA",
+        "222 Viela Boston, United States",
+        "222 viela Suite 122 - Boston, CA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 122.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_123",
+      "name": "address_rule_123",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Praca|\\s+praca)\\b.*?,?\\s*(?:Unit\\s*223|223)?,?\\s*(?:Miami|NY|Brazil)\\b",
+      "examples": [
+        "223 Praca Unit 123, Miami NY",
+        "223 Praca Miami, Brazil",
+        "223 praca Unit 123 - Miami, NY"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 123.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_124",
+      "name": "address_rule_124",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Largo|\\s+largo)\\b.*?,?\\s*(?:Floor\\s*224|224)?,?\\s*(?:Lisbon|TX|Portugal)\\b",
+      "examples": [
+        "224 Largo Floor 124, Lisbon TX",
+        "224 Largo Lisbon, Portugal",
+        "224 largo Floor 124 - Lisbon, TX"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 124.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_125",
+      "name": "address_rule_125",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Passagem|\\s+passagem)\\b.*?,?\\s*(?:Bloco\\s*225|225)?,?\\s*(?:Porto|MA|UK)\\b",
+      "examples": [
+        "225 Passagem Bloco 125, Porto MA",
+        "225 Passagem Porto, UK",
+        "225 passagem Bloco 125 - Porto, MA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 125.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_126",
+      "name": "address_rule_126",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Street|\\s+street)\\b.*?,?\\s*(?:Loja\\s*226|226)?,?\\s*(?:Sao Paulo|SP|Canada)\\b",
+      "examples": [
+        "226 Street Loja 126, Sao Paulo SP",
+        "226 Street Sao Paulo, Canada",
+        "226 street Loja 126 - Sao Paulo, SP"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 126.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_127",
+      "name": "address_rule_127",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Avenue|\\s+avenue)\\b.*?,?\\s*(?:Apt\\s*227|227)?,?\\s*(?:Campinas|RJ|Spain)\\b",
+      "examples": [
+        "227 Avenue Apt 127, Campinas RJ",
+        "227 Avenue Campinas, Spain",
+        "227 avenue Apt 127 - Campinas, RJ"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 127.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_128",
+      "name": "address_rule_128",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Road|\\s+road)\\b.*?,?\\s*(?:Suite\\s*228|228)?,?\\s*(?:London|Lisbon District|Italy)\\b",
+      "examples": [
+        "228 Road Suite 128, London Lisbon District",
+        "228 Road London, Italy",
+        "228 road Suite 128 - London, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 128.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_129",
+      "name": "address_rule_129",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Boulevard|\\s+boulevard)\\b.*?,?\\s*(?:Unit\\s*229|229)?,?\\s*(?:Berlin|Los Angeles County|USA)\\b",
+      "examples": [
+        "229 Boulevard Unit 129, Berlin Los Angeles County",
+        "229 Boulevard Berlin, USA",
+        "229 boulevard Unit 129 - Berlin, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 129.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_130",
+      "name": "address_rule_130",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Drive|\\s+drive)\\b.*?,?\\s*(?:Floor\\s*230|230)?,?\\s*(?:Madrid|Middlesex|United States)\\b",
+      "examples": [
+        "230 Drive Floor 130, Madrid Middlesex",
+        "230 Drive Madrid, United States",
+        "230 drive Floor 130 - Madrid, Middlesex"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 130.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_131",
+      "name": "address_rule_131",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Lane|\\s+lane)\\b.*?,?\\s*(?:Bloco\\s*231|231)?,?\\s*(?:Paris|Ontario|Brazil)\\b",
+      "examples": [
+        "231 Lane Bloco 131, Paris Ontario",
+        "231 Lane Paris, Brazil",
+        "231 lane Bloco 131 - Paris, Ontario"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 131.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_132",
+      "name": "address_rule_132",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Plaza|\\s+plaza)\\b.*?,?\\s*(?:Loja\\s*232|232)?,?\\s*(?:Rome|California|Portugal)\\b",
+      "examples": [
+        "232 Plaza Loja 132, Rome California",
+        "232 Plaza Rome, Portugal",
+        "232 plaza Loja 132 - Rome, California"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 132.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_133",
+      "name": "address_rule_133",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Court|\\s+court)\\b.*?,?\\s*(?:Apt\\s*233|233)?,?\\s*(?:Prague|CA|UK)\\b",
+      "examples": [
+        "233 Court Apt 133, Prague CA",
+        "233 Court Prague, UK",
+        "233 court Apt 133 - Prague, CA"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 133.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_134",
+      "name": "address_rule_134",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Circle|\\s+circle)\\b.*?,?\\s*(?:Suite\\s*234|234)?,?\\s*(?:Austin|NY|Canada)\\b",
+      "examples": [
+        "234 Circle Suite 134, Austin NY",
+        "234 Circle Austin, Canada",
+        "234 circle Suite 134 - Austin, NY"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 134.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_135",
+      "name": "address_rule_135",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Way|\\s+way)\\b.*?,?\\s*(?:Unit\\s*235|235)?,?\\s*(?:Toronto|TX|Spain)\\b",
+      "examples": [
+        "235 Way Unit 135, Toronto TX",
+        "235 Way Toronto, Spain",
+        "235 way Unit 135 - Toronto, TX"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 135.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_136",
+      "name": "address_rule_136",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Alley|\\s+alley)\\b.*?,?\\s*(?:Floor\\s*236|236)?,?\\s*(?:New York|MA|Italy)\\b",
+      "examples": [
+        "236 Alley Floor 136, New York MA",
+        "236 Alley New York, Italy",
+        "236 alley Floor 136 - New York, MA"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 136.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_137",
+      "name": "address_rule_137",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Place|\\s+place)\\b.*?,?\\s*(?:Bloco\\s*237|237)?,?\\s*(?:Boston|SP|USA)\\b",
+      "examples": [
+        "237 Place Bloco 137, Boston SP",
+        "237 Place Boston, USA",
+        "237 place Bloco 137 - Boston, SP"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 137.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_138",
+      "name": "address_rule_138",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Terrace|\\s+terrace)\\b.*?,?\\s*(?:Loja\\s*238|238)?,?\\s*(?:Miami|RJ|United States)\\b",
+      "examples": [
+        "238 Terrace Loja 138, Miami RJ",
+        "238 Terrace Miami, United States",
+        "238 terrace Loja 138 - Miami, RJ"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 138.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_139",
+      "name": "address_rule_139",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Highway|\\s+highway)\\b.*?,?\\s*(?:Apt\\s*239|239)?,?\\s*(?:Lisbon|Lisbon District|Brazil)\\b",
+      "examples": [
+        "239 Highway Apt 139, Lisbon Lisbon District",
+        "239 Highway Lisbon, Brazil",
+        "239 highway Apt 139 - Lisbon, Lisbon District"
+      ],
+      "entityType": "address",
+      "locale": "pt",
+      "notes": "Address pattern for street-style entities, rule 139.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    },
+    {
+      "id": "address_140",
+      "name": "address_rule_140",
+      "pattern": "(?:\\b\\d{1,5}\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+(?:\\s+[A-Za-zÀ-ÖØ-öø-ÿ'\\-]+){0,4}(?:\\s+Freeway|\\s+freeway)\\b.*?,?\\s*(?:Suite\\s*240|240)?,?\\s*(?:Porto|Los Angeles County|Portugal)\\b",
+      "examples": [
+        "240 Freeway Suite 140, Porto Los Angeles County",
+        "240 Freeway Porto, Portugal",
+        "240 freeway Suite 140 - Porto, Los Angeles County"
+      ],
+      "entityType": "address",
+      "locale": "en",
+      "notes": "Address pattern for street-style entities, rule 140.",
+      "normalizationContract": {
+        "type": "address",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "location_context",
+          "document_scope"
+        ],
+        "curationReason": "signals:geo_reference"
+      }
+    }
+  ]
+}

@@ -1,0 +1,982 @@
+{
+  "_meta": {
+    "id": "patterns_editor_multi_selection_rules",
+    "version": "1.0.0",
+    "owner": "editor-patterns",
+    "languages": [
+      "any"
+    ],
+    "description": "Machine-actionable rules for handling multiple selection targets and clarify-vs-apply-to-all behavior.",
+    "usedBy": [
+      "editor_scope_resolver",
+      "selection_dispatcher",
+      "tests.patternDeterminism"
+    ],
+    "tests": {
+      "positive": [
+        "select three tables and apply same edit",
+        "select all overdue cells and apply"
+      ],
+      "negative": [
+        "select conflicting ranges without consent",
+        "apply to mixed target classes without confirmation"
+      ]
+    },
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "dedupe": true,
+    "sortBy": "priority",
+    "minPatterns": 40,
+    "maxPatterns": 120
+  },
+  "rules": [
+    {
+      "id": "MS_0001",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 850,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0002",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 849,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0003",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 848,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0004",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 847,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0005",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 846,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0006",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 4,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 845,
+      "examples": [
+        "apply action to 4 selected targets",
+        "if 4 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0007",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 5,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 844,
+      "examples": [
+        "apply action to 5 selected targets",
+        "if 5 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0008",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 843,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0009",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 6,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 842,
+      "examples": [
+        "apply action to 6 selected targets",
+        "if 6 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0010",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 841,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0011",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 840,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0012",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 839,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0013",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 838,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0014",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 837,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0015",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 836,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0016",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 835,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0017",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 4,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 834,
+      "examples": [
+        "apply action to 4 selected targets",
+        "if 4 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0018",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 5,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 833,
+      "examples": [
+        "apply action to 5 selected targets",
+        "if 5 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0019",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 832,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0020",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 6,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 831,
+      "examples": [
+        "apply action to 6 selected targets",
+        "if 6 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0021",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 830,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0022",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 829,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0023",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 828,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0024",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 827,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0025",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 826,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0026",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 825,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0027",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 824,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0028",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 4,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 823,
+      "examples": [
+        "apply action to 4 selected targets",
+        "if 4 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0029",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 5,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 822,
+      "examples": [
+        "apply action to 5 selected targets",
+        "if 5 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0030",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 821,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0031",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 6,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 820,
+      "examples": [
+        "apply action to 6 selected targets",
+        "if 6 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0032",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 819,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0033",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 818,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0034",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 817,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0035",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 816,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0036",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 815,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0037",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 814,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0038",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 813,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0039",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 4,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 812,
+      "examples": [
+        "apply action to 4 selected targets",
+        "if 4 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0040",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 5,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 811,
+      "examples": [
+        "apply action to 5 selected targets",
+        "if 5 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0041",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 3,
+        "allSelectionsParsed": true,
+        "hasUniformScope": false,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 810,
+      "examples": [
+        "apply action to 3 selected targets",
+        "if 3 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0042",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 6,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 809,
+      "examples": [
+        "apply action to 6 selected targets",
+        "if 6 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0043",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 2,
+        "allSelectionsParsed": true,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": true,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 808,
+      "examples": [
+        "apply action to 2 selected targets",
+        "if 2 targets conflict -> apply to all"
+      ]
+    },
+    {
+      "id": "MS_0044",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": true,
+        "appliesAcrossPages": false,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": false,
+        "allowsBatchEdit": true
+      },
+      "action": "ASK_CLARIFY_ONE",
+      "priority": 807,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> ask one question"
+      ]
+    },
+    {
+      "id": "MS_0045",
+      "trigger": "editor.multi_selection",
+      "check": {
+        "minSelections": 2,
+        "selectionCount": 1,
+        "allSelectionsParsed": false,
+        "hasUniformScope": true,
+        "hasConflictingTargets": false,
+        "appliesAcrossPages": true,
+        "appliesAcrossTables": false,
+        "appliesAcrossCharts": true,
+        "allowsBatchEdit": true
+      },
+      "action": "APPLY_TO_ALL",
+      "priority": 806,
+      "examples": [
+        "apply action to 1 selected targets",
+        "if 1 targets conflict -> apply to all"
+      ]
+    }
+  ]
+}

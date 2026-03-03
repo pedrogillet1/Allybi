@@ -53,9 +53,34 @@ export const BannedPhrasesSchema = z.object({
 
 // prompt_registry — used by promptRegistry.service, llmRequestBuilder
 export const PromptRegistrySchema = z.object({
-  _meta: z.object({ id: z.string() }).passthrough(),
+  _meta: z.object({
+    id: z.string(),
+    version: z.string().optional(),
+    description: z.string().optional(),
+  }).passthrough(),
   config: z.object({
     enabled: z.boolean(),
+  }).passthrough().optional(),
+  promptFiles: z.array(z.object({
+    id: z.string(),
+    path: z.string().optional(),
+    required: z.boolean().optional(),
+  }).passthrough()).optional(),
+  layersByKind: z.object({
+    system: z.array(z.string()).optional(),
+    retrieval: z.array(z.string()).optional(),
+    compose_answer: z.array(z.string()).optional(),
+    disambiguation: z.array(z.string()).optional(),
+    fallback: z.array(z.string()).optional(),
+    tool: z.array(z.string()).optional(),
+  }).passthrough().optional(),
+  map: z.object({
+    system: z.string().optional(),
+    retrieval: z.string().optional(),
+    compose_answer: z.string().optional(),
+    disambiguation: z.string().optional(),
+    fallback: z.string().optional(),
+    tool: z.string().optional(),
   }).passthrough().optional(),
 }).passthrough();
 

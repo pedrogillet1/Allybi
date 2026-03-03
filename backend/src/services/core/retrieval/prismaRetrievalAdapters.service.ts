@@ -21,7 +21,6 @@ import type {
 const READY_DOCUMENT_STATUSES = [
   "ready",
   "indexed",
-  "enriching",
   "available",
   "completed",
 ] as const;

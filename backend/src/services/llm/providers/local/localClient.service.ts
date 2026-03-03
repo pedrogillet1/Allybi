@@ -142,7 +142,7 @@ interface OAIChatResponse {
 // ---------------------------------------------------------------------------
 
 export class LocalClientService implements LLMClient {
-  public readonly provider: LLMProvider = "ollama";
+  public readonly provider: LLMProvider = "local";
 
   private static readonly MODEL_CACHE_TTL = 60_000; // 1 min
 
@@ -174,12 +174,12 @@ export class LocalClientService implements LLMClient {
           signal: ac.signal,
           headers: this.authHeaders(),
         });
-        return { ok: res.ok, provider: "ollama", t };
+        return { ok: res.ok, provider: "local", t };
       } finally {
         clearTimeout(timeout);
       }
     } catch {
-      return { ok: false, provider: "ollama", t };
+      return { ok: false, provider: "local", t };
     }
   }
 
@@ -187,9 +187,10 @@ export class LocalClientService implements LLMClient {
   // Non-streamed completion
   // -------------------------------------------------------------------------
 
-  async complete(req: LLMRequest): Promise<LLMCompletionResponse> {
+  async complete(req: LLMRequest, signal?: AbortSignal): Promise<LLMCompletionResponse> {
     const model = req.model.model || this.cfg.defaultModel;
     const ac = new AbortController();
+    if (signal) signal.addEventListener("abort", () => ac.abort(), { once: true });
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
@@ -212,8 +213,9 @@ export class LocalClientService implements LLMClient {
     config: LLMStreamingConfig;
     hooks?: StreamingHooks;
     initialState?: Partial<StreamState>;
+    signal?: AbortSignal;
   }): Promise<LLMStreamResponse> {
-    const { req, sink, config, hooks, initialState } = params;
+    const { req, sink, config, hooks, initialState, signal } = params;
     const model = req.model.model || this.cfg.defaultModel;
 
     const state: StreamState = {
@@ -236,6 +238,7 @@ export class LocalClientService implements LLMClient {
     hooks?.onStart?.(state);
 
     const ac = new AbortController();
+    if (signal) signal.addEventListener("abort", () => ac.abort(), { once: true });
     const timeout = setTimeout(() => ac.abort(), this.cfg.timeoutMs);
 
     try {
@@ -544,6 +547,7 @@ export class LocalClientService implements LLMClient {
     let buffer = "";
     let firstTokenEmitted = false;
     let finishReason = "unknown";
+    let streamUsage: LLMCompletionResponse["usage"] | undefined;
 
     while (sink.isOpen()) {
       const { value, done } = await reader.read();
@@ -568,6 +572,14 @@ export class LocalClientService implements LLMClient {
           finishReason = normalizeFinishReason(
             chunk.choices[0].finish_reason || "unknown",
           );
+        }
+        // Track usage from stream chunks (some providers include it)
+        if (chunk.usage) {
+          streamUsage = {
+            promptTokens: chunk.usage.prompt_tokens,
+            completionTokens: chunk.usage.completion_tokens,
+            totalTokens: chunk.usage.total_tokens,
+          };
         }
 
         const text = chunk.choices?.[0]?.delta?.content ?? "";
@@ -605,7 +617,7 @@ export class LocalClientService implements LLMClient {
       }
     }
 
-    this.emitFinalEvent(req, sink, hooks, state, undefined);
+    this.emitFinalEvent(req, sink, hooks, state, streamUsage);
     return this.buildStreamReturn(req, state, finishReason);
   }
 
@@ -799,7 +811,7 @@ export class LocalClientService implements LLMClient {
         text: state.accumulatedText,
         kind: state.kind,
         llm: {
-          provider: "ollama",
+          provider: "local",
           model: req.model.model,
           promptTokens: usage?.promptTokens,
           completionTokens: usage?.completionTokens,
@@ -817,7 +829,7 @@ export class LocalClientService implements LLMClient {
 
     this.emit(sink, finalEvent);
     hooks?.onFinal?.(finalEvent.data, state);
-    sink.close();
+    if (sink.isOpen()) sink.close();
   }
 
   private emitStreamError(
@@ -840,7 +852,7 @@ export class LocalClientService implements LLMClient {
 
     this.emit(sink, errEvent);
     hooks?.onError?.(errEvent.data, state);
-    sink.close();
+    if (sink.isOpen()) sink.close();
   }
 
   private handleStreamError(
@@ -881,7 +893,7 @@ export class LocalClientService implements LLMClient {
       hooks?.onError?.(errEvent.data, state);
     }
 
-    sink.close();
+    if (sink.isOpen()) sink.close();
     return this.buildStreamReturn(req, state);
   }
 

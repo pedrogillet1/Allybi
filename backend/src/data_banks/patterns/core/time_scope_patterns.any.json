@@ -1,0 +1,4969 @@
+{
+  "_meta": {
+    "bankId": "time_scope_patterns",
+    "version": "1.0.0",
+    "owner": "pattern-core-curator",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "dependsOn": [
+      "nlp_tokenization.v1",
+      "language_classifier.v1"
+    ],
+    "usedBy": [
+      "query_orchestrator",
+      "intent_router",
+      "question_parser"
+    ],
+    "tests": {
+      "positive": [
+        "I need a summary of Q4 revenue and expense trends by region",
+        "Quais foram os custos em novembro e também a variação de margem?"
+      ],
+      "negative": [
+        "Tell me random text",
+        "Can you send weather details for tomorrow"
+      ]
+    },
+    "lastUpdated": "2026-03-03",
+    "id": "patterns_core_time_scope_patterns",
+    "description": "Auto-registered bank payload for patterns/core/time_scope_patterns.any.json"
+  },
+  "patterns": [
+    {
+      "id": "TSP_001",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2001 Q2"
+      ],
+      "pt": [
+        "a partir de 2/1/2001"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_002",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2002 Q3"
+      ],
+      "pt": [
+        "as at 3/2/2002"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_003",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2003 Q4"
+      ],
+      "pt": [
+        "as on 4/3/2003"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_004",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2004 Q1"
+      ],
+      "pt": [
+        "a partir de date 5/4/2004"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_005",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2005 Q2"
+      ],
+      "pt": [
+        "effective a partir de 6/5/2005"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_006",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2006 Q3"
+      ],
+      "pt": [
+        "updated a partir de 7/6/2006"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_007",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2007 Q4"
+      ],
+      "pt": [
+        "a partir de 8/7/2007"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_008",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2008 Q1"
+      ],
+      "pt": [
+        "as at 9/8/2008"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_009",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2009 Q2"
+      ],
+      "pt": [
+        "as on 10/9/2009"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_010",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2010 Q3"
+      ],
+      "pt": [
+        "a partir de date 11/10/2010"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_011",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2011 Q4"
+      ],
+      "pt": [
+        "effective a partir de 12/11/2011"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_012",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2012 Q1"
+      ],
+      "pt": [
+        "updated a partir de 13/12/2012"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_013",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2013 Q2"
+      ],
+      "pt": [
+        "a partir de 14/1/2013"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_014",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2014 Q3"
+      ],
+      "pt": [
+        "as at 15/2/2014"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_015",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2015 Q4"
+      ],
+      "pt": [
+        "as on 16/3/2015"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_016",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2016 Q1"
+      ],
+      "pt": [
+        "a partir de date 17/4/2016"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_017",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2017 Q2"
+      ],
+      "pt": [
+        "effective a partir de 18/5/2017"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_018",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2018 Q3"
+      ],
+      "pt": [
+        "updated a partir de 19/6/2018"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_019",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2019 Q4"
+      ],
+      "pt": [
+        "a partir de 20/7/2019"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_020",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2020 Q1"
+      ],
+      "pt": [
+        "as at 21/8/2020"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_021",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2021 Q2"
+      ],
+      "pt": [
+        "as on 22/9/2021"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_022",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2022 Q3"
+      ],
+      "pt": [
+        "a partir de date 23/10/2022"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_023",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2023 Q4"
+      ],
+      "pt": [
+        "effective a partir de 24/11/2023"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_024",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2024 Q1"
+      ],
+      "pt": [
+        "updated a partir de 25/12/2024"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_025",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2025 Q2"
+      ],
+      "pt": [
+        "a partir de 26/1/2025"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_026",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2000 Q3"
+      ],
+      "pt": [
+        "as at 27/2/2000"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_027",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2001 Q4"
+      ],
+      "pt": [
+        "as on 28/3/2001"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_028",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2002 Q1"
+      ],
+      "pt": [
+        "a partir de date 29/4/2002"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_029",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2003 Q2"
+      ],
+      "pt": [
+        "effective a partir de 30/5/2003"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_030",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2004 Q3"
+      ],
+      "pt": [
+        "updated a partir de 31/6/2004"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_031",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2005 Q4"
+      ],
+      "pt": [
+        "a partir de 1/7/2005"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_032",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2006 Q1"
+      ],
+      "pt": [
+        "as at 2/8/2006"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_033",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2007 Q2"
+      ],
+      "pt": [
+        "as on 3/9/2007"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_034",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2008 Q3"
+      ],
+      "pt": [
+        "a partir de date 4/10/2008"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_035",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2009 Q4"
+      ],
+      "pt": [
+        "effective a partir de 5/11/2009"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_036",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2010 Q1"
+      ],
+      "pt": [
+        "updated a partir de 6/12/2010"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_037",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2011 Q2"
+      ],
+      "pt": [
+        "a partir de 7/1/2011"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_038",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2012 Q3"
+      ],
+      "pt": [
+        "as at 8/2/2012"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_039",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2013 Q4"
+      ],
+      "pt": [
+        "as on 9/3/2013"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_040",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2014 Q1"
+      ],
+      "pt": [
+        "a partir de date 10/4/2014"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_041",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2015 Q2"
+      ],
+      "pt": [
+        "effective a partir de 11/5/2015"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_042",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2016 Q3"
+      ],
+      "pt": [
+        "updated a partir de 12/6/2016"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_043",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2017 Q4"
+      ],
+      "pt": [
+        "a partir de 13/7/2017"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_044",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2018 Q1"
+      ],
+      "pt": [
+        "as at 14/8/2018"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_045",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2019 Q2"
+      ],
+      "pt": [
+        "as on 15/9/2019"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_046",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2020 Q3"
+      ],
+      "pt": [
+        "a partir de date 16/10/2020"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_047",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2021 Q4"
+      ],
+      "pt": [
+        "effective a partir de 17/11/2021"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_048",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2022 Q1"
+      ],
+      "pt": [
+        "updated a partir de 18/12/2022"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_049",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2023 Q2"
+      ],
+      "pt": [
+        "a partir de 19/1/2023"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_050",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2024 Q3"
+      ],
+      "pt": [
+        "as at 20/2/2024"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_051",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2025 Q4"
+      ],
+      "pt": [
+        "as on 21/3/2025"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_052",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2000 Q1"
+      ],
+      "pt": [
+        "a partir de date 22/4/2000"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_053",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2001 Q2"
+      ],
+      "pt": [
+        "effective a partir de 23/5/2001"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_054",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2002 Q3"
+      ],
+      "pt": [
+        "updated a partir de 24/6/2002"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_055",
+      "shape": "as_of",
+      "en": [
+        "as of FY 2003 Q4"
+      ],
+      "pt": [
+        "a partir de 25/7/2003"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_056",
+      "shape": "as_of",
+      "en": [
+        "as at FY 2004 Q1"
+      ],
+      "pt": [
+        "as at 26/8/2004"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_057",
+      "shape": "as_of",
+      "en": [
+        "as on FY 2005 Q2"
+      ],
+      "pt": [
+        "as on 27/9/2005"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_058",
+      "shape": "as_of",
+      "en": [
+        "as of date FY 2006 Q3"
+      ],
+      "pt": [
+        "a partir de date 28/10/2006"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_059",
+      "shape": "as_of",
+      "en": [
+        "effective as of FY 2007 Q4"
+      ],
+      "pt": [
+        "effective a partir de 29/11/2007"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_060",
+      "shape": "as_of",
+      "en": [
+        "updated as of FY 2008 Q1"
+      ],
+      "pt": [
+        "updated a partir de 30/12/2008"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:as_of"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "as_of",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_061",
+      "shape": "between",
+      "en": [
+        "between FY 2006 Q2 and FY 2007 Q3"
+      ],
+      "pt": [
+        "between YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_062",
+      "shape": "between",
+      "en": [
+        "from FY 2007 Q3 and FY 2008 Q4"
+      ],
+      "pt": [
+        "from QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_063",
+      "shape": "between",
+      "en": [
+        "from and including FY 2008 Q4 and FY 2009 Q1"
+      ],
+      "pt": [
+        "from and including PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_064",
+      "shape": "between",
+      "en": [
+        "from to FY 2009 Q1 and FY 2010 Q2"
+      ],
+      "pt": [
+        "from to TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_065",
+      "shape": "between",
+      "en": [
+        "on or after FY 2010 Q2 and FY 2011 Q3"
+      ],
+      "pt": [
+        "on or after YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_066",
+      "shape": "between",
+      "en": [
+        "on or before FY 2011 Q3 and FY 2012 Q4"
+      ],
+      "pt": [
+        "on or before MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_067",
+      "shape": "between",
+      "en": [
+        "between FY 2012 Q4 and FY 2013 Q1"
+      ],
+      "pt": [
+        "between QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_068",
+      "shape": "between",
+      "en": [
+        "from FY 2013 Q1 and FY 2014 Q2"
+      ],
+      "pt": [
+        "from YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_069",
+      "shape": "between",
+      "en": [
+        "from and including FY 2014 Q2 and FY 2015 Q3"
+      ],
+      "pt": [
+        "from and including QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_070",
+      "shape": "between",
+      "en": [
+        "from to FY 2015 Q3 and FY 2016 Q4"
+      ],
+      "pt": [
+        "from to PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_071",
+      "shape": "between",
+      "en": [
+        "on or after FY 2016 Q4 and FY 2017 Q1"
+      ],
+      "pt": [
+        "on or after TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_072",
+      "shape": "between",
+      "en": [
+        "on or before FY 2017 Q1 and FY 2018 Q2"
+      ],
+      "pt": [
+        "on or before YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_073",
+      "shape": "between",
+      "en": [
+        "between FY 2018 Q2 and FY 2019 Q3"
+      ],
+      "pt": [
+        "between MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_074",
+      "shape": "between",
+      "en": [
+        "from FY 2019 Q3 and FY 2020 Q4"
+      ],
+      "pt": [
+        "from QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_075",
+      "shape": "between",
+      "en": [
+        "from and including FY 2020 Q4 and FY 2021 Q1"
+      ],
+      "pt": [
+        "from and including YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_076",
+      "shape": "between",
+      "en": [
+        "from to FY 2021 Q1 and FY 2022 Q2"
+      ],
+      "pt": [
+        "from to QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_077",
+      "shape": "between",
+      "en": [
+        "on or after FY 2022 Q2 and FY 2023 Q3"
+      ],
+      "pt": [
+        "on or after PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_078",
+      "shape": "between",
+      "en": [
+        "on or before FY 2023 Q3 and FY 2024 Q4"
+      ],
+      "pt": [
+        "on or before TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_079",
+      "shape": "between",
+      "en": [
+        "between FY 2024 Q4 and FY 2025 Q1"
+      ],
+      "pt": [
+        "between YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_080",
+      "shape": "between",
+      "en": [
+        "from FY 2025 Q1 and FY 2026 Q2"
+      ],
+      "pt": [
+        "from MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_081",
+      "shape": "between",
+      "en": [
+        "from and including FY 1999 Q2 and FY 2000 Q3"
+      ],
+      "pt": [
+        "from and including QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_082",
+      "shape": "between",
+      "en": [
+        "from to FY 2000 Q3 and FY 2001 Q4"
+      ],
+      "pt": [
+        "from to YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_083",
+      "shape": "between",
+      "en": [
+        "on or after FY 2001 Q4 and FY 2002 Q1"
+      ],
+      "pt": [
+        "on or after QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_084",
+      "shape": "between",
+      "en": [
+        "on or before FY 2002 Q1 and FY 2003 Q2"
+      ],
+      "pt": [
+        "on or before PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_085",
+      "shape": "between",
+      "en": [
+        "between FY 2003 Q2 and FY 2004 Q3"
+      ],
+      "pt": [
+        "between TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_086",
+      "shape": "between",
+      "en": [
+        "from FY 2004 Q3 and FY 2005 Q4"
+      ],
+      "pt": [
+        "from YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_087",
+      "shape": "between",
+      "en": [
+        "from and including FY 2005 Q4 and FY 2006 Q1"
+      ],
+      "pt": [
+        "from and including MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_088",
+      "shape": "between",
+      "en": [
+        "from to FY 2006 Q1 and FY 2007 Q2"
+      ],
+      "pt": [
+        "from to QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_089",
+      "shape": "between",
+      "en": [
+        "on or after FY 2007 Q2 and FY 2008 Q3"
+      ],
+      "pt": [
+        "on or after YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_090",
+      "shape": "between",
+      "en": [
+        "on or before FY 2008 Q3 and FY 2009 Q4"
+      ],
+      "pt": [
+        "on or before QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_091",
+      "shape": "between",
+      "en": [
+        "between FY 2009 Q4 and FY 2010 Q1"
+      ],
+      "pt": [
+        "between PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_092",
+      "shape": "between",
+      "en": [
+        "from FY 2010 Q1 and FY 2011 Q2"
+      ],
+      "pt": [
+        "from TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_093",
+      "shape": "between",
+      "en": [
+        "from and including FY 2011 Q2 and FY 2012 Q3"
+      ],
+      "pt": [
+        "from and including YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_094",
+      "shape": "between",
+      "en": [
+        "from to FY 2012 Q3 and FY 2013 Q4"
+      ],
+      "pt": [
+        "from to MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_095",
+      "shape": "between",
+      "en": [
+        "on or after FY 2013 Q4 and FY 2014 Q1"
+      ],
+      "pt": [
+        "on or after QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_096",
+      "shape": "between",
+      "en": [
+        "on or before FY 2014 Q1 and FY 2015 Q2"
+      ],
+      "pt": [
+        "on or before YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_097",
+      "shape": "between",
+      "en": [
+        "between FY 2015 Q2 and FY 2016 Q3"
+      ],
+      "pt": [
+        "between QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_098",
+      "shape": "between",
+      "en": [
+        "from FY 2016 Q3 and FY 2017 Q4"
+      ],
+      "pt": [
+        "from PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_099",
+      "shape": "between",
+      "en": [
+        "from and including FY 2017 Q4 and FY 2018 Q1"
+      ],
+      "pt": [
+        "from and including TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_100",
+      "shape": "between",
+      "en": [
+        "from to FY 2018 Q1 and FY 2019 Q2"
+      ],
+      "pt": [
+        "from to YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_101",
+      "shape": "between",
+      "en": [
+        "on or after FY 2019 Q2 and FY 2020 Q3"
+      ],
+      "pt": [
+        "on or after MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_102",
+      "shape": "between",
+      "en": [
+        "on or before FY 2020 Q3 and FY 2021 Q4"
+      ],
+      "pt": [
+        "on or before QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_103",
+      "shape": "between",
+      "en": [
+        "between FY 2021 Q4 and FY 2022 Q1"
+      ],
+      "pt": [
+        "between YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_104",
+      "shape": "between",
+      "en": [
+        "from FY 2022 Q1 and FY 2023 Q2"
+      ],
+      "pt": [
+        "from QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_105",
+      "shape": "between",
+      "en": [
+        "from and including FY 2023 Q2 and FY 2024 Q3"
+      ],
+      "pt": [
+        "from and including PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_106",
+      "shape": "between",
+      "en": [
+        "from to FY 2024 Q3 and FY 2025 Q4"
+      ],
+      "pt": [
+        "from to TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_107",
+      "shape": "between",
+      "en": [
+        "on or after FY 2025 Q4 and FY 2026 Q1"
+      ],
+      "pt": [
+        "on or after YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_108",
+      "shape": "between",
+      "en": [
+        "on or before FY 1999 Q1 and FY 2000 Q2"
+      ],
+      "pt": [
+        "on or before MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_109",
+      "shape": "between",
+      "en": [
+        "between FY 2000 Q2 and FY 2001 Q3"
+      ],
+      "pt": [
+        "between QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_110",
+      "shape": "between",
+      "en": [
+        "from FY 2001 Q3 and FY 2002 Q4"
+      ],
+      "pt": [
+        "from YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_111",
+      "shape": "between",
+      "en": [
+        "from and including FY 2002 Q4 and FY 2003 Q1"
+      ],
+      "pt": [
+        "from and including QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_112",
+      "shape": "between",
+      "en": [
+        "from to FY 2003 Q1 and FY 2004 Q2"
+      ],
+      "pt": [
+        "from to PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_113",
+      "shape": "between",
+      "en": [
+        "on or after FY 2004 Q2 and FY 2005 Q3"
+      ],
+      "pt": [
+        "on or after TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_114",
+      "shape": "between",
+      "en": [
+        "on or before FY 2005 Q3 and FY 2006 Q4"
+      ],
+      "pt": [
+        "on or before YESTERDAY e YESTERDAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_115",
+      "shape": "between",
+      "en": [
+        "between FY 2006 Q4 and FY 2007 Q1"
+      ],
+      "pt": [
+        "between MONTH END e MONTH-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_116",
+      "shape": "between",
+      "en": [
+        "from FY 2007 Q1 and FY 2008 Q2"
+      ],
+      "pt": [
+        "from QUARTER END e QUARTER-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_117",
+      "shape": "between",
+      "en": [
+        "from and including FY 2008 Q2 and FY 2009 Q3"
+      ],
+      "pt": [
+        "from and including YEAR END e YEAR-END"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_118",
+      "shape": "between",
+      "en": [
+        "from to FY 2009 Q3 and FY 2010 Q4"
+      ],
+      "pt": [
+        "from to QUARTER-START e QUARTER-START"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_119",
+      "shape": "between",
+      "en": [
+        "on or after FY 2010 Q4 and FY 2011 Q1"
+      ],
+      "pt": [
+        "on or after PERIOD-CLOSE e PERIOD-CLOSE"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_120",
+      "shape": "between",
+      "en": [
+        "on or before FY 2011 Q1 and FY 2012 Q2"
+      ],
+      "pt": [
+        "on or before TODAY e TODAY"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:between"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "between",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_121",
+      "shape": "window",
+      "en": [
+        "3 months rolling from as of month 2 2001"
+      ],
+      "pt": [
+        "3 months móveis a partir de a partir de 2/1"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_122",
+      "shape": "window",
+      "en": [
+        "6 months rolling from as at month 3 2002"
+      ],
+      "pt": [
+        "6 months móveis a partir de as at 3/2"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_123",
+      "shape": "window",
+      "en": [
+        "12 months rolling from as on month 4 2003"
+      ],
+      "pt": [
+        "12 months móveis a partir de as on 4/3"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_124",
+      "shape": "window",
+      "en": [
+        "4 quarters rolling from as of date month 5 2004"
+      ],
+      "pt": [
+        "4 quarters móveis a partir de a partir de date 5/4"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_125",
+      "shape": "window",
+      "en": [
+        "2 fiscal years rolling from effective as of month 6 2005"
+      ],
+      "pt": [
+        "2 fiscal years móveis a partir de effective a partir de 6/5"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_126",
+      "shape": "window",
+      "en": [
+        "3 months rolling from updated as of month 7 2006"
+      ],
+      "pt": [
+        "3 months móveis a partir de updated a partir de 7/6"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_127",
+      "shape": "window",
+      "en": [
+        "6 months rolling from as of month 8 2007"
+      ],
+      "pt": [
+        "6 months móveis a partir de a partir de 8/7"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_128",
+      "shape": "window",
+      "en": [
+        "12 months rolling from as at month 9 2008"
+      ],
+      "pt": [
+        "12 months móveis a partir de as at 9/8"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_129",
+      "shape": "window",
+      "en": [
+        "4 quarters rolling from as on month 10 2009"
+      ],
+      "pt": [
+        "4 quarters móveis a partir de as on 10/9"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_130",
+      "shape": "window",
+      "en": [
+        "2 fiscal years rolling from as of date month 11 2000"
+      ],
+      "pt": [
+        "2 fiscal years móveis a partir de a partir de date 11/10"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_131",
+      "shape": "window",
+      "en": [
+        "3 months rolling from effective as of month 12 2001"
+      ],
+      "pt": [
+        "3 months móveis a partir de effective a partir de 12/11"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_132",
+      "shape": "window",
+      "en": [
+        "6 months rolling from updated as of month 1 2002"
+      ],
+      "pt": [
+        "6 months móveis a partir de updated a partir de 13/12"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_133",
+      "shape": "window",
+      "en": [
+        "12 months rolling from as of month 2 2003"
+      ],
+      "pt": [
+        "12 months móveis a partir de a partir de 14/1"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_134",
+      "shape": "window",
+      "en": [
+        "4 quarters rolling from as at month 3 2004"
+      ],
+      "pt": [
+        "4 quarters móveis a partir de as at 15/2"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_135",
+      "shape": "window",
+      "en": [
+        "2 fiscal years rolling from as on month 4 2005"
+      ],
+      "pt": [
+        "2 fiscal years móveis a partir de as on 16/3"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_136",
+      "shape": "window",
+      "en": [
+        "3 months rolling from as of date month 5 2006"
+      ],
+      "pt": [
+        "3 months móveis a partir de a partir de date 17/4"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_137",
+      "shape": "window",
+      "en": [
+        "6 months rolling from effective as of month 6 2007"
+      ],
+      "pt": [
+        "6 months móveis a partir de effective a partir de 18/5"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_138",
+      "shape": "window",
+      "en": [
+        "12 months rolling from updated as of month 7 2008"
+      ],
+      "pt": [
+        "12 months móveis a partir de updated a partir de 19/6"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_139",
+      "shape": "window",
+      "en": [
+        "4 quarters rolling from as of month 8 2009"
+      ],
+      "pt": [
+        "4 quarters móveis a partir de a partir de 20/7"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_140",
+      "shape": "window",
+      "en": [
+        "2 fiscal years rolling from as at month 9 2000"
+      ],
+      "pt": [
+        "2 fiscal years móveis a partir de as at 21/8"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_141",
+      "shape": "window",
+      "en": [
+        "3 months rolling from as on month 10 2001"
+      ],
+      "pt": [
+        "3 months móveis a partir de as on 22/9"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_142",
+      "shape": "window",
+      "en": [
+        "6 months rolling from as of date month 11 2002"
+      ],
+      "pt": [
+        "6 months móveis a partir de a partir de date 23/10"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_143",
+      "shape": "window",
+      "en": [
+        "12 months rolling from effective as of month 12 2003"
+      ],
+      "pt": [
+        "12 months móveis a partir de effective a partir de 24/11"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_144",
+      "shape": "window",
+      "en": [
+        "4 quarters rolling from updated as of month 1 2004"
+      ],
+      "pt": [
+        "4 quarters móveis a partir de updated a partir de 25/12"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_145",
+      "shape": "window",
+      "en": [
+        "2 fiscal years rolling from as of month 2 2005"
+      ],
+      "pt": [
+        "2 fiscal years móveis a partir de a partir de 26/1"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_146",
+      "shape": "window",
+      "en": [
+        "3 months rolling from as at month 3 2006"
+      ],
+      "pt": [
+        "3 months móveis a partir de as at 27/2"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_147",
+      "shape": "window",
+      "en": [
+        "6 months rolling from as on month 4 2007"
+      ],
+      "pt": [
+        "6 months móveis a partir de as on 28/3"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_148",
+      "shape": "window",
+      "en": [
+        "12 months rolling from as of date month 5 2008"
+      ],
+      "pt": [
+        "12 months móveis a partir de a partir de date 29/4"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_149",
+      "shape": "window",
+      "en": [
+        "4 quarters rolling from effective as of month 6 2009"
+      ],
+      "pt": [
+        "4 quarters móveis a partir de effective a partir de 30/5"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_150",
+      "shape": "window",
+      "en": [
+        "2 fiscal years rolling from updated as of month 7 2000"
+      ],
+      "pt": [
+        "2 fiscal years móveis a partir de updated a partir de 1/6"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:window"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "window",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_151",
+      "shape": "relative",
+      "en": [
+        "quarter end scope with prior-period comparison 3 months"
+      ],
+      "pt": [
+        "escopo quarter end com comparação período anterior 3 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_152",
+      "shape": "relative",
+      "en": [
+        "year end scope with prior-period comparison 6 months"
+      ],
+      "pt": [
+        "escopo year end com comparação período anterior 6 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_153",
+      "shape": "relative",
+      "en": [
+        "quarter-start scope with prior-period comparison 12 months"
+      ],
+      "pt": [
+        "escopo quarter-start com comparação período anterior 12 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_154",
+      "shape": "relative",
+      "en": [
+        "period-close scope with prior-period comparison 4 quarters"
+      ],
+      "pt": [
+        "escopo period-close com comparação período anterior 4 quarters"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_155",
+      "shape": "relative",
+      "en": [
+        "today scope with prior-period comparison 2 fiscal years"
+      ],
+      "pt": [
+        "escopo today com comparação período anterior 2 fiscal years"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_156",
+      "shape": "relative",
+      "en": [
+        "yesterday scope with prior-period comparison 3 months"
+      ],
+      "pt": [
+        "escopo yesterday com comparação período anterior 3 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_157",
+      "shape": "relative",
+      "en": [
+        "month end scope with prior-period comparison 6 months"
+      ],
+      "pt": [
+        "escopo month end com comparação período anterior 6 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_158",
+      "shape": "relative",
+      "en": [
+        "quarter end scope with prior-period comparison 12 months"
+      ],
+      "pt": [
+        "escopo quarter end com comparação período anterior 12 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_159",
+      "shape": "relative",
+      "en": [
+        "year end scope with prior-period comparison 4 quarters"
+      ],
+      "pt": [
+        "escopo year end com comparação período anterior 4 quarters"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_160",
+      "shape": "relative",
+      "en": [
+        "quarter-start scope with prior-period comparison 2 fiscal years"
+      ],
+      "pt": [
+        "escopo quarter-start com comparação período anterior 2 fiscal years"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_161",
+      "shape": "relative",
+      "en": [
+        "period-close scope with prior-period comparison 3 months"
+      ],
+      "pt": [
+        "escopo period-close com comparação período anterior 3 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_162",
+      "shape": "relative",
+      "en": [
+        "today scope with prior-period comparison 6 months"
+      ],
+      "pt": [
+        "escopo today com comparação período anterior 6 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_163",
+      "shape": "relative",
+      "en": [
+        "yesterday scope with prior-period comparison 12 months"
+      ],
+      "pt": [
+        "escopo yesterday com comparação período anterior 12 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_164",
+      "shape": "relative",
+      "en": [
+        "month end scope with prior-period comparison 4 quarters"
+      ],
+      "pt": [
+        "escopo month end com comparação período anterior 4 quarters"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_165",
+      "shape": "relative",
+      "en": [
+        "quarter end scope with prior-period comparison 2 fiscal years"
+      ],
+      "pt": [
+        "escopo quarter end com comparação período anterior 2 fiscal years"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_166",
+      "shape": "relative",
+      "en": [
+        "year end scope with prior-period comparison 3 months"
+      ],
+      "pt": [
+        "escopo year end com comparação período anterior 3 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_167",
+      "shape": "relative",
+      "en": [
+        "quarter-start scope with prior-period comparison 6 months"
+      ],
+      "pt": [
+        "escopo quarter-start com comparação período anterior 6 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_168",
+      "shape": "relative",
+      "en": [
+        "period-close scope with prior-period comparison 12 months"
+      ],
+      "pt": [
+        "escopo period-close com comparação período anterior 12 months"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_169",
+      "shape": "relative",
+      "en": [
+        "today scope with prior-period comparison 4 quarters"
+      ],
+      "pt": [
+        "escopo today com comparação período anterior 4 quarters"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    },
+    {
+      "id": "TSP_170",
+      "shape": "relative",
+      "en": [
+        "yesterday scope with prior-period comparison 2 fiscal years"
+      ],
+      "pt": [
+        "escopo yesterday com comparação período anterior 2 fiscal years"
+      ],
+      "triggers": [
+        "scope:time",
+        "shape:relative"
+      ],
+      "negatives": [
+        "missing period anchor",
+        "ambiguous time scope"
+      ],
+      "slotHints": [
+        "startDate",
+        "endDate",
+        "periodType",
+        "fiscalType"
+      ],
+      "telemetryTags": [
+        "time_scope",
+        "relative",
+        "date_normalization"
+      ]
+    }
+  ],
+  "config": {
+    "enabled": true
+  }
+}
