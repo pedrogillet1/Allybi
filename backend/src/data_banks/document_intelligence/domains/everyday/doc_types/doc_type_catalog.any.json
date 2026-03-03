@@ -1,0 +1,512 @@
+{
+  "_meta": {
+    "id": "every_doc_type_catalog",
+    "version": "1.0.0",
+    "description": "Everyday document type catalog.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "enforcePackRefs": true
+  },
+  "domain": "everyday",
+  "docTypes": [
+    {
+      "id": "every_tax_return",
+      "name": {
+        "en": "Tax Return",
+        "pt": "Declaracao de Renda"
+      },
+      "description": "Individual or household tax return package with filing and liability fields.",
+      "archetypeId": "every_tax_return",
+      "detectionPatterns": [
+        "\\btax return\\b",
+        "\\bdeclaracao\\s+de\\s+renda\\b",
+        "\\bincome tax return\\b",
+        "\\bw2\\s+summary\\b"
+      ],
+      "priority": 130,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": [
+          "di_everyday_sections_every_tax_return"
+        ],
+        "entities": [
+          "di_everyday_entities_every_tax_return"
+        ],
+        "tables": [
+          "di_everyday_tables_every_tax_return"
+        ],
+        "extraction": [
+          "di_everyday_extraction_every_tax_return"
+        ]
+      },
+      "kpiOntologyRefs": [
+        "total_income",
+        "deductions",
+        "total_tax",
+        "refund_or_due"
+      ],
+      "commonSections": [
+        "document_header",
+        "taxpayer_profile",
+        "income_section",
+        "deductions",
+        "tax_summary",
+        "payment_or_refund"
+      ],
+      "extractionPriority": 120,
+      "riskTier": "medium"
+    },
+    {
+      "id": "every_tax_notice",
+      "name": {
+        "en": "Tax Notice",
+        "pt": "Notificacao de Tributos"
+      },
+      "description": "Official notice for tax assessments, penalties, and payment instructions.",
+      "archetypeId": "every_tax_notice",
+      "detectionPatterns": [
+        "\\btax notice\\b",
+        "\\bnotificacao\\s+de\\s+lancamento\\b",
+        "\\bassessment notice\\b",
+        "\\btax assessment\\b"
+      ],
+      "priority": 129,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_tax_notice"],
+        "entities": ["di_everyday_entities_every_tax_notice"],
+        "tables": ["di_everyday_tables_every_tax_notice"],
+        "extraction": ["di_everyday_extraction_every_tax_notice"]
+      },
+      "kpiOntologyRefs": [
+        "assessed_amount",
+        "penalty",
+        "due_date",
+        "payment_plan"
+      ],
+      "commonSections": [
+        "document_header",
+        "notice_reference",
+        "notice_summary",
+        "penalties",
+        "payment_instructions"
+      ],
+      "extractionPriority": 119,
+      "riskTier": "high"
+    },
+    {
+      "id": "every_phone_bill",
+      "name": {
+        "en": "Phone Bill",
+        "pt": "Conta de Telefone"
+      },
+      "description": "Mobile phone bill with usage and charges.",
+      "archetypeId": "every_phone_bill",
+      "detectionPatterns": [
+        "\\bphone bill\\b",
+        "\\bmobile bill\\b",
+        "\\bconta\\s+de\\s+telefone\\b",
+        "\\bcellular\\s+bill\\b"
+      ],
+      "priority": 128,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_phone_bill"],
+        "entities": ["di_everyday_entities_every_phone_bill"],
+        "tables": ["di_everyday_tables_every_phone_bill"],
+        "extraction": ["di_everyday_extraction_every_phone_bill"]
+      },
+      "kpiOntologyRefs": [
+        "subscriber",
+        "minutes",
+        "data_usage",
+        "total_charges"
+      ],
+      "commonSections": [
+        "document_header",
+        "subscriber_profile",
+        "usage_summary",
+        "line_items",
+        "charges_and_fees"
+      ],
+      "extractionPriority": 118,
+      "riskTier": "low"
+    },
+    {
+      "id": "every_electricity_bill",
+      "name": {
+        "en": "Electricity Bill",
+        "pt": "Conta de Energia Eletrica"
+      },
+      "description": "Utility electricity bill with meter and tariff information.",
+      "archetypeId": "every_electricity_bill",
+      "detectionPatterns": [
+        "\\belectricity bill\\b",
+        "\\bconta\\s+de\\s+energia\\b",
+        "\\bkwh\\b",
+        "\\bmeter reading\\b",
+        "\\belectric bill\\b"
+      ],
+      "priority": 127,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_electricity_bill"],
+        "entities": ["di_everyday_entities_every_electricity_bill"],
+        "tables": ["di_everyday_tables_every_electricity_bill"],
+        "extraction": ["di_everyday_extraction_every_electricity_bill"]
+      },
+      "kpiOntologyRefs": [
+        "meter_reading",
+        "kwh",
+        "tariff_rate",
+        "total_due"
+      ],
+      "commonSections": [
+        "document_header",
+        "provider_profile",
+        "consumption_summary",
+        "tariff_breakdown",
+        "charges_and_taxes"
+      ],
+      "extractionPriority": 117,
+      "riskTier": "low"
+    },
+    {
+      "id": "every_internet_bill",
+      "name": {
+        "en": "Internet Bill",
+        "pt": "Conta de Internet"
+      },
+      "description": "Internet billing document with usage, data plan, and taxes.",
+      "archetypeId": "every_internet_bill",
+      "detectionPatterns": [
+        "\\binternet bill\\b",
+        "\\bconta\\s+de\\s+internet\\b",
+        "\\bbroadband\\b",
+        "\\bfiber bill\\b"
+      ],
+      "priority": 126,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_internet_bill"],
+        "entities": ["di_everyday_entities_every_internet_bill"],
+        "tables": ["di_everyday_tables_every_internet_bill"],
+        "extraction": ["di_everyday_extraction_every_internet_bill"]
+      },
+      "kpiOntologyRefs": [
+        "bandwidth_used",
+        "plan_name",
+        "data_cap",
+        "monthly_total"
+      ],
+      "commonSections": [
+        "document_header",
+        "subscriber_profile",
+        "usage_summary",
+        "plan_and_fees",
+        "totals_and_taxes"
+      ],
+      "extractionPriority": 116,
+      "riskTier": "low"
+    },
+    {
+      "id": "every_rent_receipt",
+      "name": {
+        "en": "Rent Receipt",
+        "pt": "Recibo de Aluguel"
+      },
+      "description": "Rent receipt with payment period, property, and parties.",
+      "archetypeId": "every_rent_receipt",
+      "detectionPatterns": [
+        "\\brent receipt\\b",
+        "\\brecibo\\s+de\\s+aluguel\\b",
+        "\\blease payment\\b",
+        "\\brental payment\\b"
+      ],
+      "priority": 125,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_rent_receipt"],
+        "entities": ["di_everyday_entities_every_rent_receipt"],
+        "tables": ["di_everyday_tables_every_rent_receipt"],
+        "extraction": ["di_everyday_extraction_every_rent_receipt"]
+      },
+      "kpiOntologyRefs": [
+        "rent_amount",
+        "period_covered",
+        "landlord",
+        "tenant"
+      ],
+      "commonSections": [
+        "document_header",
+        "property_and_parties",
+        "payment_period",
+        "charges_breakdown",
+        "payment_confirmation"
+      ],
+      "extractionPriority": 115,
+      "riskTier": "low"
+    },
+    {
+      "id": "every_retail_receipt",
+      "name": {
+        "en": "Retail Receipt",
+        "pt": "Recibo Varejista"
+      },
+      "description": "Retail point-of-sale receipt with line items and payment confirmation.",
+      "archetypeId": "every_retail_receipt",
+      "detectionPatterns": [
+        "\\bretail receipt\\b",
+        "\\bstore receipt\\b",
+        "\\breceipt\\b",
+        "\\bcupom\\s+fiscal\\b"
+      ],
+      "priority": 124,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_retail_receipt"],
+        "entities": ["di_everyday_entities_every_retail_receipt"],
+        "tables": ["di_everyday_tables_every_retail_receipt"],
+        "extraction": ["di_everyday_extraction_every_retail_receipt"]
+      },
+      "kpiOntologyRefs": [
+        "subtotal",
+        "tax",
+        "discount",
+        "payment_method"
+      ],
+      "commonSections": [
+        "document_header",
+        "merchant_profile",
+        "line_items",
+        "discounts_taxes",
+        "payment_info"
+      ],
+      "extractionPriority": 124,
+      "riskTier": "low"
+    },
+    {
+      "id": "every_invoice",
+      "name": {
+        "en": "Invoice",
+        "pt": "Fatura"
+      },
+      "description": "Business or consumer invoice with line items and terms.",
+      "archetypeId": "every_invoice",
+      "detectionPatterns": [
+        "\\binvoice\\b",
+        "\\bfactura\\b",
+        "\\binvoice number\\b",
+        "\\bfatura\\b"
+      ],
+      "priority": 123,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_invoice"],
+        "entities": ["di_everyday_entities_every_invoice"],
+        "tables": ["di_everyday_tables_every_invoice"],
+        "extraction": ["di_everyday_extraction_every_invoice"]
+      },
+      "kpiOntologyRefs": [
+        "invoice_number",
+        "gross_total",
+        "subtotal",
+        "due_date"
+      ],
+      "commonSections": [
+        "document_header",
+        "vendor_profile",
+        "customer_profile",
+        "line_items",
+        "totals",
+        "payment_terms"
+      ],
+      "extractionPriority": 123,
+      "riskTier": "medium"
+    },
+    {
+      "id": "every_bank_statement",
+      "name": {
+        "en": "Bank Statement",
+        "pt": "Extrato Bancario"
+      },
+      "description": "Bank account statement with opening/closing balances and transactions.",
+      "archetypeId": "every_bank_statement",
+      "detectionPatterns": [
+        "\\bbank statement\\b",
+        "\\bconta\\s+corrente\\b",
+        "\\bextrato\\s+bancario\\b",
+        "\\bstatement period\\b"
+      ],
+      "priority": 122,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_bank_statement"],
+        "entities": ["di_everyday_entities_every_bank_statement"],
+        "tables": ["di_everyday_tables_every_bank_statement"],
+        "extraction": ["di_everyday_extraction_every_bank_statement"]
+      },
+      "kpiOntologyRefs": [
+        "opening_balance",
+        "closing_balance",
+        "transaction_count",
+        "statement_period"
+      ],
+      "commonSections": [
+        "document_header",
+        "account_profile",
+        "opening_and_closing",
+        "transactions",
+        "charges"
+      ],
+      "extractionPriority": 122,
+      "riskTier": "medium"
+    },
+    {
+      "id": "every_insurance_policy",
+      "name": {
+        "en": "Insurance Policy",
+        "pt": "Apolice de Seguro"
+      },
+      "description": "Insurance policy contract document with coverage and premium schedule.",
+      "archetypeId": "every_insurance_policy",
+      "detectionPatterns": [
+        "\\binsurance policy\\b",
+        "\\bpolicy\\s+holder\\b",
+        "\\bseguro\\b",
+        "\\babertura\\s*\\b"
+      ],
+      "priority": 121,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_insurance_policy"],
+        "entities": ["di_everyday_entities_every_insurance_policy"],
+        "tables": ["di_everyday_tables_every_insurance_policy"],
+        "extraction": ["di_everyday_extraction_every_insurance_policy"]
+      },
+      "kpiOntologyRefs": [
+        "policy_number",
+        "coverage_limit",
+        "premium_amount",
+        "renewal_date"
+      ],
+      "commonSections": [
+        "document_header",
+        "policy_holder",
+        "coverage_details",
+        "premium_schedule",
+        "exclusions",
+        "renewal_terms"
+      ],
+      "extractionPriority": 121,
+      "riskTier": "high"
+    },
+    {
+      "id": "every_insurance_claim",
+      "name": {
+        "en": "Insurance Claim",
+        "pt": "Reclamacao de Seguro"
+      },
+      "description": "Insurance claim package containing incident, status, reserve, and payment detail.",
+      "archetypeId": "every_insurance_claim",
+      "detectionPatterns": [
+        "\\binsurance claim\\b",
+        "\\bclaim number\\b",
+        "\\breclamacao\\b",
+        "\\bsiniestro\\b"
+      ],
+      "priority": 120,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_insurance_claim"],
+        "entities": ["di_everyday_entities_every_insurance_claim"],
+        "tables": ["di_everyday_tables_every_insurance_claim"],
+        "extraction": ["di_everyday_extraction_every_insurance_claim"]
+      },
+      "kpiOntologyRefs": [
+        "claim_number",
+        "status",
+        "claim_total",
+        "settlement_date"
+      ],
+      "commonSections": [
+        "document_header",
+        "claim_identity",
+        "incident",
+        "coverage_check",
+        "payments_and_status",
+        "supporting_docs"
+      ],
+      "extractionPriority": 120,
+      "riskTier": "high"
+    },
+    {
+      "id": "every_identity_document",
+      "name": {
+        "en": "Identity Document",
+        "pt": "Documento de Identidade"
+      },
+      "description": "Government-issued or official identity artifact.",
+      "archetypeId": "every_identity_document",
+      "detectionPatterns": [
+        "\\bidentity document\\b",
+        "\\bdocumento de identidade\\b",
+        "\\bidentification\\b",
+        "\\bdriver license\\b|\\bpassport\\b"
+      ],
+      "priority": 119,
+      "detectionHintsRefs": [
+        "di_everyday_domain_detection_rules"
+      ],
+      "packRefs": {
+        "sections": ["di_everyday_sections_every_identity_document"],
+        "entities": ["di_everyday_entities_every_identity_document"],
+        "tables": ["di_everyday_tables_every_identity_document"],
+        "extraction": ["di_everyday_extraction_every_identity_document"]
+      },
+      "kpiOntologyRefs": [
+        "document_number",
+        "issuer_authority",
+        "holder_name",
+        "expiry_date"
+      ],
+      "commonSections": [
+        "document_header",
+        "identity_fields",
+        "issuer_and_validity",
+        "security_features",
+        "signatures_or_validity"
+      ],
+      "extractionPriority": 119,
+      "riskTier": "high"
+    }
+  ]
+}

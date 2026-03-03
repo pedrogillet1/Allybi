@@ -65,6 +65,12 @@
       "description": "End date of report period"
     },
     {
+      "id": "exportDate",
+      "type": "date",
+      "required": false,
+      "description": "Date the ledger export was generated"
+    },
+    {
       "id": "totalDebits",
       "type": "currency",
       "required": false,
@@ -81,6 +87,18 @@
       "type": "currency",
       "required": false,
       "description": "Ending balance for report period"
+    },
+    {
+      "id": "multiCurrencyTotal",
+      "type": "currency",
+      "required": false,
+      "description": "Total across all currencies if present"
+    },
+    {
+      "id": "journalCount",
+      "type": "number",
+      "required": false,
+      "description": "Total number of journal lines"
     }
   ]
 }

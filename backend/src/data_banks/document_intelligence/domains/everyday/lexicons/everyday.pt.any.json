@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "di_everyday_lexicon_pt",
+    "version": "1.0.0",
+    "description": "PT lexicon for everyday domain extraction.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "language": "pt"
+  },
+  "domain": "everyday",
+  "terms": [
+    {
+      "id": "every_lex_pt_conta",
+      "canonical": "conta",
+      "synonyms": ["numero da conta", "conta bancaria"],
+      "display": "Conta"
+    },
+    {
+      "id": "every_lex_pt_fatura",
+      "canonical": "fatura",
+      "synonyms": ["fatura de celular", "fatura de internet", "fatura de energia"],
+      "display": "Fatura"
+    },
+    {
+      "id": "every_lex_pt_total",
+      "canonical": "valor total",
+      "synonyms": ["total", "valor final", "valor total a pagar"],
+      "display": "Total"
+    },
+    {
+      "id": "every_lex_pt_vencimento",
+      "canonical": "vencimento",
+      "synonyms": ["data de vencimento", "prazo de pagamento", "data limite"],
+      "display": "Vencimento"
+    },
+    {
+      "id": "every_lex_pt_periodo",
+      "canonical": "periodo",
+      "synonyms": ["mes de referenciacao", "periodo de cobranca", "periodo de faturamento"],
+      "display": "Periodo"
+    },
+    {
+      "id": "every_lex_pt_imposto",
+      "canonical": "imposto",
+      "synonyms": ["tributo", "taxa", "taxas"],
+      "display": "Imposto"
+    },
+    {
+      "id": "every_lex_pt_recibo",
+      "canonical": "recibo",
+      "synonyms": ["recibo de aluguel", "cupom fiscal", "comprovante"],
+      "display": "Recibo"
+    },
+    {
+      "id": "every_lex_pt_notificacao",
+      "canonical": "notificacao",
+      "synonyms": ["notificacao fiscal", "aviso", "notice"],
+      "display": "Notificacao"
+    },
+    {
+      "id": "every_lex_pt_seguro",
+      "canonical": "seguro",
+      "synonyms": ["apolice", "seguro", "policia"],
+      "display": "Seguro"
+    },
+    {
+      "id": "every_lex_pt_apolice",
+      "canonical": "apolice",
+      "synonyms": ["numero da apolice", "apolice numero", "numero de cobertura"],
+      "display": "Apolice"
+    },
+    {
+      "id": "every_lex_pt_sinistro",
+      "canonical": "sinistro",
+      "synonyms": ["reclamacao", "sinistro numero", "sinistro", "indemnizacao"],
+      "display": "Sinistro"
+    },
+    {
+      "id": "every_lex_pt_extrato",
+      "canonical": "extrato",
+      "synonyms": ["extrato bancario", "extrato de conta"],
+      "display": "Extrato"
+    },
+    {
+      "id": "every_lex_pt_titular",
+      "canonical": "titular",
+      "synonyms": ["beneficiario", "cliente", "usuário"],
+      "display": "Titular"
+    },
+    {
+      "id": "every_lex_pt_fiador",
+      "canonical": "locador",
+      "synonyms": ["proprietario", "locador", "imobiliaria"],
+      "display": "Locador"
+    },
+    {
+      "id": "every_lex_pt_inquilino",
+      "canonical": "locatario",
+      "synonyms": ["locador", "inquilino", "locatario", "hospede"],
+      "display": "Inquilino"
+    },
+    {
+      "id": "every_lex_pt_cnpj",
+      "canonical": "cnpj",
+      "synonyms": ["cpf/cnpj", "inscricao fiscal", "identificacao fiscal"],
+      "display": "CNPJ"
+    },
+    {
+      "id": "every_lex_pt_endereco",
+      "canonical": "endereco",
+      "synonyms": ["endereco completo", "residencia", "logradouro"],
+      "display": "Endereco"
+    },
+    {
+      "id": "every_lex_pt_matricula",
+      "canonical": "identidade",
+      "synonyms": ["documento", "rg", "cpf", "passaporte", "cnh"],
+      "display": "Identidade"
+    },
+    {
+      "id": "every_lex_pt_consumo",
+      "canonical": "consumo",
+      "synonyms": ["consumo de energia", "consumo de dados", "consumo", "uso"],
+      "display": "Consumo"
+    },
+    {
+      "id": "every_lex_pt_multa",
+      "canonical": "multa",
+      "synonyms": ["multa por atraso", "penalidade", "taxa de atraso"],
+      "display": "Multa"
+    },
+    {
+      "id": "every_lex_pt_juros",
+      "canonical": "juros",
+      "synonyms": ["taxa de juros", "juros de atraso", "juros financeiros"],
+      "display": "Juros"
+    },
+    {
+      "id": "every_lex_pt_desconto",
+      "canonical": "desconto",
+      "synonyms": ["abatimento", "ajuste", "promocao"],
+      "display": "Desconto"
+    },
+    {
+      "id": "every_lex_pt_taxa",
+      "canonical": "taxa",
+      "synonyms": ["tarifa", "fee", "custo adicional"],
+      "display": "Taxa"
+    },
+    {
+      "id": "every_lex_pt_assinatura",
+      "canonical": "assinatura",
+      "synonyms": ["assinatura do documento", "assinatura do contratante", "assinatura eletrônica"],
+      "display": "Assinatura"
+    },
+    {
+      "id": "every_lex_pt_renovacao",
+      "canonical": "renovacao",
+      "synonyms": ["renovacao de apolice", "prorrogacao", "prazo"],
+      "display": "Renovacao"
+    },
+    {
+      "id": "every_lex_pt_cobertura",
+      "canonical": "cobertura",
+      "synonyms": ["cobertura maxima", "limite de cobertura", "cobertura contratual"],
+      "display": "Cobertura"
+    },
+    {
+      "id": "every_lex_pt_exclusao",
+      "canonical": "exclusao",
+      "synonyms": ["nao coberto", "exclusao", "exclusoes"],
+      "display": "Exclusao"
+    },
+    {
+      "id": "every_lex_pt_saldo",
+      "canonical": "saldo",
+      "synonyms": ["saldo anterior", "saldo final", "saldo atual"],
+      "display": "Saldo"
+    },
+    {
+      "id": "every_lex_pt_disputa",
+      "canonical": "disputa",
+      "synonyms": ["contestacao", "reclamacao", "discordancia"],
+      "display": "Disputa"
+    },
+    {
+      "id": "every_lex_pt_numero_medidor",
+      "canonical": "numero do medidor",
+      "synonyms": ["medidor", "hidrometro", "conta de consumo"],
+      "display": "Numero do Medidor"
+    }
+  ]
+}

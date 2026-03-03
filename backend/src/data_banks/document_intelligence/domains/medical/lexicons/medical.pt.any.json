@@ -1444,6 +1444,88 @@
       ],
       "display": "Care Objective",
       "enRef": "medical_lex_en_130"
+    },
+    {
+      "id": "medical_lex_pt_131",
+      "canonical": "laudo",
+      "synonyms": [
+        "laudo",
+        "laudo médico",
+        "laudo laboratorial",
+        "laudo medico"
+      ],
+      "display": "Laudo",
+      "enRef": "medical_lex_en_131"
+    },
+    {
+      "id": "medical_lex_pt_132",
+      "canonical": "exame",
+      "synonyms": [
+        "exame",
+        "exame médico",
+        "exame clínico",
+        "exame de laboratorio"
+      ],
+      "display": "Exame",
+      "enRef": "medical_lex_en_131"
+    },
+    {
+      "id": "medical_lex_pt_133",
+      "canonical": "alta",
+      "synonyms": [
+        "alta",
+        "alta medica",
+        "alta hospitalar"
+      ],
+      "display": "Alta",
+      "enRef": "medical_lex_en_135"
+    },
+    {
+      "id": "medical_lex_pt_134",
+      "canonical": "prescricao",
+      "synonyms": [
+        "prescricao",
+        "prescrição",
+        "prescricao medica",
+        "prescrição médica",
+        "prescrição de medicamentos"
+      ],
+      "display": "Prescricao",
+      "enRef": "medical_lex_en_131"
+    },
+    {
+      "id": "medical_lex_pt_135",
+      "canonical": "unidade laboratorial",
+      "synonyms": [
+        "unidade laboratorial",
+        "unidade de medida",
+        "unidade de laboratorio"
+      ],
+      "display": "Unidade Laboratorial",
+      "enRef": "medical_lex_en_133"
+    },
+    {
+      "id": "medical_lex_pt_136",
+      "canonical": "intervalo de referencia",
+      "synonyms": [
+        "intervalo de referencia",
+        "faixa de referência",
+        "valor de referência",
+        "valor de referencia"
+      ],
+      "display": "Intervalo de Referencia",
+      "enRef": "medical_lex_en_053"
+    },
+    {
+      "id": "medical_lex_pt_137",
+      "canonical": "valor anormal",
+      "synonyms": [
+        "valor anormal",
+        "resultado anormal",
+        "flag anormal"
+      ],
+      "display": "Valor Anormal",
+      "enRef": "medical_lex_en_132"
     }
   ]
 }

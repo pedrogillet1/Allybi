@@ -22,15 +22,8 @@
       "debit amount",
       "debit amt",
       "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
       "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "valor debito"
     ],
     "credit": [
       "credit",
@@ -40,87 +33,8 @@
       "credit amount",
       "credit amt",
       "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
       "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
-    ],
-    "balance": [
-      "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
-      "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
-    ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+      "valor credito"
     ]
   },
   "tables": [
@@ -132,34 +46,260 @@
       },
       "section": "line_items",
       "expectedColumns": [
-        "date",
+        "posting_date",
         "journal_id",
         "account_code",
         "account_name",
         "description",
+        "currency_code",
         "debit",
         "credit",
         "balance"
       ],
       "keyRows": [
-        "grand_total"
+        "grand_total",
+        "subtotal",
+        "end_of_file"
+      ],
+      "headerSynonyms": {
+        "posting_date": [
+          "posting date",
+          "journal date",
+          "transaction date",
+          "date"
+        ],
+        "journal_id": [
+          "journal id",
+          "journal number",
+          "je",
+          "entry id"
+        ],
+        "account_code": [
+          "account",
+          "account code",
+          "account no",
+          "acct"
+        ],
+        "currency_code": [
+          "currency",
+          "ccy",
+          "moeda"
+        ],
+        "debit": [
+          "dr",
+          "debit",
+          "debit amount"
+        ],
+        "credit": [
+          "cr",
+          "credit",
+          "credit amount"
+        ],
+        "balance": [
+          "balance",
+          "running balance",
+          "saldo"
+        ]
+      },
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "notes": "when both debit and credit are populated, compute net movement from signed sum"
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "journal_id"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "balance"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "balance"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "BRL",
+        "$",
+        "€",
+        "£"
+      ]
+    },
+    {
+      "id": "acct_gl_export_currency_table",
+      "name": {
+        "en": "General Ledger Currency Breakdown",
+        "pt": "Detalhe de Moeda do Razao Geral"
+      },
+      "section": "currency_breakout",
+      "expectedColumns": [
+        "currency_code",
+        "dr_total",
+        "cr_total",
+        "net_total"
+      ],
+      "keyRows": [
+        "grand_total",
+        "subtotal"
+      ],
+      "headerSynonyms": {
+        "currency_code": [
+          "currency",
+          "currency code",
+          "moeda"
+        ],
+        "dr_total": [
+          "debit total",
+          "dr total",
+          "total debits"
+        ],
+        "cr_total": [
+          "credit total",
+          "cr total",
+          "total credits"
+        ],
+        "net_total": [
+          "net",
+          "net total",
+          "saldo"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "dr_total",
+            "cr_total",
+            "net_total"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "dr_total",
+            "cr_total",
+            "net_total"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "dr_total"
+        ],
+        "creditColumns": [
+          "cr_total"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL"
       ]
     },
     {
       "id": "acct_gl_export_summary_table",
       "name": {
         "en": "General Ledger Export Summary",
-        "pt": "Exportacao do Razao Geral Resumo"
+        "pt": "Resumo de Exportacao do Razao Geral"
       },
-      "section": "summary",
+      "section": "totals",
       "expectedColumns": [
         "metric",
         "value"
       ],
       "keyRows": [
         "total",
-        "subtotal",
-        "difference"
+        "difference",
+        "total_debits",
+        "total_credits"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "debitMetrics": [
+          "total_debits"
+        ],
+        "creditMetrics": [
+          "total_credits",
+          "difference"
+        ],
+        "notes": "Summary rows that use total_debits/total_credits should be treated as debit- versus credit-style totals even when flattened."
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "€",
+        "£",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Handle summary rows that may appear in merged cells or multiple spacing styles",
+        "Allow both native and translated labels like 'Totais' and 'Summary'"
       ]
     }
   ]

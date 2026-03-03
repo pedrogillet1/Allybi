@@ -11,7 +11,7 @@
   "config": {
     "enabled": true,
     "domain": "legal",
-    "docType": "msa"
+    "docType": "legal_msa"
   },
   "hints": [
     {

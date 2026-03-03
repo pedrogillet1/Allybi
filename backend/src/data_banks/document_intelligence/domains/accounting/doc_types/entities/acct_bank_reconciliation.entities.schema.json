@@ -59,10 +59,16 @@
       "description": "Reconciliation date"
     },
     {
+      "id": "bankAccount",
+      "type": "string",
+      "required": true,
+      "description": "Bank account identifier"
+    },
+    {
       "id": "bookBalance",
       "type": "currency",
       "required": true,
-      "description": "Book balance"
+      "description": "Book balance before reconciliation"
     },
     {
       "id": "bankBalance",
@@ -87,6 +93,24 @@
       "type": "currency",
       "required": false,
       "description": "Difference after adjustments"
+    },
+    {
+      "id": "outstandingDeposits",
+      "type": "currency",
+      "required": false,
+      "description": "Outstanding deposits amount"
+    },
+    {
+      "id": "outstandingCheques",
+      "type": "currency",
+      "required": false,
+      "description": "Outstanding cheques amount"
+    },
+    {
+      "id": "currencyDriftAmount",
+      "type": "currency",
+      "required": false,
+      "description": "Cross-currency FX adjustment included in reconciliation"
     }
   ]
 }

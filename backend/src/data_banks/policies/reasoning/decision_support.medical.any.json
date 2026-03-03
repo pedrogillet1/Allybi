@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -1513,5 +1519,47 @@
         "allowInferenceWhenLabeled": true
       }
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "MED_DEC_001_compare_docs_required",
+      "trigger": "medical compare intent with missing docs",
+      "check": "context.domain=='medical' && context.intent=='compare' && context.explicitDocs.count < 2",
+      "failureAction": "ASK_FOR_SECOND_DOC"
+    },
+    {
+      "id": "MED_DEC_002_clinical_time_scope",
+      "trigger": "medical query missing explicit timeframe",
+      "check": "context.domain=='medical' && context.queryNeedsTimeScope == true && context.periodRef == null",
+      "failureAction": "ASK_FOR_TIME_SCOPE"
+    },
+    {
+      "id": "MED_DEC_003_unit_safety_guard",
+      "trigger": "medical numeric answer changes units without request",
+      "check": "context.domain=='medical' && output.unitConverted == true && context.unitConversionRequested == false",
+      "failureAction": "PRESERVE_UNIT"
+    },
+    {
+      "id": "MED_DEC_004_do_not_diagnose",
+      "trigger": "medical recommendation resembles diagnosis with insufficient certainty",
+      "check": "context.domain=='medical' && context.userRequestsDiagnosticConclusion == true && context.clinicalConfidence < 0.8",
+      "failureAction": "ASK_FOR_CLINICAL_REVIEW"
+    },
+    {
+      "id": "MED_DEC_005_critical_value_disclosure",
+      "trigger": "medical output uses critical value from single evidence point",
+      "check": "context.domain=='medical' && output.evidenceCount < 2 && output.containsCriticalValue == true",
+      "failureAction": "REQUEST_CONFIRMING_EVIDENCE"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "MED_DEC_SMOKE_001"
+      }
+    ]
+  }
 }

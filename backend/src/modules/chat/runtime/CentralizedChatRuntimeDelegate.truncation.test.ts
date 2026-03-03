@@ -51,6 +51,42 @@ describe("CentralizedChatRuntimeDelegate pre-enforcer trim", () => {
   });
 });
 
+describe("CentralizedChatRuntimeDelegate sentence-boundary recovery", () => {
+  test("falls back to earlier complete sentence when latest sentence is semantically broken", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as CentralizedChatRuntimeDelegate;
+
+    const truncated =
+      'The 2024 operating statement does not include unusual items. The "214 Move Out Statement (2).';
+    const recovered = (delegate as any).applySentenceBoundaryRecovery(
+      truncated,
+      { finishReason: "length" },
+    );
+
+    expect(recovered).toBe(
+      "The 2024 operating statement does not include unusual items.",
+    );
+  });
+
+  test("removes inline bullet spillover and keeps a complete lead sentence", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as CentralizedChatRuntimeDelegate;
+
+    const truncated =
+      "The finance spreadsheets show inconsistencies in currency and periods: * `214 Move Out Statement` uses mixed labels and then";
+    const recovered = (delegate as any).applySentenceBoundaryRecovery(
+      truncated,
+      { finishReason: "max_tokens" },
+    );
+
+    expect(recovered).toBe(
+      "The finance spreadsheets show inconsistencies in currency and periods.",
+    );
+  });
+});
+
 describe("CentralizedChatRuntimeDelegate provider overflow repair", () => {
   test("preserves incomplete narrative text instead of replacing with generic fallback", () => {
     const delegate = Object.create(
@@ -181,6 +217,29 @@ describe("CentralizedChatRuntimeDelegate answer mode routing", () => {
     );
 
     expect(mode).toBe("doc_grounded_single");
+  });
+
+  test("avoids nav_pills for analytical prompts even when operator is open", () => {
+    const delegate = Object.create(
+      CentralizedChatRuntimeDelegate.prototype,
+    ) as any;
+    delegate.collectSemanticSignals = () => ({
+      userAskedForTable: false,
+      tableExpected: false,
+      userAskedForQuote: false,
+    });
+
+    const mode = delegate.resolveAnswerMode(
+      {
+        userId: "user-1",
+        message: "open and compute EBITDA margin for 2024",
+        attachedDocumentIds: ["doc-1"],
+        meta: { operator: "open" },
+      },
+      { evidence: [] },
+    );
+
+    expect(mode).toBe("help_steps");
   });
 });
 

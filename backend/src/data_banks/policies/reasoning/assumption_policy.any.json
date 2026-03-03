@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -24,7 +30,10 @@
         "market_close_sensitive",
         "medical_dosing"
       ],
-      "labelFormat": "Assumption/Pressuposto [timezone_default]: {text}"
+      "labelFormat": "Assumption/Pressuposto [timezone_default]: {text}",
+      "trigger": "assumption_condition_ASSUME_001",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"low_risk_context\",\"missing_timezone\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"legal_deadline\",\"market_close_sensitive\",\"medical_dosing\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_002",
@@ -37,7 +46,10 @@
         "medication_schedule",
         "regulatory_filing"
       ],
-      "labelFormat": "Assumption/Pressuposto [date_format_default]: {text}"
+      "labelFormat": "Assumption/Pressuposto [date_format_default]: {text}",
+      "trigger": "assumption_condition_ASSUME_002",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"low_risk_context\",\"missing_date_format\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"court_deadline\",\"medication_schedule\",\"regulatory_filing\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_003",
@@ -50,7 +62,10 @@
         "hedging_decision",
         "investment_order"
       ],
-      "labelFormat": "Assumption/Pressuposto [currency_default]: {text}"
+      "labelFormat": "Assumption/Pressuposto [currency_default]: {text}",
+      "trigger": "assumption_condition_ASSUME_003",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"explicit_region_context\",\"single_currency_workspace\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"cross_border_settlement\",\"hedging_decision\",\"investment_order\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_004",
@@ -63,7 +78,10 @@
         "engineering_safety_limit",
         "financial_pricing_commitment"
       ],
-      "labelFormat": "Assumption/Pressuposto [unit_default]: {text}"
+      "labelFormat": "Assumption/Pressuposto [unit_default]: {text}",
+      "trigger": "assumption_condition_ASSUME_004",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"single_unit_document\",\"technical_low_risk\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"dosage_calculation\",\"engineering_safety_limit\",\"financial_pricing_commitment\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_005",
@@ -76,7 +94,10 @@
         "compliance_notice",
         "informed_consent"
       ],
-      "labelFormat": "Assumption/Pressuposto [language_default]: {text}"
+      "labelFormat": "Assumption/Pressuposto [language_default]: {text}",
+      "trigger": "assumption_condition_ASSUME_005",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"conversation_history_consistent\",\"user_locale_detected\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"binding_contract_clause\",\"compliance_notice\",\"informed_consent\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_006",
@@ -89,7 +110,10 @@
         "multi_party_contract",
         "multi_patient_record"
       ],
-      "labelFormat": "Assumption/Pressuposto [pronoun_resolution]: {text}"
+      "labelFormat": "Assumption/Pressuposto [pronoun_resolution]: {text}",
+      "trigger": "assumption_condition_ASSUME_006",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"recent_reference_in_context\",\"single_clear_entity\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"multi_issuer_financials\",\"multi_party_contract\",\"multi_patient_record\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_007",
@@ -102,7 +126,10 @@
         "ambiguous_medical_abbreviation",
         "ticker_symbol_conflict"
       ],
-      "labelFormat": "Assumption/Pressuposto [abbreviation_expansion]: {text}"
+      "labelFormat": "Assumption/Pressuposto [abbreviation_expansion]: {text}",
+      "trigger": "assumption_condition_ASSUME_007",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"document_contains_definition\",\"domain_standard_abbreviation\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"ambiguous_legal_abbreviation\",\"ambiguous_medical_abbreviation\",\"ticker_symbol_conflict\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_008",
@@ -115,7 +142,10 @@
         "regulatory_tax_table",
         "signed_legal_schedule"
       ],
-      "labelFormat": "Assumption/Pressuposto [table_header_guess]: {text}"
+      "labelFormat": "Assumption/Pressuposto [table_header_guess]: {text}",
+      "trigger": "assumption_condition_ASSUME_008",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"high_token_overlap\",\"repeatable_tabular_pattern\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"clinical_lab_unit_mismatch\",\"regulatory_tax_table\",\"signed_legal_schedule\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_009",
@@ -128,7 +158,10 @@
         "earnings_release",
         "prescription_validity"
       ],
-      "labelFormat": "Assumption/Pressuposto [missing_period_fill]: {text}"
+      "labelFormat": "Assumption/Pressuposto [missing_period_fill]: {text}",
+      "trigger": "assumption_condition_ASSUME_009",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"prior_turn_mentions_period\",\"single_period_candidates\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"audit_opinion\",\"earnings_release\",\"prescription_validity\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_010",
@@ -141,7 +174,10 @@
         "litigation_party_dispute",
         "sanctions_screening"
       ],
-      "labelFormat": "Assumption/Pressuposto [entity_alias_mapping]: {text}"
+      "labelFormat": "Assumption/Pressuposto [entity_alias_mapping]: {text}",
+      "trigger": "assumption_condition_ASSUME_010",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"known_alias_dictionary\",\"single_counterparty_match\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"identity_verification\",\"litigation_party_dispute\",\"sanctions_screening\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_011",
@@ -154,7 +190,10 @@
         "employment_law_advice",
         "tax_filing_advice"
       ],
-      "labelFormat": "Assumption/Pressuposto [country_context]: {text}"
+      "labelFormat": "Assumption/Pressuposto [country_context]: {text}",
+      "trigger": "assumption_condition_ASSUME_011",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"document_jurisdiction_hint\",\"ip_or_profile_signal\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"clinical_protocol_decision\",\"employment_law_advice\",\"tax_filing_advice\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_012",
@@ -167,7 +206,10 @@
         "dosage_plan_revision",
         "legal_redline_review"
       ],
-      "labelFormat": "Assumption/Pressuposto [version_pick_latest]: {text}"
+      "labelFormat": "Assumption/Pressuposto [version_pick_latest]: {text}",
+      "trigger": "assumption_condition_ASSUME_012",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"clear_timestamp_order\",\"user_asks_latest\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"board_approved_only\",\"dosage_plan_revision\",\"legal_redline_review\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_013",
@@ -180,7 +222,10 @@
         "party_name",
         "security_ticker"
       ],
-      "labelFormat": "Assumption/Pressuposto [minor_typo_correction]: {text}"
+      "labelFormat": "Assumption/Pressuposto [minor_typo_correction]: {text}",
+      "trigger": "assumption_condition_ASSUME_013",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"high_confidence_typo\",\"no_semantic_change\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"drug_name\",\"party_name\",\"security_ticker\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_014",
@@ -193,7 +238,10 @@
         "contract_term",
         "treatment_timeline"
       ],
-      "labelFormat": "Assumption/Pressuposto [time_horizon_default]: {text}"
+      "labelFormat": "Assumption/Pressuposto [time_horizon_default]: {text}",
+      "trigger": "assumption_condition_ASSUME_014",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"no_explicit_horizon\",\"planning_request\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"cash_runway_commitment\",\"contract_term\",\"treatment_timeline\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_015",
@@ -206,7 +254,10 @@
         "user_requests_external_law",
         "user_requests_market_price"
       ],
-      "labelFormat": "Assumption/Pressuposto [scope_default_local_docs]: {text}"
+      "labelFormat": "Assumption/Pressuposto [scope_default_local_docs]: {text}",
+      "trigger": "assumption_condition_ASSUME_015",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"docs_attached\",\"scope_unspecified\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"missing_required_evidence\",\"user_requests_external_law\",\"user_requests_market_price\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_016",
@@ -219,7 +270,10 @@
         "covenant_ratio_test",
         "invoice_total"
       ],
-      "labelFormat": "Assumption/Pressuposto [numeric_rounding]: {text}"
+      "labelFormat": "Assumption/Pressuposto [numeric_rounding]: {text}",
+      "trigger": "assumption_condition_ASSUME_016",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"display_only_summary\",\"non_binding_calculation\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"clinical_dose\",\"covenant_ratio_test\",\"invoice_total\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_017",
@@ -232,7 +286,10 @@
         "legal_liability_exposure",
         "safety_critical_decision"
       ],
-      "labelFormat": "Assumption/Pressuposto [scenario_baseline]: {text}"
+      "labelFormat": "Assumption/Pressuposto [scenario_baseline]: {text}",
+      "trigger": "assumption_condition_ASSUME_017",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"decision_support_mode\",\"single_base_case_available\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"capital_allocation_order\",\"legal_liability_exposure\",\"safety_critical_decision\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_018",
@@ -245,7 +302,10 @@
         "contractual_sla_required",
         "regulatory_benchmark_required"
       ],
-      "labelFormat": "Assumption/Pressuposto [missing_benchmark_proxy]: {text}"
+      "labelFormat": "Assumption/Pressuposto [missing_benchmark_proxy]: {text}",
+      "trigger": "assumption_condition_ASSUME_018",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"explicitly_labeled_proxy\",\"industry_baseline_available\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"clinical_guideline_required\",\"contractual_sla_required\",\"regulatory_benchmark_required\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_019",
@@ -258,7 +318,10 @@
         "diagnosis_coding",
         "legal_classification_filing"
       ],
-      "labelFormat": "Assumption/Pressuposto [document_type_guess]: {text}"
+      "labelFormat": "Assumption/Pressuposto [document_type_guess]: {text}",
+      "trigger": "assumption_condition_ASSUME_019",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"high_keyword_overlap\",\"single_doc_type_candidate\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"billing_code_assignment\",\"diagnosis_coding\",\"legal_classification_filing\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_020",
@@ -271,7 +334,10 @@
         "multi_counterparty_deal",
         "sanctions_risk"
       ],
-      "labelFormat": "Assumption/Pressuposto [counterparty_default_primary]: {text}"
+      "labelFormat": "Assumption/Pressuposto [counterparty_default_primary]: {text}",
+      "trigger": "assumption_condition_ASSUME_020",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"clear_thread_context\",\"single_active_counterparty\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"conflict_of_interest_review\",\"multi_counterparty_deal\",\"sanctions_risk\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_021",
@@ -282,7 +348,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [sensitivity_labeling]: {text}"
+      "labelFormat": "Assumption/Pressuposto [sensitivity_labeling]: {text}",
+      "trigger": "assumption_condition_ASSUME_021",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"insufficient_evidence\",\"uncertainty_detected\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_022",
@@ -293,7 +362,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [ask_when_high_impact]: {text}"
+      "labelFormat": "Assumption/Pressuposto [ask_when_high_impact]: {text}",
+      "trigger": "assumption_condition_ASSUME_022",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"decision_irreversible\",\"impact_unknown\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_023",
@@ -303,7 +375,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [forbid_fabricated_source]: {text}"
+      "labelFormat": "Assumption/Pressuposto [forbid_fabricated_source]: {text}",
+      "trigger": "assumption_condition_ASSUME_023",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"always\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_024",
@@ -314,7 +389,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [assumption_budget_vs_actual_disambiguation]: {text}"
+      "labelFormat": "Assumption/Pressuposto [assumption_budget_vs_actual_disambiguation]: {text}",
+      "trigger": "assumption_condition_ASSUME_024",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"both_terms_present\",\"finance_compare_intent\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_025",
@@ -325,7 +403,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [assumption_year_quarter_disambiguation]: {text}"
+      "labelFormat": "Assumption/Pressuposto [assumption_year_quarter_disambiguation]: {text}",
+      "trigger": "assumption_condition_ASSUME_025",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"multiple_periods_found\",\"time_period_ambiguous\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_026",
@@ -336,7 +417,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [assumption_counterparty_disambiguation]: {text}"
+      "labelFormat": "Assumption/Pressuposto [assumption_counterparty_disambiguation]: {text}",
+      "trigger": "assumption_condition_ASSUME_026",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"entity_conflict\",\"multiple_entities_possible\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_027",
@@ -347,7 +431,10 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [assumption_medical_escalation]: {text}"
+      "labelFormat": "Assumption/Pressuposto [assumption_medical_escalation]: {text}",
+      "trigger": "assumption_condition_ASSUME_027",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"clinical_decision_requested\",\"medical_domain_detected\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     },
     {
       "id": "ASSUME_028",
@@ -358,7 +445,34 @@
       "whenForbidden": [
         "none"
       ],
-      "labelFormat": "Assumption/Pressuposto [assumption_legal_escalation]: {text}"
+      "labelFormat": "Assumption/Pressuposto [assumption_legal_escalation]: {text}",
+      "trigger": "assumption_condition_ASSUME_028",
+      "check": "context.assumptionSignals?.allowed.includesAny([\"jurisdiction_sensitive_question\",\"legal_domain_detected\"]) == true && (context.assumptionSignals?.forbidden || []).intersects([\"none\"]) == false",
+      "failureAction": "ALLOW_WITH_ASSUMPTION_LABEL"
     }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ASSUME_T_001",
+        "runtime": {
+          "context": "low_risk_context"
+        },
+        "expect": {
+          "maxAssumptionsPerAnswer": 2
+        }
+      }
+    ]
+  },
+  "templates": [
+    {
+      "id": "ASSUMPTION_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in assumption_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
   ]
 }

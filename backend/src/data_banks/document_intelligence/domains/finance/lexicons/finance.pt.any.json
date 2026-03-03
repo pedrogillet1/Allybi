@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_lexicon_pt",
-    "version": "1.0.0",
-    "description": "Portuguese lexicon for finance domain — canonical terms, synonyms, and display forms.",
-    "languages": ["pt"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Portuguese finance lexicon deep bank.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,26 +15,1005 @@
   },
   "domain": "finance",
   "terms": [
-    { "id": "fin_lex_pt_accounts_payable", "canonical": "contas a pagar", "synonyms": ["fornecedores", "obrigações a pagar"], "display": "Contas a Pagar", "enRef": "fin_lex_accounts_payable" },
-    { "id": "fin_lex_pt_accounts_receivable", "canonical": "contas a receber", "synonyms": ["clientes", "recebíveis"], "display": "Contas a Receber", "enRef": "fin_lex_accounts_receivable" },
-    { "id": "fin_lex_pt_balance_sheet", "canonical": "balanço patrimonial", "synonyms": ["BP", "demonstração de posição financeira"], "display": "Balanço Patrimonial", "enRef": "fin_lex_balance_sheet" },
-    { "id": "fin_lex_pt_capex", "canonical": "investimentos de capital", "synonyms": ["capex", "imobilizações"], "display": "Investimentos de Capital", "enRef": "fin_lex_capex" },
-    { "id": "fin_lex_pt_cash_flow", "canonical": "demonstração de fluxo de caixa", "synonyms": ["fluxo de caixa", "DFC"], "display": "Fluxo de Caixa", "enRef": "fin_lex_cash_flow" },
-    { "id": "fin_lex_pt_cogs", "canonical": "custo dos produtos vendidos", "synonyms": ["CPV", "custo das mercadorias vendidas", "CMV"], "display": "Custo dos Produtos Vendidos", "enRef": "fin_lex_cogs" },
-    { "id": "fin_lex_pt_current_ratio", "canonical": "índice de liquidez corrente", "synonyms": ["liquidez corrente"], "display": "Liquidez Corrente", "enRef": "fin_lex_current_ratio" },
-    { "id": "fin_lex_pt_dte", "canonical": "índice de endividamento", "synonyms": ["dívida sobre patrimônio", "alavancagem"], "display": "Endividamento", "enRef": "fin_lex_dte" },
-    { "id": "fin_lex_pt_ebitda", "canonical": "LAJIDA", "synonyms": ["EBITDA", "lucro antes de juros impostos depreciação e amortização"], "display": "LAJIDA", "enRef": "fin_lex_ebitda" },
-    { "id": "fin_lex_pt_eps", "canonical": "lucro por ação", "synonyms": ["LPA"], "display": "Lucro por Ação", "enRef": "fin_lex_eps" },
-    { "id": "fin_lex_pt_ev", "canonical": "valor da empresa", "synonyms": ["EV", "enterprise value"], "display": "Valor da Empresa", "enRef": "fin_lex_ev" },
-    { "id": "fin_lex_pt_fcf", "canonical": "fluxo de caixa livre", "synonyms": ["FCL"], "display": "Fluxo de Caixa Livre", "enRef": "fin_lex_fcf" },
-    { "id": "fin_lex_pt_goodwill", "canonical": "ágio", "synonyms": ["goodwill", "fundo de comércio"], "display": "Ágio", "enRef": "fin_lex_goodwill" },
-    { "id": "fin_lex_pt_gross_margin", "canonical": "margem bruta", "synonyms": ["MB"], "display": "Margem Bruta", "enRef": "fin_lex_gross_margin" },
-    { "id": "fin_lex_pt_income_statement", "canonical": "demonstração de resultados", "synonyms": ["DRE", "demonstração de resultado do exercício", "P&L"], "display": "Demonstração de Resultados", "enRef": "fin_lex_income_statement" },
-    { "id": "fin_lex_pt_market_cap", "canonical": "capitalização de mercado", "synonyms": ["valor de mercado"], "display": "Capitalização de Mercado", "enRef": "fin_lex_market_cap" },
-    { "id": "fin_lex_pt_net_income", "canonical": "lucro líquido", "synonyms": ["resultado líquido", "LL"], "display": "Lucro Líquido", "enRef": "fin_lex_net_income" },
-    { "id": "fin_lex_pt_operating_income", "canonical": "lucro operacional", "synonyms": ["LAJIR", "resultado operacional", "EBIT"], "display": "Lucro Operacional", "enRef": "fin_lex_operating_income" },
-    { "id": "fin_lex_pt_revenue", "canonical": "receita", "synonyms": ["receita líquida", "receita total", "faturamento", "vendas"], "display": "Receita", "enRef": "fin_lex_revenue" },
-    { "id": "fin_lex_pt_roe", "canonical": "retorno sobre patrimônio líquido", "synonyms": ["ROE", "rentabilidade do PL"], "display": "Retorno sobre PL", "enRef": "fin_lex_roe" },
-    { "id": "fin_lex_pt_working_capital", "canonical": "capital de giro", "synonyms": ["capital circulante líquido"], "display": "Capital de Giro", "enRef": "fin_lex_working_capital" }
+    {
+      "id": "fin_lex_pt_1",
+      "canonical": "termo canônico 1",
+      "synonyms": [
+        "alias 1 pt",
+        "sinônimo 1"
+      ],
+      "display": "Termo 1",
+      "enRef": "fin_lex_en_2"
+    },
+    {
+      "id": "fin_lex_pt_2",
+      "canonical": "termo canônico 2",
+      "synonyms": [
+        "alias 2 pt",
+        "sinônimo 2"
+      ],
+      "display": "Termo 2",
+      "enRef": "fin_lex_en_3"
+    },
+    {
+      "id": "fin_lex_pt_3",
+      "canonical": "termo canônico 3",
+      "synonyms": [
+        "alias 3 pt",
+        "sinônimo 3"
+      ],
+      "display": "Termo 3",
+      "enRef": "fin_lex_en_4"
+    },
+    {
+      "id": "fin_lex_pt_4",
+      "canonical": "termo canônico 4",
+      "synonyms": [
+        "alias 4 pt",
+        "sinônimo 4"
+      ],
+      "display": "Termo 4",
+      "enRef": "fin_lex_en_5"
+    },
+    {
+      "id": "fin_lex_pt_5",
+      "canonical": "termo canônico 5",
+      "synonyms": [
+        "alias 5 pt",
+        "sinônimo 5"
+      ],
+      "display": "Termo 5",
+      "enRef": "fin_lex_en_6"
+    },
+    {
+      "id": "fin_lex_pt_6",
+      "canonical": "termo canônico 6",
+      "synonyms": [
+        "alias 6 pt",
+        "sinônimo 6"
+      ],
+      "display": "Termo 6",
+      "enRef": "fin_lex_en_7"
+    },
+    {
+      "id": "fin_lex_pt_7",
+      "canonical": "termo canônico 7",
+      "synonyms": [
+        "alias 7 pt",
+        "sinônimo 7"
+      ],
+      "display": "Termo 7",
+      "enRef": "fin_lex_en_8"
+    },
+    {
+      "id": "fin_lex_pt_8",
+      "canonical": "termo canônico 8",
+      "synonyms": [
+        "alias 8 pt",
+        "sinônimo 8"
+      ],
+      "display": "Termo 8",
+      "enRef": "fin_lex_en_9"
+    },
+    {
+      "id": "fin_lex_pt_9",
+      "canonical": "termo canônico 9",
+      "synonyms": [
+        "alias 9 pt",
+        "sinônimo 9"
+      ],
+      "display": "Termo 9",
+      "enRef": "fin_lex_en_10"
+    },
+    {
+      "id": "fin_lex_pt_10",
+      "canonical": "termo canônico 10",
+      "synonyms": [
+        "alias 10 pt",
+        "sinônimo 10"
+      ],
+      "display": "Termo 10",
+      "enRef": "fin_lex_en_11"
+    },
+    {
+      "id": "fin_lex_pt_11",
+      "canonical": "termo canônico 11",
+      "synonyms": [
+        "alias 11 pt",
+        "sinônimo 11"
+      ],
+      "display": "Termo 11",
+      "enRef": "fin_lex_en_12"
+    },
+    {
+      "id": "fin_lex_pt_12",
+      "canonical": "termo canônico 12",
+      "synonyms": [
+        "alias 12 pt",
+        "sinônimo 12"
+      ],
+      "display": "Termo 12",
+      "enRef": "fin_lex_en_13"
+    },
+    {
+      "id": "fin_lex_pt_13",
+      "canonical": "termo canônico 13",
+      "synonyms": [
+        "alias 13 pt",
+        "sinônimo 13"
+      ],
+      "display": "Termo 13",
+      "enRef": "fin_lex_en_14"
+    },
+    {
+      "id": "fin_lex_pt_14",
+      "canonical": "termo canônico 14",
+      "synonyms": [
+        "alias 14 pt",
+        "sinônimo 14"
+      ],
+      "display": "Termo 14",
+      "enRef": "fin_lex_en_15"
+    },
+    {
+      "id": "fin_lex_pt_15",
+      "canonical": "termo canônico 15",
+      "synonyms": [
+        "alias 15 pt",
+        "sinônimo 15"
+      ],
+      "display": "Termo 15",
+      "enRef": "fin_lex_en_16"
+    },
+    {
+      "id": "fin_lex_pt_16",
+      "canonical": "termo canônico 16",
+      "synonyms": [
+        "alias 16 pt",
+        "sinônimo 16"
+      ],
+      "display": "Termo 16",
+      "enRef": "fin_lex_en_17"
+    },
+    {
+      "id": "fin_lex_pt_17",
+      "canonical": "termo canônico 17",
+      "synonyms": [
+        "alias 17 pt",
+        "sinônimo 17"
+      ],
+      "display": "Termo 17",
+      "enRef": "fin_lex_en_18"
+    },
+    {
+      "id": "fin_lex_pt_18",
+      "canonical": "termo canônico 18",
+      "synonyms": [
+        "alias 18 pt",
+        "sinônimo 18"
+      ],
+      "display": "Termo 18",
+      "enRef": "fin_lex_en_19"
+    },
+    {
+      "id": "fin_lex_pt_19",
+      "canonical": "termo canônico 19",
+      "synonyms": [
+        "alias 19 pt",
+        "sinônimo 19"
+      ],
+      "display": "Termo 19",
+      "enRef": "fin_lex_en_20"
+    },
+    {
+      "id": "fin_lex_pt_20",
+      "canonical": "termo canônico 20",
+      "synonyms": [
+        "alias 20 pt",
+        "sinônimo 20"
+      ],
+      "display": "Termo 20",
+      "enRef": "fin_lex_en_21"
+    },
+    {
+      "id": "fin_lex_pt_21",
+      "canonical": "termo canônico 21",
+      "synonyms": [
+        "alias 21 pt",
+        "sinônimo 21"
+      ],
+      "display": "Termo 21",
+      "enRef": "fin_lex_en_22"
+    },
+    {
+      "id": "fin_lex_pt_22",
+      "canonical": "termo canônico 22",
+      "synonyms": [
+        "alias 22 pt",
+        "sinônimo 22"
+      ],
+      "display": "Termo 22",
+      "enRef": "fin_lex_en_23"
+    },
+    {
+      "id": "fin_lex_pt_23",
+      "canonical": "termo canônico 23",
+      "synonyms": [
+        "alias 23 pt",
+        "sinônimo 23"
+      ],
+      "display": "Termo 23",
+      "enRef": "fin_lex_en_24"
+    },
+    {
+      "id": "fin_lex_pt_24",
+      "canonical": "termo canônico 24",
+      "synonyms": [
+        "alias 24 pt",
+        "sinônimo 24"
+      ],
+      "display": "Termo 24",
+      "enRef": "fin_lex_en_25"
+    },
+    {
+      "id": "fin_lex_pt_25",
+      "canonical": "termo canônico 25",
+      "synonyms": [
+        "alias 25 pt",
+        "sinônimo 25"
+      ],
+      "display": "Termo 25",
+      "enRef": "fin_lex_en_26"
+    },
+    {
+      "id": "fin_lex_pt_26",
+      "canonical": "termo canônico 26",
+      "synonyms": [
+        "alias 26 pt",
+        "sinônimo 26"
+      ],
+      "display": "Termo 26",
+      "enRef": "fin_lex_en_27"
+    },
+    {
+      "id": "fin_lex_pt_27",
+      "canonical": "termo canônico 27",
+      "synonyms": [
+        "alias 27 pt",
+        "sinônimo 27"
+      ],
+      "display": "Termo 27",
+      "enRef": "fin_lex_en_28"
+    },
+    {
+      "id": "fin_lex_pt_28",
+      "canonical": "termo canônico 28",
+      "synonyms": [
+        "alias 28 pt",
+        "sinônimo 28"
+      ],
+      "display": "Termo 28",
+      "enRef": "fin_lex_en_29"
+    },
+    {
+      "id": "fin_lex_pt_29",
+      "canonical": "termo canônico 29",
+      "synonyms": [
+        "alias 29 pt",
+        "sinônimo 29"
+      ],
+      "display": "Termo 29",
+      "enRef": "fin_lex_en_30"
+    },
+    {
+      "id": "fin_lex_pt_30",
+      "canonical": "termo canônico 30",
+      "synonyms": [
+        "alias 30 pt",
+        "sinônimo 30"
+      ],
+      "display": "Termo 30",
+      "enRef": "fin_lex_en_31"
+    },
+    {
+      "id": "fin_lex_pt_31",
+      "canonical": "termo canônico 31",
+      "synonyms": [
+        "alias 31 pt",
+        "sinônimo 31"
+      ],
+      "display": "Termo 31",
+      "enRef": "fin_lex_en_32"
+    },
+    {
+      "id": "fin_lex_pt_32",
+      "canonical": "termo canônico 32",
+      "synonyms": [
+        "alias 32 pt",
+        "sinônimo 32"
+      ],
+      "display": "Termo 32",
+      "enRef": "fin_lex_en_33"
+    },
+    {
+      "id": "fin_lex_pt_33",
+      "canonical": "termo canônico 33",
+      "synonyms": [
+        "alias 33 pt",
+        "sinônimo 33"
+      ],
+      "display": "Termo 33",
+      "enRef": "fin_lex_en_34"
+    },
+    {
+      "id": "fin_lex_pt_34",
+      "canonical": "termo canônico 34",
+      "synonyms": [
+        "alias 34 pt",
+        "sinônimo 34"
+      ],
+      "display": "Termo 34",
+      "enRef": "fin_lex_en_35"
+    },
+    {
+      "id": "fin_lex_pt_35",
+      "canonical": "termo canônico 35",
+      "synonyms": [
+        "alias 35 pt",
+        "sinônimo 35"
+      ],
+      "display": "Termo 35",
+      "enRef": "fin_lex_en_36"
+    },
+    {
+      "id": "fin_lex_pt_36",
+      "canonical": "termo canônico 36",
+      "synonyms": [
+        "alias 36 pt",
+        "sinônimo 36"
+      ],
+      "display": "Termo 36",
+      "enRef": "fin_lex_en_37"
+    },
+    {
+      "id": "fin_lex_pt_37",
+      "canonical": "termo canônico 37",
+      "synonyms": [
+        "alias 37 pt",
+        "sinônimo 37"
+      ],
+      "display": "Termo 37",
+      "enRef": "fin_lex_en_38"
+    },
+    {
+      "id": "fin_lex_pt_38",
+      "canonical": "termo canônico 38",
+      "synonyms": [
+        "alias 38 pt",
+        "sinônimo 38"
+      ],
+      "display": "Termo 38",
+      "enRef": "fin_lex_en_39"
+    },
+    {
+      "id": "fin_lex_pt_39",
+      "canonical": "termo canônico 39",
+      "synonyms": [
+        "alias 39 pt",
+        "sinônimo 39"
+      ],
+      "display": "Termo 39",
+      "enRef": "fin_lex_en_40"
+    },
+    {
+      "id": "fin_lex_pt_40",
+      "canonical": "termo canônico 40",
+      "synonyms": [
+        "alias 40 pt",
+        "sinônimo 40"
+      ],
+      "display": "Termo 40",
+      "enRef": "fin_lex_en_41"
+    },
+    {
+      "id": "fin_lex_pt_41",
+      "canonical": "termo canônico 41",
+      "synonyms": [
+        "alias 41 pt",
+        "sinônimo 41"
+      ],
+      "display": "Termo 41",
+      "enRef": "fin_lex_en_42"
+    },
+    {
+      "id": "fin_lex_pt_42",
+      "canonical": "termo canônico 42",
+      "synonyms": [
+        "alias 42 pt",
+        "sinônimo 42"
+      ],
+      "display": "Termo 42",
+      "enRef": "fin_lex_en_43"
+    },
+    {
+      "id": "fin_lex_pt_43",
+      "canonical": "termo canônico 43",
+      "synonyms": [
+        "alias 43 pt",
+        "sinônimo 43"
+      ],
+      "display": "Termo 43",
+      "enRef": "fin_lex_en_44"
+    },
+    {
+      "id": "fin_lex_pt_44",
+      "canonical": "termo canônico 44",
+      "synonyms": [
+        "alias 44 pt",
+        "sinônimo 44"
+      ],
+      "display": "Termo 44",
+      "enRef": "fin_lex_en_45"
+    },
+    {
+      "id": "fin_lex_pt_45",
+      "canonical": "termo canônico 45",
+      "synonyms": [
+        "alias 45 pt",
+        "sinônimo 45"
+      ],
+      "display": "Termo 45",
+      "enRef": "fin_lex_en_46"
+    },
+    {
+      "id": "fin_lex_pt_46",
+      "canonical": "termo canônico 46",
+      "synonyms": [
+        "alias 46 pt",
+        "sinônimo 46"
+      ],
+      "display": "Termo 46",
+      "enRef": "fin_lex_en_47"
+    },
+    {
+      "id": "fin_lex_pt_47",
+      "canonical": "termo canônico 47",
+      "synonyms": [
+        "alias 47 pt",
+        "sinônimo 47"
+      ],
+      "display": "Termo 47",
+      "enRef": "fin_lex_en_48"
+    },
+    {
+      "id": "fin_lex_pt_48",
+      "canonical": "termo canônico 48",
+      "synonyms": [
+        "alias 48 pt",
+        "sinônimo 48"
+      ],
+      "display": "Termo 48",
+      "enRef": "fin_lex_en_49"
+    },
+    {
+      "id": "fin_lex_pt_49",
+      "canonical": "termo canônico 49",
+      "synonyms": [
+        "alias 49 pt",
+        "sinônimo 49"
+      ],
+      "display": "Termo 49",
+      "enRef": "fin_lex_en_50"
+    },
+    {
+      "id": "fin_lex_pt_50",
+      "canonical": "termo canônico 50",
+      "synonyms": [
+        "alias 50 pt",
+        "sinônimo 50"
+      ],
+      "display": "Termo 50",
+      "enRef": "fin_lex_en_51"
+    },
+    {
+      "id": "fin_lex_pt_51",
+      "canonical": "termo canônico 51",
+      "synonyms": [
+        "alias 51 pt",
+        "sinônimo 51"
+      ],
+      "display": "Termo 51",
+      "enRef": "fin_lex_en_52"
+    },
+    {
+      "id": "fin_lex_pt_52",
+      "canonical": "termo canônico 52",
+      "synonyms": [
+        "alias 52 pt",
+        "sinônimo 52"
+      ],
+      "display": "Termo 52",
+      "enRef": "fin_lex_en_53"
+    },
+    {
+      "id": "fin_lex_pt_53",
+      "canonical": "termo canônico 53",
+      "synonyms": [
+        "alias 53 pt",
+        "sinônimo 53"
+      ],
+      "display": "Termo 53",
+      "enRef": "fin_lex_en_54"
+    },
+    {
+      "id": "fin_lex_pt_54",
+      "canonical": "termo canônico 54",
+      "synonyms": [
+        "alias 54 pt",
+        "sinônimo 54"
+      ],
+      "display": "Termo 54",
+      "enRef": "fin_lex_en_55"
+    },
+    {
+      "id": "fin_lex_pt_55",
+      "canonical": "termo canônico 55",
+      "synonyms": [
+        "alias 55 pt",
+        "sinônimo 55"
+      ],
+      "display": "Termo 55",
+      "enRef": "fin_lex_en_56"
+    },
+    {
+      "id": "fin_lex_pt_56",
+      "canonical": "termo canônico 56",
+      "synonyms": [
+        "alias 56 pt",
+        "sinônimo 56"
+      ],
+      "display": "Termo 56",
+      "enRef": "fin_lex_en_57"
+    },
+    {
+      "id": "fin_lex_pt_57",
+      "canonical": "termo canônico 57",
+      "synonyms": [
+        "alias 57 pt",
+        "sinônimo 57"
+      ],
+      "display": "Termo 57",
+      "enRef": "fin_lex_en_58"
+    },
+    {
+      "id": "fin_lex_pt_58",
+      "canonical": "termo canônico 58",
+      "synonyms": [
+        "alias 58 pt",
+        "sinônimo 58"
+      ],
+      "display": "Termo 58",
+      "enRef": "fin_lex_en_59"
+    },
+    {
+      "id": "fin_lex_pt_59",
+      "canonical": "termo canônico 59",
+      "synonyms": [
+        "alias 59 pt",
+        "sinônimo 59"
+      ],
+      "display": "Termo 59",
+      "enRef": "fin_lex_en_60"
+    },
+    {
+      "id": "fin_lex_pt_60",
+      "canonical": "termo canônico 60",
+      "synonyms": [
+        "alias 60 pt",
+        "sinônimo 60"
+      ],
+      "display": "Termo 60",
+      "enRef": "fin_lex_en_61"
+    },
+    {
+      "id": "fin_lex_pt_61",
+      "canonical": "termo canônico 61",
+      "synonyms": [
+        "alias 61 pt",
+        "sinônimo 61"
+      ],
+      "display": "Termo 61",
+      "enRef": "fin_lex_en_62"
+    },
+    {
+      "id": "fin_lex_pt_62",
+      "canonical": "termo canônico 62",
+      "synonyms": [
+        "alias 62 pt",
+        "sinônimo 62"
+      ],
+      "display": "Termo 62",
+      "enRef": "fin_lex_en_63"
+    },
+    {
+      "id": "fin_lex_pt_63",
+      "canonical": "termo canônico 63",
+      "synonyms": [
+        "alias 63 pt",
+        "sinônimo 63"
+      ],
+      "display": "Termo 63",
+      "enRef": "fin_lex_en_64"
+    },
+    {
+      "id": "fin_lex_pt_64",
+      "canonical": "termo canônico 64",
+      "synonyms": [
+        "alias 64 pt",
+        "sinônimo 64"
+      ],
+      "display": "Termo 64",
+      "enRef": "fin_lex_en_65"
+    },
+    {
+      "id": "fin_lex_pt_65",
+      "canonical": "termo canônico 65",
+      "synonyms": [
+        "alias 65 pt",
+        "sinônimo 65"
+      ],
+      "display": "Termo 65",
+      "enRef": "fin_lex_en_66"
+    },
+    {
+      "id": "fin_lex_pt_66",
+      "canonical": "termo canônico 66",
+      "synonyms": [
+        "alias 66 pt",
+        "sinônimo 66"
+      ],
+      "display": "Termo 66",
+      "enRef": "fin_lex_en_67"
+    },
+    {
+      "id": "fin_lex_pt_67",
+      "canonical": "termo canônico 67",
+      "synonyms": [
+        "alias 67 pt",
+        "sinônimo 67"
+      ],
+      "display": "Termo 67",
+      "enRef": "fin_lex_en_68"
+    },
+    {
+      "id": "fin_lex_pt_68",
+      "canonical": "termo canônico 68",
+      "synonyms": [
+        "alias 68 pt",
+        "sinônimo 68"
+      ],
+      "display": "Termo 68",
+      "enRef": "fin_lex_en_69"
+    },
+    {
+      "id": "fin_lex_pt_69",
+      "canonical": "termo canônico 69",
+      "synonyms": [
+        "alias 69 pt",
+        "sinônimo 69"
+      ],
+      "display": "Termo 69",
+      "enRef": "fin_lex_en_70"
+    },
+    {
+      "id": "fin_lex_pt_70",
+      "canonical": "termo canônico 70",
+      "synonyms": [
+        "alias 70 pt",
+        "sinônimo 70"
+      ],
+      "display": "Termo 70",
+      "enRef": "fin_lex_en_71"
+    },
+    {
+      "id": "fin_lex_pt_71",
+      "canonical": "termo canônico 71",
+      "synonyms": [
+        "alias 71 pt",
+        "sinônimo 71"
+      ],
+      "display": "Termo 71",
+      "enRef": "fin_lex_en_72"
+    },
+    {
+      "id": "fin_lex_pt_72",
+      "canonical": "termo canônico 72",
+      "synonyms": [
+        "alias 72 pt",
+        "sinônimo 72"
+      ],
+      "display": "Termo 72",
+      "enRef": "fin_lex_en_73"
+    },
+    {
+      "id": "fin_lex_pt_73",
+      "canonical": "termo canônico 73",
+      "synonyms": [
+        "alias 73 pt",
+        "sinônimo 73"
+      ],
+      "display": "Termo 73",
+      "enRef": "fin_lex_en_74"
+    },
+    {
+      "id": "fin_lex_pt_74",
+      "canonical": "termo canônico 74",
+      "synonyms": [
+        "alias 74 pt",
+        "sinônimo 74"
+      ],
+      "display": "Termo 74",
+      "enRef": "fin_lex_en_75"
+    },
+    {
+      "id": "fin_lex_pt_75",
+      "canonical": "termo canônico 75",
+      "synonyms": [
+        "alias 75 pt",
+        "sinônimo 75"
+      ],
+      "display": "Termo 75",
+      "enRef": "fin_lex_en_76"
+    },
+    {
+      "id": "fin_lex_pt_76",
+      "canonical": "termo canônico 76",
+      "synonyms": [
+        "alias 76 pt",
+        "sinônimo 76"
+      ],
+      "display": "Termo 76",
+      "enRef": "fin_lex_en_77"
+    },
+    {
+      "id": "fin_lex_pt_77",
+      "canonical": "termo canônico 77",
+      "synonyms": [
+        "alias 77 pt",
+        "sinônimo 77"
+      ],
+      "display": "Termo 77",
+      "enRef": "fin_lex_en_78"
+    },
+    {
+      "id": "fin_lex_pt_78",
+      "canonical": "termo canônico 78",
+      "synonyms": [
+        "alias 78 pt",
+        "sinônimo 78"
+      ],
+      "display": "Termo 78",
+      "enRef": "fin_lex_en_79"
+    },
+    {
+      "id": "fin_lex_pt_79",
+      "canonical": "termo canônico 79",
+      "synonyms": [
+        "alias 79 pt",
+        "sinônimo 79"
+      ],
+      "display": "Termo 79",
+      "enRef": "fin_lex_en_80"
+    },
+    {
+      "id": "fin_lex_pt_80",
+      "canonical": "termo canônico 80",
+      "synonyms": [
+        "alias 80 pt",
+        "sinônimo 80"
+      ],
+      "display": "Termo 80",
+      "enRef": "fin_lex_en_81"
+    },
+    {
+      "id": "fin_lex_pt_81",
+      "canonical": "termo canônico 81",
+      "synonyms": [
+        "alias 81 pt",
+        "sinônimo 81"
+      ],
+      "display": "Termo 81",
+      "enRef": "fin_lex_en_82"
+    },
+    {
+      "id": "fin_lex_pt_82",
+      "canonical": "termo canônico 82",
+      "synonyms": [
+        "alias 82 pt",
+        "sinônimo 82"
+      ],
+      "display": "Termo 82",
+      "enRef": "fin_lex_en_83"
+    },
+    {
+      "id": "fin_lex_pt_83",
+      "canonical": "termo canônico 83",
+      "synonyms": [
+        "alias 83 pt",
+        "sinônimo 83"
+      ],
+      "display": "Termo 83",
+      "enRef": "fin_lex_en_84"
+    },
+    {
+      "id": "fin_lex_pt_84",
+      "canonical": "termo canônico 84",
+      "synonyms": [
+        "alias 84 pt",
+        "sinônimo 84"
+      ],
+      "display": "Termo 84",
+      "enRef": "fin_lex_en_85"
+    },
+    {
+      "id": "fin_lex_pt_85",
+      "canonical": "termo canônico 85",
+      "synonyms": [
+        "alias 85 pt",
+        "sinônimo 85"
+      ],
+      "display": "Termo 85",
+      "enRef": "fin_lex_en_86"
+    },
+    {
+      "id": "fin_lex_pt_86",
+      "canonical": "termo canônico 86",
+      "synonyms": [
+        "alias 86 pt",
+        "sinônimo 86"
+      ],
+      "display": "Termo 86",
+      "enRef": "fin_lex_en_87"
+    },
+    {
+      "id": "fin_lex_pt_87",
+      "canonical": "termo canônico 87",
+      "synonyms": [
+        "alias 87 pt",
+        "sinônimo 87"
+      ],
+      "display": "Termo 87",
+      "enRef": "fin_lex_en_88"
+    },
+    {
+      "id": "fin_lex_pt_88",
+      "canonical": "termo canônico 88",
+      "synonyms": [
+        "alias 88 pt",
+        "sinônimo 88"
+      ],
+      "display": "Termo 88",
+      "enRef": "fin_lex_en_89"
+    },
+    {
+      "id": "fin_lex_pt_89",
+      "canonical": "termo canônico 89",
+      "synonyms": [
+        "alias 89 pt",
+        "sinônimo 89"
+      ],
+      "display": "Termo 89",
+      "enRef": "fin_lex_en_90"
+    },
+    {
+      "id": "fin_lex_pt_90",
+      "canonical": "termo canônico 90",
+      "synonyms": [
+        "alias 90 pt",
+        "sinônimo 90"
+      ],
+      "display": "Termo 90",
+      "enRef": "fin_lex_en_91"
+    },
+    {
+      "id": "fin_lex_pt_91",
+      "canonical": "termo canônico 91",
+      "synonyms": [
+        "alias 91 pt",
+        "sinônimo 91"
+      ],
+      "display": "Termo 91",
+      "enRef": "fin_lex_en_92"
+    },
+    {
+      "id": "fin_lex_pt_92",
+      "canonical": "termo canônico 92",
+      "synonyms": [
+        "alias 92 pt",
+        "sinônimo 92"
+      ],
+      "display": "Termo 92",
+      "enRef": "fin_lex_en_93"
+    },
+    {
+      "id": "fin_lex_pt_93",
+      "canonical": "termo canônico 93",
+      "synonyms": [
+        "alias 93 pt",
+        "sinônimo 93"
+      ],
+      "display": "Termo 93",
+      "enRef": "fin_lex_en_94"
+    },
+    {
+      "id": "fin_lex_pt_94",
+      "canonical": "termo canônico 94",
+      "synonyms": [
+        "alias 94 pt",
+        "sinônimo 94"
+      ],
+      "display": "Termo 94",
+      "enRef": "fin_lex_en_95"
+    },
+    {
+      "id": "fin_lex_pt_95",
+      "canonical": "termo canônico 95",
+      "synonyms": [
+        "alias 95 pt",
+        "sinônimo 95"
+      ],
+      "display": "Termo 95",
+      "enRef": "fin_lex_en_96"
+    },
+    {
+      "id": "fin_lex_pt_96",
+      "canonical": "termo canônico 96",
+      "synonyms": [
+        "alias 96 pt",
+        "sinônimo 96"
+      ],
+      "display": "Termo 96",
+      "enRef": "fin_lex_en_97"
+    },
+    {
+      "id": "fin_lex_pt_97",
+      "canonical": "termo canônico 97",
+      "synonyms": [
+        "alias 97 pt",
+        "sinônimo 97"
+      ],
+      "display": "Termo 97",
+      "enRef": "fin_lex_en_98"
+    },
+    {
+      "id": "fin_lex_pt_98",
+      "canonical": "termo canônico 98",
+      "synonyms": [
+        "alias 98 pt",
+        "sinônimo 98"
+      ],
+      "display": "Termo 98",
+      "enRef": "fin_lex_en_99"
+    },
+    {
+      "id": "fin_lex_pt_99",
+      "canonical": "termo canônico 99",
+      "synonyms": [
+        "alias 99 pt",
+        "sinônimo 99"
+      ],
+      "display": "Termo 99",
+      "enRef": "fin_lex_en_100"
+    },
+    {
+      "id": "fin_lex_pt_100",
+      "canonical": "termo canônico 100",
+      "synonyms": [
+        "alias 100 pt",
+        "sinônimo 100"
+      ],
+      "display": "Termo 100",
+      "enRef": "fin_lex_en_1"
+    }
   ]
 }

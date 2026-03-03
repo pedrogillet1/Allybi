@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "identifier_patterns",
-    "version": "1.2.0",
-    "description": "Cross-domain identifier extraction patterns for everyday documents (billing, banking, tax, insurance, identity, education, travel, HR/payroll, housing).",
+    "version": "1.3.0",
+    "description": "Cross-domain identifier extraction with EN/PT and locale-aware normalization notes.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -21,2168 +21,3222 @@
   "rules": [
     {
       "id": "ident_001",
-      "name": "alphanumeric_dash_pattern",
-      "pattern": "[A-Z]{2,5}-\\d{4}-\\d{4,8}",
+      "name": "identifier_rule_1",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "DOC-2024-001234",
-        "INV-2024-00001",
-        "REF-2024-12345678"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "document_id",
-      "notes": "Alphanumeric prefix-year-sequence pattern",
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 1.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_002",
-      "name": "alphanumeric_triple_dash",
-      "pattern": "[A-Z]{3}-\\d{3}-[A-Z]{3}",
+      "name": "identifier_rule_2",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "ABC-123-DEF",
-        "INV-001-XYZ"
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "document_id",
-      "notes": "Triple-segment alphanumeric identifier",
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 2.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_003",
-      "name": "bank_account_en",
-      "pattern": "(?:Account|Acct)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_3",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Account#12345678",
-        "Acct No. 9876-5432-10"
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "bank_id",
-      "notes": "English bank account number",
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 3.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_004",
-      "name": "bank_agencia_pt",
-      "pattern": "(?:Agencia|Ag)\\s*[#:No.]*\\s*\\d{4}(?:-?\\d)?",
+      "name": "identifier_rule_4",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Ag. 1234-5",
-        "Agencia 1234",
-        "Agencia: 0001"
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
-      "entityType": "bank_id",
-      "notes": "Brazilian bank branch (agencia)",
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 4.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_005",
-      "name": "bank_conta_pt",
-      "pattern": "(?:Conta)\\s*[#:No.]*\\s*\\d{5,12}(?:-?\\d)?",
+      "name": "identifier_rule_5",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Conta 12345-6",
-        "Conta: 123456789-0"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
       "entityType": "bank_id",
-      "notes": "Brazilian bank account (conta)",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 5.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_006",
-      "name": "bank_iban",
-      "pattern": "(?:IBAN)\\s*[#:No.]*\\s*[A-Z]{2}\\d{2}[A-Z0-9]{11,30}",
+      "name": "identifier_rule_6",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "IBAN BR1800000000141220000100009",
-        "IBAN DE89370400440532013000"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "bank_id",
-      "notes": "International bank account number",
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 6.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_007",
-      "name": "bank_routing",
-      "pattern": "(?:Routing|ABA)\\s*[#:No.]*\\s*\\d{9}",
+      "name": "identifier_rule_7",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "ABA 026009593",
-        "Routing#021000021"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "bank_id",
-      "notes": "US bank routing number",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 7.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "bank_statement_id",
-      "pattern": "(?:Bank\\sStatement|Statement)\\s*[#:No.]*\\s*[A-Z0-9-]{4,30}",
-      "examples": [
-        "Bank Statement #A12003",
-        "Statement No. BNK-2026-001"
-      ],
-      "entityType": "bank_statement_id",
-      "notes": "Bank statement identifier",
       "id": "ident_008",
+      "name": "identifier_rule_8",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 8.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_009",
-      "name": "bank_swift",
-      "pattern": "(?:SWIFT|BIC)\\s*[#:No.]*\\s*[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}(?:[A-Z0-9]{3})?",
+      "name": "identifier_rule_9",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
       "examples": [
-        "BIC: DEUTDEFF",
-        "SWIFT BOFAUS3N"
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "bank_id",
-      "notes": "SWIFT/BIC code",
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 9.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "bank_transaction_reference",
-      "pattern": "(?:Transaction\\sReference|Referencia\\sda\\sTransacao)\\s*[#:No.]*\\s*[A-Z0-9]{8,40}",
-      "examples": [
-        "Transaction Reference 7FC1A2B39911"
-      ],
-      "entityType": "transaction_id",
-      "notes": "Bank transaction reference code",
       "id": "ident_010",
+      "name": "identifier_rule_10",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 10.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_011",
-      "name": "bill_of_lading",
-      "pattern": "(?:BL|B/L|Bill\\sof\\sLading)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_11",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
       "examples": [
-        "B/L 123456",
-        "Bill of Lading #BL-2024",
-        "BL No. MSKU1234567"
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "shipping_id",
-      "notes": "Bill of lading number",
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 11.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "billing_account_number",
-      "pattern": "(?:Billing\\sAccount|Conta\\sde\\sCobranca)\\s*[#:No.]*\\s*[A-Z0-9-]{5,24}",
-      "examples": [
-        "Billing Account 99887766",
-        "Conta de Cobranca 112233-4"
-      ],
-      "entityType": "billing_account_id",
-      "notes": "Billing account identifier",
       "id": "ident_012",
+      "name": "identifier_rule_12",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 12.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "boarding_pass_sequence",
-      "pattern": "(?:Boarding\\sPass|Cartao\\sde\\sEmbarque)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Boarding Pass BP-778899",
-        "Cartao de Embarque EMB-9911"
-      ],
-      "entityType": "travel_id",
-      "notes": "Boarding-pass identifier",
       "id": "ident_013",
+      "name": "identifier_rule_13",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 13.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_014",
-      "name": "br_crea",
-      "pattern": "(?:CREA)\\s*[#:No./]*\\s*[A-Z]{2}\\s?\\d{4,8}",
+      "name": "identifier_rule_14",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "CREA SP 12345678",
-        "CREA/SP 1234567"
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "professional_id",
-      "notes": "Brazilian engineering council (CREA)",
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 14.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_015",
-      "name": "br_crf",
-      "pattern": "(?:CRF)\\s*[#:No./]*\\s*[A-Z]{2}\\s?\\d{4,6}",
+      "name": "identifier_rule_15",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "CRF SP 123456",
-        "CRF/SP 12345"
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "professional_id",
-      "notes": "Brazilian pharmacy council (CRF)",
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 15.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_016",
-      "name": "br_crm",
-      "pattern": "(?:CRM)\\s*[#:No./]*\\s*[A-Z]{2}\\s?\\d{4,6}",
+      "name": "identifier_rule_16",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "CRM SP 12345",
-        "CRM-RJ 654321",
-        "CRM/SP 123456"
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
-      "entityType": "professional_id",
-      "notes": "Brazilian medical license (CRM)",
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 16.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_017",
-      "name": "br_oab",
-      "pattern": "(?:OAB)\\s*[#:No./]*\\s*[A-Z]{2}\\s?\\d{4,6}",
+      "name": "identifier_rule_17",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "OAB SP 12345",
-        "OAB-RJ 654321",
-        "OAB/SP 123456"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "professional_id",
-      "notes": "Brazilian bar association (OAB)",
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 17.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_018",
-      "name": "br_renavam",
-      "pattern": "(?:RENAVAM)\\s*[#:No.]*\\s*\\d{11}",
+      "name": "identifier_rule_18",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "RENAVAM 12345678901",
-        "RENAVAM: 98765432101"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "vehicle_id",
-      "notes": "Brazilian vehicle registration (RENAVAM)",
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 18.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_019",
-      "name": "case_number_docket",
-      "pattern": "(?:Docket)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_19",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Docket #CV-24-001",
-        "Docket No. 12345"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "case_id",
-      "notes": "Court docket number",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 19.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_020",
-      "name": "case_number_en",
-      "pattern": "(?:Case)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_20",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Case #12345",
-        "Case No. CV-2024-001"
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "case_id",
-      "notes": "English case number",
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 20.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_021",
-      "name": "case_number_pt",
-      "pattern": "(?:Processo|Acao)\\s*[#:No.]*\\s*[A-Z0-9.-]+",
+      "name": "identifier_rule_21",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
       "examples": [
-        "Acao No. 12345",
-        "Processo 1234567-89.2024.8.26.0100"
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "case_id",
-      "notes": "Brazilian court case number",
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 21.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_022",
-      "name": "certificate_number",
-      "pattern": "(?:Cert|Certificate|Certificado)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_22",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
       "examples": [
-        "Cert#12345",
-        "Certificado 12345",
-        "Certificate No. CERT-2024-001"
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "certificate_id",
-      "notes": "Certificate number",
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 22.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_023",
-      "name": "claim_number_en",
-      "pattern": "(?:Claim)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_23",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
       "examples": [
-        "Claim #12345",
-        "Claim No. CLM-2024-001"
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "claim_id",
-      "notes": "English claim number",
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 23.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_024",
-      "name": "claim_number_pt",
-      "pattern": "(?:Sinistro)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_24",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Sinistro 12345",
-        "Sinistro No. 2024-001"
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "claim_id",
-      "notes": "Portuguese claim/sinistro number",
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 24.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_025",
-      "name": "cnj_case_number",
-      "pattern": "\\d{7}-\\d{2}\\.\\d{4}\\.\\d\\.\\d{2}\\.\\d{4}",
+      "name": "identifier_rule_25",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "1234567-89.2024.8.26.0100"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "case_id",
-      "notes": "Brazilian CNJ standardized case number format",
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 25.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_026",
-      "name": "contract_number_en",
-      "pattern": "(?:Contract|Agreement)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_26",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Agreement No. A-2024-001",
-        "Contract #12345"
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
       ],
       "entityType": "contract_id",
-      "notes": "English contract number",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 26.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_027",
-      "name": "contract_number_pt",
-      "pattern": "(?:Contrato|Acordo)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_27",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Acordo No. 2024-001",
-        "Contrato 12345"
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "contract_id",
-      "notes": "Portuguese contract number",
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 27.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "credit_card_statement_id",
-      "pattern": "(?:Card\\sStatement|CC\\sStatement)\\s*[#:No.]*\\s*[A-Z0-9-]{4,30}",
-      "examples": [
-        "Card Statement #CC-9988",
-        "CC Statement No. 2026-07"
-      ],
-      "entityType": "bank_statement_id",
-      "notes": "Credit-card statement identifier",
       "id": "ident_028",
+      "name": "identifier_rule_28",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 28.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "diploma_registry_id",
-      "pattern": "(?:Diploma\\sRegistry|Registro\\sde\\sDiploma)\\s*[#:No.]*\\s*[A-Z0-9-]{5,24}",
-      "examples": [
-        "Diploma Registry DR-2026-1001"
-      ],
-      "entityType": "education_id",
-      "notes": "Diploma registry identifier",
       "id": "ident_029",
+      "name": "identifier_rule_29",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 29.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "document_hash_sha256",
-      "pattern": "(?:SHA-256|Hash)\\s*[#:No.]*\\s*[a-fA-F0-9]{64}",
-      "examples": [
-        "SHA-256 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
-      ],
-      "entityType": "document_id",
-      "notes": "Document SHA-256 fingerprint",
       "id": "ident_030",
+      "name": "identifier_rule_30",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 30.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "driver_license_number",
-      "pattern": "(?:Driver\\sLicense|CNH|Carteira\\sde\\sMotorista)\\s*[#:No.]*\\s*[A-Z0-9-]{6,20}",
-      "examples": [
-        "CNH 01234567890",
-        "Driver License D123-9988"
-      ],
-      "entityType": "identity_id",
-      "notes": "Driver-license identifier",
       "id": "ident_031",
+      "name": "identifier_rule_31",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 31.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "education_degree_code",
-      "pattern": "(?:Degree\\sCode|Codigo\\sdo\\sCurso)\\s*[#:No.]*\\s*[A-Z]{2,5}\\d{2,5}",
-      "examples": [
-        "Codigo do Curso ADM401",
-        "Degree Code BSCS2026"
-      ],
-      "entityType": "education_id",
-      "notes": "Academic program/degree code",
       "id": "ident_032",
+      "name": "identifier_rule_32",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 32.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "employee_id",
-      "pattern": "(?:Employee\\sID|Matricula\\sFuncional)\\s*[#:No.]*\\s*[A-Z0-9-]{4,20}",
-      "examples": [
-        "Employee ID EMP-9901",
-        "Matricula Funcional 123456"
-      ],
-      "entityType": "hr_id",
-      "notes": "Employee identifier",
       "id": "ident_033",
+      "name": "identifier_rule_33",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 33.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_034",
-      "name": "guid_generic",
-      "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+      "name": "identifier_rule_34",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
       "examples": [
-        "550E8400-E29B-41D4-A716-446655440000",
-        "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "guid",
-      "notes": "Generic GUID/UUID pattern",
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 34.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "hotel_confirmation_id",
-      "pattern": "(?:Hotel\\sConfirmation|Confirmacao\\sde\\sReserva)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Hotel Confirmation HTL-554433"
-      ],
-      "entityType": "travel_id",
-      "notes": "Hotel confirmation identifier",
       "id": "ident_035",
+      "name": "identifier_rule_35",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 35.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "housing_unit_identifier",
-      "pattern": "(?:Unit|Apartamento|Apt)\\s*[#:No.]*\\s*[A-Z0-9-]{1,12}",
-      "examples": [
-        "Apartamento 43-A",
-        "Unit 1203B"
-      ],
-      "entityType": "housing_id",
-      "notes": "Housing unit identifier",
       "id": "ident_036",
+      "name": "identifier_rule_36",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 36.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "hr_cost_center_code",
-      "pattern": "(?:Cost\\sCenter|Centro\\sde\\sCusto)\\s*[#:No.]*\\s*[A-Z0-9-]{3,16}",
-      "examples": [
-        "Centro de Custo FIN-10",
-        "Cost Center HR-220"
-      ],
-      "entityType": "hr_id",
-      "notes": "HR/payroll cost center id",
       "id": "ident_037",
+      "name": "identifier_rule_37",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 37.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "iata_airline_ticket_prefix",
-      "pattern": "\\b\\d{3}-\\d{10}\\b",
-      "examples": [
-        "001-2345678901"
-      ],
-      "entityType": "travel_id",
-      "notes": "IATA ticket number format",
       "id": "ident_038",
+      "name": "identifier_rule_38",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 38.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "imei_number",
-      "pattern": "(?:IMEI)\\s*[#:No.]*\\s*\\d{14,16}",
-      "examples": [
-        "IMEI 352099001761481",
-        "IMEI: 490154203237518"
-      ],
-      "entityType": "device_id",
-      "notes": "Mobile device IMEI",
       "id": "ident_039",
+      "name": "identifier_rule_39",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 39.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "imsi_number",
-      "pattern": "(?:IMSI)\\s*[#:No.]*\\s*\\d{14,16}",
-      "examples": [
-        "IMSI 724051234567890"
-      ],
-      "entityType": "device_id",
-      "notes": "Mobile IMSI",
       "id": "ident_040",
+      "name": "identifier_rule_40",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 40.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "insurance_claim_line_id",
-      "pattern": "(?:Claim\\sLine|Linha\\sdo\\sSinistro)\\s*[#:No.]*\\s*[A-Z0-9-]{3,20}",
-      "examples": [
-        "Claim Line CL-10-03",
-        "Linha do Sinistro LS-22"
-      ],
-      "entityType": "insurance_id",
-      "notes": "Insurance claim line identifier",
       "id": "ident_041",
+      "name": "identifier_rule_41",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 41.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_042",
-      "name": "insurance_group",
-      "pattern": "(?:Group)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_42",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Group No. GRP-2024-001",
-        "Group#12345"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "insurance_id",
-      "notes": "Insurance group number",
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 42.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_043",
-      "name": "insurance_member",
-      "pattern": "(?:Member\\sID|Subscriber\\sID|Plan\\sID)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_43",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Member ID 12345",
-        "Plan ID PLN-2024",
-        "Subscriber ID: SUB-001"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "insurance_id",
-      "notes": "Insurance member/subscriber/plan ID",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 43.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "insurance_member_group_combo",
-      "pattern": "(?:Member\\sID|ID\\sdo\\sBeneficiario)\\s*[#:No.]*\\s*[A-Z0-9-]{4,24}\\s*(?:Group|Grupo)\\s*[#:No.]*\\s*[A-Z0-9-]{2,24}",
-      "examples": [
-        "Member ID AB998 Group G-1122"
-      ],
-      "entityType": "insurance_id",
-      "notes": "Member + group combined pattern",
       "id": "ident_044",
+      "name": "identifier_rule_44",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 44.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "insurance_policy_schedule_id",
-      "pattern": "(?:Policy\\sSchedule|Endosso)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Endosso END-4433",
-        "Policy Schedule PSC-2026-003"
-      ],
-      "entityType": "insurance_id",
-      "notes": "Insurance policy schedule id",
       "id": "ident_045",
+      "name": "identifier_rule_45",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 45.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "insurance_policyholder_id",
-      "pattern": "(?:Policyholder\\sID|ID\\sdo\\sSegurado)\\s*[#:No.]*\\s*[A-Z0-9-]{4,24}",
-      "examples": [
-        "ID do Segurado SG-4433",
-        "Policyholder ID PH-8877"
-      ],
-      "entityType": "insurance_id",
-      "notes": "Policyholder identifier",
       "id": "ident_046",
+      "name": "identifier_rule_46",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 46.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "insurance_preauth_id",
-      "pattern": "(?:Pre[- ]?Authorization|Preautorizacao)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Pre-Authorization PA-889900",
-        "Preautorizacao PA-4433"
-      ],
-      "entityType": "insurance_id",
-      "notes": "Insurance pre-authorization id",
       "id": "ident_047",
+      "name": "identifier_rule_47",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 47.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_048",
-      "name": "intl_cusip",
-      "pattern": "(?:CUSIP)\\s*[#:No.]*\\s*[A-Z0-9]{9}",
+      "name": "identifier_rule_48",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "CUSIP 037833100",
-        "CUSIP: 594918104"
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "securities_id",
-      "notes": "CUSIP securities identifier (US/Canada)",
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 48.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_049",
-      "name": "intl_duns",
-      "pattern": "(?:DUNS|D-U-N-S)\\s*[#:No.]*\\s*\\d{2}-?\\d{3}-?\\d{4}",
+      "name": "identifier_rule_49",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "D-U-N-S: 123456789",
-        "DUNS 12-345-6789"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "business_id",
-      "notes": "Dun & Bradstreet DUNS number",
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 49.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_050",
-      "name": "intl_isin",
-      "pattern": "(?:ISIN)\\s*[#:No.]*\\s*[A-Z]{2}[A-Z0-9]{9}\\d",
+      "name": "identifier_rule_50",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "ISIN US0378331005",
-        "ISIN: BR0000000001"
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "securities_id",
-      "notes": "International Securities Identification Number",
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 50.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_051",
-      "name": "intl_lei",
-      "pattern": "(?:LEI)\\s*[#:No.]*\\s*[A-Z0-9]{20}",
+      "name": "identifier_rule_51",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "LEI 529900HNOAA1KXQJUH57",
-        "LEI: 5493001KJTIIGC8Y1R12"
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "business_id",
-      "notes": "Legal Entity Identifier (LEI)",
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 51.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_052",
-      "name": "intl_sedol",
-      "pattern": "(?:SEDOL)\\s*[#:No.]*\\s*[A-Z0-9]{7}",
+      "name": "identifier_rule_52",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "SEDOL 0263494",
-        "SEDOL: B0YBKJ7"
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
-      "entityType": "securities_id",
-      "notes": "SEDOL securities identifier (UK)",
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 52.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_053",
-      "name": "invoice_fatura_pt",
-      "pattern": "(?:Fatura|Fat)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_53",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Fat. 2024-001",
-        "Fatura #12345"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "invoice_id",
-      "notes": "Portuguese/Brazilian invoice (fatura)",
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 53.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_054",
-      "name": "invoice_number_en",
-      "pattern": "(?:Invoice|Inv|INV)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_54",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Inv No. A-9876",
-        "INV-2024-001",
-        "Invoice #12345"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "invoice_id",
-      "notes": "English invoice number with common prefixes",
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 54.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_055",
-      "name": "invoice_number_pt_nf",
-      "pattern": "(?:Nota\\sFiscal|NF|NF-e|NFe)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_55",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "NF 2024/001",
-        "NF-e 000123456",
-        "Nota Fiscal 12345"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "invoice_id",
-      "notes": "Brazilian nota fiscal",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 55.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "irs_submission_id",
-      "pattern": "(?:IRS\\sSubmission\\sID)\\s*[#:No.]*\\s*[A-Z0-9-]{6,40}",
-      "examples": [
-        "IRS Submission ID 26-XYZ-9911"
-      ],
-      "entityType": "tax_return_id",
-      "notes": "IRS submission identifier",
       "id": "ident_056",
+      "name": "identifier_rule_56",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 56.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "lease_contract_id",
-      "pattern": "(?:Lease\\sContract|Contrato\\sde\\sLocacao)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Lease Contract LSE-2026-22"
-      ],
-      "entityType": "housing_id",
-      "notes": "Lease agreement identifier",
       "id": "ident_057",
+      "name": "identifier_rule_57",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 57.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_058",
-      "name": "license_number_en",
-      "pattern": "(?:License|Licence)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_58",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
       "examples": [
-        "Licence No. LIC-2024-001",
-        "License #12345"
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "license_id",
-      "notes": "English license number",
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 58.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_059",
-      "name": "license_number_pt",
-      "pattern": "(?:Licenca|Alvara)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_59",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
       "examples": [
-        "Alvara No. 2024-001",
-        "Licenca 12345"
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "license_id",
-      "notes": "Portuguese license/permit",
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 59.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "loan_statement_id",
-      "pattern": "(?:Loan\\sStatement)\\s*[#:No.]*\\s*[A-Z0-9-]{4,30}",
-      "examples": [
-        "Loan Statement #1044",
-        "Loan Statement LNS-2026-044"
-      ],
-      "entityType": "loan_id",
-      "notes": "Loan statement identifier",
       "id": "ident_060",
+      "name": "identifier_rule_60",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 60.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_061",
-      "name": "lot_number",
-      "pattern": "(?:Lot|Batch|Lote)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_61",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Batch No. B-2024-001",
-        "Lot#12345",
-        "Lote 12345"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "lot_id",
-      "notes": "Lot/batch number",
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 61.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "mobile_line_number",
-      "pattern": "(?:MSISDN|Mobile\\sLine|Linha)\\s*[#:No.]*\\s*\\+?\\d{8,15}",
-      "examples": [
-        "Linha 5511987654321",
-        "MSISDN +5511998765432"
-      ],
-      "entityType": "telecom_line_id",
-      "notes": "Telecom line identifier",
       "id": "ident_062",
+      "name": "identifier_rule_62",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 62.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "mortgage_contract_id",
-      "pattern": "(?:Mortgage\\sContract|Contrato\\sde\\sHipoteca)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Mortgage Contract MRG-2026-0102"
-      ],
-      "entityType": "housing_id",
-      "notes": "Mortgage identifier",
       "id": "ident_063",
+      "name": "identifier_rule_63",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 63.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_064",
-      "name": "mrn_en",
-      "pattern": "(?:MRN|Medical\\sRecord)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_64",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Medical Record No. MR-2024-001",
-        "MRN #12345"
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
-      "entityType": "medical_record_id",
-      "notes": "English medical record number",
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 64.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_065",
-      "name": "mrn_pt",
-      "pattern": "(?:Prontuario)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_65",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Prontuario 12345",
-        "Prontuario No. 2024-001"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "medical_record_id",
-      "notes": "Portuguese medical record (prontuario)",
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 65.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "national_id_number",
-      "pattern": "(?:National\\sID|RG|Identity\\sCard)\\s*[#:No.]*\\s*[A-Z0-9.-]{6,20}",
-      "examples": [
-        "National ID 9988776655",
-        "RG 44.555.666-7"
-      ],
-      "entityType": "identity_id",
-      "notes": "National identity document number",
       "id": "ident_066",
+      "name": "identifier_rule_66",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 66.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_067",
-      "name": "nfe_access_key",
-      "pattern": "\\d{44}",
+      "name": "identifier_rule_67",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "35240112345678000190550010000012341123456789"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "nfe_key",
-      "notes": "Brazilian NF-e 44-digit access key",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 67.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "passport_number_generic",
-      "pattern": "(?:Passport|Passaporte)\\s*[#:No.]*\\s*[A-Z0-9]{6,12}",
-      "examples": [
-        "Passaporte AB987654",
-        "Passport X1234567"
-      ],
-      "entityType": "identity_id",
-      "notes": "Passport identifier",
       "id": "ident_068",
+      "name": "identifier_rule_68",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 68.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_069",
-      "name": "patient_id_en",
-      "pattern": "(?:Patient\\sID|PID)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_69",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
       "examples": [
-        "Patient ID #12345",
-        "PID: PAT-2024-001"
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "patient_id",
-      "notes": "English patient identifier",
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 69.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "payroll_run_id",
-      "pattern": "(?:Payroll\\sRun|Lote\\sda\\sFolha)\\s*[#:No.]*\\s*[A-Z0-9-]{4,24}",
-      "examples": [
-        "Lote da Folha LF-3344",
-        "Payroll Run PR-2026-09"
-      ],
-      "entityType": "hr_id",
-      "notes": "Payroll run identifier",
       "id": "ident_070",
+      "name": "identifier_rule_70",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 70.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "payslip_id",
-      "pattern": "(?:Payslip|Holerite)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Holerite HLR-7788",
-        "Payslip PAY-2026-05-77"
-      ],
-      "entityType": "hr_id",
-      "notes": "Payroll slip identifier",
       "id": "ident_071",
+      "name": "identifier_rule_71",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 71.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_072",
-      "name": "permit_number",
-      "pattern": "(?:Permit)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_72",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Permit #12345",
-        "Permit No. PER-2024-001"
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "permit_id",
-      "notes": "Permit number",
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 72.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "pix_e2e_id",
-      "pattern": "(?:E2E|End[- ]to[- ]End)\\s*[#:No.]*\\s*[A-Z0-9]{20,35}",
-      "examples": [
-        "E2E E123456789012345678901234567890"
-      ],
-      "entityType": "transaction_id",
-      "notes": "PIX end-to-end id",
       "id": "ident_073",
+      "name": "identifier_rule_73",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 73.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "pnr_locator",
-      "pattern": "(?:PNR|Record\\sLocator|Codigo\\sLocalizador)\\s*[#:No.]*\\s*[A-Z0-9]{5,8}",
-      "examples": [
-        "PNR Q7K9PL",
-        "Record Locator AB12CD"
-      ],
-      "entityType": "travel_id",
-      "notes": "Travel booking locator",
       "id": "ident_074",
+      "name": "identifier_rule_74",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 74.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_075",
-      "name": "po_number_en",
-      "pattern": "(?:PO|P\\.O\\.|Purchase\\sOrder)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_75",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "P.O. 2024-001",
-        "PO#12345",
-        "Purchase Order No. A-9876"
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "purchase_order_id",
-      "notes": "English purchase order number",
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 75.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_076",
-      "name": "po_number_pt",
-      "pattern": "(?:Pedido\\sde\\sCompra|OC|Ordem\\sde\\sCompra)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_76",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "OC-2024-001",
-        "Pedido de Compra 12345"
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
-      "entityType": "purchase_order_id",
-      "notes": "Portuguese purchase order",
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 76.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_077",
-      "name": "policy_number_en",
-      "pattern": "(?:Policy)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_77",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Policy #12345",
-        "Policy No. INS-2024-001"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "policy_id",
-      "notes": "English insurance policy number",
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 77.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_078",
-      "name": "policy_number_pt",
-      "pattern": "(?:Apolice|Apol)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_78",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Apol. No. 2024-001",
-        "Apolice 12345"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
       "entityType": "policy_id",
-      "notes": "Portuguese insurance policy",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 78.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_079",
-      "name": "prescription_pt",
-      "pattern": "(?:Receita|Receituario)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_79",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Receita 12345",
-        "Receituario No. 2024-001"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "prescription_id",
-      "notes": "Portuguese prescription",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 79.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_080",
-      "name": "prescription_rx_en",
-      "pattern": "(?:Rx|Prescription)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_80",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Prescription No. RX-2024-001",
-        "Rx#12345"
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "prescription_id",
-      "notes": "English prescription number",
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 80.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "property_registration_id",
-      "pattern": "(?:Property\\sRegistration|Matricula\\sdo\\sImovel)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Matricula do Imovel 11223344",
-        "Property Registration PR-998877"
-      ],
-      "entityType": "housing_id",
-      "notes": "Property registration identifier",
       "id": "ident_081",
+      "name": "identifier_rule_81",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 81.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_082",
-      "name": "protocol_number_pt",
-      "pattern": "(?:Protocolo)\\s*[#:No.]*\\s*[A-Z0-9.-]+",
+      "name": "identifier_rule_82",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
       "examples": [
-        "Protocolo 12345",
-        "Protocolo No. 2024.001.234"
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "protocol_id",
-      "notes": "Portuguese protocol number",
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 82.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_083",
-      "name": "reference_number",
-      "pattern": "(?:Ref|Reference|Referencia)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_83",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
       "examples": [
-        "Ref#12345",
-        "Reference No. REF-2024-001",
-        "Referencia 12345"
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "reference_id",
-      "notes": "Generic reference number",
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 83.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_084",
-      "name": "registration_number",
-      "pattern": "(?:Reg|Registration|Registro)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_84",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Reg#12345",
-        "Registration No. REG-2024-001",
-        "Registro 12345"
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "registration_id",
-      "notes": "Registration number",
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 84.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_085",
-      "name": "serial_number",
-      "pattern": "(?:S/N|Serial\\sNo|SN)\\s*[#:.]?\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_85",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "S/N 12345",
-        "Serial No. ABC-123-DEF",
-        "SN: XYZ789"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "serial_id",
-      "notes": "Serial number",
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 85.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_086",
-      "name": "serial_number_pt",
-      "pattern": "(?:Numero\\sde\\sSerie)\\s*[#:.]?\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_86",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Numero de Serie 12345",
-        "Numero de Serie: ABC-123"
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "serial_id",
-      "notes": "Portuguese serial number",
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 86.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "sim_iccid",
-      "pattern": "(?:ICCID|SIM\\sID)\\s*[#:No.]*\\s*\\d{18,22}",
-      "examples": [
-        "ICCID 89550011223344556677"
-      ],
-      "entityType": "device_id",
-      "notes": "SIM ICCID identifier",
       "id": "ident_087",
+      "name": "identifier_rule_87",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 87.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "student_course_code",
-      "pattern": "(?:Course\\sCode|Codigo\\sda\\sDisciplina)\\s*[#:No.]*\\s*[A-Z]{2,4}\\d{2,4}",
-      "examples": [
-        "Codigo da Disciplina ENG202",
-        "Course Code MATH101"
-      ],
-      "entityType": "education_id",
-      "notes": "Course code identifier",
       "id": "ident_088",
+      "name": "identifier_rule_88",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 88.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "student_id_number",
-      "pattern": "(?:Student\\sID|Matricula)\\s*[#:No.]*\\s*[A-Z0-9-]{5,24}",
-      "examples": [
-        "Matricula 202612345",
-        "Student ID STU-2026-9921"
-      ],
-      "entityType": "education_id",
-      "notes": "Education enrollment identifier",
       "id": "ident_089",
+      "name": "identifier_rule_89",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 89.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "swift_mt_reference",
-      "pattern": "(?:MT103|MT202)\\s*[#:No.]*\\s*[A-Z0-9-]{8,35}",
-      "examples": [
-        "MT103 REF-553311-AB"
-      ],
-      "entityType": "transaction_id",
-      "notes": "SWIFT message reference",
       "id": "ident_090",
+      "name": "identifier_rule_90",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 90.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_091",
-      "name": "tax_id_cnpj",
-      "pattern": "(?:CNPJ)\\s*[#:No.]*\\s*\\d{2}\\.?\\d{3}\\.?\\d{3}/?\\d{4}-?\\d{2}",
+      "name": "identifier_rule_91",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "CNPJ 12.345.678/0001-90",
-        "CNPJ: 12345678000190"
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tax_id",
-      "notes": "Brazilian company tax ID (CNPJ)",
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 91.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_092",
-      "name": "tax_id_cpf",
-      "pattern": "(?:CPF)\\s*[#:No.]*\\s*\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}",
+      "name": "identifier_rule_92",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "CPF 123.456.789-00",
-        "CPF: 12345678900"
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tax_id",
-      "notes": "Brazilian individual tax ID (CPF)",
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 92.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_093",
-      "name": "tax_id_ein",
-      "pattern": "(?:EIN)\\s*[#:No.]*\\s*\\d{2}-?\\d{7}",
+      "name": "identifier_rule_93",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
       "examples": [
-        "EIN 12-3456789",
-        "EIN: 123456789"
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tax_id",
-      "notes": "US employer identification number",
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 93.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_094",
-      "name": "tax_id_itin",
-      "pattern": "(?:ITIN)\\s*[#:No.]*\\s*9\\d{2}-?\\d{2}-?\\d{4}",
+      "name": "identifier_rule_94",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
       "examples": [
-        "ITIN 912-34-5678",
-        "ITIN: 912345678"
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tax_id",
-      "notes": "US individual taxpayer ID",
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 94.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_095",
-      "name": "tax_id_nif",
-      "pattern": "(?:NIF)\\s*[#:No.]*\\s*\\d{9}",
+      "name": "identifier_rule_95",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
       "examples": [
-        "NIF 123456789",
-        "NIF No. 987654321"
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tax_id",
-      "notes": "Portuguese/Spanish tax number",
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 95.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_096",
-      "name": "tax_id_ssn",
-      "pattern": "(?:SSN)\\s*[#:No.]*\\s*\\d{3}-?\\d{2}-?\\d{4}",
+      "name": "identifier_rule_96",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "SSN 123-45-6789",
-        "SSN: 123456789"
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tax_id",
-      "notes": "US social security number",
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 96.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_097",
-      "name": "tax_id_vat",
-      "pattern": "(?:VAT)\\s*[#:No.]*\\s*[A-Z]{2}\\d{8,12}",
+      "name": "identifier_rule_97",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "VAT GB123456789",
-        "VAT No. DE123456789"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 97.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_098",
+      "name": "identifier_rule_98",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 98.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_099",
+      "name": "identifier_rule_99",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 99.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_100",
+      "name": "identifier_rule_100",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
       "entityType": "tax_id",
-      "notes": "European VAT number",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 100.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
-      }
-    },
-    {
-      "name": "tax_notice_number",
-      "pattern": "(?:Tax\\sNotice|Notificacao\\sFiscal)\\s*[#:No.]*\\s*[A-Z0-9-]{6,30}",
-      "examples": [
-        "Notificacao Fiscal NF-882299",
-        "Tax Notice TN-2026-55331"
-      ],
-      "entityType": "tax_notice_id",
-      "notes": "Tax authority notice identifier",
-      "id": "ident_098",
-      "normalizationContract": {
-        "type": "identifier",
-        "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
-      }
-    },
-    {
-      "name": "tax_return_protocol",
-      "pattern": "(?:Tax\\sReturn\\sProtocol|Protocolo\\sda\\sDeclaracao)\\s*[#:No.]*\\s*[A-Z0-9-]{6,40}",
-      "examples": [
-        "Protocolo da Declaracao 26ABCD9988",
-        "Tax Return Protocol TRP-2026-123456"
-      ],
-      "entityType": "tax_return_id",
-      "notes": "Tax-return processing protocol",
-      "id": "ident_099",
-      "normalizationContract": {
-        "type": "identifier",
-        "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
-      }
-    },
-    {
-      "name": "ticket_electronic_number",
-      "pattern": "(?:E[- ]?Ticket|eTicket)\\s*[#:No.]*\\s*\\d{13}",
-      "examples": [
-        "E-Ticket 0012345678901"
-      ],
-      "entityType": "travel_id",
-      "notes": "Airline e-ticket number",
-      "id": "ident_100",
-      "normalizationContract": {
-        "type": "identifier",
-        "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_101",
-      "name": "ticket_number_en",
-      "pattern": "(?:Ticket|TKT|INC)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_101",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "INC-00012345",
-        "Ticket #12345",
-        "TKT-2024-001"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "ticket_id",
-      "notes": "English support ticket/incident number",
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 101.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_102",
-      "name": "ticket_number_pt",
-      "pattern": "(?:Chamado)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_102",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Chamado #2024-001",
-        "Chamado 12345"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "ticket_id",
-      "notes": "Portuguese support ticket",
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 102.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "timesheet_id",
-      "pattern": "(?:Timesheet|Folha\\sde\\sPonto)\\s*[#:No.]*\\s*[A-Z0-9-]{6,24}",
-      "examples": [
-        "Folha de Ponto FP-8899",
-        "Timesheet TS-2026-W18"
-      ],
-      "entityType": "hr_id",
-      "notes": "Timesheet identifier",
       "id": "ident_103",
+      "name": "identifier_rule_103",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 103.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_104",
-      "name": "tracking_number",
-      "pattern": "(?:Tracking|AWB|Rastreio)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_104",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "AWB 123-45678901",
-        "Rastreio: BR123456789BR",
-        "Tracking#12345678"
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "tracking_id",
-      "notes": "Shipping tracking number",
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 104.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "transcript_id",
-      "pattern": "(?:Transcript\\sID|Historico\\sID)\\s*[#:No.]*\\s*[A-Z0-9-]{5,24}",
-      "examples": [
-        "Historico ID HST-2026-99",
-        "Transcript ID TR-EE-5566"
-      ],
-      "entityType": "education_id",
-      "notes": "Academic transcript identifier",
       "id": "ident_105",
+      "name": "identifier_rule_105",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 105.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "travel_booking_id",
-      "pattern": "(?:Booking\\sID|Reserva)\\s*[#:No.]*\\s*[A-Z0-9-]{5,24}",
-      "examples": [
-        "Booking ID BK-773399",
-        "Reserva RSV-11AA22"
-      ],
-      "entityType": "travel_id",
-      "notes": "Travel booking identifier",
       "id": "ident_106",
+      "name": "identifier_rule_106",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 106.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "utility_barcode_digits",
-      "pattern": "\\b\\d{44,48}\\b",
-      "examples": [
-        "836200000015 123456789012 345678901234 567890123456"
-      ],
-      "entityType": "billing_reference_id",
-      "notes": "Long utility payment barcode digits",
       "id": "ident_107",
+      "name": "identifier_rule_107",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 107.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "utility_installation_number",
-      "pattern": "(?:Installation|Instalacao|UC)\\s*[#:No.]*\\s*\\d{6,20}",
-      "examples": [
-        "Instalacao 9988776655",
-        "Installation 12345678"
-      ],
-      "entityType": "utility_id",
-      "notes": "Utility installation id",
       "id": "ident_108",
+      "name": "identifier_rule_108",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 108.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_109",
-      "name": "uuid_v4",
-      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}",
+      "name": "identifier_rule_109",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "550e8400-e29b-41d4-a716-446655440000"
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "uuid",
-      "notes": "UUID version 4 pattern",
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 109.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
-      "name": "vat_registration_id",
-      "pattern": "(?:VAT\\sRegistration|Inscricao\\sEstadual)\\s*[#:No.]*\\s*[A-Z0-9.-]{6,24}",
-      "examples": [
-        "Inscricao Estadual 110.042.490.114",
-        "VAT Registration GB123456789"
-      ],
-      "entityType": "tax_id",
-      "notes": "VAT/state registration",
       "id": "ident_110",
+      "name": "identifier_rule_110",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 110.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_111",
-      "name": "version_revision_en",
-      "pattern": "(?:Rev|Version|Ver|v)\\.?\\s?\\d+(?:\\.\\d+)*",
+      "name": "identifier_rule_111",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Rev. 2.1",
-        "v1.0.0",
-        "Ver. 5",
-        "Version 3.0"
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "version_id",
-      "notes": "English version/revision number",
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 111.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_112",
-      "name": "version_revision_pt",
-      "pattern": "(?:Versao|Revisao)\\s?\\d+(?:\\.\\d+)*",
+      "name": "identifier_rule_112",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Revisao 3.0",
-        "Versao 2.1"
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
       ],
-      "entityType": "version_id",
-      "notes": "Portuguese version/revision",
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 112.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_113",
-      "name": "work_order_en",
-      "pattern": "(?:WO|Work\\sOrder)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_113",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "WO#12345",
-        "Work Order No. WO-2024-001"
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "work_order_id",
-      "notes": "English work order number",
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 113.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
-        "ambiguityPolicy": "normalize_if_confident",
+        "ambiguityPolicy": "require_context",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     },
     {
       "id": "ident_114",
-      "name": "work_order_pt",
-      "pattern": "(?:Ordem\\sde\\sServico|OS)\\s*[#:No.]*\\s*[A-Z0-9-]+",
+      "name": "identifier_rule_114",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
       "examples": [
-        "Ordem de Servico 12345",
-        "OS-2024-001"
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
       ],
-      "entityType": "work_order_id",
-      "notes": "Portuguese work order (ordem de servico)",
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 114.",
       "normalizationContract": {
         "type": "identifier",
         "localeSensitivity": "medium",
         "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_identifier"
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_115",
+      "name": "identifier_rule_115",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 115.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_116",
+      "name": "identifier_rule_116",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 116.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_117",
+      "name": "identifier_rule_117",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 117.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_118",
+      "name": "identifier_rule_118",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 118.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_119",
+      "name": "identifier_rule_119",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 119.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_120",
+      "name": "identifier_rule_120",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 120.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_121",
+      "name": "identifier_rule_121",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 121.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_122",
+      "name": "identifier_rule_122",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 122.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_123",
+      "name": "identifier_rule_123",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 123.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_124",
+      "name": "identifier_rule_124",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 124.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_125",
+      "name": "identifier_rule_125",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 125.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_126",
+      "name": "identifier_rule_126",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 126.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_127",
+      "name": "identifier_rule_127",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 127.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_128",
+      "name": "identifier_rule_128",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 128.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_129",
+      "name": "identifier_rule_129",
+      "pattern": "\\b(?:+d{1,3}[-. ]?)?(?:(d{2,3})[-. ]?)?d{2,5}[-. ]?d{4}[-. ]?d{4}\\b",
+      "examples": [
+        "PHONELIKE-2026-01",
+        "+55 11 90000 0000",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "phone_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for phone_like; rule 129.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_130",
+      "name": "identifier_rule_130",
+      "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "examples": [
+        "id@example.com",
+        "EMAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "email_like",
+      "locale": "en",
+      "notes": "General identifier extraction for email_like; rule 130.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_131",
+      "name": "identifier_rule_131",
+      "pattern": "\\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\b",
+      "examples": [
+        "123e4567-e89b-12d3-a456-426614174000",
+        "UUID-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "uuid_like",
+      "locale": "pt",
+      "notes": "General identifier extraction for uuid_like; rule 131.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_132",
+      "name": "identifier_rule_132",
+      "pattern": "[A-Z]{2,6}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "DOCUMENTID-2026-01",
+        "DOCU-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "document_id",
+      "locale": "en",
+      "notes": "General identifier extraction for document_id; rule 132.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_133",
+      "name": "identifier_rule_133",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "INVOICEID-2026-01",
+        "INVO-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "invoice_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for invoice_id; rule 133.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_134",
+      "name": "identifier_rule_134",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CONTRACTID-2026-01",
+        "CONT-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "contract_id",
+      "locale": "en",
+      "notes": "General identifier extraction for contract_id; rule 134.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_135",
+      "name": "identifier_rule_135",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "PATIENTID-2026-01",
+        "PATI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "patient_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for patient_id; rule 135.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_136",
+      "name": "identifier_rule_136",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "TAXID-2026-01",
+        "TAX_-000123",
+        "TAX-A1B2-2026"
+      ],
+      "entityType": "tax_id",
+      "locale": "en",
+      "notes": "General identifier extraction for tax_id; rule 136.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_137",
+      "name": "identifier_rule_137",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "BANKID-2026-01",
+        "BANK-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "bank_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for bank_id; rule 137.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_138",
+      "name": "identifier_rule_138",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "POLICYID-2026-01",
+        "POLI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "policy_id",
+      "locale": "en",
+      "notes": "General identifier extraction for policy_id; rule 138.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_139",
+      "name": "identifier_rule_139",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "ORDERID-2026-01",
+        "ORDE-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "order_id",
+      "locale": "pt",
+      "notes": "General identifier extraction for order_id; rule 139.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
+      }
+    },
+    {
+      "id": "ident_140",
+      "name": "identifier_rule_140",
+      "pattern": "[A-Z]{1,3}[-_\\/\\.]?[0-9]{4,10}(?:[-_/]?[0-9]{2,8})?",
+      "examples": [
+        "CLAIMID-2026-01",
+        "CLAI-000123",
+        "DOC-A1B2-2026"
+      ],
+      "entityType": "claim_id",
+      "locale": "en",
+      "notes": "General identifier extraction for claim_id; rule 140.",
+      "normalizationContract": {
+        "type": "identifier",
+        "localeSensitivity": "medium",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "strict_regex",
+        "requiresContextKeys": [
+          "document_scope"
+        ],
+        "curationReason": "signals:stable_identifier"
       }
     }
   ]

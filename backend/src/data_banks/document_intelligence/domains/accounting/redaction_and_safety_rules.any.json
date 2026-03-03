@@ -1,10 +1,10 @@
 {
   "_meta": {
-    "id": "di_accounting_redaction_and_safety_rules",
-    "version": "1.0.0",
-    "description": "Redaction and safety rules for accounting domain — PII handling and sensitive data policies.",
+    "id": "di_accounting_redaction_and_safety_rules_v2",
+    "version": "2.0.0",
+    "description": "Safety and redaction policy for accounting documents.",
     "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -12,63 +12,50 @@
   },
   "domain": "accounting",
   "redactionRules": [
-    {
-      "id": "acct_redact_001_ssn",
-      "dataType": "SSN",
-      "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b",
-      "action": "REDACT",
-      "replacement": "[SSN REDACTED]"
-    },
-    {
-      "id": "acct_redact_002_bank_account",
-      "dataType": "bank_account_number",
-      "pattern": "\\b(?:account\\s*(?:no\\.?|number|#)\\s*:?\\s*)\\d{8,17}\\b",
-      "action": "REDACT",
-      "replacement": "[ACCOUNT REDACTED]"
-    },
-    {
-      "id": "acct_redact_003_ein",
-      "dataType": "employer_id",
-      "pattern": "\\b(?:EIN|employer\\s+id)\\s*:?\\s*\\d{2}-\\d{7}\\b",
-      "action": "REDACT",
-      "replacement": "[EIN REDACTED]"
-    },
-    {
-      "id": "acct_redact_004_vendor_bank",
-      "dataType": "vendor_banking_details",
-      "pattern": "\\b(?:routing|swift|iban|bic)\\s*(?:no\\.?|number|#|code)?\\s*:?\\s*[A-Z0-9]{8,34}\\b",
-      "action": "REDACT",
-      "replacement": "[BANKING DETAIL REDACTED]"
-    }
+    { "id": "acct_redact_001_ssn", "dataType": "SSN", "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b", "action": "REDACT", "replacement": "[SSN REDACTED]" },
+    { "id": "acct_redact_002_tax_id", "dataType": "tax_id", "pattern": "\\b\\d{2}-\\d{3}-\\d{3}\\/\\d{4}-\\d{2}\\b", "action": "REDACT", "replacement": "[TAX_ID REDACTED]" },
+    { "id": "acct_redact_003_cpf", "dataType": "cpf", "pattern": "\\b\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}\\b", "action": "REDACT", "replacement": "[CPF REDACTED]" },
+    { "id": "acct_redact_004_cnpj", "dataType": "cnpj", "pattern": "\\b\\d{2}\\.?\\d{3}\\.?\\d{3}\\/?\\d{4}-?\\d{2}\\b", "action": "REDACT", "replacement": "[CNPJ REDACTED]" },
+    { "id": "acct_redact_005_bank_account", "dataType": "bank_account_number", "pattern": "\\b(?:acct|account|conta|accountno|a\\.?c\\.?o?\\.?|no|nº|#)\\s*:?\\s*\\d{6,20}\\b", "action": "REDACT", "replacement": "[BANK_ACCOUNT REDACTED]" },
+    { "id": "acct_redact_006_routing", "dataType": "bank_routing", "pattern": "\\b(?:routing|route)\\s*(?:no|number|nº|#)?\\s*:?\\s*\\d{8,12}\\b", "action": "REDACT", "replacement": "[ROUTING REDACTED]" },
+    { "id": "acct_redact_007_card_number", "dataType": "card_number", "pattern": "\\b(?:\\d{4}[ -]?){3}\\d{4}\\b", "action": "REDACT", "replacement": "[CARD_NUMBER REDACTED]" },
+    { "id": "acct_redact_008_salary", "dataType": "salary", "pattern": "\\b(?:gross\\s+pay|net\\s+pay|sal[aá]rio|compensation)\\b[\\s\\S]{0,25}\\$?[0-9][0-9\\.,]{4,}", "action": "MASK", "replacement": "[SALARY REDACTED]" }
   ],
   "safetyRules": [
     {
-      "id": "acct_safety_001_no_audit_opinion",
+      "id": "acct_safety_001_no_opinion",
       "severity": "error",
-      "description": "Never state or imply an audit opinion. Only describe what the documents show.",
-      "trigger": "query asks for audit conclusion",
+      "description": "Do not issue professional audit, accounting, or legal opinions; report only evidenced extraction and reconciliation status.",
+      "trigger": "query asks for definitive opinion/opinion text",
       "action": "BLOCK_WITH_DISCLAIMER"
     },
     {
       "id": "acct_safety_002_no_fraud_accusation",
       "severity": "error",
-      "description": "Never accuse individuals or entities of fraud. Flag anomalies neutrally.",
-      "trigger": "analysis reveals potential irregularity",
+      "description": "Do not accuse specific people of fraud or misconduct; flag anomalies neutrally with evidence references.",
+      "trigger": "analysis identifies potential irregularity",
       "action": "NEUTRAL_FLAG"
     },
     {
       "id": "acct_safety_003_no_tax_filing",
       "severity": "warning",
-      "description": "Do not generate content intended to be filed with tax authorities.",
-      "trigger": "query asks to prepare a tax return or filing",
+      "description": "Do not create tax return filing documents or definitive tax positions.",
+      "trigger": "query asks to prepare filing",
       "action": "DISCLAIMER"
     },
     {
-      "id": "acct_safety_004_confidential_workpapers",
+      "id": "acct_safety_004_privileged_docs",
       "severity": "warning",
-      "description": "Audit workpapers may be privileged. Do not reproduce full workpaper content verbatim.",
-      "trigger": "document is identified as audit workpaper",
+      "description": "Prefer summaries for audit workpapers and legal privilege markers.",
+      "trigger": "document_marked_privileged_or_workpaper",
       "action": "SUMMARIZE_ONLY"
+    },
+    {
+      "id": "acct_safety_005_confidence_limit",
+      "severity": "info",
+      "description": "For non-straightforward tables, lower confidence and request next-best source page for tie-out.",
+      "trigger": "table quality low / signatures missing / split pages",
+      "action": "ANNOTATE"
     }
   ]
 }

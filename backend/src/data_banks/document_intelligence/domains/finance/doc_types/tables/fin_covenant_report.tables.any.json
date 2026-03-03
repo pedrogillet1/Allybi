@@ -1,0 +1,2358 @@
+{
+  "_meta": {
+    "id": "di_finance_tables_fin_covenant_report",
+    "version": "2.1.0",
+    "description": "Table signatures for Covenant Report.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_covenant_report"
+  },
+  "tables": [
+    {
+      "id": "covenant_calculation_1",
+      "canonicalName": {
+        "en": "Covenant Calculation",
+        "pt": "Covenant Calculation"
+      },
+      "section": "facility_summary",
+      "signaturePatterns": [
+        "\\bcovenant calculation\\b",
+        "\\bcovenant_calculation_1\\b",
+        "\\btable 1\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_covenant_calculation_1_01",
+        "fn_covenant_calculation_1_02",
+        "fn_covenant_calculation_1_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "coverage_ratio_table_2",
+      "canonicalName": {
+        "en": "Coverage Ratio Table",
+        "pt": "Coverage Ratio Table"
+      },
+      "section": "thresholds",
+      "signaturePatterns": [
+        "\\bcoverage ratio table\\b",
+        "\\bcoverage_ratio_table_2\\b",
+        "\\btable 2\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_coverage_ratio_table_2_01",
+        "fn_coverage_ratio_table_2_02",
+        "fn_coverage_ratio_table_2_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "leverage_ratio_table_3",
+      "canonicalName": {
+        "en": "Leverage Ratio Table",
+        "pt": "Leverage Ratio Table"
+      },
+      "section": "calculation_walkthrough",
+      "signaturePatterns": [
+        "\\bleverage ratio table\\b",
+        "\\bleverage_ratio_table_3\\b",
+        "\\btable 3\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_leverage_ratio_table_3_01",
+        "fn_leverage_ratio_table_3_02",
+        "fn_leverage_ratio_table_3_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "liquidity_ratio_table_4",
+      "canonicalName": {
+        "en": "Liquidity Ratio Table",
+        "pt": "Liquidity Ratio Table"
+      },
+      "section": "testing_period",
+      "signaturePatterns": [
+        "\\bliquidity ratio table\\b",
+        "\\bliquidity_ratio_table_4\\b",
+        "\\btable 4\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_liquidity_ratio_table_4_01",
+        "fn_liquidity_ratio_table_4_02",
+        "fn_liquidity_ratio_table_4_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "minimum_test_matrix_5",
+      "canonicalName": {
+        "en": "Minimum Test Matrix",
+        "pt": "Minimum Test Matrix"
+      },
+      "section": "compliance_matrix",
+      "signaturePatterns": [
+        "\\bminimum test matrix\\b",
+        "\\bminimum_test_matrix_5\\b",
+        "\\btable 5\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_minimum_test_matrix_5_01",
+        "fn_minimum_test_matrix_5_02",
+        "fn_minimum_test_matrix_5_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "cure_plan_6",
+      "canonicalName": {
+        "en": "Cure Plan",
+        "pt": "Cure Plan"
+      },
+      "section": "waivers",
+      "signaturePatterns": [
+        "\\bcure plan\\b",
+        "\\bcure_plan_6\\b",
+        "\\btable 6\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cure_plan_6_01",
+        "fn_cure_plan_6_02",
+        "fn_cure_plan_6_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "waiver_register_7",
+      "canonicalName": {
+        "en": "Waiver Register",
+        "pt": "Waiver Register"
+      },
+      "section": "breach_analysis",
+      "signaturePatterns": [
+        "\\bwaiver register\\b",
+        "\\bwaiver_register_7\\b",
+        "\\btable 7\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_waiver_register_7_01",
+        "fn_waiver_register_7_02",
+        "fn_waiver_register_7_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "default_notification_8",
+      "canonicalName": {
+        "en": "Default Notification",
+        "pt": "Default Notification"
+      },
+      "section": "remedies",
+      "signaturePatterns": [
+        "\\bdefault notification\\b",
+        "\\bdefault_notification_8\\b",
+        "\\btable 8\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_default_notification_8_01",
+        "fn_default_notification_8_02",
+        "fn_default_notification_8_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "trend_compliance_9",
+      "canonicalName": {
+        "en": "Trend Compliance",
+        "pt": "Trend Compliance"
+      },
+      "section": "security_covenants",
+      "signaturePatterns": [
+        "\\btrend compliance\\b",
+        "\\btrend_compliance_9\\b",
+        "\\btable 9\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_trend_compliance_9_01",
+        "fn_trend_compliance_9_02",
+        "fn_trend_compliance_9_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "covenant_definition_10",
+      "canonicalName": {
+        "en": "Covenant Definition",
+        "pt": "Covenant Definition"
+      },
+      "section": "financial_covenants",
+      "signaturePatterns": [
+        "\\bcovenant definition\\b",
+        "\\bcovenant_definition_10\\b",
+        "\\btable 10\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_covenant_definition_10_01",
+        "fn_covenant_definition_10_02",
+        "fn_covenant_definition_10_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "covenant_calculation_11",
+      "canonicalName": {
+        "en": "Covenant Calculation",
+        "pt": "Covenant Calculation"
+      },
+      "section": "reporting_requirements",
+      "signaturePatterns": [
+        "\\bcovenant calculation\\b",
+        "\\bcovenant_calculation_11\\b",
+        "\\btable 11\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_covenant_calculation_11_01",
+        "fn_covenant_calculation_11_02",
+        "fn_covenant_calculation_11_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "coverage_ratio_table_12",
+      "canonicalName": {
+        "en": "Coverage Ratio Table",
+        "pt": "Coverage Ratio Table"
+      },
+      "section": "borrower_certification",
+      "signaturePatterns": [
+        "\\bcoverage ratio table\\b",
+        "\\bcoverage_ratio_table_12\\b",
+        "\\btable 12\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_coverage_ratio_table_12_01",
+        "fn_coverage_ratio_table_12_02",
+        "fn_coverage_ratio_table_12_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "leverage_ratio_table_13",
+      "canonicalName": {
+        "en": "Leverage Ratio Table",
+        "pt": "Leverage Ratio Table"
+      },
+      "section": "auditor_attestation",
+      "signaturePatterns": [
+        "\\bleverage ratio table\\b",
+        "\\bleverage_ratio_table_13\\b",
+        "\\btable 13\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_leverage_ratio_table_13_01",
+        "fn_leverage_ratio_table_13_02",
+        "fn_leverage_ratio_table_13_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "liquidity_ratio_table_14",
+      "canonicalName": {
+        "en": "Liquidity Ratio Table",
+        "pt": "Liquidity Ratio Table"
+      },
+      "section": "compliance_history",
+      "signaturePatterns": [
+        "\\bliquidity ratio table\\b",
+        "\\bliquidity_ratio_table_14\\b",
+        "\\btable 14\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_liquidity_ratio_table_14_01",
+        "fn_liquidity_ratio_table_14_02",
+        "fn_liquidity_ratio_table_14_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "minimum_test_matrix_15",
+      "canonicalName": {
+        "en": "Minimum Test Matrix",
+        "pt": "Minimum Test Matrix"
+      },
+      "section": "appendix_disclosure",
+      "signaturePatterns": [
+        "\\bminimum test matrix\\b",
+        "\\bminimum_test_matrix_15\\b",
+        "\\btable 15\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_minimum_test_matrix_15_01",
+        "fn_minimum_test_matrix_15_02",
+        "fn_minimum_test_matrix_15_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "cure_plan_16",
+      "canonicalName": {
+        "en": "Cure Plan",
+        "pt": "Cure Plan"
+      },
+      "section": "covenant_overview",
+      "signaturePatterns": [
+        "\\bcure plan\\b",
+        "\\bcure_plan_16\\b",
+        "\\btable 16\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_cure_plan_16_01",
+        "fn_cure_plan_16_02",
+        "fn_cure_plan_16_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "waiver_register_17",
+      "canonicalName": {
+        "en": "Waiver Register",
+        "pt": "Waiver Register"
+      },
+      "section": "facility_summary",
+      "signaturePatterns": [
+        "\\bwaiver register\\b",
+        "\\bwaiver_register_17\\b",
+        "\\btable 17\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_waiver_register_17_01",
+        "fn_waiver_register_17_02",
+        "fn_waiver_register_17_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "default_notification_18",
+      "canonicalName": {
+        "en": "Default Notification",
+        "pt": "Default Notification"
+      },
+      "section": "thresholds",
+      "signaturePatterns": [
+        "\\bdefault notification\\b",
+        "\\bdefault_notification_18\\b",
+        "\\btable 18\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_default_notification_18_01",
+        "fn_default_notification_18_02",
+        "fn_default_notification_18_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "trend_compliance_19",
+      "canonicalName": {
+        "en": "Trend Compliance",
+        "pt": "Trend Compliance"
+      },
+      "section": "calculation_walkthrough",
+      "signaturePatterns": [
+        "\\btrend compliance\\b",
+        "\\btrend_compliance_19\\b",
+        "\\btable 19\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_trend_compliance_19_01",
+        "fn_trend_compliance_19_02",
+        "fn_trend_compliance_19_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "covenant_definition_20",
+      "canonicalName": {
+        "en": "Covenant Definition",
+        "pt": "Covenant Definition"
+      },
+      "section": "testing_period",
+      "signaturePatterns": [
+        "\\bcovenant definition\\b",
+        "\\bcovenant_definition_20\\b",
+        "\\btable 20\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_covenant_definition_20_01",
+        "fn_covenant_definition_20_02",
+        "fn_covenant_definition_20_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "covenant_calculation_21",
+      "canonicalName": {
+        "en": "Covenant Calculation",
+        "pt": "Covenant Calculation"
+      },
+      "section": "compliance_matrix",
+      "signaturePatterns": [
+        "\\bcovenant calculation\\b",
+        "\\bcovenant_calculation_21\\b",
+        "\\btable 21\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_covenant_calculation_21_01",
+        "fn_covenant_calculation_21_02",
+        "fn_covenant_calculation_21_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "coverage_ratio_table_22",
+      "canonicalName": {
+        "en": "Coverage Ratio Table",
+        "pt": "Coverage Ratio Table"
+      },
+      "section": "waivers",
+      "signaturePatterns": [
+        "\\bcoverage ratio table\\b",
+        "\\bcoverage_ratio_table_22\\b",
+        "\\btable 22\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_coverage_ratio_table_22_01",
+        "fn_coverage_ratio_table_22_02",
+        "fn_coverage_ratio_table_22_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "leverage_ratio_table_23",
+      "canonicalName": {
+        "en": "Leverage Ratio Table",
+        "pt": "Leverage Ratio Table"
+      },
+      "section": "breach_analysis",
+      "signaturePatterns": [
+        "\\bleverage ratio table\\b",
+        "\\bleverage_ratio_table_23\\b",
+        "\\btable 23\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "table_note"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "inferred_currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_leverage_ratio_table_23_01",
+        "fn_leverage_ratio_table_23_02",
+        "fn_leverage_ratio_table_23_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    },
+    {
+      "id": "liquidity_ratio_table_24",
+      "canonicalName": {
+        "en": "Liquidity Ratio Table",
+        "pt": "Liquidity Ratio Table"
+      },
+      "section": "remedies",
+      "signaturePatterns": [
+        "\\bliquidity ratio table\\b",
+        "\\bliquidity_ratio_table_24\\b",
+        "\\btable 24\\b"
+      ],
+      "requiredHeaders": [
+        "period",
+        "metric",
+        "value",
+        "unit",
+        "currency",
+        "variance"
+      ],
+      "headerAliases": [
+        [
+          "period",
+          "fiscal period",
+          "periodo fiscal",
+          "data"
+        ],
+        [
+          "metric",
+          "line item",
+          "item"
+        ],
+        [
+          "value",
+          "amount",
+          "valor"
+        ],
+        [
+          "unit",
+          "scale",
+          "escala",
+          "unidade"
+        ],
+        [
+          "currency",
+          "moeda"
+        ]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": [
+          "units",
+          "thousands",
+          "millions"
+        ],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": [
+        "fn_liquidity_ratio_table_24_01",
+        "fn_liquidity_ratio_table_24_02",
+        "fn_liquidity_ratio_table_24_03"
+      ],
+      "extractionNotes": "Use row/column anchors and table context for numeric values."
+    }
+  ],
+  "tableHeaderMappings": [
+    {
+      "canonicalHeader": "metric_1",
+      "aliases": [
+        "metric 1",
+        "metrica 1",
+        "kpi_1",
+        "item"
+      ],
+      "enAliases": [
+        "item 1",
+        "line item 1"
+      ],
+      "ptAliases": [
+        "item 1",
+        "linha 1"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_2",
+      "aliases": [
+        "metric 2",
+        "metrica 2",
+        "kpi_2",
+        "item"
+      ],
+      "enAliases": [
+        "item 2",
+        "line item 2"
+      ],
+      "ptAliases": [
+        "item 2",
+        "linha 2"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_3",
+      "aliases": [
+        "metric 3",
+        "metrica 3",
+        "kpi_3",
+        "item"
+      ],
+      "enAliases": [
+        "item 3",
+        "line item 3"
+      ],
+      "ptAliases": [
+        "item 3",
+        "linha 3"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_4",
+      "aliases": [
+        "metric 4",
+        "metrica 4",
+        "kpi_4",
+        "item"
+      ],
+      "enAliases": [
+        "item 4",
+        "line item 4"
+      ],
+      "ptAliases": [
+        "item 4",
+        "linha 4"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_5",
+      "aliases": [
+        "metric 5",
+        "metrica 5",
+        "kpi_5",
+        "item"
+      ],
+      "enAliases": [
+        "item 5",
+        "line item 5"
+      ],
+      "ptAliases": [
+        "item 5",
+        "linha 5"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_6",
+      "aliases": [
+        "metric 6",
+        "metrica 6",
+        "kpi_6",
+        "item"
+      ],
+      "enAliases": [
+        "item 6",
+        "line item 6"
+      ],
+      "ptAliases": [
+        "item 6",
+        "linha 6"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_7",
+      "aliases": [
+        "metric 7",
+        "metrica 7",
+        "kpi_7",
+        "item"
+      ],
+      "enAliases": [
+        "item 7",
+        "line item 7"
+      ],
+      "ptAliases": [
+        "item 7",
+        "linha 7"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_8",
+      "aliases": [
+        "metric 8",
+        "metrica 8",
+        "kpi_8",
+        "item"
+      ],
+      "enAliases": [
+        "item 8",
+        "line item 8"
+      ],
+      "ptAliases": [
+        "item 8",
+        "linha 8"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_9",
+      "aliases": [
+        "metric 9",
+        "metrica 9",
+        "kpi_9",
+        "item"
+      ],
+      "enAliases": [
+        "item 9",
+        "line item 9"
+      ],
+      "ptAliases": [
+        "item 9",
+        "linha 9"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_10",
+      "aliases": [
+        "metric 10",
+        "metrica 10",
+        "kpi_10",
+        "item"
+      ],
+      "enAliases": [
+        "item 10",
+        "line item 10"
+      ],
+      "ptAliases": [
+        "item 10",
+        "linha 10"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_11",
+      "aliases": [
+        "metric 11",
+        "metrica 11",
+        "kpi_11",
+        "item"
+      ],
+      "enAliases": [
+        "item 11",
+        "line item 11"
+      ],
+      "ptAliases": [
+        "item 11",
+        "linha 11"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_12",
+      "aliases": [
+        "metric 12",
+        "metrica 12",
+        "kpi_12",
+        "item"
+      ],
+      "enAliases": [
+        "item 12",
+        "line item 12"
+      ],
+      "ptAliases": [
+        "item 12",
+        "linha 12"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_13",
+      "aliases": [
+        "metric 13",
+        "metrica 13",
+        "kpi_13",
+        "item"
+      ],
+      "enAliases": [
+        "item 13",
+        "line item 13"
+      ],
+      "ptAliases": [
+        "item 13",
+        "linha 13"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_14",
+      "aliases": [
+        "metric 14",
+        "metrica 14",
+        "kpi_14",
+        "item"
+      ],
+      "enAliases": [
+        "item 14",
+        "line item 14"
+      ],
+      "ptAliases": [
+        "item 14",
+        "linha 14"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_15",
+      "aliases": [
+        "metric 15",
+        "metrica 15",
+        "kpi_15",
+        "item"
+      ],
+      "enAliases": [
+        "item 15",
+        "line item 15"
+      ],
+      "ptAliases": [
+        "item 15",
+        "linha 15"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_16",
+      "aliases": [
+        "metric 16",
+        "metrica 16",
+        "kpi_16",
+        "item"
+      ],
+      "enAliases": [
+        "item 16",
+        "line item 16"
+      ],
+      "ptAliases": [
+        "item 16",
+        "linha 16"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_17",
+      "aliases": [
+        "metric 17",
+        "metrica 17",
+        "kpi_17",
+        "item"
+      ],
+      "enAliases": [
+        "item 17",
+        "line item 17"
+      ],
+      "ptAliases": [
+        "item 17",
+        "linha 17"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_18",
+      "aliases": [
+        "metric 18",
+        "metrica 18",
+        "kpi_18",
+        "item"
+      ],
+      "enAliases": [
+        "item 18",
+        "line item 18"
+      ],
+      "ptAliases": [
+        "item 18",
+        "linha 18"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_19",
+      "aliases": [
+        "metric 19",
+        "metrica 19",
+        "kpi_19",
+        "item"
+      ],
+      "enAliases": [
+        "item 19",
+        "line item 19"
+      ],
+      "ptAliases": [
+        "item 19",
+        "linha 19"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_20",
+      "aliases": [
+        "metric 20",
+        "metrica 20",
+        "kpi_20",
+        "item"
+      ],
+      "enAliases": [
+        "item 20",
+        "line item 20"
+      ],
+      "ptAliases": [
+        "item 20",
+        "linha 20"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_21",
+      "aliases": [
+        "metric 21",
+        "metrica 21",
+        "kpi_21",
+        "item"
+      ],
+      "enAliases": [
+        "item 21",
+        "line item 21"
+      ],
+      "ptAliases": [
+        "item 21",
+        "linha 21"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_22",
+      "aliases": [
+        "metric 22",
+        "metrica 22",
+        "kpi_22",
+        "item"
+      ],
+      "enAliases": [
+        "item 22",
+        "line item 22"
+      ],
+      "ptAliases": [
+        "item 22",
+        "linha 22"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_23",
+      "aliases": [
+        "metric 23",
+        "metrica 23",
+        "kpi_23",
+        "item"
+      ],
+      "enAliases": [
+        "item 23",
+        "line item 23"
+      ],
+      "ptAliases": [
+        "item 23",
+        "linha 23"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_24",
+      "aliases": [
+        "metric 24",
+        "metrica 24",
+        "kpi_24",
+        "item"
+      ],
+      "enAliases": [
+        "item 24",
+        "line item 24"
+      ],
+      "ptAliases": [
+        "item 24",
+        "linha 24"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_25",
+      "aliases": [
+        "metric 25",
+        "metrica 25",
+        "kpi_25",
+        "item"
+      ],
+      "enAliases": [
+        "item 25",
+        "line item 25"
+      ],
+      "ptAliases": [
+        "item 25",
+        "linha 25"
+      ],
+      "normalizeTo": "text"
+    },
+    {
+      "canonicalHeader": "metric_26",
+      "aliases": [
+        "metric 26",
+        "metrica 26",
+        "kpi_26",
+        "item"
+      ],
+      "enAliases": [
+        "item 26",
+        "line item 26"
+      ],
+      "ptAliases": [
+        "item 26",
+        "linha 26"
+      ],
+      "normalizeTo": "text"
+    }
+  ],
+  "unitsRules": [
+    {
+      "id": "fin_unit_rule_1",
+      "appliesTo": [
+        "metric_1",
+        "number"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_2",
+      "appliesTo": [
+        "metric_2",
+        "currency"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_3",
+      "appliesTo": [
+        "metric_3",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_4",
+      "appliesTo": [
+        "metric_4",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_5",
+      "appliesTo": [
+        "metric_5",
+        "number"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_6",
+      "appliesTo": [
+        "metric_6",
+        "currency"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_7",
+      "appliesTo": [
+        "metric_7",
+        "number"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_8",
+      "appliesTo": [
+        "metric_8",
+        "currency"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_9",
+      "appliesTo": [
+        "metric_9",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_10",
+      "appliesTo": [
+        "metric_10",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_11",
+      "appliesTo": [
+        "metric_11",
+        "number"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_12",
+      "appliesTo": [
+        "metric_12",
+        "currency"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_13",
+      "appliesTo": [
+        "metric_13",
+        "number"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_14",
+      "appliesTo": [
+        "metric_14",
+        "currency"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_15",
+      "appliesTo": [
+        "metric_15",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_16",
+      "appliesTo": [
+        "metric_16",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_17",
+      "appliesTo": [
+        "metric_17",
+        "number"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_18",
+      "appliesTo": [
+        "metric_18",
+        "currency"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_19",
+      "appliesTo": [
+        "metric_19",
+        "number"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_20",
+      "appliesTo": [
+        "metric_20",
+        "currency"
+      ],
+      "rule": "percent_requires_%_suffix",
+      "failureAction": "WARN"
+    },
+    {
+      "id": "fin_unit_rule_21",
+      "appliesTo": [
+        "metric_21",
+        "number"
+      ],
+      "rule": "currency_require_header_or_footnote",
+      "failureAction": "FLAG"
+    },
+    {
+      "id": "fin_unit_rule_22",
+      "appliesTo": [
+        "metric_22",
+        "currency"
+      ],
+      "rule": "scale_mandatory",
+      "failureAction": "FLAG"
+    }
+  ],
+  "footnoteLinking": [
+    {
+      "footnoteId": "fn_global_01",
+      "targetTables": [
+        "table_1",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_02",
+      "targetTables": [
+        "table_2",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_03",
+      "targetTables": [
+        "table_3",
+        "income_statement_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_04",
+      "targetTables": [
+        "table_4",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_05",
+      "targetTables": [
+        "table_5",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_06",
+      "targetTables": [
+        "table_6",
+        "income_statement_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_07",
+      "targetTables": [
+        "table_7",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_08",
+      "targetTables": [
+        "table_8",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_09",
+      "targetTables": [
+        "table_9",
+        "income_statement_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_10",
+      "targetTables": [
+        "table_10",
+        "variance_summary_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_11",
+      "targetTables": [
+        "table_11",
+        "variance_summary_1"
+      ],
+      "noteHint": "methodological note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    },
+    {
+      "footnoteId": "fn_global_12",
+      "targetTables": [
+        "table_12",
+        "income_statement_1"
+      ],
+      "noteHint": "disclosure note",
+      "linkingRule": "inherit_when_table_context_has_footnote_anchor"
+    }
+  ]
+}

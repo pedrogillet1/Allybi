@@ -1,4 +1,10 @@
 import { getBankLoaderInstance } from "./bankLoader.service";
+import {
+  asNumber,
+  getArrayCount,
+  lower,
+  uniqueSorted,
+} from "./documentIntelligenceBanks.helpers";
 
 export type DocumentIntelligenceDomain =
   | "finance"
@@ -14,7 +20,11 @@ export type DocumentIntelligenceDomain =
   | "identity"
   | "insurance"
   | "tax"
-  | "travel";
+  | "travel"
+  | "everyday"
+  | "compliance"
+  | "education_research"
+  | "procurement";
 
 export type DocumentIntelligenceOntologyType =
   | "doc_type"
@@ -126,6 +136,10 @@ const EXTENDED_DOMAINS: DocumentIntelligenceDomain[] = [
   "insurance",
   "tax",
   "travel",
+  "everyday",
+  "compliance",
+  "education_research",
+  "procurement",
 ];
 
 const DOMAINS: DocumentIntelligenceDomain[] = [
@@ -203,51 +217,6 @@ function domainBankPrefix(domain: DocumentIntelligenceDomain): string {
   return `di_${domain}`;
 }
 
-function asNumber(value: unknown): number | null {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return null;
-  return parsed;
-}
-
-function uniqueSorted(values: string[]): string[] {
-  return Array.from(
-    new Set(values.map((v) => String(v || "").trim()).filter(Boolean)),
-  ).sort((a, b) => a.localeCompare(b));
-}
-
-function lower(value: unknown): string {
-  return String(value || "")
-    .trim()
-    .toLowerCase();
-}
-
-function getArrayCount(bank: unknown): number {
-  if (!bank || typeof bank !== "object") return 0;
-
-  const record = bank as Record<string, unknown>;
-  const candidateArrayKeys = [
-    "rules",
-    "aliases",
-    "priorities",
-    "typeDefinitions",
-    "templates",
-    "questions",
-    "frameworks",
-    "entries",
-    "patterns",
-  ];
-
-  for (const key of candidateArrayKeys) {
-    if (Array.isArray(record[key])) return (record[key] as unknown[]).length;
-  }
-
-  if (record.entries && typeof record.entries === "object") {
-    return Object.keys(record.entries as Record<string, unknown>).length;
-  }
-
-  return 0;
-}
-
 export class DocumentIntelligenceBanksService {
   private readonly cache = new Map<string, unknown | typeof MISSING>();
 
@@ -296,6 +265,72 @@ export class DocumentIntelligenceBanksService {
 
     this.cache.set(bankId, bank as unknown);
     return bank;
+  }
+
+  private getFirstAvailableBank<T = unknown>(bankIds: string[]): T | null {
+    for (const bankId of bankIds) {
+      const bank = this.getCachedOptional<T>(bankId);
+      if (bank) {
+        return bank;
+      }
+    }
+    return null;
+  }
+
+  private getDomainFamilyBankIds(
+    domain: DocumentIntelligenceDomain,
+    family: string,
+  ): string[] {
+    const normalizedDomain = this.normalizeDomainOrThrow(domain, "domain family lookup");
+    const prefix = domainBankPrefix(normalizedDomain);
+    const normalizedFamily = String(family || "").trim().replace(/\s+/g, "_");
+    return uniqueSorted([
+      `${prefix}_${normalizedFamily}`,
+      `${prefix}_${normalizedFamily}_v2`,
+    ]);
+  }
+
+  private getDomainFamilyLocaleBankIds(
+    domain: DocumentIntelligenceDomain,
+    family: string,
+    locale: "en" | "pt",
+  ): string[] {
+    const normalizedDomain = this.normalizeDomainOrThrow(
+      domain,
+      "domain family locale lookup",
+    );
+    const prefix = domainBankPrefix(normalizedDomain);
+    const normalizedFamily = String(family || "").trim().replace(/\s+/g, "_");
+    return uniqueSorted([
+      `${prefix}_${normalizedFamily}_${locale}`,
+      `${prefix}_${normalizedFamily}_${locale}_v2`,
+    ]);
+  }
+
+  private getDomainDocTypeBankIds(
+    domain: DocumentIntelligenceDomain,
+    docType: string,
+    suffix: "sections" | "extraction_hints" | "tables",
+  ): string[] {
+    const normalizedDocType = this.resolveDocTypeLookupKey(
+      this.normalizeDomainOrThrow(domain, "doc-type lookup"),
+      docType,
+    );
+    if (!normalizedDocType) return [];
+
+    const normalizedDomain = this.normalizeDomainOrThrow(
+      domain,
+      "doc type family lookup",
+    );
+    const prefix = domainBankPrefix(normalizedDomain);
+    const candidates = uniqueSorted([
+      `${prefix}_${normalizedDocType}_${suffix}`,
+      `${prefix}_${suffix}_${normalizedDocType}`,
+    ]);
+    if (suffix === "extraction_hints") {
+      candidates.push(`${prefix}_extraction_${normalizedDocType}`);
+    }
+    return uniqueSorted(candidates);
   }
 
   getDocumentIntelligenceMap(): Record<string, unknown> | null {
@@ -538,8 +573,8 @@ export class DocumentIntelligenceBanksService {
 
   getDomainProfile(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDomainProfile");
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_domain_profile`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "domain_profile"),
     );
   }
 
@@ -548,8 +583,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getDomainDetectionRules",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_domain_detection_rules`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "domain_detection_rules"),
     );
   }
 
@@ -558,8 +593,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getAnswerStyleBank",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_answer_style_bank`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "answer_style_bank"),
     );
   }
 
@@ -568,8 +603,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getEvidenceRequirements",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_evidence_requirements`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "evidence_requirements"),
     );
   }
 
@@ -578,8 +613,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getReasoningScaffolds",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_reasoning_scaffolds`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "reasoning_scaffolds"),
     );
   }
 
@@ -588,8 +623,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getRetrievalStrategies",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_retrieval_strategies`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "retrieval_strategies"),
     );
   }
 
@@ -598,8 +633,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getDisclaimerPolicy",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_disclaimer_policy`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "disclaimer_policy"),
     );
   }
 
@@ -608,8 +643,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getRedactionAndSafetyRules",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_redaction_and_safety_rules`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "redaction_and_safety_rules"),
     );
   }
 
@@ -618,8 +653,8 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getValidationPolicies",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_validation_policies`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyBankIds(normalized, "validation_policies"),
     );
   }
 
@@ -628,9 +663,11 @@ export class DocumentIntelligenceBanksService {
     locale: "en" | "pt",
   ): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDomainLexicon");
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_lexicon_${locale}`,
-    );
+    const prefix = domainBankPrefix(normalized);
+    return this.getFirstAvailableBank<Record<string, unknown>>([
+      `${prefix}_lexicon_${locale}`,
+      `${prefix}_lexicon_${locale}_v2`,
+    ]);
   }
 
   getDomainAbbreviations(
@@ -641,15 +678,18 @@ export class DocumentIntelligenceBanksService {
       domain,
       "getDomainAbbreviations",
     );
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_abbreviations_${locale}`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainFamilyLocaleBankIds(normalized, "abbreviations", locale),
     );
   }
 
   getDocTypeCatalog(domain: DocumentIntelligenceDomain): Record<string, unknown> | null {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeCatalog");
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_doc_type_catalog`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      [
+        `${domainBankPrefix(normalized)}_doc_type_catalog`,
+        `${domainBankPrefix(normalized)}_doc_type_catalog_v2`,
+      ],
     );
   }
 
@@ -663,8 +703,8 @@ export class DocumentIntelligenceBanksService {
     );
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_${lookupDocType}_sections`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainDocTypeBankIds(normalized, lookupDocType, "sections"),
     );
   }
 
@@ -678,8 +718,8 @@ export class DocumentIntelligenceBanksService {
     );
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_${lookupDocType}_extraction_hints`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainDocTypeBankIds(normalized, lookupDocType, "extraction_hints"),
     );
   }
 
@@ -690,8 +730,8 @@ export class DocumentIntelligenceBanksService {
     const normalized = this.normalizeDomainOrThrow(domain, "getDocTypeTables");
     const lookupDocType = this.resolveDocTypeLookupKey(normalized, docType);
     if (!lookupDocType) return null;
-    return this.getCachedOptional<Record<string, unknown>>(
-      `${domainBankPrefix(normalized)}_${lookupDocType}_tables`,
+    return this.getFirstAvailableBank<Record<string, unknown>>(
+      this.getDomainDocTypeBankIds(normalized, lookupDocType, "tables"),
     );
   }
 

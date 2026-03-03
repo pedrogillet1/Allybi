@@ -25,38 +25,59 @@
       "headingAnchors": [
         "Trial Balance",
         "Balancete de Verificacao",
+        "Statement of Trial Balance",
         "Period",
-        "Entity"
+        "Entity",
+        "As Of"
       ]
     },
     {
       "id": "line_items",
       "name": {
-        "en": "Line Items",
-        "pt": "Itens"
+        "en": "Account Lines",
+        "pt": "Linhas de Contas"
       },
       "required": true,
       "order": 2,
       "headingAnchors": [
+        "Account",
+        "Conta",
         "Detail",
         "Transactions",
         "Lines",
-        "Detalhes"
+        "Detalhes",
+        "Chart"
       ]
     },
     {
-      "id": "summary",
+      "id": "totals",
       "name": {
-        "en": "Summary",
-        "pt": "Resumo"
+        "en": "Totals",
+        "pt": "Totais"
       },
       "required": true,
       "order": 3,
       "headingAnchors": [
-        "Summary",
         "Totals",
-        "Resumo",
-        "Totais"
+        "Total",
+        "Summary Totals",
+        "Resume",
+        "Resumo"
+      ]
+    },
+    {
+      "id": "currency_validation",
+      "name": {
+        "en": "Currency Validation",
+        "pt": "Validacao de Moeda"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Currency",
+        "Moeda",
+        "Multi-currency",
+        "Exchange"
       ]
     },
     {
@@ -66,7 +87,7 @@
         "pt": "Aprovacao"
       },
       "required": false,
-      "order": 4,
+      "order": 5,
       "headingAnchors": [
         "Approval",
         "Reviewed by",

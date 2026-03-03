@@ -93,4 +93,31 @@ describe("EditingAgentRouterService", () => {
     const execution = await router.execute(makeRequest("plan", "docx"));
     expect(execution.agentId).toBe("edit_agent_default");
   });
+
+  test("uses editing_agent_policy rules when provided", async () => {
+    mockedSafeEditingBank.mockReturnValue({
+      config: {
+        enabled: true,
+        defaultAgentId: "edit_agent_default",
+      },
+      rules: [
+        {
+          id: "route_docx",
+          priority: 100,
+          when: { path: "domain", op: "eq", value: "docx" },
+          then: { agentId: "edit_agent_docx" },
+        },
+        {
+          id: "fallback",
+          priority: 1,
+          when: { any: true },
+          then: { agentId: "edit_agent_default" },
+        },
+      ],
+    } as any);
+
+    const router = new EditingAgentRouterService();
+    const execution = await router.execute(makeRequest("plan", "docx"));
+    expect(execution.agentId).toBe("edit_agent_docx");
+  });
 });

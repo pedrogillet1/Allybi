@@ -1,0 +1,122 @@
+{
+  "_meta": {
+    "id": "access_control_policy",
+    "version": "1.0.0",
+    "description": "Role and permission runtime policy for privileged actions.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "platform-security",
+    "reviewCadenceDays": 30,
+    "criticality": "critical",
+    "changeLog": [
+      "Initial access control runtime policy bank"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": true,
+    "defaultAction": "deny"
+  },
+  "rules": [
+    {
+      "id": "ACP_1000_admin_privileged",
+      "priority": 1000,
+      "when": {
+        "all": [
+          {
+            "path": "signals.action",
+            "op": "in",
+            "value": [
+              "rotate_secret",
+              "export_sensitive_data",
+              "override_policy"
+            ]
+          },
+          {
+            "path": "signals.role",
+            "op": "eq",
+            "value": "admin"
+          }
+        ]
+      },
+      "then": {
+        "action": "allow",
+        "requireMfa": true,
+        "requireApproval": true
+      },
+      "reasonCode": "access_admin_privileged",
+      "terminal": true
+    },
+    {
+      "id": "ACP_950_non_admin_privileged",
+      "priority": 950,
+      "when": {
+        "path": "signals.action",
+        "op": "in",
+        "value": [
+          "rotate_secret",
+          "export_sensitive_data",
+          "override_policy"
+        ]
+      },
+      "then": {
+        "action": "deny",
+        "userMessage": "This action requires admin privileges."
+      },
+      "reasonCode": "access_denied_privileged_action",
+      "terminal": true
+    },
+    {
+      "id": "ACP_400_standard_collaboration_actions",
+      "priority": 400,
+      "when": {
+        "path": "signals.action",
+        "op": "in",
+        "value": [
+          "viewer_chat_query",
+          "viewer_edit_preview",
+          "viewer_edit_apply",
+          "viewer_stream_query"
+        ]
+      },
+      "then": {
+        "action": "allow",
+        "requireMfa": false,
+        "requireApproval": false
+      },
+      "reasonCode": "access_allowed_standard_action",
+      "terminal": true
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ACP_T_001",
+        "runtime": {
+          "signals": {
+            "role": "member",
+            "action": "rotate_secret"
+          }
+        },
+        "expect": {
+          "action": "deny"
+        }
+      },
+      {
+        "id": "ACP_T_002",
+        "runtime": {
+          "signals": {
+            "role": "admin",
+            "action": "rotate_secret"
+          }
+        },
+        "expect": {
+          "action": "allow"
+        }
+      }
+    ]
+  }
+}

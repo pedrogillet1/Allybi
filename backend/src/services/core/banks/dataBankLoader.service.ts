@@ -15,7 +15,8 @@
 import * as fs from "fs/promises";
 import * as fsSync from "fs";
 import * as path from "path";
-import crypto from "crypto";
+import { nowIso, sha256, stripBom } from "./dataBankLoader.shared";
+import { getBankTierPolicyInstance } from "./bankTierPolicy.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 
@@ -105,10 +106,6 @@ export class DataBankError extends Error {
   }
 }
 
-function sha256(input: string): string {
-  return crypto.createHash("sha256").update(input, "utf8").digest("hex");
-}
-
 function isEnvName(x: unknown): x is EnvName {
   return x === "production" || x === "staging" || x === "dev" || x === "local";
 }
@@ -122,11 +119,6 @@ function deepFreeze<T>(obj: T): T {
     }
   }
   return obj;
-}
-
-function stripBom(s: string): string {
-  if (!s) return s;
-  return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
 }
 
 function assertNoJsonComments(raw: string, fileHint: string) {
@@ -187,10 +179,6 @@ function ensureEnvMap(map: unknown, fileHint: string): Record<EnvName, boolean> 
     out[k] = Boolean(map[k]);
   }
   return out;
-}
-
-function nowIso(): string {
-  return new Date().toISOString();
 }
 
 function normalizeAliasKey(value: string, options: Record<string, unknown>): string {
@@ -285,6 +273,12 @@ export class DataBankLoaderService {
 
   // Schema cache (schemaId -> schema object)
   private schemaCache = new Map<string, unknown>();
+  private bootstrapReady = false;
+  private bankUsageCounts = new Map<string, number>();
+  private bankLoadDurationsMs = new Map<string, number>();
+  private bankLoadSamplesMs = new Map<string, number[]>();
+  private bankLastAccessMs = new Map<string, number>();
+  private readonly tierPolicy = getBankTierPolicyInstance();
 
   // AJV instance if available and enabled
   private ajv: unknown | null = null;
@@ -316,84 +310,228 @@ export class DataBankLoaderService {
    * Call once at boot; then use getBank().
    */
   async loadAll(): Promise<void> {
-    this.bankCache.clear();
-    this.schemaCache.clear();
-    this.loadLog = [];
-    this.aliasEntries = [];
-    this.aliasNormalizedMap.clear();
-    this.dependencies = null;
-
-    // Bootstrap: load registry + aliases with minimal checks (no schema validation)
-    await this.loadRegistryBootstrap();
-    await this.loadAliasesBootstrap();
-    await this.loadDependenciesBootstrap();
-
-    // Validate registry integrity (duplicates, paths, env keys)
-    this.validateRegistryIntegrity();
-    this.validateAliasIntegrity();
-    this.validateDependencyGraphIntegrity();
-
-    // Bootstrap schemas next (so we can validate everything else)
-    await this.loadSchemasBootstrap();
-
-    // Resolve bank loading order (category loadOrder + dependency DAG)
+    await this.bootstrap(true);
     const ordered = this.resolveLoadOrder();
+    await this.loadEntries(ordered);
+    if (this.opts.strict) {
+      this.assertRequiredBanksLoaded();
+    }
+    this.validateDocumentIntelligenceContracts();
+    this.logger.info("Data banks loaded successfully", {
+      env: this.opts.env,
+      loaded: this.bankCache.size,
+      mode: "eager_all",
+    });
+  }
 
-    // Load banks in order
-    for (const entry of ordered) {
+  async loadByIds(bankIds: string[]): Promise<{
+    loadedBankIds: string[];
+    missingBankIds: string[];
+  }> {
+    await this.bootstrap(false);
+    const entries = this.resolveEntriesForIds(bankIds);
+    const result = await this.loadEntries(entries);
+    this.logger.info("Data banks loaded by id set", {
+      env: this.opts.env,
+      requested: bankIds.length,
+      selected: entries.length,
+      loadedNow: result.loadedBankIds.length,
+      missing: result.missingBankIds.length,
+    });
+    return result;
+  }
+
+  async preloadUniversalBanks(
+    bankIds: string[] = [
+      "intent_config",
+      "intent_patterns",
+      "operator_families",
+      "operator_contracts",
+      "operator_output_shapes",
+      "document_intelligence_bank_map",
+      "semantic_search_config",
+      "retrieval_ranker_config",
+      "diversification_rules",
+      "retrieval_negatives",
+      "evidence_packaging",
+      "scope_resolution",
+      "routing_priority",
+      "memory_policy",
+      "clarification_policy",
+      "fallback_policy",
+      "compliance_policy",
+      "logging_policy",
+      "rate_limit_policy",
+      "refusal_policy",
+    ],
+  ): Promise<{ loadedBankIds: string[]; missingBankIds: string[] }> {
+    await this.bootstrap(false);
+    const result = await this.loadByIds(bankIds);
+    this.logger.info("Universal bank preload completed", {
+      requested: bankIds.length,
+      loadedNow: result.loadedBankIds.length,
+      missing: result.missingBankIds.length,
+    });
+    return result;
+  }
+
+  getBankUsageStats(): {
+    usageCounts: Record<string, number>;
+    loadDurationsMs: Record<string, number>;
+    loadP95Ms: Record<string, number>;
+  } {
+    const loadP95Ms: Record<string, number> = {};
+    for (const [bankId, samples] of this.bankLoadSamplesMs.entries()) {
+      if (!Array.isArray(samples) || samples.length === 0) continue;
+      loadP95Ms[bankId] = this.percentile(samples, 0.95);
+    }
+    return {
+      usageCounts: Object.fromEntries(this.bankUsageCounts.entries()),
+      loadDurationsMs: Object.fromEntries(this.bankLoadDurationsMs.entries()),
+      loadP95Ms,
+    };
+  }
+
+  private async bootstrap(forceReset: boolean): Promise<void> {
+    if (forceReset || !this.bootstrapReady) {
+      this.bankCache.clear();
+      this.schemaCache.clear();
+      this.loadLog = [];
+      this.aliasEntries = [];
+      this.aliasNormalizedMap.clear();
+      this.dependencies = null;
+      this.bankUsageCounts.clear();
+      this.bankLoadDurationsMs.clear();
+      this.bankLoadSamplesMs.clear();
+      this.bankLastAccessMs.clear();
+
+      await this.loadRegistryBootstrap();
+      await this.loadAliasesBootstrap();
+      await this.loadDependenciesBootstrap();
+      this.validateRegistryIntegrity();
+      this.validateAliasIntegrity();
+      this.validateDependencyGraphIntegrity();
+      await this.loadSchemasBootstrap();
+      await this.loadCompiledArtifactsBootstrap();
+      this.bootstrapReady = true;
+    }
+  }
+
+  private async loadEntries(entries: BankRegistryEntry[]): Promise<{
+    loadedBankIds: string[];
+    missingBankIds: string[];
+  }> {
+    const loadedBankIds: string[] = [];
+    const missingBankIds: string[] = [];
+
+    for (const entry of entries) {
       if (!this.isEnabledInEnv(entry)) continue;
+      if (this.bankCache.has(entry.id)) continue;
 
       const filePath = path.join(
         this.opts.rootDir,
         normalizeRegistryPath(entry.path),
       );
-      const bank = await this.readBankFile<BankFile>(filePath, entry.id);
 
-      // Minimal contract
-      validateMinimalBankContract(bank, entry.path);
+      try {
+        const startedAt = Date.now();
+        const bank = await this.readBankFile<BankFile>(filePath, entry.id);
+        validateMinimalBankContract(bank, entry.path);
 
-      // Ensure id matches registry id. In non-strict mode, tolerate legacy ids
-      // and normalize to registry id so runtime lookups remain deterministic.
-      if (bank._meta?.id !== entry.id) {
-        const mismatchMessage = `Bank _meta.id mismatch for ${entry.id}. Registry id=${entry.id}, file _meta.id=${bank._meta?.id}`;
-        if (this.opts.strict) {
-          throw new DataBankError(mismatchMessage, {
-            entry,
+        if (bank._meta?.id !== entry.id) {
+          const mismatchMessage = `Bank _meta.id mismatch for ${entry.id}. Registry id=${entry.id}, file _meta.id=${bank._meta?.id}`;
+          if (this.opts.strict) {
+            throw new DataBankError(mismatchMessage, {
+              entry,
+              fileMetaId: bank._meta?.id,
+            });
+          }
+          this.logger.warn(mismatchMessage, {
+            entryId: entry.id,
             fileMetaId: bank._meta?.id,
+            path: entry.path,
+            strict: this.opts.strict,
+          });
+          bank._meta.id = entry.id;
+        }
+
+        await this.validateChecksumPolicy(entry, filePath);
+        if (this.opts.validateSchemas) {
+          await this.validateAgainstSchema(entry, bank);
+        }
+
+        this.bankCache.set(entry.id, deepFreeze(bank));
+        this.loadLog.push({ id: entry.id, path: entry.path, loadedAt: nowIso() });
+        const loadDurationMs = Date.now() - startedAt;
+        this.bankLoadDurationsMs.set(entry.id, loadDurationMs);
+        const samples = this.bankLoadSamplesMs.get(entry.id) || [];
+        samples.push(loadDurationMs);
+        if (samples.length > 200) {
+          samples.splice(0, samples.length - 200);
+        }
+        this.bankLoadSamplesMs.set(entry.id, samples);
+        this.touchBank(entry.id);
+        this.evictColdBanksIfNeeded();
+        loadedBankIds.push(entry.id);
+      } catch (error: unknown) {
+        const reason = (error as Record<string, unknown>)?.message || "unknown";
+        missingBankIds.push(entry.id);
+        if (this.opts.strict && this.isRequiredInEnv(entry)) {
+          if (error instanceof DataBankError) {
+            throw error;
+          }
+          throw new DataBankError(`Failed loading required bank: ${entry.id}`, {
+            entryId: entry.id,
+            path: entry.path,
+            reason,
           });
         }
-        this.logger.warn(mismatchMessage, {
+        this.logger.warn("Skipping failed optional bank load", {
           entryId: entry.id,
-          fileMetaId: bank._meta?.id,
           path: entry.path,
-          strict: this.opts.strict,
+          reason: String(reason),
         });
-        bank._meta.id = entry.id;
       }
-
-      // Validate checksum policy (optional)
-      await this.validateChecksumPolicy(entry, filePath);
-
-      // Schema validation (if enabled and possible)
-      if (this.opts.validateSchemas) {
-        await this.validateAgainstSchema(entry, bank);
-      }
-
-      // Freeze and store
-      this.bankCache.set(entry.id, deepFreeze(bank));
-      this.loadLog.push({ id: entry.id, path: entry.path, loadedAt: nowIso() });
     }
 
-    // If strict, ensure required banks present for env
-    if (this.opts.strict) {
-      this.assertRequiredBanksLoaded();
-    }
-    this.validateDocumentIntelligenceContracts();
+    return {
+      loadedBankIds,
+      missingBankIds: missingBankIds.sort((a, b) => a.localeCompare(b)),
+    };
+  }
 
-    this.logger.info("Data banks loaded successfully", {
-      env: this.opts.env,
-      loaded: this.bankCache.size,
-    });
+  private resolveEntriesForIds(bankIds: string[]): BankRegistryEntry[] {
+    if (!this.registry) return [];
+    const byId = new Map(this.registry.banks.map((entry) => [entry.id, entry]));
+    const seen = new Set<string>();
+    const out: BankRegistryEntry[] = [];
+    const overlayDeps = new Map<string, string[]>();
+
+    if (this.dependencies && Array.isArray(this.dependencies.banks)) {
+      for (const node of this.dependencies.banks) {
+        const id = String(node?.id || "").trim();
+        if (!id) continue;
+        overlayDeps.set(id, toStringList(node?.dependsOn));
+      }
+    }
+
+    const visit = (idRaw: string) => {
+      const canonical = this.resolveAlias(idRaw);
+      if (!canonical || seen.has(canonical)) return;
+      seen.add(canonical);
+
+      const entry = byId.get(canonical);
+      if (!entry) return;
+
+      const directDeps = Array.isArray(entry.dependsOn) ? entry.dependsOn : [];
+      for (const dep of directDeps) visit(dep);
+      for (const dep of overlayDeps.get(canonical) || []) visit(dep);
+
+      out.push(entry);
+    };
+
+    for (const idRaw of bankIds) visit(idRaw);
+    return out;
   }
 
   /**
@@ -412,6 +550,11 @@ export class DataBankLoaderService {
         },
       );
     }
+    this.bankUsageCounts.set(
+      canonical,
+      (this.bankUsageCounts.get(canonical) || 0) + 1,
+    );
+    this.touchBank(canonical);
     return bank as unknown as T;
   }
 
@@ -438,9 +581,112 @@ export class DataBankLoaderService {
     return this.registry.banks.find((b) => b.id === canonical) ?? null;
   }
 
+  private touchBank(bankId: string): void {
+    this.bankLastAccessMs.set(String(bankId || "").trim(), Date.now());
+  }
+
+  private evictColdBanksIfNeeded(): void {
+    const configuredMax = Number(process.env.BANK_COLD_CACHE_MAX_BANKS || 240);
+    if (!Number.isFinite(configuredMax) || configuredMax <= 0) return;
+    const maxColdBanks = Math.floor(configuredMax);
+
+    const coldBankIds = Array.from(this.bankCache.keys()).filter(
+      (bankId) => this.tierPolicy.decide(bankId).tier === "cold",
+    );
+    if (coldBankIds.length <= maxColdBanks) return;
+
+    const overflow = coldBankIds.length - maxColdBanks;
+    const sortedByLastAccess = coldBankIds.sort((a, b) => {
+      const aTs = this.bankLastAccessMs.get(a) || 0;
+      const bTs = this.bankLastAccessMs.get(b) || 0;
+      if (aTs !== bTs) return aTs - bTs;
+      return a.localeCompare(b);
+    });
+
+    const evicted: string[] = [];
+    for (let i = 0; i < overflow; i++) {
+      const bankId = sortedByLastAccess[i];
+      if (!bankId) continue;
+      this.bankCache.delete(bankId);
+      this.bankLastAccessMs.delete(bankId);
+      evicted.push(bankId);
+    }
+
+    if (evicted.length > 0) {
+      this.logger.info("Evicted cold banks from runtime cache", {
+        evictedCount: evicted.length,
+        evictedSample: evicted.slice(0, 20),
+        maxColdBanks,
+        remainingLoaded: this.bankCache.size,
+      });
+    }
+  }
+
+  private percentile(values: number[], q: number): number {
+    if (!Array.isArray(values) || values.length === 0) return 0;
+    const sorted = [...values]
+      .map((value) => Number(value))
+      .filter((value) => Number.isFinite(value) && value >= 0)
+      .sort((a, b) => a - b);
+    if (sorted.length === 0) return 0;
+    const clamped = Math.min(1, Math.max(0, q));
+    const idx = Math.max(0, Math.ceil(clamped * sorted.length) - 1);
+    return sorted[idx];
+  }
+
   // -------------------------
   // Bootstrap steps
   // -------------------------
+
+  private async loadCompiledArtifactsBootstrap(): Promise<void> {
+    if (process.env.BANK_COMPILED_ARTIFACTS_ENABLED !== "true") return;
+    const artifactFiles = [
+      "section_heading_index.any.json",
+      "docType_signature_index.any.json",
+      "alias_trie.any.json",
+      "table_header_hash_index.any.json",
+    ];
+
+    for (const filename of artifactFiles) {
+      const artifactPath = path.join(
+        this.opts.rootDir,
+        ".compiled",
+        filename,
+      );
+      if (!fsSync.existsSync(artifactPath)) continue;
+      try {
+        const raw = await fs.readFile(artifactPath, "utf8");
+        const parsed = safeParseJson<Record<string, unknown>>(
+          raw,
+          `.compiled/${filename}`,
+        );
+        const bankId = `compiled_${filename.replace(".any.json", "")}`;
+        const bank: BankFile = {
+          _meta: {
+            id: bankId,
+            version: "1.0.0",
+            description: `Compiled artifact for ${filename}`,
+            languages: ["any"],
+            lastUpdated: nowIso(),
+          },
+          config: { enabled: true },
+          artifact: parsed,
+          sourceFile: filename,
+        };
+        this.bankCache.set(bankId, deepFreeze(bank));
+        this.loadLog.push({
+          id: bankId,
+          path: `.compiled/${filename}`,
+          loadedAt: nowIso(),
+        });
+      } catch (error: unknown) {
+        this.logger.warn("Failed loading compiled artifact", {
+          filename,
+          error: (error as Record<string, unknown>)?.message || String(error),
+        });
+      }
+    }
+  }
 
   private async loadRegistryBootstrap(): Promise<void> {
     const registryPath = path.join(
@@ -774,6 +1020,9 @@ export class DataBankLoaderService {
           aliasMap[current] ?? this.aliasNormalizedMap.get(normalized);
         if (!mapped) {
           return registryIds.has(current) ? current : null;
+        }
+        if (mapped === current) {
+          return registryIds.has(mapped) ? mapped : null;
         }
         current = String(mapped || "").trim();
       }
@@ -1526,7 +1775,8 @@ export class DataBankLoaderService {
     const explicitlyProvided =
       entry.enabledByEnv && Object.keys(entry.enabledByEnv).length > 0;
     if (!explicitlyProvided) return true;
-    return Boolean(enabledByEnv[env]);
+    const key = (env in enabledByEnv ? env : "local") as EnvName;
+    return Boolean(enabledByEnv[key]);
   }
 
   private isRequiredInEnv(entry: BankRegistryEntry): boolean {
@@ -1538,7 +1788,8 @@ export class DataBankLoaderService {
     const explicitlyProvided =
       entry.requiredByEnv && Object.keys(entry.requiredByEnv).length > 0;
     if (!explicitlyProvided) return false;
-    return Boolean(requiredByEnv[env]);
+    const key = (env in requiredByEnv ? env : "local") as EnvName;
+    return Boolean(requiredByEnv[key]);
   }
 
   // -------------------------

@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_phone_bill",
+    "version": "1.0.0",
+    "description": "Entity schema for every_phone_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_phone_bill"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    { "id": "subscriber_name", "type": "string", "required": true, "description": "Subscriber full name.", "section": "subscriber_profile", "evidence": {"minCitations": 1, "anchors": ["subscriber", "titular"], "disallowInference": true, "preferredSources": ["subscriber_profile"]} },
+    { "id": "subscriber_id", "type": "string", "required": false, "description": "Subscriber account id.", "section": "subscriber_profile", "evidence": {"minCitations": 1, "anchors": ["account", "id", "cliente"], "disallowInference": true, "preferredSources": ["subscriber_profile"]} },
+    { "id": "mobile_number", "type": "string", "required": true, "description": "Primary phone number.", "section": "subscriber_profile", "evidence": {"minCitations": 1, "anchors": ["phone", "mobile", "msisdn"], "disallowInference": true, "preferredSources": ["subscriber_profile"]} },
+    { "id": "billing_period_start", "type": "date", "required": true, "description": "Billing period start.", "section": "billing_period", "evidence": {"minCitations": 1, "anchors": ["period start", "from", "de"], "disallowInference": true, "preferredSources": ["billing_period"]} },
+    { "id": "billing_period_end", "type": "date", "required": true, "description": "Billing period end.", "section": "billing_period", "evidence": {"minCitations": 1, "anchors": ["period end", "to", "ate"], "disallowInference": true, "preferredSources": ["billing_period"]} },
+    { "id": "plan_name", "type": "string", "required": false, "description": "Mobile plan name.", "section": "plan_and_features", "evidence": {"minCitations": 1, "anchors": ["plan", "plan name"], "disallowInference": false, "preferredSources": ["plan_and_features"]} },
+    { "id": "minutes_used", "type": "number", "required": false, "description": "Voice minutes used.", "section": "line_usage", "evidence": {"minCitations": 1, "anchors": ["minutes", "voz"], "disallowInference": false, "preferredSources": ["line_usage"]} },
+    { "id": "sms_used", "type": "number", "required": false, "description": "SMS usage.", "section": "line_usage", "evidence": {"minCitations": 1, "anchors": ["sms", "text"], "disallowInference": false, "preferredSources": ["line_usage"]} },
+    { "id": "data_used_gb", "type": "number", "required": false, "description": "Data usage in gigabytes.", "section": "line_usage", "evidence": {"minCitations": 1, "anchors": ["data", "mb", "gb", "gb used"], "disallowInference": false, "preferredSources": ["line_usage"]} },
+    { "id": "subtotal_amount", "type": "currency", "required": false, "description": "Subtotal before taxes.", "section": "charges_and_fees", "evidence": {"minCitations": 1, "anchors": ["subtotal", "subtotal amount"], "disallowInference": true, "preferredSources": ["charges_and_fees"]} },
+    { "id": "taxes_amount", "type": "currency", "required": false, "description": "Total taxes.", "section": "taxes", "evidence": {"minCitations": 1, "anchors": ["tax", "impostos"], "disallowInference": true, "preferredSources": ["taxes"]} },
+    { "id": "total_due", "type": "currency", "required": true, "description": "Total amount due.", "section": "totals_and_due", "evidence": {"minCitations": 1, "anchors": ["total", "total due", "amount due"], "disallowInference": true, "preferredSources": ["totals_and_due"]} },
+    { "id": "due_date", "type": "date", "required": true, "description": "Bill due date.", "section": "totals_and_due", "evidence": {"minCitations": 1, "anchors": ["due date", "vencimento"], "disallowInference": true, "preferredSources": ["totals_and_due"]} },
+    { "id": "payment_method", "type": "string", "required": false, "description": "Preferred payment method.", "section": "payment_info", "evidence": {"minCitations": 0, "anchors": ["payment", "method"], "disallowInference": false, "preferredSources": ["payment_info"]} }
+  ]
+}

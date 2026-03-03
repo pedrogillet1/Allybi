@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_disclaimer_policy",
-    "version": "1.0.0",
-    "description": "Disclaimer templates for finance domain — required legal and professional disclaimers.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Finance disclaimers and legal posture templates.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,53 +15,603 @@
   "domain": "finance",
   "disclaimers": [
     {
-      "id": "fin_disc_001_not_financial_advice",
+      "id": "fin_disc_advice",
       "trigger": "always",
       "severity": "info",
       "position": "footer",
       "text": {
-        "en": "This analysis is based on the uploaded document(s) and does not constitute financial, investment, or tax advice. Consult a qualified professional before making decisions.",
-        "pt": "Esta análise é baseada no(s) documento(s) enviado(s) e não constitui consultoria financeira, de investimento ou tributária. Consulte um profissional qualificado antes de tomar decisões."
+        "en": "This is financial analysis support and does not constitute investment, legal, or tax advice.",
+        "pt": "Esta é uma análise financeira e não constitui assessoria de investimento, jurídica ou tributária."
       }
     },
     {
-      "id": "fin_disc_002_unaudited_warning",
+      "id": "fin_disc_unaudited",
       "trigger": "source_is_unaudited",
       "severity": "warning",
       "position": "inline",
       "text": {
-        "en": "Note: The source data is unaudited and may be subject to revision.",
-        "pt": "Nota: Os dados de origem não são auditados e podem estar sujeitos a revisão."
+        "en": "Figures may be unaudited and subject to future revision.",
+        "pt": "Os valores podem ser não auditados e sujeitos a revisão futura."
       }
     },
     {
-      "id": "fin_disc_003_forward_looking",
+      "id": "fin_disc_forward",
       "trigger": "contains_forecast_or_projection",
       "severity": "warning",
       "position": "inline",
       "text": {
-        "en": "This includes forward-looking statements or projections that involve uncertainty and may differ materially from actual results.",
-        "pt": "Isto inclui declarações prospectivas ou projeções que envolvem incertezas e podem diferir materialmente dos resultados reais."
+        "en": "Forward-looking statements involve uncertainty and may diverge from results.",
+        "pt": "As projeções envolvem incerteza e podem divergir dos resultados reais."
       }
     },
     {
-      "id": "fin_disc_004_non_gaap",
+      "id": "fin_disc_gap",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Not all figures were independently validated with complete table headers.",
+        "pt": "Nem todos os valores foram validados com cabeçalhos de tabela completos."
+      }
+    },
+    {
+      "id": "fin_disc_non_gaap",
       "trigger": "contains_non_gaap_metric",
       "severity": "info",
       "position": "inline",
       "text": {
-        "en": "Non-GAAP metrics are presented as reported by the company and may not be comparable across entities.",
-        "pt": "Métricas não-GAAP são apresentadas conforme reportado pela empresa e podem não ser comparáveis entre entidades."
+        "en": "Non-GAAP metrics may not be fully comparable across entities.",
+        "pt": "Métricas não-GAAP podem não ser totalmente comparáveis entre entidades."
       }
     },
     {
-      "id": "fin_disc_005_stale_data",
-      "trigger": "data_older_than_12_months",
-      "severity": "warning",
+      "id": "fin_disc_extra_001",
+      "trigger": "always",
+      "severity": "info",
       "position": "inline",
       "text": {
-        "en": "Caution: Some figures may be outdated. Verify against the most recent filings.",
-        "pt": "Atenção: Alguns valores podem estar desatualizados. Verifique com os relatórios mais recentes."
+        "en": "Financial reasoning for segment 1: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 1: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_002",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 2: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 2: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_003",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 3: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 3: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_004",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 4: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 4: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_005",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 5: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 5: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_006",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 6: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 6: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_007",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 7: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 7: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_008",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 8: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 8: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_009",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 9: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 9: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_010",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 10: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 10: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_011",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 11: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 11: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_012",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 12: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 12: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_013",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 13: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 13: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_014",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 14: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 14: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_015",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 15: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 15: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_016",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 16: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 16: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_017",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 17: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 17: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_018",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 18: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 18: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_019",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 19: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 19: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_020",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 20: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 20: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_021",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 21: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 21: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_022",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 22: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 22: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_023",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 23: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 23: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_024",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 24: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 24: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_025",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 25: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 25: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_026",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 26: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 26: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_027",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 27: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 27: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_028",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 28: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 28: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_029",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 29: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 29: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_030",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 30: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 30: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_031",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 31: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 31: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_032",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 32: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 32: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_033",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 33: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 33: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_034",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 34: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 34: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_035",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 35: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 35: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_036",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 36: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 36: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_037",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 37: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 37: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_038",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 38: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 38: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_039",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 39: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 39: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_040",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 40: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 40: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_041",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 41: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 41: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_042",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 42: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 42: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_043",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 43: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 43: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_044",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 44: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 44: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_045",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 45: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 45: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_046",
+      "trigger": "always",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 46: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 46: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_047",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 47: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 47: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_048",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 48: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 48: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_049",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 49: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 49: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_050",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 50: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 50: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_051",
+      "trigger": "always",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 51: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 51: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_052",
+      "trigger": "source_is_unaudited",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 52: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 52: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_053",
+      "trigger": "contains_forecast_or_projection",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 53: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 53: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_054",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "footer",
+      "text": {
+        "en": "Financial reasoning for segment 54: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 54: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
+      }
+    },
+    {
+      "id": "fin_disc_extra_055",
+      "trigger": "insufficient_evidence",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Financial reasoning for segment 55: confirm assumptions and verify currency-unit-period mappings before action.",
+        "pt": "Raciocínio financeiro para segmento 55: confirme premissas e valide combinação de moeda/unidade/periodo antes de agir."
       }
     }
   ]

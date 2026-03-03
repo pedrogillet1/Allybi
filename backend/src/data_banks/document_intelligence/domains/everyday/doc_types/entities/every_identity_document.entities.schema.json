@@ -1,0 +1,269 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_identity_document",
+    "version": "1.0.0",
+    "description": "Entity schema for every_identity_document.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_identity_document"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "document_type",
+      "type": "string",
+      "required": true,
+      "description": "Type of identity document.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["passport", "identity", "driver license", "rg", "id", "document type"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "document_number",
+      "type": "string",
+      "required": true,
+      "description": "Raw document identifier.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["document number", "id number", "documento", "numero", "numero do documento"],
+        "disallowInference": true,
+        "preferredSources": ["identity_fields"]
+      }
+    },
+    {
+      "id": "document_number_redacted",
+      "type": "string",
+      "required": false,
+      "description": "Redacted/masked document number for safe output.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["redacted id", "masked", "xxxx", "redacted number"],
+        "disallowInference": true,
+        "preferredSources": ["security_features", "verification"]
+      }
+    },
+    {
+      "id": "full_name",
+      "type": "string",
+      "required": true,
+      "description": "Full legal name.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["name", "nome", "full name", "nome completo"],
+        "disallowInference": true,
+        "preferredSources": ["identity_fields", "issuer_and_validity"]
+      }
+    },
+    {
+      "id": "full_name_redacted",
+      "type": "string",
+      "required": false,
+      "description": "Masked full name for safe exposure.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["redacted name", "masked name", "initials only"],
+        "disallowInference": true,
+        "preferredSources": ["verification", "security_features"]
+      }
+    },
+    {
+      "id": "date_of_birth",
+      "type": "date",
+      "required": true,
+      "description": "Date of birth.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["date of birth", "nascimento", "born", "birth date"],
+        "disallowInference": true,
+        "preferredSources": ["identity_fields"]
+      }
+    },
+    {
+      "id": "sex",
+      "type": "enum",
+      "values": ["male", "female", "non_binary", "unknown"],
+      "required": false,
+      "description": "Biological sex, if present.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["sex", "gender", "sexo"],
+        "disallowInference": false,
+        "preferredSources": ["identity_fields"]
+      }
+    },
+    {
+      "id": "nationality",
+      "type": "string",
+      "required": false,
+      "description": "Document holder nationality.",
+      "section": "identity_fields",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["nationality", "nacionalidade", "national", "country"],
+        "disallowInference": false,
+        "preferredSources": ["identity_fields", "issue"]
+      }
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Date issued.",
+      "section": "issuer_and_validity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["issue date", "issued", "emissao", "data de emissao"],
+        "disallowInference": true,
+        "preferredSources": ["issuer_and_validity"]
+      }
+    },
+    {
+      "id": "expiry_date",
+      "type": "date",
+      "required": true,
+      "description": "Expiry date.",
+      "section": "issuer_and_validity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["expiry", "valid until", "validade", "vencimento", "expira"],
+        "disallowInference": true,
+        "preferredSources": ["issuer_and_validity"]
+      }
+    },
+    {
+      "id": "issuing_authority",
+      "type": "string",
+      "required": false,
+      "description": "Issuing authority.",
+      "section": "issuer_and_validity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["authority", "issuing authority", "orgao expedidor"],
+        "disallowInference": false,
+        "preferredSources": ["issuer_and_validity"]
+      }
+    },
+    {
+      "id": "issuing_country",
+      "type": "string",
+      "required": false,
+      "description": "Issuing country.",
+      "section": "issuer_and_validity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["country", "issued by", "pais", "country of issue"],
+        "disallowInference": false,
+        "preferredSources": ["issuer_and_validity"]
+      }
+    },
+    {
+      "id": "photo_present",
+      "type": "enum",
+      "values": ["yes", "no", "unknown"],
+      "required": false,
+      "description": "Photo field presence.",
+      "section": "photograph_or_biometric",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["photo", "picture", "foto", "image"],
+        "disallowInference": false,
+        "preferredSources": ["photograph_or_biometric"]
+      }
+    },
+    {
+      "id": "biometric_present",
+      "type": "enum",
+      "values": ["yes", "no", "unknown"],
+      "required": false,
+      "description": "Biometric markers present.",
+      "section": "photograph_or_biometric",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["biometric", "fingerprint", "irises", "biometria"],
+        "disallowInference": false,
+        "preferredSources": ["photograph_or_biometric", "security_features"]
+      }
+    },
+    {
+      "id": "mrz_line",
+      "type": "string",
+      "required": false,
+      "description": "Machine Readable Zone line when visible.",
+      "section": "photograph_or_biometric",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["mrz", "machine readable", "linha mrz"],
+        "disallowInference": true,
+        "preferredSources": ["photograph_or_biometric"]
+      }
+    },
+    {
+      "id": "security_features",
+      "type": "array_string",
+      "required": false,
+      "description": "Observed physical security features.",
+      "section": "security_features",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["hologram", "watermark", "uv", "barcode", "security"],
+        "disallowInference": false,
+        "preferredSources": ["security_features"]
+      }
+    },
+    {
+      "id": "signature_present",
+      "type": "enum",
+      "values": ["yes", "no", "unknown"],
+      "required": false,
+      "description": "Whether signature field exists.",
+      "section": "signatures_or_validity",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["signature", "assinatura", "assinado"],
+        "disallowInference": false,
+        "preferredSources": ["signatures_or_validity"]
+      }
+    },
+    {
+      "id": "verification_status",
+      "type": "enum",
+      "values": ["valid", "expired", "revoked", "suspended", "unknown"],
+      "required": false,
+      "description": "Observed validity state from document data.",
+      "section": "verification",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["valid", "expired", "revoked", "revogado", "status"],
+        "disallowInference": true,
+        "preferredSources": ["verification", "issuer_and_validity"]
+      }
+    },
+    {
+      "id": "safety_notes",
+      "type": "string",
+      "required": false,
+      "description": "Internal safety/restriction notes.",
+      "section": "restrictions_or_notes",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["notes", "alerts", "restrictions", "limitations"],
+        "disallowInference": false,
+        "preferredSources": ["restrictions_or_notes"]
+      }
+    }
+  ]
+}

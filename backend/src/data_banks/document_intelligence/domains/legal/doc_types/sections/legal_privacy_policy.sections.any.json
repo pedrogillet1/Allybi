@@ -11,7 +11,7 @@
   "config": {
     "enabled": true,
     "domain": "legal",
-    "docType": "privacy_policy"
+    "docType": "legal_privacy_policy"
   },
   "sections": [
     {

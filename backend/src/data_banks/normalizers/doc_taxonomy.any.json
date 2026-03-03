@@ -1,0 +1,101 @@
+{
+  "_meta": {
+    "id": "doc_taxonomy",
+    "version": "2.1.0",
+    "description": "Canonical document-type taxonomy used by legacy identity banks for finance, legal, medical, accounting and everyday documents.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "canonicalDomains": [
+      "finance",
+      "legal",
+      "medical",
+      "accounting",
+      "everyday"
+    ],
+    "domainAliases": {
+      "everyday": "everyday"
+    }
+  },
+  "clusters": {
+    "finance": [
+      "fin_bank_statement",
+      "fin_cash_flow_statement",
+      "fin_budget",
+      "fin_invoice",
+      "fin_tax_return",
+      "fin_expense_report",
+      "fin_earnings_release",
+      "fin_cap_table",
+      "fin_loan_schedule",
+      "fin_investor_presentation",
+      "fin_cash_flow_forecast",
+      "fin_management_report"
+    ],
+    "legal": [
+      "legal_service_agreement",
+      "legal_purchase_agreement",
+      "legal_nda",
+      "legal_terms_of_service",
+      "legal_privacy_policy",
+      "legal_employment_agreement",
+      "legal_lease_agreement",
+      "legal_board_resolution",
+      "legal_settlement_agreement",
+      "legal_patent_license",
+      "legal_complaint",
+      "legal_demand_letter"
+    ],
+    "medical": [
+      "med_lab_results",
+      "med_lab_order",
+      "med_radiology_report",
+      "med_pathology_report",
+      "med_prescription",
+      "med_discharge_summary",
+      "med_medication_list",
+      "med_allergy_list",
+      "med_vitals_sheet",
+      "med_immunization_record",
+      "med_insurance_claim",
+      "med_referral_letter",
+      "med_medical_imaging_report"
+    ],
+    "accounting": [
+      "acct_chart_of_accounts",
+      "acct_general_ledger",
+      "acct_trial_balance",
+      "acct_journal_entry",
+      "acct_cash_flow_statement",
+      "acct_income_statement",
+      "acct_balance_sheet",
+      "acct_inventory_valuation",
+      "acct_audit_workpaper",
+      "acct_pbc_list",
+      "acct_controls_narrative",
+      "acct_management_rep_letter"
+    ],
+    "everyday": [
+      "everyday_phone_bill",
+      "everyday_internet_bill",
+      "everyday_electricity_bill",
+      "everyday_water_bill",
+      "everyday_gas_bill",
+      "everyday_rental_receipt",
+      "everyday_grocery_receipt",
+      "everyday_restaurant_receipt",
+      "everyday_gas_station_receipt",
+      "everyday_parking_ticket",
+      "everyday_shopping_receipt",
+      "everyday_toll_bill",
+      "everyday_ticket_receipt",
+      "everyday_transport_receipt",
+      "everyday_subscription_receipt",
+      "everyday_cash_receipt"
+    ]
+  }
+}

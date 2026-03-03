@@ -19,9 +19,11 @@
       "entity": "period",
       "anchors": [
         "period",
-        "reporting period",
+        "reconciliation period",
         "competencia",
-        "periodo"
+        "periodo",
+        "from",
+        "to"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -45,7 +47,7 @@
         "currency",
         "moeda",
         "curr",
-        "reporting currency"
+        "presentation currency"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -79,8 +81,21 @@
       "entity": "reconciliationDate",
       "anchors": [
         "reconciliation date",
-        "reconciliation Date",
-        "reconciliationDate"
+        "as of",
+        "date",
+        "reconciled on"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_bankAccount",
+      "entity": "bankAccount",
+      "anchors": [
+        "bank account",
+        "conta bancaria",
+        "account number",
+        "acct no"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -91,20 +106,20 @@
       "anchors": [
         "book balance",
         "book Balance",
-        "bookBalance"
+        "saldo contabil"
       ],
-      "location": "header",
-      "extractionMethod": "heading_proximity"
+      "location": "reconciliation_summary",
+      "extractionMethod": "table_row_match"
     },
     {
       "id": "hint_bankBalance",
       "entity": "bankBalance",
       "anchors": [
         "bank balance",
-        "bank Balance",
-        "bankBalance"
+        "statement balance",
+        "saldo banco"
       ],
-      "location": "summary",
+      "location": "reconciliation_summary",
       "extractionMethod": "table_row_match"
     },
     {
@@ -112,10 +127,78 @@
       "entity": "adjustedBookBalance",
       "anchors": [
         "adjusted book balance",
-        "adjusted Book Balance",
-        "adjustedBookBalance"
+        "adjusted books",
+        "book balance adjusted"
       ],
-      "location": "summary",
+      "location": "reconciliation_summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_adjustedBankBalance",
+      "entity": "adjustedBankBalance",
+      "anchors": [
+        "adjusted bank balance",
+        "adjusted statement",
+        "bank balance adjusted"
+      ],
+      "location": "reconciliation_summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_unreconciledDifference",
+      "entity": "unreconciledDifference",
+      "anchors": [
+        "difference",
+        "unreconciled",
+        "out of balance"
+      ],
+      "location": "reconciliation_summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_outstandingDeposits",
+      "entity": "outstandingDeposits",
+      "anchors": [
+        "outstanding deposits",
+        "deposits in transit",
+        "pendente"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_outstandingCheques",
+      "entity": "outstandingCheques",
+      "anchors": [
+        "outstanding cheques",
+        "outstanding checks",
+        "cheques em aberto"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_line_order_shift",
+      "entity": "bookBalance",
+      "anchors": [
+        "book balance",
+        "bank balance",
+        "row order",
+        "column shift"
+      ],
+      "location": "reconciliation_summary",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_messy_export",
+      "entity": "adjustedBankBalance",
+      "anchors": [
+        "excel export",
+        "csv export",
+        "messy export",
+        "split table"
+      ],
+      "location": "line_items",
       "extractionMethod": "table_row_match"
     }
   ]

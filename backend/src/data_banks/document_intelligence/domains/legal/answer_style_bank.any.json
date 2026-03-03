@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "legal_answer_style_bank",
-    "version": "2.0.0",
-    "description": "Response style policy for legal domain outputs.",
+    "version": "2.2.0",
+    "description": "Legal answer style policy focused on clause-level evidence and bounded legal interpretation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,36 +15,36 @@
   "domain": "legal",
   "audienceProfiles": [
     {
-      "id": "specialist",
-      "tone": "precise",
+      "id": "legal_auditor",
+      "tone": "skeptical",
+      "defaultDepth": "audit_trail",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "legal_legal_ops",
+      "tone": "actionable",
       "defaultDepth": "detailed",
       "numberFormatting": "exact_with_decimals",
       "jargonLevel": "high"
     },
     {
-      "id": "analyst",
+      "id": "legal_manager",
       "tone": "analytical",
-      "defaultDepth": "detailed",
-      "numberFormatting": "exact_with_decimals",
-      "jargonLevel": "high"
-    },
-    {
-      "id": "manager",
-      "tone": "explanatory",
-      "defaultDepth": "summary",
+      "defaultDepth": "paragraph",
       "numberFormatting": "rounded_with_units",
       "jargonLevel": "medium"
     },
     {
-      "id": "operator",
-      "tone": "directive",
+      "id": "legal_executive",
+      "tone": "concise",
       "defaultDepth": "summary",
       "numberFormatting": "rounded_with_units",
-      "jargonLevel": "medium"
+      "jargonLevel": "low"
     },
     {
-      "id": "external",
-      "tone": "neutral",
+      "id": "legal_general",
+      "tone": "plain",
       "defaultDepth": "paragraph",
       "numberFormatting": "rounded_with_units",
       "jargonLevel": "low"
@@ -60,72 +60,98 @@
   ],
   "styleRules": [
     {
-      "id": "legal_style_001",
-      "rule": "State conclusions only after citing clause locations.",
+      "id": "legal_style_001_clause_first",
+      "rule": "Never state an obligation/limitation without placing the exact clause text (quote) and section/page location first.",
       "applies": [
         "extract",
-        "summarize",
         "compare",
-        "validate"
-      ]
-    },
-    {
-      "id": "legal_style_002",
-      "rule": "When language is ambiguous, explicitly mark uncertainty and ask a focused follow-up question.",
-      "applies": [
-        "summarize",
-        "advise",
-        "validate"
-      ]
-    },
-    {
-      "id": "legal_style_003",
-      "rule": "Separate binding obligations from operational recommendations.",
-      "applies": [
-        "advise",
-        "evaluate"
-      ]
-    },
-    {
-      "id": "legal_style_004",
-      "rule": "Prefer bullet-point obligation matrices for multi-party agreements.",
-      "applies": [
-        "extract",
-        "compare"
-      ]
-    },
-    {
-      "id": "legal_style_005",
-      "rule": "Do not claim legal compliance; report evidence and gaps.",
-      "applies": [
-        "evaluate",
         "validate",
-        "advise"
+        "summarize"
+      ],
+      "impact": "prevents hallucinated legal conclusions"
+    },
+    {
+      "id": "legal_style_002_separate_facts_vs_ops",
+      "rule": "Separate binding obligations from recommendations or operational actions, marking each section clearly.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "advise",
+        "summarize"
       ]
     },
     {
-      "id": "legal_style_006",
-      "rule": "Preserve exact monetary figures and dates as in source.",
+      "id": "legal_style_003_obligation_matrix",
+      "rule": "When multiple counterparties or clause owners exist, return obligations in matrix form with clause anchor per row.",
       "applies": [
         "extract",
+        "compare"
+      ]
+    },
+    {
+      "id": "legal_style_004_cross_reference_resolution",
+      "rule": "If clause references a definition, expansion, or exhibit, resolve and cite that source inline; do not infer missing definitions.",
+      "applies": [
+        "extract",
+        "locate",
         "compare",
         "validate"
       ]
     },
     {
-      "id": "legal_style_007",
-      "rule": "Differentiate policy statements from contractual commitments.",
+      "id": "legal_style_005_ambiguity_protocol",
+      "rule": "On ambiguity, output explicit uncertainty with fallback scope and ask one clarifying question if critical fields are missing.",
       "applies": [
+        "extract",
+        "evaluate",
+        "advise",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_style_006_no_unfounded_advice",
+      "rule": "No legal advice, no legal conclusion language, and no assumptions about enforceability beyond source text and legal basis.",
+      "applies": [
+        "advise",
+        "evaluate",
+        "extract"
+      ]
+    },
+    {
+      "id": "legal_style_007_dated_outputs",
+      "rule": "Every timeline or deadline answer must include effective/trigger date and clause location.",
+      "applies": [
+        "extract",
+        "monitor",
+        "evaluate",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_style_008_exception_visibility",
+      "rule": "When exceptions/ carveouts/survival language appears, make that explicit as an impact block rather than flattening it away.",
+      "applies": [
+        "extract",
         "summarize",
+        "validate"
+      ]
+    },
+    {
+      "id": "legal_style_009_currency_risk_language",
+      "rule": "Financial/penalty values must preserve exact currency and precision from source, including cap/limit unit qualifiers.",
+      "applies": [
+        "extract",
+        "evaluate",
         "compare"
       ]
     },
     {
-      "id": "legal_style_008",
-      "rule": "Use concise risk labels: low/medium/high with rationale.",
+      "id": "legal_style_010_citation_density",
+      "rule": "For high-risk outputs (termination, liability, governing law), provide at least three clause citations when source has multiple sections.",
       "applies": [
         "evaluate",
-        "advise",
+        "compare",
+        "validate",
         "monitor"
       ]
     }

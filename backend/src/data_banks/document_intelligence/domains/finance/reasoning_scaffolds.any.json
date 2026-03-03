@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_reasoning_scaffolds",
-    "version": "1.0.0",
-    "description": "Reasoning scaffolds for finance domain — structured thinking patterns for financial analysis.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Structured reasoning scaffolds for finance analysis workflows.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,81 +15,1044 @@
   "domain": "finance",
   "scaffolds": [
     {
-      "id": "fin_scaffold_001_ratio_analysis",
-      "name": "Financial Ratio Analysis",
-      "operators": ["calculate", "evaluate"],
+      "id": "fin_scaffold_ratio_valuation",
+      "name": "Valuation and Ratio Scaffold",
+      "operators": [
+        "calculate",
+        "evaluate"
+      ],
       "steps": [
-        "Identify the ratio requested and its standard formula",
-        "Locate numerator and denominator values in the document with exact citations",
-        "Verify both values are from the same period and same accounting basis",
-        "Compute the ratio showing the formula with actual numbers",
-        "Compare against industry benchmarks or prior periods if available",
-        "State whether the ratio indicates strength, weakness, or neutrality"
+        "Identify metric family and accounting basis",
+        "Resolve period and currency context",
+        "Locate numerator and denominator from table headers",
+        "Run formula with explicit units",
+        "Cross-check against peers or historical bands",
+        "Output interpretation with confidence and caveats"
       ]
     },
     {
-      "id": "fin_scaffold_002_variance_analysis",
-      "name": "Budget vs. Actual Variance",
-      "operators": ["compare", "evaluate"],
+      "id": "fin_scaffold_variance",
+      "name": "Variance and Trend Scaffold",
+      "operators": [
+        "compare",
+        "monitor"
+      ],
       "steps": [
-        "Identify the line item(s) and periods under comparison",
-        "Extract budget/plan figure and actual figure with citations",
-        "Compute absolute and percentage variance",
-        "Classify variance as favorable or unfavorable",
-        "Identify likely drivers from MD&A or notes if available",
-        "Assess materiality relative to the total budget"
+        "Extract comparable periods with same table header",
+        "Align units and scale",
+        "Compute abs + pct variance",
+        "Flag materiality threshold and drivers",
+        "Link drivers to disclosures",
+        "Provide concise recommendation"
       ]
     },
     {
-      "id": "fin_scaffold_003_covenant_check",
-      "name": "Debt Covenant Compliance Check",
-      "operators": ["validate", "monitor"],
+      "id": "fin_scaffold_covenant",
+      "name": "Covenant Validation Scaffold",
+      "operators": [
+        "validate",
+        "monitor"
+      ],
       "steps": [
-        "Locate the covenant definition (threshold, formula, measurement period)",
-        "Extract the required financial metrics with citations",
-        "Compute the covenant ratio or metric using the defined formula",
-        "Compare computed value against the covenant threshold",
-        "Determine compliance status: pass, fail, or within warning range",
-        "Note cure period or waiver provisions if covenant is breached"
+        "Read covenant clause and exact threshold",
+        "Collect source metrics and formulas",
+        "Harmonize period and basis",
+        "Compute test value",
+        "Determine pass/fail/warning",
+        "Report cure or waiver language if present"
       ]
     },
     {
-      "id": "fin_scaffold_004_trend_analysis",
-      "name": "Multi-Period Trend Analysis",
-      "operators": ["compare", "monitor", "summarize"],
+      "id": "fin_scaffold_cash",
+      "name": "Cash Management Scaffold",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate"
+      ],
       "steps": [
-        "Identify the metric and all available periods",
-        "Extract values for each period with citations",
-        "Compute period-over-period changes (absolute and percentage)",
-        "Identify inflection points or significant changes",
-        "Correlate with known events (acquisitions, restructuring, market shifts)",
-        "Project direction if sufficient data points exist, with uncertainty qualifier"
+        "Identify period buckets and liquidity class",
+        "Capture opening cash and net change inputs",
+        "Reconcile by table sections",
+        "Check non-cash and FX effects",
+        "Compute runway or remaining runway",
+        "Explain risks of concentration"
       ]
     },
     {
-      "id": "fin_scaffold_005_cap_table_analysis",
-      "name": "Cap Table Analysis",
-      "operators": ["extract", "calculate"],
+      "id": "fin_scaffold_budget",
+      "name": "Budget Integrity Scaffold",
+      "operators": [
+        "compare",
+        "validate"
+      ],
       "steps": [
-        "Identify all share classes and their terms",
-        "Extract outstanding shares, options, warrants for each class",
-        "Compute fully-diluted share count",
-        "Calculate ownership percentages per holder or class",
-        "Identify liquidation preferences and anti-dilution provisions",
-        "Note any vesting schedules or exercise price thresholds"
+        "Map budget and actual line items",
+        "Ensure same denominator units",
+        "Recalculate variances line-by-line",
+        "Sum by section to validate totals",
+        "Check commentary consistency",
+        "Produce exception list for high variance items"
       ]
     },
     {
-      "id": "fin_scaffold_006_earnings_analysis",
-      "name": "Earnings Release Analysis",
-      "operators": ["summarize", "evaluate", "compare"],
+      "id": "fin_scaffold_cap",
+      "name": "Cap Table Scaffold",
+      "operators": [
+        "extract",
+        "calculate"
+      ],
       "steps": [
-        "Extract headline figures: revenue, net income, EPS (GAAP and non-GAAP)",
-        "Compare against consensus estimates if referenced",
-        "Identify management guidance for next period",
-        "Note one-time items or adjustments",
-        "Summarize segment performance",
-        "Highlight management commentary on outlook"
+        "Identify holders and classes",
+        "Normalize share counts and options",
+        "Apply dilution from warrants/options",
+        "Calculate fully diluted basis",
+        "Compare by stakeholder",
+        "Validate against preferred terms"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_01",
+      "name": "Extended Finance Scaffold 1",
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 1 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_02",
+      "name": "Extended Finance Scaffold 2",
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 2 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_03",
+      "name": "Extended Finance Scaffold 3",
+      "operators": [
+        "extract",
+        "compare",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 3 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_04",
+      "name": "Extended Finance Scaffold 4",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Collect relevant 4 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_05",
+      "name": "Extended Finance Scaffold 5",
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 5 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_06",
+      "name": "Extended Finance Scaffold 6",
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 6 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_07",
+      "name": "Extended Finance Scaffold 7",
+      "operators": [
+        "extract",
+        "compare",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 7 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_08",
+      "name": "Extended Finance Scaffold 8",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Collect relevant 8 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_09",
+      "name": "Extended Finance Scaffold 9",
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 9 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_10",
+      "name": "Extended Finance Scaffold 10",
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 10 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_11",
+      "name": "Extended Finance Scaffold 11",
+      "operators": [
+        "extract",
+        "compare",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 11 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_12",
+      "name": "Extended Finance Scaffold 12",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Collect relevant 12 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_13",
+      "name": "Extended Finance Scaffold 13",
+      "operators": [
+        "compare",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 13 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_ext_14",
+      "name": "Extended Finance Scaffold 14",
+      "operators": [
+        "extract",
+        "evaluate",
+        "summarize"
+      ],
+      "steps": [
+        "Collect relevant 14 finance signal from statements",
+        "Confirm table/header context and period",
+        "Normalize currency and unit",
+        "Cross-check with alternate source if available",
+        "Provide concise insight with residual uncertainty"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_01",
+      "name": "Growth and Portfolio Scaffold 1",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #1 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_02",
+      "name": "Growth and Portfolio Scaffold 2",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #2 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_03",
+      "name": "Growth and Portfolio Scaffold 3",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #3 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_04",
+      "name": "Growth and Portfolio Scaffold 4",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #4 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_05",
+      "name": "Growth and Portfolio Scaffold 5",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #5 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_06",
+      "name": "Growth and Portfolio Scaffold 6",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #6 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_07",
+      "name": "Growth and Portfolio Scaffold 7",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #7 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_08",
+      "name": "Growth and Portfolio Scaffold 8",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #8 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_09",
+      "name": "Growth and Portfolio Scaffold 9",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #9 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_10",
+      "name": "Growth and Portfolio Scaffold 10",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #10 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_11",
+      "name": "Growth and Portfolio Scaffold 11",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #11 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_12",
+      "name": "Growth and Portfolio Scaffold 12",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #12 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_13",
+      "name": "Growth and Portfolio Scaffold 13",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #13 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_14",
+      "name": "Growth and Portfolio Scaffold 14",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #14 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_15",
+      "name": "Growth and Portfolio Scaffold 15",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #15 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_16",
+      "name": "Growth and Portfolio Scaffold 16",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #16 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_17",
+      "name": "Growth and Portfolio Scaffold 17",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #17 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_18",
+      "name": "Growth and Portfolio Scaffold 18",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #18 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_19",
+      "name": "Growth and Portfolio Scaffold 19",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #19 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_20",
+      "name": "Growth and Portfolio Scaffold 20",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #20 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_21",
+      "name": "Growth and Portfolio Scaffold 21",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #21 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_22",
+      "name": "Growth and Portfolio Scaffold 22",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #22 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_23",
+      "name": "Growth and Portfolio Scaffold 23",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #23 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_24",
+      "name": "Growth and Portfolio Scaffold 24",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #24 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_25",
+      "name": "Growth and Portfolio Scaffold 25",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #25 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_26",
+      "name": "Growth and Portfolio Scaffold 26",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #26 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_27",
+      "name": "Growth and Portfolio Scaffold 27",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #27 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_28",
+      "name": "Growth and Portfolio Scaffold 28",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #28 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_29",
+      "name": "Growth and Portfolio Scaffold 29",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #29 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_30",
+      "name": "Growth and Portfolio Scaffold 30",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #30 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_31",
+      "name": "Growth and Portfolio Scaffold 31",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #31 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_32",
+      "name": "Growth and Portfolio Scaffold 32",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #32 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_33",
+      "name": "Growth and Portfolio Scaffold 33",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #33 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_34",
+      "name": "Growth and Portfolio Scaffold 34",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #34 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_35",
+      "name": "Growth and Portfolio Scaffold 35",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #35 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_36",
+      "name": "Growth and Portfolio Scaffold 36",
+      "operators": [
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #36 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_37",
+      "name": "Growth and Portfolio Scaffold 37",
+      "operators": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #37 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_38",
+      "name": "Growth and Portfolio Scaffold 38",
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #38 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_39",
+      "name": "Growth and Portfolio Scaffold 39",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor"
+      ],
+      "steps": [
+        "Load growth signal #39 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
+      ]
+    },
+    {
+      "id": "fin_scaffold_growth_40",
+      "name": "Growth and Portfolio Scaffold 40",
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate"
+      ],
+      "steps": [
+        "Load growth signal #40 from finance tables",
+        "Validate table header context with period and unit",
+        "Normalize to same currency and granularity",
+        "Compute trend and volatility band",
+        "Attach disclosure context and confidence",
+        "Emit concise decision-ready summary"
       ]
     }
   ]

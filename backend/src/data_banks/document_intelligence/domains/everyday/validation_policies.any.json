@@ -1,0 +1,108 @@
+{
+  "_meta": {
+    "id": "di_everyday_validation_policies",
+    "version": "1.0.0",
+    "description": "Everyday-domain validation checks with conservative and user-facing safety signals.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "policies": [
+    {
+      "id": "every_val_001_totals_reconciliation",
+      "severity": "error",
+      "description": "Numeric subtotal/tax/fees should reconcile to total when all components are present.",
+      "applies": [
+        "extract",
+        "calculate",
+        "validate"
+      ],
+      "check": "subtotal_tax_total_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "every_val_002_period_validity",
+      "severity": "warning",
+      "description": "Billing and bank-style documents should include a valid period/billing window when numeric totals are requested.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "period_required_for_financial_claims",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "every_val_003_currency_consistency",
+      "severity": "error",
+      "description": "Single-currency documents must remain currency-consistent unless explicitly multi-currency.",
+      "applies": [
+        "extract",
+        "validate",
+        "compare"
+      ],
+      "check": "single_currency_consistency",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "every_val_004_identity_redaction_check",
+      "severity": "warning",
+      "description": "Identity docs should not leak full sensitive identifiers in user-facing outputs.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "pii_redaction_enforced",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "every_val_005_bank_running_balance",
+      "severity": "warning",
+      "description": "Bank statement outputs should validate balance continuity when both opening and movement rows are available.",
+      "applies": [
+        "validate",
+        "calculate"
+      ],
+      "check": "running_balance_continuity",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "every_val_006_receipt_tax_presence",
+      "severity": "info",
+      "description": "Retail receipts may omit tax details; mark as missing rather than infer.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "check": "tax_presence_soft_validation",
+      "failureAction": "SOFT_INFO"
+    },
+    {
+      "id": "every_val_007_identity_lifecycle",
+      "severity": "error",
+      "description": "Identity documents with expired dates should be flagged as not valid.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "identity_validity_window",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "every_val_008_lab_or_medical_lockout",
+      "severity": "error",
+      "description": "If medical-lab markers dominate with diagnosis or range fields, reduce everyday confidence and request reclassification.",
+      "applies": [
+        "validate",
+        "evaluate"
+      ],
+      "check": "medical_lockout_against_everyday",
+      "failureAction": "BLOCK_AND_FLAG"
+    }
+  ]
+}

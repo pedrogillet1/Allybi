@@ -1,23 +1,15 @@
 {
   "_meta": {
     "id": "di_unit_and_measurement_ontology",
-    "version": "1.0.0",
+    "bankId": "di_unit_and_measurement_ontology",
+    "version": "2.0.0",
     "owner": "document_intelligence",
     "languages": [
       "en",
       "pt"
     ],
-    "dependsOn": [
-      "di_domain_ontology"
-    ],
-    "usedBy": [
-      "di_metric_ontology"
-    ],
-    "tests": [
-      "SSOT_UNIT_001"
-    ],
-    "lastUpdated": "2026-02-27",
-    "description": "di_unit_and_measurement_ontology (document_intelligence) configuration bank."
+    "lastUpdated": "2026-03-03",
+    "description": "Expanded unit and measurement ontology with conversions and formatting constraints, including %/bps/mg/dL/mmHg."
   },
   "config": {
     "enabled": true
@@ -45,19 +37,7 @@
       "id": "mass",
       "label": "Mass",
       "labelPt": "Massa",
-      "baseUnit": "kilogram"
-    },
-    {
-      "id": "percentage",
-      "label": "Percentage",
-      "labelPt": "Percentual",
-      "baseUnit": "percent"
-    },
-    {
-      "id": "temperature_unit",
-      "label": "Temperature",
-      "labelPt": "Temperatura",
-      "baseUnit": "celsius"
+      "baseUnit": "gram"
     },
     {
       "id": "time",
@@ -66,116 +46,67 @@
       "baseUnit": "second"
     },
     {
+      "id": "percentage",
+      "label": "Percentage",
+      "labelPt": "Percentual",
+      "baseUnit": "percent"
+    },
+    {
+      "id": "temperature",
+      "label": "Temperature",
+      "labelPt": "Temperatura",
+      "baseUnit": "celsius"
+    },
+    {
+      "id": "pressure",
+      "label": "Pressure",
+      "labelPt": "Pressão",
+      "baseUnit": "pascal"
+    },
+    {
       "id": "volume",
       "label": "Volume",
       "labelPt": "Volume",
       "baseUnit": "liter"
+    },
+    {
+      "id": "concentration",
+      "label": "Concentration",
+      "labelPt": "Concentração",
+      "baseUnit": "gram_per_liter"
+    },
+    {
+      "id": "velocity",
+      "label": "Velocity",
+      "labelPt": "Velocidade",
+      "baseUnit": "m_per_s"
+    },
+    {
+      "id": "data",
+      "label": "Data",
+      "labelPt": "Dados",
+      "baseUnit": "byte"
+    },
+    {
+      "id": "energy",
+      "label": "Energy",
+      "labelPt": "Energia",
+      "baseUnit": "joule"
+    },
+    {
+      "id": "angle",
+      "label": "Angle",
+      "labelPt": "Ângulo",
+      "baseUnit": "degree"
+    },
+    {
+      "id": "unknown",
+      "label": "Unknown",
+      "labelPt": "Desconhecido",
+      "baseUnit": "unit"
     }
   ],
   "units": [
-    {
-      "id": "billion",
-      "familyId": "count",
-      "label": "Billion",
-      "labelPt": "Bilhão",
-      "symbol": "B",
-      "conversionToBase": 1000000000,
-      "patterns": {
-        "en": [
-          "billion",
-          "B",
-          "bn",
-          "billions"
-        ],
-        "pt": [
-          "bilhão",
-          "bilhões",
-          "bi"
-        ]
-      }
-    },
-    {
-      "id": "dozen",
-      "familyId": "count",
-      "label": "Dozen",
-      "labelPt": "Dúzia",
-      "symbol": "dz",
-      "conversionToBase": 12,
-      "patterns": {
-        "en": [
-          "dozen",
-          "dz",
-          "dozens"
-        ],
-        "pt": [
-          "dúzia",
-          "dúzias",
-          "dz"
-        ]
-      }
-    },
-    {
-      "id": "million",
-      "familyId": "count",
-      "label": "Million",
-      "labelPt": "Milhão",
-      "symbol": "M",
-      "conversionToBase": 1000000,
-      "patterns": {
-        "en": [
-          "million",
-          "M",
-          "mm",
-          "millions"
-        ],
-        "pt": [
-          "milhão",
-          "milhões",
-          "mi"
-        ]
-      }
-    },
-    {
-      "id": "thousand",
-      "familyId": "count",
-      "label": "Thousand",
-      "labelPt": "Milhar",
-      "symbol": "K",
-      "conversionToBase": 1000,
-      "patterns": {
-        "en": [
-          "thousand",
-          "K",
-          "thousands"
-        ],
-        "pt": [
-          "milhar",
-          "milhares",
-          "mil"
-        ]
-      }
-    },
-    {
-      "id": "unit",
-      "familyId": "count",
-      "label": "Unit",
-      "labelPt": "Unidade",
-      "symbol": "u",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "unit",
-          "units",
-          "ea",
-          "each"
-        ],
-        "pt": [
-          "unidade",
-          "unidades",
-          "un"
-        ]
-      }
-    },
     {
       "id": "aud",
       "familyId": "currency",
@@ -183,18 +114,105 @@
       "labelPt": "Dólar Australiano",
       "symbol": "A$",
       "isoCode": "AUD",
-      "conversionToBase": null,
+      "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 2,
+        "allowThousands": true,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false,
+        "symbolPosition": "prefix"
+      },
       "patterns": {
         "en": [
-          "A$",
-          "AUD",
-          "Australian dollars",
-          "AU dollars"
+          "australian dollar",
+          "a$"
         ],
         "pt": [
-          "AUD",
-          "dólares australianos",
-          "dólar australiano"
+          "dólar australiano",
+          "a$"
+        ]
+      }
+    },
+    {
+      "id": "bar",
+      "familyId": "pressure",
+      "label": "Bar",
+      "labelPt": "Bar",
+      "symbol": "bar",
+      "isoCode": null,
+      "conversionToBase": 100000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "bar",
+          "bar"
+        ],
+        "pt": [
+          "bar",
+          "bar"
+        ]
+      }
+    },
+    {
+      "id": "billion",
+      "familyId": "count",
+      "label": "Billion",
+      "labelPt": "Bilhão",
+      "symbol": "B",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "billion",
+          "b"
+        ],
+        "pt": [
+          "bilhão",
+          "b"
+        ]
+      }
+    },
+    {
+      "id": "bps",
+      "familyId": "percentage",
+      "label": "Basis Points",
+      "labelPt": "Pontos-base",
+      "symbol": "bps",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "basis points",
+          "bps"
+        ],
+        "pt": [
+          "pontos-base",
+          "bps"
         ]
       }
     },
@@ -205,19 +223,51 @@
       "labelPt": "Real Brasileiro",
       "symbol": "R$",
       "isoCode": "BRL",
-      "conversionToBase": null,
+      "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 2,
+        "allowThousands": true,
+        "thousandsSeparator": ".",
+        "decimalSeparator": ",",
+        "allowSign": false,
+        "symbolPosition": "prefix"
+      },
       "patterns": {
         "en": [
-          "R$",
-          "BRL",
-          "Brazilian reais",
-          "reais"
+          "brazilian real",
+          "r$"
         ],
         "pt": [
-          "R$",
-          "BRL",
-          "reais",
-          "real"
+          "real brasileiro",
+          "r$"
+        ]
+      }
+    },
+    {
+      "id": "byte",
+      "familyId": "data",
+      "label": "Byte",
+      "labelPt": "Byte",
+      "symbol": "B",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "byte",
+          "b"
+        ],
+        "pt": [
+          "byte",
+          "b"
         ]
       }
     },
@@ -228,40 +278,213 @@
       "labelPt": "Dólar Canadense",
       "symbol": "C$",
       "isoCode": "CAD",
-      "conversionToBase": null,
+      "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 2,
+        "allowThousands": true,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false,
+        "symbolPosition": "prefix"
+      },
       "patterns": {
         "en": [
-          "C$",
-          "CAD",
-          "Canadian dollars",
-          "CA dollars"
+          "canadian dollar",
+          "c$"
         ],
         "pt": [
-          "CAD",
-          "dólares canadenses",
-          "dólar canadense"
+          "dólar canadense",
+          "c$"
         ]
       }
     },
     {
-      "id": "chf",
-      "familyId": "currency",
-      "label": "Swiss Franc",
-      "labelPt": "Franco Suíço",
-      "symbol": "CHF",
-      "isoCode": "CHF",
-      "conversionToBase": null,
+      "id": "calorie",
+      "familyId": "energy",
+      "label": "Calorie",
+      "labelPt": "Caloria",
+      "symbol": "cal",
+      "isoCode": null,
+      "conversionToBase": 4.184,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
       "patterns": {
         "en": [
-          "CHF",
-          "Swiss francs",
-          "francs",
-          "Swiss franc"
+          "calorie",
+          "cal"
         ],
         "pt": [
-          "CHF",
-          "francos suíços",
-          "franco suíço"
+          "caloria",
+          "cal"
+        ]
+      }
+    },
+    {
+      "id": "celsius",
+      "familyId": "temperature",
+      "label": "Celsius",
+      "labelPt": "Celsius",
+      "symbol": "°C",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "celsius",
+          "°c"
+        ],
+        "pt": [
+          "celsius",
+          "°c"
+        ]
+      }
+    },
+    {
+      "id": "centimeter",
+      "familyId": "length",
+      "label": "Centimeter",
+      "labelPt": "Centímetro",
+      "symbol": "cm",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "centimeter",
+          "cm"
+        ],
+        "pt": [
+          "centímetro",
+          "cm"
+        ]
+      }
+    },
+    {
+      "id": "cubic_meter",
+      "familyId": "volume",
+      "label": "Cubic Meter",
+      "labelPt": "Metro Cúbico",
+      "symbol": "m³",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "cubic meter",
+          "m³"
+        ],
+        "pt": [
+          "metro cúbico",
+          "m³"
+        ]
+      }
+    },
+    {
+      "id": "day",
+      "familyId": "time",
+      "label": "Day",
+      "labelPt": "Dia",
+      "symbol": "d",
+      "isoCode": null,
+      "conversionToBase": 86400,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "day",
+          "d"
+        ],
+        "pt": [
+          "dia",
+          "d"
+        ]
+      }
+    },
+    {
+      "id": "degree",
+      "familyId": "angle",
+      "label": "Degree",
+      "labelPt": "Grau",
+      "symbol": "°",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "degree",
+          "°"
+        ],
+        "pt": [
+          "grau",
+          "°"
+        ]
+      }
+    },
+    {
+      "id": "dozen",
+      "familyId": "count",
+      "label": "Dozen",
+      "labelPt": "Dúzia",
+      "symbol": "dz",
+      "isoCode": null,
+      "conversionToBase": 12,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "dozen",
+          "dz"
+        ],
+        "pt": [
+          "dúzia",
+          "dz"
         ]
       }
     },
@@ -272,42 +495,376 @@
       "labelPt": "Euro",
       "symbol": "€",
       "isoCode": "EUR",
-      "conversionToBase": null,
+      "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 2,
+        "allowThousands": true,
+        "thousandsSeparator": ".",
+        "decimalSeparator": ",",
+        "allowSign": false,
+        "symbolPosition": "suffix"
+      },
       "patterns": {
         "en": [
-          "€",
-          "EUR",
-          "euros",
-          "euro"
+          "euro",
+          "€"
         ],
         "pt": [
-          "€",
-          "EUR",
-          "euros",
-          "euro"
+          "euro",
+          "€"
+        ]
+      }
+    },
+    {
+      "id": "fahrenheit",
+      "familyId": "temperature",
+      "label": "Fahrenheit",
+      "labelPt": "Fahrenheit",
+      "symbol": "°F",
+      "isoCode": null,
+      "conversionToBase": null,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "fahrenheit",
+          "°f"
+        ],
+        "pt": [
+          "fahrenheit",
+          "°f"
+        ]
+      }
+    },
+    {
+      "id": "foot",
+      "familyId": "length",
+      "label": "Foot",
+      "labelPt": "Pé",
+      "symbol": "ft",
+      "isoCode": null,
+      "conversionToBase": 0.3048,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "foot",
+          "ft"
+        ],
+        "pt": [
+          "pé",
+          "ft"
+        ]
+      }
+    },
+    {
+      "id": "gallon",
+      "familyId": "volume",
+      "label": "Gallon",
+      "labelPt": "Galão",
+      "symbol": "gal",
+      "isoCode": null,
+      "conversionToBase": 3.78541,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "gallon",
+          "gal"
+        ],
+        "pt": [
+          "galão",
+          "gal"
         ]
       }
     },
     {
       "id": "gbp",
       "familyId": "currency",
-      "label": "British Pound",
+      "label": "Pound Sterling",
       "labelPt": "Libra Esterlina",
       "symbol": "£",
       "isoCode": "GBP",
-      "conversionToBase": null,
+      "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 2,
+        "allowThousands": true,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false,
+        "symbolPosition": "prefix"
+      },
       "patterns": {
         "en": [
-          "£",
-          "GBP",
-          "pounds",
-          "British pounds"
+          "pound sterling",
+          "£"
         ],
         "pt": [
-          "£",
-          "GBP",
-          "libras esterlinas",
-          "libra"
+          "libra esterlina",
+          "£"
+        ]
+      }
+    },
+    {
+      "id": "gigabyte",
+      "familyId": "data",
+      "label": "Gigabyte",
+      "labelPt": "Gigabyte",
+      "symbol": "GB",
+      "isoCode": null,
+      "conversionToBase": 1073741824,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "gigabyte",
+          "gb"
+        ],
+        "pt": [
+          "gigabyte",
+          "gb"
+        ]
+      }
+    },
+    {
+      "id": "grad",
+      "familyId": "angle",
+      "label": "Grade",
+      "labelPt": "Grau Decimal",
+      "symbol": "grad",
+      "isoCode": null,
+      "conversionToBase": 0.9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "grade",
+          "grad"
+        ],
+        "pt": [
+          "grau decimal",
+          "grad"
+        ]
+      }
+    },
+    {
+      "id": "gram",
+      "familyId": "mass",
+      "label": "Gram",
+      "labelPt": "Grama",
+      "symbol": "g",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "gram",
+          "g"
+        ],
+        "pt": [
+          "grama",
+          "g"
+        ]
+      }
+    },
+    {
+      "id": "gram_per_liter",
+      "familyId": "concentration",
+      "label": "Gram per Liter",
+      "labelPt": "Grama por Litro",
+      "symbol": "g/L",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "gram per liter",
+          "g/l"
+        ],
+        "pt": [
+          "grama por litro",
+          "g/l"
+        ]
+      }
+    },
+    {
+      "id": "gross",
+      "familyId": "count",
+      "label": "Gross",
+      "labelPt": "Dúzia de Dúzias",
+      "symbol": "gr",
+      "isoCode": null,
+      "conversionToBase": 144,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "gross",
+          "gr"
+        ],
+        "pt": [
+          "dúzia de dúzias",
+          "gr"
+        ]
+      }
+    },
+    {
+      "id": "hour",
+      "familyId": "time",
+      "label": "Hour",
+      "labelPt": "Hora",
+      "symbol": "h",
+      "isoCode": null,
+      "conversionToBase": 3600,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "hour",
+          "h"
+        ],
+        "pt": [
+          "hora",
+          "h"
+        ]
+      }
+    },
+    {
+      "id": "hundred",
+      "familyId": "count",
+      "label": "Hundred",
+      "labelPt": "Cem",
+      "symbol": "100",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "hundred",
+          "100"
+        ],
+        "pt": [
+          "cem",
+          "100"
+        ]
+      }
+    },
+    {
+      "id": "inch",
+      "familyId": "length",
+      "label": "Inch",
+      "labelPt": "Polegada",
+      "symbol": "in",
+      "isoCode": null,
+      "conversionToBase": 0.0254,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "inch",
+          "in"
+        ],
+        "pt": [
+          "polegada",
+          "in"
+        ]
+      }
+    },
+    {
+      "id": "joule",
+      "familyId": "energy",
+      "label": "Joule",
+      "labelPt": "Joule",
+      "symbol": "J",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "joule",
+          "j"
+        ],
+        "pt": [
+          "joule",
+          "j"
         ]
       }
     },
@@ -315,22 +872,5346 @@
       "id": "jpy",
       "familyId": "currency",
       "label": "Japanese Yen",
-      "labelPt": "Iene Japonês",
+      "labelPt": "Iene",
       "symbol": "¥",
       "isoCode": "JPY",
-      "conversionToBase": null,
+      "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": true,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false,
+        "symbolPosition": "prefix"
+      },
       "patterns": {
         "en": [
-          "¥",
-          "JPY",
-          "yen",
-          "Japanese yen"
+          "japanese yen",
+          "¥"
         ],
         "pt": [
-          "¥",
-          "JPY",
-          "ienes",
-          "iene"
+          "iene",
+          "¥"
+        ]
+      }
+    },
+    {
+      "id": "kelvin",
+      "familyId": "temperature",
+      "label": "Kelvin",
+      "labelPt": "Kelvin",
+      "symbol": "K",
+      "isoCode": null,
+      "conversionToBase": null,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kelvin",
+          "k"
+        ],
+        "pt": [
+          "kelvin",
+          "k"
+        ]
+      }
+    },
+    {
+      "id": "kilobyte",
+      "familyId": "data",
+      "label": "Kilobyte",
+      "labelPt": "Kilobyte",
+      "symbol": "KB",
+      "isoCode": null,
+      "conversionToBase": 1024,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilobyte",
+          "kb"
+        ],
+        "pt": [
+          "kilobyte",
+          "kb"
+        ]
+      }
+    },
+    {
+      "id": "kilocalorie",
+      "familyId": "energy",
+      "label": "Kilocalorie",
+      "labelPt": "Quilocaloria",
+      "symbol": "kcal",
+      "isoCode": null,
+      "conversionToBase": 4184,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilocalorie",
+          "kcal"
+        ],
+        "pt": [
+          "quilocaloria",
+          "kcal"
+        ]
+      }
+    },
+    {
+      "id": "kilogram",
+      "familyId": "mass",
+      "label": "Kilogram",
+      "labelPt": "Quilograma",
+      "symbol": "kg",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilogram",
+          "kg"
+        ],
+        "pt": [
+          "quilograma",
+          "kg"
+        ]
+      }
+    },
+    {
+      "id": "kilojoule",
+      "familyId": "energy",
+      "label": "Kilojoule",
+      "labelPt": "Quilojoule",
+      "symbol": "kJ",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilojoule",
+          "kj"
+        ],
+        "pt": [
+          "quilojoule",
+          "kj"
+        ]
+      }
+    },
+    {
+      "id": "kilometer",
+      "familyId": "length",
+      "label": "Kilometer",
+      "labelPt": "Quilômetro",
+      "symbol": "km",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilometer",
+          "km"
+        ],
+        "pt": [
+          "quilômetro",
+          "km"
+        ]
+      }
+    },
+    {
+      "id": "kilopascal",
+      "familyId": "pressure",
+      "label": "Kilopascal",
+      "labelPt": "Quilopascal",
+      "symbol": "kPa",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilopascal",
+          "kpa"
+        ],
+        "pt": [
+          "quilopascal",
+          "kpa"
+        ]
+      }
+    },
+    {
+      "id": "km_per_h",
+      "familyId": "velocity",
+      "label": "Kilometer per Hour",
+      "labelPt": "Quilômetro por Hora",
+      "symbol": "km/h",
+      "isoCode": null,
+      "conversionToBase": 0.277778,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "kilometer per hour",
+          "km/h"
+        ],
+        "pt": [
+          "quilômetro por hora",
+          "km/h"
+        ]
+      }
+    },
+    {
+      "id": "liter",
+      "familyId": "volume",
+      "label": "Liter",
+      "labelPt": "Litro",
+      "symbol": "L",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "liter",
+          "l"
+        ],
+        "pt": [
+          "litro",
+          "l"
+        ]
+      }
+    },
+    {
+      "id": "m_per_s",
+      "familyId": "velocity",
+      "label": "Meter per Second",
+      "labelPt": "Metro por Segundo",
+      "symbol": "m/s",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "meter per second",
+          "m/s"
+        ],
+        "pt": [
+          "metro por segundo",
+          "m/s"
+        ]
+      }
+    },
+    {
+      "id": "megabyte",
+      "familyId": "data",
+      "label": "Megabyte",
+      "labelPt": "Megabyte",
+      "symbol": "MB",
+      "isoCode": null,
+      "conversionToBase": 1048576,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "megabyte",
+          "mb"
+        ],
+        "pt": [
+          "megabyte",
+          "mb"
+        ]
+      }
+    },
+    {
+      "id": "meter",
+      "familyId": "length",
+      "label": "Meter",
+      "labelPt": "Metro",
+      "symbol": "m",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "meter",
+          "m"
+        ],
+        "pt": [
+          "metro",
+          "m"
+        ]
+      }
+    },
+    {
+      "id": "microgram_per_ml",
+      "familyId": "concentration",
+      "label": "Microgram per Milliliter",
+      "labelPt": "Micrograma por Mililitro",
+      "symbol": "mcg/mL",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "microgram per milliliter",
+          "mcg/ml"
+        ],
+        "pt": [
+          "micrograma por mililitro",
+          "mcg/ml"
+        ]
+      }
+    },
+    {
+      "id": "mile",
+      "familyId": "length",
+      "label": "Mile",
+      "labelPt": "Milha",
+      "symbol": "mi",
+      "isoCode": null,
+      "conversionToBase": 1609.344,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "mile",
+          "mi"
+        ],
+        "pt": [
+          "milha",
+          "mi"
+        ]
+      }
+    },
+    {
+      "id": "milligram",
+      "familyId": "mass",
+      "label": "Milligram",
+      "labelPt": "Miligrama",
+      "symbol": "mg",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "milligram",
+          "mg"
+        ],
+        "pt": [
+          "miligrama",
+          "mg"
+        ]
+      }
+    },
+    {
+      "id": "milligram_per_deciliter",
+      "familyId": "concentration",
+      "label": "Milligram per Deciliter",
+      "labelPt": "Miligrama por Decilitro",
+      "symbol": "mg/dL",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "milligram per deciliter",
+          "mg/dl"
+        ],
+        "pt": [
+          "miligrama por decilitro",
+          "mg/dl"
+        ]
+      }
+    },
+    {
+      "id": "milliliter",
+      "familyId": "volume",
+      "label": "Milliliter",
+      "labelPt": "Mililitro",
+      "symbol": "mL",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "milliliter",
+          "ml"
+        ],
+        "pt": [
+          "mililitro",
+          "ml"
+        ]
+      }
+    },
+    {
+      "id": "millimeter",
+      "familyId": "length",
+      "label": "Millimeter",
+      "labelPt": "Milímetro",
+      "symbol": "mm",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "millimeter",
+          "mm"
+        ],
+        "pt": [
+          "milímetro",
+          "mm"
+        ]
+      }
+    },
+    {
+      "id": "millimole_per_liter",
+      "familyId": "concentration",
+      "label": "Millimole per Liter",
+      "labelPt": "Milimol por Litro",
+      "symbol": "mmol/L",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "millimole per liter",
+          "mmol/l"
+        ],
+        "pt": [
+          "milimol por litro",
+          "mmol/l"
+        ]
+      }
+    },
+    {
+      "id": "million",
+      "familyId": "count",
+      "label": "Million",
+      "labelPt": "Milhão",
+      "symbol": "M",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "million",
+          "m"
+        ],
+        "pt": [
+          "milhão",
+          "m"
+        ]
+      }
+    },
+    {
+      "id": "minute",
+      "familyId": "time",
+      "label": "Minute",
+      "labelPt": "Minuto",
+      "symbol": "min",
+      "isoCode": null,
+      "conversionToBase": 60,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "minute",
+          "min"
+        ],
+        "pt": [
+          "minuto",
+          "min"
+        ]
+      }
+    },
+    {
+      "id": "mmhg",
+      "familyId": "pressure",
+      "label": "Millimeter of Mercury",
+      "labelPt": "Milímetros de Mercúrio",
+      "symbol": "mmHg",
+      "isoCode": null,
+      "conversionToBase": 133.322,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "millimeter of mercury",
+          "mmhg"
+        ],
+        "pt": [
+          "milímetros de mercúrio",
+          "mmhg"
+        ]
+      }
+    },
+    {
+      "id": "month",
+      "familyId": "time",
+      "label": "Month",
+      "labelPt": "Mês",
+      "symbol": "mo",
+      "isoCode": null,
+      "conversionToBase": 2628000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "month",
+          "mo"
+        ],
+        "pt": [
+          "mês",
+          "mo"
+        ]
+      }
+    },
+    {
+      "id": "mph",
+      "familyId": "velocity",
+      "label": "Miles per Hour",
+      "labelPt": "Milha por Hora",
+      "symbol": "mph",
+      "isoCode": null,
+      "conversionToBase": 0.44704,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "miles per hour",
+          "mph"
+        ],
+        "pt": [
+          "milha por hora",
+          "mph"
+        ]
+      }
+    },
+    {
+      "id": "ounce",
+      "familyId": "mass",
+      "label": "Ounce",
+      "labelPt": "Onça",
+      "symbol": "oz",
+      "isoCode": null,
+      "conversionToBase": 28.3495,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "ounce",
+          "oz"
+        ],
+        "pt": [
+          "onça",
+          "oz"
+        ]
+      }
+    },
+    {
+      "id": "pascal",
+      "familyId": "pressure",
+      "label": "Pascal",
+      "labelPt": "Pascal",
+      "symbol": "Pa",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "pascal",
+          "pa"
+        ],
+        "pt": [
+          "pascal",
+          "pa"
+        ]
+      }
+    },
+    {
+      "id": "percent",
+      "familyId": "percentage",
+      "label": "Percent",
+      "labelPt": "Porcentagem",
+      "symbol": "%",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "percent",
+          "%"
+        ],
+        "pt": [
+          "porcentagem",
+          "%"
+        ]
+      }
+    },
+    {
+      "id": "percent_point",
+      "familyId": "percentage",
+      "label": "Percentage Point",
+      "labelPt": "Ponto Percentual",
+      "symbol": "pp",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "percentage point",
+          "pp"
+        ],
+        "pt": [
+          "ponto percentual",
+          "pp"
+        ]
+      }
+    },
+    {
+      "id": "pound",
+      "familyId": "mass",
+      "label": "Pound",
+      "labelPt": "Libra",
+      "symbol": "lb",
+      "isoCode": null,
+      "conversionToBase": 453.592,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "pound",
+          "lb"
+        ],
+        "pt": [
+          "libra",
+          "lb"
+        ]
+      }
+    },
+    {
+      "id": "radian",
+      "familyId": "angle",
+      "label": "Radian",
+      "labelPt": "Radiando",
+      "symbol": "rad",
+      "isoCode": null,
+      "conversionToBase": 57.2958,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "radian",
+          "rad"
+        ],
+        "pt": [
+          "radiando",
+          "rad"
+        ]
+      }
+    },
+    {
+      "id": "score",
+      "familyId": "count",
+      "label": "Score",
+      "labelPt": "Centena de Vinte",
+      "symbol": "score",
+      "isoCode": null,
+      "conversionToBase": 20,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "score",
+          "score"
+        ],
+        "pt": [
+          "centena de vinte",
+          "score"
+        ]
+      }
+    },
+    {
+      "id": "second",
+      "familyId": "time",
+      "label": "Second",
+      "labelPt": "Segundo",
+      "symbol": "s",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "second",
+          "s"
+        ],
+        "pt": [
+          "segundo",
+          "s"
+        ]
+      }
+    },
+    {
+      "id": "thousand",
+      "familyId": "count",
+      "label": "Thousand",
+      "labelPt": "Mil",
+      "symbol": "K",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "thousand",
+          "k"
+        ],
+        "pt": [
+          "mil",
+          "k"
+        ]
+      }
+    },
+    {
+      "id": "ton",
+      "familyId": "mass",
+      "label": "Metric Ton",
+      "labelPt": "Tonelada Métrica",
+      "symbol": "t",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "metric ton",
+          "t"
+        ],
+        "pt": [
+          "tonelada métrica",
+          "t"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_angle_059",
+      "familyId": "angle",
+      "label": "Centi Angle",
+      "labelPt": "Centi Angle",
+      "symbol": "centiang",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_angle_059",
+          "centi_angle"
+        ],
+        "pt": [
+          "u_centi_angle_059",
+          "centi_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_concentration_070",
+      "familyId": "concentration",
+      "label": "Centi Concentration",
+      "labelPt": "Centi Concentration",
+      "symbol": "centicon",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_concentration_070",
+          "centi_concentration"
+        ],
+        "pt": [
+          "u_centi_concentration_070",
+          "centi_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_count_136",
+      "familyId": "count",
+      "label": "Centi Count",
+      "labelPt": "Centi Count",
+      "symbol": "centicou",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_count_136",
+          "centi_count"
+        ],
+        "pt": [
+          "u_centi_count_136",
+          "centi_count"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_currency_092",
+      "familyId": "currency",
+      "label": "Centi Currency",
+      "labelPt": "Centi Currency",
+      "symbol": "centicur",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_currency_092",
+          "centi_currency"
+        ],
+        "pt": [
+          "u_centi_currency_092",
+          "centi_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_data_147",
+      "familyId": "data",
+      "label": "Centi Data",
+      "labelPt": "Centi Data",
+      "symbol": "centidat",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_data_147",
+          "centi_data"
+        ],
+        "pt": [
+          "u_centi_data_147",
+          "centi_data"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_energy_103",
+      "familyId": "energy",
+      "label": "Centi Energy",
+      "labelPt": "Centi Energy",
+      "symbol": "centiene",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_energy_103",
+          "centi_energy"
+        ],
+        "pt": [
+          "u_centi_energy_103",
+          "centi_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_length_048",
+      "familyId": "length",
+      "label": "Centi Length",
+      "labelPt": "Centi Length",
+      "symbol": "centilen",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_length_048",
+          "centi_length"
+        ],
+        "pt": [
+          "u_centi_length_048",
+          "centi_length"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_mass_004",
+      "familyId": "mass",
+      "label": "Centi Mass",
+      "labelPt": "Centi Mass",
+      "symbol": "centimas",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_mass_004",
+          "centi_mass"
+        ],
+        "pt": [
+          "u_centi_mass_004",
+          "centi_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_percentage_081",
+      "familyId": "percentage",
+      "label": "Centi Percentage",
+      "labelPt": "Centi Percentage",
+      "symbol": "centiper",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_percentage_081",
+          "centi_percentage"
+        ],
+        "pt": [
+          "u_centi_percentage_081",
+          "centi_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_pressure_158",
+      "familyId": "pressure",
+      "label": "Centi Pressure",
+      "labelPt": "Centi Pressure",
+      "symbol": "centipre",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_pressure_158",
+          "centi_pressure"
+        ],
+        "pt": [
+          "u_centi_pressure_158",
+          "centi_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_temperature_037",
+      "familyId": "temperature",
+      "label": "Centi Temperature",
+      "labelPt": "Centi Temperature",
+      "symbol": "centitem",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_temperature_037",
+          "centi_temperature"
+        ],
+        "pt": [
+          "u_centi_temperature_037",
+          "centi_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_time_125",
+      "familyId": "time",
+      "label": "Centi Time",
+      "labelPt": "Centi Time",
+      "symbol": "centitim",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_time_125",
+          "centi_time"
+        ],
+        "pt": [
+          "u_centi_time_125",
+          "centi_time"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_unknown_015",
+      "familyId": "unknown",
+      "label": "Centi Unknown",
+      "labelPt": "Centi Unknown",
+      "symbol": "centiunk",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_unknown_015",
+          "centi_unknown"
+        ],
+        "pt": [
+          "u_centi_unknown_015",
+          "centi_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_velocity_026",
+      "familyId": "velocity",
+      "label": "Centi Velocity",
+      "labelPt": "Centi Velocity",
+      "symbol": "centivel",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_velocity_026",
+          "centi_velocity"
+        ],
+        "pt": [
+          "u_centi_velocity_026",
+          "centi_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_centi_volume_114",
+      "familyId": "volume",
+      "label": "Centi Volume",
+      "labelPt": "Centi Volume",
+      "symbol": "centivol",
+      "isoCode": null,
+      "conversionToBase": 0.01,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_centi_volume_114",
+          "centi_volume"
+        ],
+        "pt": [
+          "u_centi_volume_114",
+          "centi_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_angle_149",
+      "familyId": "angle",
+      "label": "Deca Angle",
+      "labelPt": "Deca Angle",
+      "symbol": "decaang",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_angle_149",
+          "deca_angle"
+        ],
+        "pt": [
+          "u_deca_angle_149",
+          "deca_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_concentration_160",
+      "familyId": "concentration",
+      "label": "Deca Concentration",
+      "labelPt": "Deca Concentration",
+      "symbol": "decacon",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_concentration_160",
+          "deca_concentration"
+        ],
+        "pt": [
+          "u_deca_concentration_160",
+          "deca_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_count_061",
+      "familyId": "count",
+      "label": "Deca Count",
+      "labelPt": "Deca Count",
+      "symbol": "decacou",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_count_061",
+          "deca_count"
+        ],
+        "pt": [
+          "u_deca_count_061",
+          "deca_count"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_currency_017",
+      "familyId": "currency",
+      "label": "Deca Currency",
+      "labelPt": "Deca Currency",
+      "symbol": "decacur",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_currency_017",
+          "deca_currency"
+        ],
+        "pt": [
+          "u_deca_currency_017",
+          "deca_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_data_072",
+      "familyId": "data",
+      "label": "Deca Data",
+      "labelPt": "Deca Data",
+      "symbol": "decadat",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_data_072",
+          "deca_data"
+        ],
+        "pt": [
+          "u_deca_data_072",
+          "deca_data"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_energy_028",
+      "familyId": "energy",
+      "label": "Deca Energy",
+      "labelPt": "Deca Energy",
+      "symbol": "decaene",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_energy_028",
+          "deca_energy"
+        ],
+        "pt": [
+          "u_deca_energy_028",
+          "deca_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_length_138",
+      "familyId": "length",
+      "label": "Deca Length",
+      "labelPt": "Deca Length",
+      "symbol": "decalen",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_length_138",
+          "deca_length"
+        ],
+        "pt": [
+          "u_deca_length_138",
+          "deca_length"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_mass_094",
+      "familyId": "mass",
+      "label": "Deca Mass",
+      "labelPt": "Deca Mass",
+      "symbol": "decamas",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_mass_094",
+          "deca_mass"
+        ],
+        "pt": [
+          "u_deca_mass_094",
+          "deca_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_percentage_006",
+      "familyId": "percentage",
+      "label": "Deca Percentage",
+      "labelPt": "Deca Percentage",
+      "symbol": "decaper",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_percentage_006",
+          "deca_percentage"
+        ],
+        "pt": [
+          "u_deca_percentage_006",
+          "deca_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_pressure_083",
+      "familyId": "pressure",
+      "label": "Deca Pressure",
+      "labelPt": "Deca Pressure",
+      "symbol": "decapre",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_pressure_083",
+          "deca_pressure"
+        ],
+        "pt": [
+          "u_deca_pressure_083",
+          "deca_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_temperature_127",
+      "familyId": "temperature",
+      "label": "Deca Temperature",
+      "labelPt": "Deca Temperature",
+      "symbol": "decatem",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_temperature_127",
+          "deca_temperature"
+        ],
+        "pt": [
+          "u_deca_temperature_127",
+          "deca_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_time_050",
+      "familyId": "time",
+      "label": "Deca Time",
+      "labelPt": "Deca Time",
+      "symbol": "decatim",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_time_050",
+          "deca_time"
+        ],
+        "pt": [
+          "u_deca_time_050",
+          "deca_time"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_unknown_105",
+      "familyId": "unknown",
+      "label": "Deca Unknown",
+      "labelPt": "Deca Unknown",
+      "symbol": "decaunk",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_unknown_105",
+          "deca_unknown"
+        ],
+        "pt": [
+          "u_deca_unknown_105",
+          "deca_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_velocity_116",
+      "familyId": "velocity",
+      "label": "Deca Velocity",
+      "labelPt": "Deca Velocity",
+      "symbol": "decavel",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_velocity_116",
+          "deca_velocity"
+        ],
+        "pt": [
+          "u_deca_velocity_116",
+          "deca_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_deca_volume_039",
+      "familyId": "volume",
+      "label": "Deca Volume",
+      "labelPt": "Deca Volume",
+      "symbol": "decavol",
+      "isoCode": null,
+      "conversionToBase": 10,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deca_volume_039",
+          "deca_volume"
+        ],
+        "pt": [
+          "u_deca_volume_039",
+          "deca_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_angle_104",
+      "familyId": "angle",
+      "label": "Deci Angle",
+      "labelPt": "Deci Angle",
+      "symbol": "deciang",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_angle_104",
+          "deci_angle"
+        ],
+        "pt": [
+          "u_deci_angle_104",
+          "deci_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_concentration_115",
+      "familyId": "concentration",
+      "label": "Deci Concentration",
+      "labelPt": "Deci Concentration",
+      "symbol": "decicon",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_concentration_115",
+          "deci_concentration"
+        ],
+        "pt": [
+          "u_deci_concentration_115",
+          "deci_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_count_016",
+      "familyId": "count",
+      "label": "Deci Count",
+      "labelPt": "Deci Count",
+      "symbol": "decicou",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_count_016",
+          "deci_count"
+        ],
+        "pt": [
+          "u_deci_count_016",
+          "deci_count"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_currency_137",
+      "familyId": "currency",
+      "label": "Deci Currency",
+      "labelPt": "Deci Currency",
+      "symbol": "decicur",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_currency_137",
+          "deci_currency"
+        ],
+        "pt": [
+          "u_deci_currency_137",
+          "deci_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_data_027",
+      "familyId": "data",
+      "label": "Deci Data",
+      "labelPt": "Deci Data",
+      "symbol": "decidat",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_data_027",
+          "deci_data"
+        ],
+        "pt": [
+          "u_deci_data_027",
+          "deci_data"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_energy_148",
+      "familyId": "energy",
+      "label": "Deci Energy",
+      "labelPt": "Deci Energy",
+      "symbol": "deciene",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_energy_148",
+          "deci_energy"
+        ],
+        "pt": [
+          "u_deci_energy_148",
+          "deci_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_length_093",
+      "familyId": "length",
+      "label": "Deci Length",
+      "labelPt": "Deci Length",
+      "symbol": "decilen",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_length_093",
+          "deci_length"
+        ],
+        "pt": [
+          "u_deci_length_093",
+          "deci_length"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_mass_049",
+      "familyId": "mass",
+      "label": "Deci Mass",
+      "labelPt": "Deci Mass",
+      "symbol": "decimas",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_mass_049",
+          "deci_mass"
+        ],
+        "pt": [
+          "u_deci_mass_049",
+          "deci_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_percentage_126",
+      "familyId": "percentage",
+      "label": "Deci Percentage",
+      "labelPt": "Deci Percentage",
+      "symbol": "deciper",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_percentage_126",
+          "deci_percentage"
+        ],
+        "pt": [
+          "u_deci_percentage_126",
+          "deci_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_pressure_038",
+      "familyId": "pressure",
+      "label": "Deci Pressure",
+      "labelPt": "Deci Pressure",
+      "symbol": "decipre",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_pressure_038",
+          "deci_pressure"
+        ],
+        "pt": [
+          "u_deci_pressure_038",
+          "deci_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_temperature_082",
+      "familyId": "temperature",
+      "label": "Deci Temperature",
+      "labelPt": "Deci Temperature",
+      "symbol": "decitem",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_temperature_082",
+          "deci_temperature"
+        ],
+        "pt": [
+          "u_deci_temperature_082",
+          "deci_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_time_005",
+      "familyId": "time",
+      "label": "Deci Time",
+      "labelPt": "Deci Time",
+      "symbol": "decitim",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_time_005",
+          "deci_time"
+        ],
+        "pt": [
+          "u_deci_time_005",
+          "deci_time"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_unknown_060",
+      "familyId": "unknown",
+      "label": "Deci Unknown",
+      "labelPt": "Deci Unknown",
+      "symbol": "deciunk",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_unknown_060",
+          "deci_unknown"
+        ],
+        "pt": [
+          "u_deci_unknown_060",
+          "deci_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_velocity_071",
+      "familyId": "velocity",
+      "label": "Deci Velocity",
+      "labelPt": "Deci Velocity",
+      "symbol": "decivel",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_velocity_071",
+          "deci_velocity"
+        ],
+        "pt": [
+          "u_deci_velocity_071",
+          "deci_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_deci_volume_159",
+      "familyId": "volume",
+      "label": "Deci Volume",
+      "labelPt": "Deci Volume",
+      "symbol": "decivol",
+      "isoCode": null,
+      "conversionToBase": 0.1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_deci_volume_159",
+          "deci_volume"
+        ],
+        "pt": [
+          "u_deci_volume_159",
+          "deci_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_concentration_010",
+      "familyId": "concentration",
+      "label": "Giga Concentration",
+      "labelPt": "Giga Concentration",
+      "symbol": "gigacon",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_concentration_010",
+          "giga_concentration"
+        ],
+        "pt": [
+          "u_giga_concentration_010",
+          "giga_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_count_076",
+      "familyId": "count",
+      "label": "Giga Count",
+      "labelPt": "Giga Count",
+      "symbol": "gigacou",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_count_076",
+          "giga_count"
+        ],
+        "pt": [
+          "u_giga_count_076",
+          "giga_count"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_currency_032",
+      "familyId": "currency",
+      "label": "Giga Currency",
+      "labelPt": "Giga Currency",
+      "symbol": "gigacur",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_currency_032",
+          "giga_currency"
+        ],
+        "pt": [
+          "u_giga_currency_032",
+          "giga_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_data_087",
+      "familyId": "data",
+      "label": "Giga Data",
+      "labelPt": "Giga Data",
+      "symbol": "gigadat",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_data_087",
+          "giga_data"
+        ],
+        "pt": [
+          "u_giga_data_087",
+          "giga_data"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_energy_043",
+      "familyId": "energy",
+      "label": "Giga Energy",
+      "labelPt": "Giga Energy",
+      "symbol": "gigaene",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_energy_043",
+          "giga_energy"
+        ],
+        "pt": [
+          "u_giga_energy_043",
+          "giga_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_length_153",
+      "familyId": "length",
+      "label": "Giga Length",
+      "labelPt": "Giga Length",
+      "symbol": "gigalen",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_length_153",
+          "giga_length"
+        ],
+        "pt": [
+          "u_giga_length_153",
+          "giga_length"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_mass_109",
+      "familyId": "mass",
+      "label": "Giga Mass",
+      "labelPt": "Giga Mass",
+      "symbol": "gigamas",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_mass_109",
+          "giga_mass"
+        ],
+        "pt": [
+          "u_giga_mass_109",
+          "giga_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_percentage_021",
+      "familyId": "percentage",
+      "label": "Giga Percentage",
+      "labelPt": "Giga Percentage",
+      "symbol": "gigaper",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_percentage_021",
+          "giga_percentage"
+        ],
+        "pt": [
+          "u_giga_percentage_021",
+          "giga_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_pressure_098",
+      "familyId": "pressure",
+      "label": "Giga Pressure",
+      "labelPt": "Giga Pressure",
+      "symbol": "gigapre",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_pressure_098",
+          "giga_pressure"
+        ],
+        "pt": [
+          "u_giga_pressure_098",
+          "giga_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_temperature_142",
+      "familyId": "temperature",
+      "label": "Giga Temperature",
+      "labelPt": "Giga Temperature",
+      "symbol": "gigatem",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_temperature_142",
+          "giga_temperature"
+        ],
+        "pt": [
+          "u_giga_temperature_142",
+          "giga_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_time_065",
+      "familyId": "time",
+      "label": "Giga Time",
+      "labelPt": "Giga Time",
+      "symbol": "gigatim",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_time_065",
+          "giga_time"
+        ],
+        "pt": [
+          "u_giga_time_065",
+          "giga_time"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_unknown_120",
+      "familyId": "unknown",
+      "label": "Giga Unknown",
+      "labelPt": "Giga Unknown",
+      "symbol": "gigaunk",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_unknown_120",
+          "giga_unknown"
+        ],
+        "pt": [
+          "u_giga_unknown_120",
+          "giga_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_velocity_131",
+      "familyId": "velocity",
+      "label": "Giga Velocity",
+      "labelPt": "Giga Velocity",
+      "symbol": "gigavel",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_velocity_131",
+          "giga_velocity"
+        ],
+        "pt": [
+          "u_giga_velocity_131",
+          "giga_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_giga_volume_054",
+      "familyId": "volume",
+      "label": "Giga Volume",
+      "labelPt": "Giga Volume",
+      "symbol": "gigavol",
+      "isoCode": null,
+      "conversionToBase": 1000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_giga_volume_054",
+          "giga_volume"
+        ],
+        "pt": [
+          "u_giga_volume_054",
+          "giga_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_angle_029",
+      "familyId": "angle",
+      "label": "Hecto Angle",
+      "labelPt": "Hecto Angle",
+      "symbol": "hectoang",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_angle_029",
+          "hecto_angle"
+        ],
+        "pt": [
+          "u_hecto_angle_029",
+          "hecto_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_concentration_040",
+      "familyId": "concentration",
+      "label": "Hecto Concentration",
+      "labelPt": "Hecto Concentration",
+      "symbol": "hectocon",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_concentration_040",
+          "hecto_concentration"
+        ],
+        "pt": [
+          "u_hecto_concentration_040",
+          "hecto_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_count_106",
+      "familyId": "count",
+      "label": "Hecto Count",
+      "labelPt": "Hecto Count",
+      "symbol": "hectocou",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_count_106",
+          "hecto_count"
+        ],
+        "pt": [
+          "u_hecto_count_106",
+          "hecto_count"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_currency_062",
+      "familyId": "currency",
+      "label": "Hecto Currency",
+      "labelPt": "Hecto Currency",
+      "symbol": "hectocur",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_currency_062",
+          "hecto_currency"
+        ],
+        "pt": [
+          "u_hecto_currency_062",
+          "hecto_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_data_117",
+      "familyId": "data",
+      "label": "Hecto Data",
+      "labelPt": "Hecto Data",
+      "symbol": "hectodat",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_data_117",
+          "hecto_data"
+        ],
+        "pt": [
+          "u_hecto_data_117",
+          "hecto_data"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_energy_073",
+      "familyId": "energy",
+      "label": "Hecto Energy",
+      "labelPt": "Hecto Energy",
+      "symbol": "hectoene",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_energy_073",
+          "hecto_energy"
+        ],
+        "pt": [
+          "u_hecto_energy_073",
+          "hecto_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_length_018",
+      "familyId": "length",
+      "label": "Hecto Length",
+      "labelPt": "Hecto Length",
+      "symbol": "hectolen",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_length_018",
+          "hecto_length"
+        ],
+        "pt": [
+          "u_hecto_length_018",
+          "hecto_length"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_mass_139",
+      "familyId": "mass",
+      "label": "Hecto Mass",
+      "labelPt": "Hecto Mass",
+      "symbol": "hectomas",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_mass_139",
+          "hecto_mass"
+        ],
+        "pt": [
+          "u_hecto_mass_139",
+          "hecto_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_percentage_051",
+      "familyId": "percentage",
+      "label": "Hecto Percentage",
+      "labelPt": "Hecto Percentage",
+      "symbol": "hectoper",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_percentage_051",
+          "hecto_percentage"
+        ],
+        "pt": [
+          "u_hecto_percentage_051",
+          "hecto_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_pressure_128",
+      "familyId": "pressure",
+      "label": "Hecto Pressure",
+      "labelPt": "Hecto Pressure",
+      "symbol": "hectopre",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_pressure_128",
+          "hecto_pressure"
+        ],
+        "pt": [
+          "u_hecto_pressure_128",
+          "hecto_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_temperature_007",
+      "familyId": "temperature",
+      "label": "Hecto Temperature",
+      "labelPt": "Hecto Temperature",
+      "symbol": "hectotem",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_temperature_007",
+          "hecto_temperature"
+        ],
+        "pt": [
+          "u_hecto_temperature_007",
+          "hecto_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_time_095",
+      "familyId": "time",
+      "label": "Hecto Time",
+      "labelPt": "Hecto Time",
+      "symbol": "hectotim",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_time_095",
+          "hecto_time"
+        ],
+        "pt": [
+          "u_hecto_time_095",
+          "hecto_time"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_unknown_150",
+      "familyId": "unknown",
+      "label": "Hecto Unknown",
+      "labelPt": "Hecto Unknown",
+      "symbol": "hectounk",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_unknown_150",
+          "hecto_unknown"
+        ],
+        "pt": [
+          "u_hecto_unknown_150",
+          "hecto_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_velocity_161",
+      "familyId": "velocity",
+      "label": "Hecto Velocity",
+      "labelPt": "Hecto Velocity",
+      "symbol": "hectovel",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_velocity_161",
+          "hecto_velocity"
+        ],
+        "pt": [
+          "u_hecto_velocity_161",
+          "hecto_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_hecto_volume_084",
+      "familyId": "volume",
+      "label": "Hecto Volume",
+      "labelPt": "Hecto Volume",
+      "symbol": "hectovol",
+      "isoCode": null,
+      "conversionToBase": 100,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_hecto_volume_084",
+          "hecto_volume"
+        ],
+        "pt": [
+          "u_hecto_volume_084",
+          "hecto_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_angle_074",
+      "familyId": "angle",
+      "label": "Kilo Angle",
+      "labelPt": "Kilo Angle",
+      "symbol": "kiloang",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_angle_074",
+          "kilo_angle"
+        ],
+        "pt": [
+          "u_kilo_angle_074",
+          "kilo_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_concentration_085",
+      "familyId": "concentration",
+      "label": "Kilo Concentration",
+      "labelPt": "Kilo Concentration",
+      "symbol": "kilocon",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_concentration_085",
+          "kilo_concentration"
+        ],
+        "pt": [
+          "u_kilo_concentration_085",
+          "kilo_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_count_151",
+      "familyId": "count",
+      "label": "Kilo Count",
+      "labelPt": "Kilo Count",
+      "symbol": "kilocou",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_count_151",
+          "kilo_count"
+        ],
+        "pt": [
+          "u_kilo_count_151",
+          "kilo_count"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_currency_107",
+      "familyId": "currency",
+      "label": "Kilo Currency",
+      "labelPt": "Kilo Currency",
+      "symbol": "kilocur",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_currency_107",
+          "kilo_currency"
+        ],
+        "pt": [
+          "u_kilo_currency_107",
+          "kilo_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_data_162",
+      "familyId": "data",
+      "label": "Kilo Data",
+      "labelPt": "Kilo Data",
+      "symbol": "kilodat",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_data_162",
+          "kilo_data"
+        ],
+        "pt": [
+          "u_kilo_data_162",
+          "kilo_data"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_energy_118",
+      "familyId": "energy",
+      "label": "Kilo Energy",
+      "labelPt": "Kilo Energy",
+      "symbol": "kiloene",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_energy_118",
+          "kilo_energy"
+        ],
+        "pt": [
+          "u_kilo_energy_118",
+          "kilo_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_length_063",
+      "familyId": "length",
+      "label": "Kilo Length",
+      "labelPt": "Kilo Length",
+      "symbol": "kilolen",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_length_063",
+          "kilo_length"
+        ],
+        "pt": [
+          "u_kilo_length_063",
+          "kilo_length"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_mass_019",
+      "familyId": "mass",
+      "label": "Kilo Mass",
+      "labelPt": "Kilo Mass",
+      "symbol": "kilomas",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_mass_019",
+          "kilo_mass"
+        ],
+        "pt": [
+          "u_kilo_mass_019",
+          "kilo_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_percentage_096",
+      "familyId": "percentage",
+      "label": "Kilo Percentage",
+      "labelPt": "Kilo Percentage",
+      "symbol": "kiloper",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_percentage_096",
+          "kilo_percentage"
+        ],
+        "pt": [
+          "u_kilo_percentage_096",
+          "kilo_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_pressure_008",
+      "familyId": "pressure",
+      "label": "Kilo Pressure",
+      "labelPt": "Kilo Pressure",
+      "symbol": "kilopre",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_pressure_008",
+          "kilo_pressure"
+        ],
+        "pt": [
+          "u_kilo_pressure_008",
+          "kilo_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_temperature_052",
+      "familyId": "temperature",
+      "label": "Kilo Temperature",
+      "labelPt": "Kilo Temperature",
+      "symbol": "kilotem",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_temperature_052",
+          "kilo_temperature"
+        ],
+        "pt": [
+          "u_kilo_temperature_052",
+          "kilo_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_time_140",
+      "familyId": "time",
+      "label": "Kilo Time",
+      "labelPt": "Kilo Time",
+      "symbol": "kilotim",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_time_140",
+          "kilo_time"
+        ],
+        "pt": [
+          "u_kilo_time_140",
+          "kilo_time"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_unknown_030",
+      "familyId": "unknown",
+      "label": "Kilo Unknown",
+      "labelPt": "Kilo Unknown",
+      "symbol": "kilounk",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_unknown_030",
+          "kilo_unknown"
+        ],
+        "pt": [
+          "u_kilo_unknown_030",
+          "kilo_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_velocity_041",
+      "familyId": "velocity",
+      "label": "Kilo Velocity",
+      "labelPt": "Kilo Velocity",
+      "symbol": "kilovel",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_velocity_041",
+          "kilo_velocity"
+        ],
+        "pt": [
+          "u_kilo_velocity_041",
+          "kilo_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_kilo_volume_129",
+      "familyId": "volume",
+      "label": "Kilo Volume",
+      "labelPt": "Kilo Volume",
+      "symbol": "kilovol",
+      "isoCode": null,
+      "conversionToBase": 1000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_kilo_volume_129",
+          "kilo_volume"
+        ],
+        "pt": [
+          "u_kilo_volume_129",
+          "kilo_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_angle_119",
+      "familyId": "angle",
+      "label": "Mega Angle",
+      "labelPt": "Mega Angle",
+      "symbol": "megaang",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_angle_119",
+          "mega_angle"
+        ],
+        "pt": [
+          "u_mega_angle_119",
+          "mega_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_concentration_130",
+      "familyId": "concentration",
+      "label": "Mega Concentration",
+      "labelPt": "Mega Concentration",
+      "symbol": "megacon",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_concentration_130",
+          "mega_concentration"
+        ],
+        "pt": [
+          "u_mega_concentration_130",
+          "mega_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_count_031",
+      "familyId": "count",
+      "label": "Mega Count",
+      "labelPt": "Mega Count",
+      "symbol": "megacou",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_count_031",
+          "mega_count"
+        ],
+        "pt": [
+          "u_mega_count_031",
+          "mega_count"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_currency_152",
+      "familyId": "currency",
+      "label": "Mega Currency",
+      "labelPt": "Mega Currency",
+      "symbol": "megacur",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_currency_152",
+          "mega_currency"
+        ],
+        "pt": [
+          "u_mega_currency_152",
+          "mega_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_data_042",
+      "familyId": "data",
+      "label": "Mega Data",
+      "labelPt": "Mega Data",
+      "symbol": "megadat",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_data_042",
+          "mega_data"
+        ],
+        "pt": [
+          "u_mega_data_042",
+          "mega_data"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_length_108",
+      "familyId": "length",
+      "label": "Mega Length",
+      "labelPt": "Mega Length",
+      "symbol": "megalen",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_length_108",
+          "mega_length"
+        ],
+        "pt": [
+          "u_mega_length_108",
+          "mega_length"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_mass_064",
+      "familyId": "mass",
+      "label": "Mega Mass",
+      "labelPt": "Mega Mass",
+      "symbol": "megamas",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_mass_064",
+          "mega_mass"
+        ],
+        "pt": [
+          "u_mega_mass_064",
+          "mega_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_percentage_141",
+      "familyId": "percentage",
+      "label": "Mega Percentage",
+      "labelPt": "Mega Percentage",
+      "symbol": "megaper",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_percentage_141",
+          "mega_percentage"
+        ],
+        "pt": [
+          "u_mega_percentage_141",
+          "mega_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_pressure_053",
+      "familyId": "pressure",
+      "label": "Mega Pressure",
+      "labelPt": "Mega Pressure",
+      "symbol": "megapre",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_pressure_053",
+          "mega_pressure"
+        ],
+        "pt": [
+          "u_mega_pressure_053",
+          "mega_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_temperature_097",
+      "familyId": "temperature",
+      "label": "Mega Temperature",
+      "labelPt": "Mega Temperature",
+      "symbol": "megatem",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_temperature_097",
+          "mega_temperature"
+        ],
+        "pt": [
+          "u_mega_temperature_097",
+          "mega_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_time_020",
+      "familyId": "time",
+      "label": "Mega Time",
+      "labelPt": "Mega Time",
+      "symbol": "megatim",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_time_020",
+          "mega_time"
+        ],
+        "pt": [
+          "u_mega_time_020",
+          "mega_time"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_unknown_075",
+      "familyId": "unknown",
+      "label": "Mega Unknown",
+      "labelPt": "Mega Unknown",
+      "symbol": "megaunk",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_unknown_075",
+          "mega_unknown"
+        ],
+        "pt": [
+          "u_mega_unknown_075",
+          "mega_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_velocity_086",
+      "familyId": "velocity",
+      "label": "Mega Velocity",
+      "labelPt": "Mega Velocity",
+      "symbol": "megavel",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_velocity_086",
+          "mega_velocity"
+        ],
+        "pt": [
+          "u_mega_velocity_086",
+          "mega_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_mega_volume_009",
+      "familyId": "volume",
+      "label": "Mega Volume",
+      "labelPt": "Mega Volume",
+      "symbol": "megavol",
+      "isoCode": null,
+      "conversionToBase": 1000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_mega_volume_009",
+          "mega_volume"
+        ],
+        "pt": [
+          "u_mega_volume_009",
+          "mega_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_angle_134",
+      "familyId": "angle",
+      "label": "Micro Angle",
+      "labelPt": "Micro Angle",
+      "symbol": "microang",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_angle_134",
+          "micro_angle"
+        ],
+        "pt": [
+          "u_micro_angle_134",
+          "micro_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_concentration_145",
+      "familyId": "concentration",
+      "label": "Micro Concentration",
+      "labelPt": "Micro Concentration",
+      "symbol": "microcon",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_concentration_145",
+          "micro_concentration"
+        ],
+        "pt": [
+          "u_micro_concentration_145",
+          "micro_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_count_046",
+      "familyId": "count",
+      "label": "Micro Count",
+      "labelPt": "Micro Count",
+      "symbol": "microcou",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_count_046",
+          "micro_count"
+        ],
+        "pt": [
+          "u_micro_count_046",
+          "micro_count"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_currency_002",
+      "familyId": "currency",
+      "label": "Micro Currency",
+      "labelPt": "Micro Currency",
+      "symbol": "microcur",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_currency_002",
+          "micro_currency"
+        ],
+        "pt": [
+          "u_micro_currency_002",
+          "micro_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_data_057",
+      "familyId": "data",
+      "label": "Micro Data",
+      "labelPt": "Micro Data",
+      "symbol": "microdat",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_data_057",
+          "micro_data"
+        ],
+        "pt": [
+          "u_micro_data_057",
+          "micro_data"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_energy_013",
+      "familyId": "energy",
+      "label": "Micro Energy",
+      "labelPt": "Micro Energy",
+      "symbol": "microene",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_energy_013",
+          "micro_energy"
+        ],
+        "pt": [
+          "u_micro_energy_013",
+          "micro_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_length_123",
+      "familyId": "length",
+      "label": "Micro Length",
+      "labelPt": "Micro Length",
+      "symbol": "microlen",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_length_123",
+          "micro_length"
+        ],
+        "pt": [
+          "u_micro_length_123",
+          "micro_length"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_mass_079",
+      "familyId": "mass",
+      "label": "Micro Mass",
+      "labelPt": "Micro Mass",
+      "symbol": "micromas",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_mass_079",
+          "micro_mass"
+        ],
+        "pt": [
+          "u_micro_mass_079",
+          "micro_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_percentage_156",
+      "familyId": "percentage",
+      "label": "Micro Percentage",
+      "labelPt": "Micro Percentage",
+      "symbol": "microper",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_percentage_156",
+          "micro_percentage"
+        ],
+        "pt": [
+          "u_micro_percentage_156",
+          "micro_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_pressure_068",
+      "familyId": "pressure",
+      "label": "Micro Pressure",
+      "labelPt": "Micro Pressure",
+      "symbol": "micropre",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_pressure_068",
+          "micro_pressure"
+        ],
+        "pt": [
+          "u_micro_pressure_068",
+          "micro_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_temperature_112",
+      "familyId": "temperature",
+      "label": "Micro Temperature",
+      "labelPt": "Micro Temperature",
+      "symbol": "microtem",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_temperature_112",
+          "micro_temperature"
+        ],
+        "pt": [
+          "u_micro_temperature_112",
+          "micro_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_time_035",
+      "familyId": "time",
+      "label": "Micro Time",
+      "labelPt": "Micro Time",
+      "symbol": "microtim",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_time_035",
+          "micro_time"
+        ],
+        "pt": [
+          "u_micro_time_035",
+          "micro_time"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_unknown_090",
+      "familyId": "unknown",
+      "label": "Micro Unknown",
+      "labelPt": "Micro Unknown",
+      "symbol": "microunk",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_unknown_090",
+          "micro_unknown"
+        ],
+        "pt": [
+          "u_micro_unknown_090",
+          "micro_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_velocity_101",
+      "familyId": "velocity",
+      "label": "Micro Velocity",
+      "labelPt": "Micro Velocity",
+      "symbol": "microvel",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_velocity_101",
+          "micro_velocity"
+        ],
+        "pt": [
+          "u_micro_velocity_101",
+          "micro_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_micro_volume_024",
+      "familyId": "volume",
+      "label": "Micro Volume",
+      "labelPt": "Micro Volume",
+      "symbol": "microvol",
+      "isoCode": null,
+      "conversionToBase": 0.000001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_micro_volume_024",
+          "micro_volume"
+        ],
+        "pt": [
+          "u_micro_volume_024",
+          "micro_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_angle_014",
+      "familyId": "angle",
+      "label": "Milli Angle",
+      "labelPt": "Milli Angle",
+      "symbol": "milliang",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_angle_014",
+          "milli_angle"
+        ],
+        "pt": [
+          "u_milli_angle_014",
+          "milli_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_concentration_025",
+      "familyId": "concentration",
+      "label": "Milli Concentration",
+      "labelPt": "Milli Concentration",
+      "symbol": "millicon",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_concentration_025",
+          "milli_concentration"
+        ],
+        "pt": [
+          "u_milli_concentration_025",
+          "milli_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_count_091",
+      "familyId": "count",
+      "label": "Milli Count",
+      "labelPt": "Milli Count",
+      "symbol": "millicou",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_count_091",
+          "milli_count"
+        ],
+        "pt": [
+          "u_milli_count_091",
+          "milli_count"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_currency_047",
+      "familyId": "currency",
+      "label": "Milli Currency",
+      "labelPt": "Milli Currency",
+      "symbol": "millicur",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_currency_047",
+          "milli_currency"
+        ],
+        "pt": [
+          "u_milli_currency_047",
+          "milli_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_data_102",
+      "familyId": "data",
+      "label": "Milli Data",
+      "labelPt": "Milli Data",
+      "symbol": "millidat",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_data_102",
+          "milli_data"
+        ],
+        "pt": [
+          "u_milli_data_102",
+          "milli_data"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_energy_058",
+      "familyId": "energy",
+      "label": "Milli Energy",
+      "labelPt": "Milli Energy",
+      "symbol": "milliene",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_energy_058",
+          "milli_energy"
+        ],
+        "pt": [
+          "u_milli_energy_058",
+          "milli_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_length_003",
+      "familyId": "length",
+      "label": "Milli Length",
+      "labelPt": "Milli Length",
+      "symbol": "millilen",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_length_003",
+          "milli_length"
+        ],
+        "pt": [
+          "u_milli_length_003",
+          "milli_length"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_mass_124",
+      "familyId": "mass",
+      "label": "Milli Mass",
+      "labelPt": "Milli Mass",
+      "symbol": "millimas",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_mass_124",
+          "milli_mass"
+        ],
+        "pt": [
+          "u_milli_mass_124",
+          "milli_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_percentage_036",
+      "familyId": "percentage",
+      "label": "Milli Percentage",
+      "labelPt": "Milli Percentage",
+      "symbol": "milliper",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_percentage_036",
+          "milli_percentage"
+        ],
+        "pt": [
+          "u_milli_percentage_036",
+          "milli_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_pressure_113",
+      "familyId": "pressure",
+      "label": "Milli Pressure",
+      "labelPt": "Milli Pressure",
+      "symbol": "millipre",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_pressure_113",
+          "milli_pressure"
+        ],
+        "pt": [
+          "u_milli_pressure_113",
+          "milli_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_temperature_157",
+      "familyId": "temperature",
+      "label": "Milli Temperature",
+      "labelPt": "Milli Temperature",
+      "symbol": "millitem",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_temperature_157",
+          "milli_temperature"
+        ],
+        "pt": [
+          "u_milli_temperature_157",
+          "milli_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_time_080",
+      "familyId": "time",
+      "label": "Milli Time",
+      "labelPt": "Milli Time",
+      "symbol": "millitim",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_time_080",
+          "milli_time"
+        ],
+        "pt": [
+          "u_milli_time_080",
+          "milli_time"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_unknown_135",
+      "familyId": "unknown",
+      "label": "Milli Unknown",
+      "labelPt": "Milli Unknown",
+      "symbol": "milliunk",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_unknown_135",
+          "milli_unknown"
+        ],
+        "pt": [
+          "u_milli_unknown_135",
+          "milli_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_velocity_146",
+      "familyId": "velocity",
+      "label": "Milli Velocity",
+      "labelPt": "Milli Velocity",
+      "symbol": "millivel",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_velocity_146",
+          "milli_velocity"
+        ],
+        "pt": [
+          "u_milli_velocity_146",
+          "milli_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_milli_volume_069",
+      "familyId": "volume",
+      "label": "Milli Volume",
+      "labelPt": "Milli Volume",
+      "symbol": "millivol",
+      "isoCode": null,
+      "conversionToBase": 0.001,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_milli_volume_069",
+          "milli_volume"
+        ],
+        "pt": [
+          "u_milli_volume_069",
+          "milli_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_angle_089",
+      "familyId": "angle",
+      "label": "Nano Angle",
+      "labelPt": "Nano Angle",
+      "symbol": "nanoang",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_angle_089",
+          "nano_angle"
+        ],
+        "pt": [
+          "u_nano_angle_089",
+          "nano_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_concentration_100",
+      "familyId": "concentration",
+      "label": "Nano Concentration",
+      "labelPt": "Nano Concentration",
+      "symbol": "nanocon",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_concentration_100",
+          "nano_concentration"
+        ],
+        "pt": [
+          "u_nano_concentration_100",
+          "nano_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_count_001",
+      "familyId": "count",
+      "label": "Nano Count",
+      "labelPt": "Nano Count",
+      "symbol": "nanocou",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_count_001",
+          "nano_count"
+        ],
+        "pt": [
+          "u_nano_count_001",
+          "nano_count"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_currency_122",
+      "familyId": "currency",
+      "label": "Nano Currency",
+      "labelPt": "Nano Currency",
+      "symbol": "nanocur",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_currency_122",
+          "nano_currency"
+        ],
+        "pt": [
+          "u_nano_currency_122",
+          "nano_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_data_012",
+      "familyId": "data",
+      "label": "Nano Data",
+      "labelPt": "Nano Data",
+      "symbol": "nanodat",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_data_012",
+          "nano_data"
+        ],
+        "pt": [
+          "u_nano_data_012",
+          "nano_data"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_energy_133",
+      "familyId": "energy",
+      "label": "Nano Energy",
+      "labelPt": "Nano Energy",
+      "symbol": "nanoene",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_energy_133",
+          "nano_energy"
+        ],
+        "pt": [
+          "u_nano_energy_133",
+          "nano_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_length_078",
+      "familyId": "length",
+      "label": "Nano Length",
+      "labelPt": "Nano Length",
+      "symbol": "nanolen",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_length_078",
+          "nano_length"
+        ],
+        "pt": [
+          "u_nano_length_078",
+          "nano_length"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_mass_034",
+      "familyId": "mass",
+      "label": "Nano Mass",
+      "labelPt": "Nano Mass",
+      "symbol": "nanomas",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_mass_034",
+          "nano_mass"
+        ],
+        "pt": [
+          "u_nano_mass_034",
+          "nano_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_percentage_111",
+      "familyId": "percentage",
+      "label": "Nano Percentage",
+      "labelPt": "Nano Percentage",
+      "symbol": "nanoper",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_percentage_111",
+          "nano_percentage"
+        ],
+        "pt": [
+          "u_nano_percentage_111",
+          "nano_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_pressure_023",
+      "familyId": "pressure",
+      "label": "Nano Pressure",
+      "labelPt": "Nano Pressure",
+      "symbol": "nanopre",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_pressure_023",
+          "nano_pressure"
+        ],
+        "pt": [
+          "u_nano_pressure_023",
+          "nano_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_temperature_067",
+      "familyId": "temperature",
+      "label": "Nano Temperature",
+      "labelPt": "Nano Temperature",
+      "symbol": "nanotem",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_temperature_067",
+          "nano_temperature"
+        ],
+        "pt": [
+          "u_nano_temperature_067",
+          "nano_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_time_155",
+      "familyId": "time",
+      "label": "Nano Time",
+      "labelPt": "Nano Time",
+      "symbol": "nanotim",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_time_155",
+          "nano_time"
+        ],
+        "pt": [
+          "u_nano_time_155",
+          "nano_time"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_unknown_045",
+      "familyId": "unknown",
+      "label": "Nano Unknown",
+      "labelPt": "Nano Unknown",
+      "symbol": "nanounk",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_unknown_045",
+          "nano_unknown"
+        ],
+        "pt": [
+          "u_nano_unknown_045",
+          "nano_unknown"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_velocity_056",
+      "familyId": "velocity",
+      "label": "Nano Velocity",
+      "labelPt": "Nano Velocity",
+      "symbol": "nanovel",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_velocity_056",
+          "nano_velocity"
+        ],
+        "pt": [
+          "u_nano_velocity_056",
+          "nano_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_nano_volume_144",
+      "familyId": "volume",
+      "label": "Nano Volume",
+      "labelPt": "Nano Volume",
+      "symbol": "nanovol",
+      "isoCode": null,
+      "conversionToBase": 1e-9,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_nano_volume_144",
+          "nano_volume"
+        ],
+        "pt": [
+          "u_nano_volume_144",
+          "nano_volume"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_angle_044",
+      "familyId": "angle",
+      "label": "Tera Angle",
+      "labelPt": "Tera Angle",
+      "symbol": "teraang",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_angle_044",
+          "tera_angle"
+        ],
+        "pt": [
+          "u_tera_angle_044",
+          "tera_angle"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_concentration_055",
+      "familyId": "concentration",
+      "label": "Tera Concentration",
+      "labelPt": "Tera Concentration",
+      "symbol": "teracon",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_concentration_055",
+          "tera_concentration"
+        ],
+        "pt": [
+          "u_tera_concentration_055",
+          "tera_concentration"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_count_121",
+      "familyId": "count",
+      "label": "Tera Count",
+      "labelPt": "Tera Count",
+      "symbol": "teracou",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_count_121",
+          "tera_count"
+        ],
+        "pt": [
+          "u_tera_count_121",
+          "tera_count"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_currency_077",
+      "familyId": "currency",
+      "label": "Tera Currency",
+      "labelPt": "Tera Currency",
+      "symbol": "teracur",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_currency_077",
+          "tera_currency"
+        ],
+        "pt": [
+          "u_tera_currency_077",
+          "tera_currency"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_data_132",
+      "familyId": "data",
+      "label": "Tera Data",
+      "labelPt": "Tera Data",
+      "symbol": "teradat",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_data_132",
+          "tera_data"
+        ],
+        "pt": [
+          "u_tera_data_132",
+          "tera_data"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_energy_088",
+      "familyId": "energy",
+      "label": "Tera Energy",
+      "labelPt": "Tera Energy",
+      "symbol": "teraene",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_energy_088",
+          "tera_energy"
+        ],
+        "pt": [
+          "u_tera_energy_088",
+          "tera_energy"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_length_033",
+      "familyId": "length",
+      "label": "Tera Length",
+      "labelPt": "Tera Length",
+      "symbol": "teralen",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_length_033",
+          "tera_length"
+        ],
+        "pt": [
+          "u_tera_length_033",
+          "tera_length"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_mass_154",
+      "familyId": "mass",
+      "label": "Tera Mass",
+      "labelPt": "Tera Mass",
+      "symbol": "teramas",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_mass_154",
+          "tera_mass"
+        ],
+        "pt": [
+          "u_tera_mass_154",
+          "tera_mass"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_percentage_066",
+      "familyId": "percentage",
+      "label": "Tera Percentage",
+      "labelPt": "Tera Percentage",
+      "symbol": "teraper",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_percentage_066",
+          "tera_percentage"
+        ],
+        "pt": [
+          "u_tera_percentage_066",
+          "tera_percentage"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_pressure_143",
+      "familyId": "pressure",
+      "label": "Tera Pressure",
+      "labelPt": "Tera Pressure",
+      "symbol": "terapre",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_pressure_143",
+          "tera_pressure"
+        ],
+        "pt": [
+          "u_tera_pressure_143",
+          "tera_pressure"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_temperature_022",
+      "familyId": "temperature",
+      "label": "Tera Temperature",
+      "labelPt": "Tera Temperature",
+      "symbol": "teratem",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_temperature_022",
+          "tera_temperature"
+        ],
+        "pt": [
+          "u_tera_temperature_022",
+          "tera_temperature"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_time_110",
+      "familyId": "time",
+      "label": "Tera Time",
+      "labelPt": "Tera Time",
+      "symbol": "teratim",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_time_110",
+          "tera_time"
+        ],
+        "pt": [
+          "u_tera_time_110",
+          "tera_time"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_velocity_011",
+      "familyId": "velocity",
+      "label": "Tera Velocity",
+      "labelPt": "Tera Velocity",
+      "symbol": "teravel",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_velocity_011",
+          "tera_velocity"
+        ],
+        "pt": [
+          "u_tera_velocity_011",
+          "tera_velocity"
+        ]
+      }
+    },
+    {
+      "id": "u_tera_volume_099",
+      "familyId": "volume",
+      "label": "Tera Volume",
+      "labelPt": "Tera Volume",
+      "symbol": "teravol",
+      "isoCode": null,
+      "conversionToBase": 1000000000000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "u_tera_volume_099",
+          "tera_volume"
+        ],
+        "pt": [
+          "u_tera_volume_099",
+          "tera_volume"
+        ]
+      }
+    },
+    {
+      "id": "unit",
+      "familyId": "count",
+      "label": "Unit",
+      "labelPt": "Unidade",
+      "symbol": "u",
+      "isoCode": null,
+      "conversionToBase": 1,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "unit",
+          "u"
+        ],
+        "pt": [
+          "unidade",
+          "u"
         ]
       }
     },
@@ -342,414 +6223,23 @@
       "symbol": "$",
       "isoCode": "USD",
       "conversionToBase": 1,
+      "conversionType": "cross_currency",
+      "formattingConstraints": {
+        "precision": 2,
+        "allowThousands": true,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false,
+        "symbolPosition": "prefix"
+      },
       "patterns": {
         "en": [
-          "$",
-          "USD",
-          "US dollars",
-          "dollars"
+          "us dollar",
+          "$"
         ],
         "pt": [
-          "USD",
-          "dólares americanos",
-          "dólar",
-          "dólares"
-        ]
-      }
-    },
-    {
-      "id": "centimeter",
-      "familyId": "length",
-      "label": "Centimeter",
-      "labelPt": "Centímetro",
-      "symbol": "cm",
-      "conversionToBase": 0.01,
-      "patterns": {
-        "en": [
-          "cm",
-          "centimeter",
-          "centimeters",
-          "centimetre"
-        ],
-        "pt": [
-          "cm",
-          "centímetro",
-          "centímetros"
-        ]
-      }
-    },
-    {
-      "id": "inch",
-      "familyId": "length",
-      "label": "Inch",
-      "labelPt": "Polegada",
-      "symbol": "in",
-      "conversionToBase": 0.0254,
-      "patterns": {
-        "en": [
-          "in",
-          "inch",
-          "inches",
-          "\""
-        ],
-        "pt": [
-          "pol",
-          "polegada",
-          "polegadas"
-        ]
-      }
-    },
-    {
-      "id": "meter",
-      "familyId": "length",
-      "label": "Meter",
-      "labelPt": "Metro",
-      "symbol": "m",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "m",
-          "meter",
-          "meters",
-          "metre"
-        ],
-        "pt": [
-          "m",
-          "metro",
-          "metros"
-        ]
-      }
-    },
-    {
-      "id": "millimeter",
-      "familyId": "length",
-      "label": "Millimeter",
-      "labelPt": "Milímetro",
-      "symbol": "mm",
-      "conversionToBase": 0.001,
-      "patterns": {
-        "en": [
-          "mm",
-          "millimeter",
-          "millimeters",
-          "millimetre"
-        ],
-        "pt": [
-          "mm",
-          "milímetro",
-          "milímetros"
-        ]
-      }
-    },
-    {
-      "id": "gram",
-      "familyId": "mass",
-      "label": "Gram",
-      "labelPt": "Grama",
-      "symbol": "g",
-      "conversionToBase": 0.001,
-      "patterns": {
-        "en": [
-          "g",
-          "gram",
-          "grams",
-          "gramme"
-        ],
-        "pt": [
-          "g",
-          "grama",
-          "gramas"
-        ]
-      }
-    },
-    {
-      "id": "kilogram",
-      "familyId": "mass",
-      "label": "Kilogram",
-      "labelPt": "Quilograma",
-      "symbol": "kg",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "kg",
-          "kilogram",
-          "kilograms",
-          "kilo"
-        ],
-        "pt": [
-          "kg",
-          "quilograma",
-          "quilogramas",
-          "quilo"
-        ]
-      }
-    },
-    {
-      "id": "milligram",
-      "familyId": "mass",
-      "label": "Milligram",
-      "labelPt": "Miligrama",
-      "symbol": "mg",
-      "conversionToBase": 0.000001,
-      "patterns": {
-        "en": [
-          "mg",
-          "milligram",
-          "milligrams"
-        ],
-        "pt": [
-          "mg",
-          "miligrama",
-          "miligramas"
-        ]
-      }
-    },
-    {
-      "id": "pound",
-      "familyId": "mass",
-      "label": "Pound",
-      "labelPt": "Libra",
-      "symbol": "lb",
-      "conversionToBase": 0.453592,
-      "patterns": {
-        "en": [
-          "lb",
-          "pound",
-          "pounds",
-          "lbs"
-        ],
-        "pt": [
-          "lb",
-          "libra",
-          "libras"
-        ]
-      }
-    },
-    {
-      "id": "basis_point",
-      "familyId": "percentage",
-      "label": "Basis Point",
-      "labelPt": "Ponto Base",
-      "symbol": "bp",
-      "conversionToBase": 0.01,
-      "patterns": {
-        "en": [
-          "bp",
-          "bps",
-          "basis point",
-          "basis points"
-        ],
-        "pt": [
-          "pb",
-          "ponto base",
-          "pontos base"
-        ]
-      }
-    },
-    {
-      "id": "percent",
-      "familyId": "percentage",
-      "label": "Percent",
-      "labelPt": "Porcento",
-      "symbol": "%",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "%",
-          "percent",
-          "percentage",
-          "pct"
-        ],
-        "pt": [
-          "%",
-          "porcento",
-          "por cento",
-          "percentual"
-        ]
-      }
-    },
-    {
-      "id": "percentage_point",
-      "familyId": "percentage",
-      "label": "Percentage Point",
-      "labelPt": "Ponto Percentual",
-      "symbol": "pp",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "pp",
-          "percentage point",
-          "percentage points",
-          "p.p."
-        ],
-        "pt": [
-          "pp",
-          "ponto percentual",
-          "pontos percentuais",
-          "p.p."
-        ]
-      }
-    },
-    {
-      "id": "celsius",
-      "familyId": "temperature_unit",
-      "label": "Celsius",
-      "labelPt": "Celsius",
-      "symbol": "°C",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "°C",
-          "Celsius",
-          "degrees Celsius",
-          "C"
-        ],
-        "pt": [
-          "°C",
-          "Celsius",
-          "graus Celsius"
-        ]
-      }
-    },
-    {
-      "id": "fahrenheit",
-      "familyId": "temperature_unit",
-      "label": "Fahrenheit",
-      "labelPt": "Fahrenheit",
-      "symbol": "°F",
-      "conversionToBase": null,
-      "patterns": {
-        "en": [
-          "°F",
-          "Fahrenheit",
-          "degrees Fahrenheit",
-          "F"
-        ],
-        "pt": [
-          "°F",
-          "Fahrenheit",
-          "graus Fahrenheit"
-        ]
-      }
-    },
-    {
-      "id": "kelvin",
-      "familyId": "temperature_unit",
-      "label": "Kelvin",
-      "labelPt": "Kelvin",
-      "symbol": "K",
-      "conversionToBase": null,
-      "patterns": {
-        "en": [
-          "K",
-          "Kelvin",
-          "kelvins"
-        ],
-        "pt": [
-          "K",
-          "Kelvin",
-          "kelvins"
-        ]
-      }
-    },
-    {
-      "id": "day",
-      "familyId": "time",
-      "label": "Day",
-      "labelPt": "Dia",
-      "symbol": "d",
-      "conversionToBase": 86400,
-      "patterns": {
-        "en": [
-          "d",
-          "day",
-          "days"
-        ],
-        "pt": [
-          "d",
-          "dia",
-          "dias"
-        ]
-      }
-    },
-    {
-      "id": "hour",
-      "familyId": "time",
-      "label": "Hour",
-      "labelPt": "Hora",
-      "symbol": "h",
-      "conversionToBase": 3600,
-      "patterns": {
-        "en": [
-          "h",
-          "hour",
-          "hours",
-          "hr"
-        ],
-        "pt": [
-          "h",
-          "hora",
-          "horas"
-        ]
-      }
-    },
-    {
-      "id": "minute",
-      "familyId": "time",
-      "label": "Minute",
-      "labelPt": "Minuto",
-      "symbol": "min",
-      "conversionToBase": 60,
-      "patterns": {
-        "en": [
-          "min",
-          "minute",
-          "minutes"
-        ],
-        "pt": [
-          "min",
-          "minuto",
-          "minutos"
-        ]
-      }
-    },
-    {
-      "id": "month",
-      "familyId": "time",
-      "label": "Month",
-      "labelPt": "Mês",
-      "symbol": "mo",
-      "conversionToBase": 2592000,
-      "patterns": {
-        "en": [
-          "mo",
-          "month",
-          "months"
-        ],
-        "pt": [
-          "mês",
-          "meses"
-        ]
-      }
-    },
-    {
-      "id": "second",
-      "familyId": "time",
-      "label": "Second",
-      "labelPt": "Segundo",
-      "symbol": "s",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "s",
-          "second",
-          "seconds",
-          "sec"
-        ],
-        "pt": [
-          "s",
-          "segundo",
-          "segundos"
+          "dólar americano",
+          "$"
         ]
       }
     },
@@ -758,18 +6248,52 @@
       "familyId": "time",
       "label": "Week",
       "labelPt": "Semana",
-      "symbol": "wk",
+      "symbol": "w",
+      "isoCode": null,
       "conversionToBase": 604800,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
       "patterns": {
         "en": [
-          "wk",
           "week",
-          "weeks"
+          "w"
         ],
         "pt": [
-          "sem",
           "semana",
-          "semanas"
+          "w"
+        ]
+      }
+    },
+    {
+      "id": "yard",
+      "familyId": "length",
+      "label": "Yard",
+      "labelPt": "Jarda",
+      "symbol": "yd",
+      "isoCode": null,
+      "conversionToBase": 0.9144,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
+      "patterns": {
+        "en": [
+          "yard",
+          "yd"
+        ],
+        "pt": [
+          "jarda",
+          "yd"
         ]
       }
     },
@@ -779,99 +6303,24 @@
       "label": "Year",
       "labelPt": "Ano",
       "symbol": "yr",
+      "isoCode": null,
       "conversionToBase": 31536000,
+      "conversionType": "linear",
+      "formattingConstraints": {
+        "precision": 3,
+        "allowThousands": false,
+        "thousandsSeparator": ",",
+        "decimalSeparator": ".",
+        "allowSign": false
+      },
       "patterns": {
         "en": [
-          "yr",
           "year",
-          "years",
-          "annum"
+          "yr"
         ],
         "pt": [
           "ano",
-          "anos"
-        ]
-      }
-    },
-    {
-      "id": "fluid_ounce",
-      "familyId": "volume",
-      "label": "Fluid Ounce",
-      "labelPt": "Onça Fluida",
-      "symbol": "fl oz",
-      "conversionToBase": 0.0295735,
-      "patterns": {
-        "en": [
-          "fl oz",
-          "fluid ounce",
-          "fluid ounces"
-        ],
-        "pt": [
-          "fl oz",
-          "onça fluida",
-          "onças fluidas"
-        ]
-      }
-    },
-    {
-      "id": "gallon",
-      "familyId": "volume",
-      "label": "Gallon",
-      "labelPt": "Galão",
-      "symbol": "gal",
-      "conversionToBase": 3.78541,
-      "patterns": {
-        "en": [
-          "gal",
-          "gallon",
-          "gallons"
-        ],
-        "pt": [
-          "gal",
-          "galão",
-          "galões"
-        ]
-      }
-    },
-    {
-      "id": "liter",
-      "familyId": "volume",
-      "label": "Liter",
-      "labelPt": "Litro",
-      "symbol": "L",
-      "conversionToBase": 1,
-      "patterns": {
-        "en": [
-          "L",
-          "liter",
-          "liters",
-          "litre"
-        ],
-        "pt": [
-          "L",
-          "litro",
-          "litros"
-        ]
-      }
-    },
-    {
-      "id": "milliliter",
-      "familyId": "volume",
-      "label": "Milliliter",
-      "labelPt": "Mililitro",
-      "symbol": "mL",
-      "conversionToBase": 0.001,
-      "patterns": {
-        "en": [
-          "mL",
-          "milliliter",
-          "milliliters",
-          "ml"
-        ],
-        "pt": [
-          "mL",
-          "mililitro",
-          "mililitros"
+          "yr"
         ]
       }
     }

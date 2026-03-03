@@ -1,114 +1,1045 @@
 {
   "_meta": {
     "id": "di_finance_entities_fin_forecast",
-    "version": "2.0.0",
-    "description": "Entity extraction schema for fin_forecast.",
+    "version": "2.1.0",
+    "description": "Entity schema for Forecast.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "docType": "fin_forecast"
+    "docType": "fin_forecast",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
   },
   "entities": [
     {
       "id": "document_id",
       "type": "string",
       "required": true,
-      "description": "Unique document identifier"
+      "evidenceRequirement": [
+        "header_id",
+        "source_table"
+      ],
+      "notes": "document-level evidence required"
     },
     {
-      "id": "reporting_entity",
+      "id": "source_file_name",
       "type": "string",
       "required": true,
-      "description": "Entity or BU covered"
+      "evidenceRequirement": [
+        "file_metadata"
+      ],
+      "notes": "source file provenance"
     },
     {
-      "id": "period_start",
-      "type": "date",
+      "id": "extraction_timestamp",
+      "type": "datetime",
       "required": true,
-      "description": "Period start date"
+      "evidenceRequirement": [
+        "ingestion_metadata"
+      ],
+      "notes": "must include parse timestamp"
     },
     {
-      "id": "period_end",
+      "id": "company_name",
+      "canonical": "company_name",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: company_name from table/header context."
+    },
+    {
+      "id": "forecast_version",
+      "canonical": "forecast_version",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_version from table/header context."
+    },
+    {
+      "id": "fiscal_horizon",
+      "canonical": "fiscal_horizon",
       "type": "date",
       "required": true,
-      "description": "Period end date"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: fiscal_horizon from table/header context."
     },
     {
       "id": "currency",
-      "type": "string",
+      "canonical": "currency",
+      "type": "currency",
       "required": true,
-      "description": "ISO currency code"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: currency from table/header context."
     },
     {
       "id": "unit_scale",
+      "canonical": "unit_scale",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: unit_scale from table/header context."
+    },
+    {
+      "id": "base_case_revenue",
+      "canonical": "base_case_revenue",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: base_case_revenue from table/header context."
+    },
+    {
+      "id": "base_case_ebitda",
+      "canonical": "base_case_ebitda",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: base_case_ebitda from table/header context."
+    },
+    {
+      "id": "base_case_cash",
+      "canonical": "base_case_cash",
       "type": "string",
       "required": true,
-      "description": "Unit scale (units, thousands, millions)"
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: base_case_cash from table/header context."
     },
     {
-      "id": "revenue",
-      "type": "currency",
-      "required": false,
-      "description": "Revenue amount"
-    },
-    {
-      "id": "ebitda",
-      "type": "currency",
-      "required": false,
-      "description": "EBITDA amount"
-    },
-    {
-      "id": "net_income",
-      "type": "currency",
-      "required": false,
-      "description": "Net income amount"
-    },
-    {
-      "id": "cash_position",
-      "type": "currency",
-      "required": false,
-      "description": "Cash balance"
-    },
-    {
-      "id": "variance_percent",
+      "id": "forecast_growth_rate",
+      "canonical": "forecast_growth_rate",
       "type": "number",
-      "required": false,
-      "description": "Variance percentage"
-    },
-    {
-      "id": "source_table_ref",
-      "type": "string",
       "required": true,
-      "description": "Source table identifier"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_growth_rate from table/header context."
     },
     {
-      "id": "kpi_projected_revenue",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for projected_revenue"
+      "id": "forecast_churn",
+      "canonical": "forecast_churn",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_churn from table/header context."
     },
     {
-      "id": "kpi_projected_ebitda",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for projected_ebitda"
+      "id": "new_arr",
+      "canonical": "new_arr",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: new_arr from table/header context."
     },
     {
-      "id": "kpi_projected_cash",
-      "type": "number",
-      "required": false,
-      "description": "KPI reference for projected_cash"
+      "id": "logo",
+      "canonical": "logo",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: logo from table/header context."
     },
     {
-      "id": "kpi_assumption",
+      "id": "forecast_scenarios",
+      "canonical": "forecast_scenarios",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_scenarios from table/header context."
+    },
+    {
+      "id": "confidence_interval",
+      "canonical": "confidence_interval",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: confidence_interval from table/header context."
+    },
+    {
+      "id": "sensitivity_factor",
+      "canonical": "sensitivity_factor",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: sensitivity_factor from table/header context."
+    },
+    {
+      "id": "driver_assumptions",
+      "canonical": "driver_assumptions",
       "type": "number",
       "required": false,
-      "description": "KPI reference for assumption"
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: driver_assumptions from table/header context."
+    },
+    {
+      "id": "risk_of_non_realization",
+      "canonical": "risk_of_non_realization",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: risk_of_non_realization from table/header context."
+    },
+    {
+      "id": "capital_required",
+      "canonical": "capital_required",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: capital_required from table/header context."
+    },
+    {
+      "id": "runway_projection",
+      "canonical": "runway_projection",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: runway_projection from table/header context."
+    },
+    {
+      "id": "scenario_break_even",
+      "canonical": "scenario_break_even",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: scenario_break_even from table/header context."
+    },
+    {
+      "id": "forecast_metric_21",
+      "canonical": "forecast_metric_21",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_21 from table/header context."
+    },
+    {
+      "id": "forecast_metric_22",
+      "canonical": "forecast_metric_22",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_22 from table/header context."
+    },
+    {
+      "id": "forecast_metric_23",
+      "canonical": "forecast_metric_23",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_23 from table/header context."
+    },
+    {
+      "id": "forecast_metric_24",
+      "canonical": "forecast_metric_24",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_24 from table/header context."
+    },
+    {
+      "id": "forecast_metric_25",
+      "canonical": "forecast_metric_25",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_25 from table/header context."
+    },
+    {
+      "id": "forecast_metric_26",
+      "canonical": "forecast_metric_26",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_26 from table/header context."
+    },
+    {
+      "id": "forecast_metric_27",
+      "canonical": "forecast_metric_27",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_27 from table/header context."
+    },
+    {
+      "id": "forecast_metric_28",
+      "canonical": "forecast_metric_28",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_28 from table/header context."
+    },
+    {
+      "id": "forecast_metric_29",
+      "canonical": "forecast_metric_29",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_29 from table/header context."
+    },
+    {
+      "id": "forecast_metric_30",
+      "canonical": "forecast_metric_30",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_30 from table/header context."
+    },
+    {
+      "id": "forecast_metric_31",
+      "canonical": "forecast_metric_31",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_31 from table/header context."
+    },
+    {
+      "id": "forecast_metric_32",
+      "canonical": "forecast_metric_32",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_32 from table/header context."
+    },
+    {
+      "id": "forecast_metric_33",
+      "canonical": "forecast_metric_33",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_33 from table/header context."
+    },
+    {
+      "id": "forecast_metric_34",
+      "canonical": "forecast_metric_34",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_34 from table/header context."
+    },
+    {
+      "id": "forecast_metric_35",
+      "canonical": "forecast_metric_35",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_35 from table/header context."
+    },
+    {
+      "id": "forecast_metric_36",
+      "canonical": "forecast_metric_36",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_36 from table/header context."
+    },
+    {
+      "id": "forecast_metric_37",
+      "canonical": "forecast_metric_37",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_37 from table/header context."
+    },
+    {
+      "id": "forecast_metric_38",
+      "canonical": "forecast_metric_38",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_38 from table/header context."
+    },
+    {
+      "id": "forecast_metric_39",
+      "canonical": "forecast_metric_39",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_39 from table/header context."
+    },
+    {
+      "id": "forecast_metric_40",
+      "canonical": "forecast_metric_40",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_40 from table/header context."
+    },
+    {
+      "id": "forecast_metric_41",
+      "canonical": "forecast_metric_41",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_41 from table/header context."
+    },
+    {
+      "id": "forecast_metric_42",
+      "canonical": "forecast_metric_42",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_42 from table/header context."
+    },
+    {
+      "id": "forecast_metric_43",
+      "canonical": "forecast_metric_43",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_43 from table/header context."
+    },
+    {
+      "id": "forecast_metric_44",
+      "canonical": "forecast_metric_44",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_44 from table/header context."
+    },
+    {
+      "id": "forecast_metric_45",
+      "canonical": "forecast_metric_45",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_45 from table/header context."
+    },
+    {
+      "id": "forecast_metric_46",
+      "canonical": "forecast_metric_46",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_46 from table/header context."
+    },
+    {
+      "id": "forecast_metric_47",
+      "canonical": "forecast_metric_47",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_47 from table/header context."
+    },
+    {
+      "id": "forecast_metric_48",
+      "canonical": "forecast_metric_48",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_48 from table/header context."
+    },
+    {
+      "id": "forecast_metric_49",
+      "canonical": "forecast_metric_49",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_49 from table/header context."
+    },
+    {
+      "id": "forecast_metric_50",
+      "canonical": "forecast_metric_50",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_50 from table/header context."
+    },
+    {
+      "id": "forecast_metric_51",
+      "canonical": "forecast_metric_51",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_51 from table/header context."
+    },
+    {
+      "id": "forecast_metric_52",
+      "canonical": "forecast_metric_52",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_52 from table/header context."
+    },
+    {
+      "id": "forecast_metric_53",
+      "canonical": "forecast_metric_53",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_53 from table/header context."
+    },
+    {
+      "id": "forecast_metric_54",
+      "canonical": "forecast_metric_54",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_54 from table/header context."
+    },
+    {
+      "id": "forecast_metric_55",
+      "canonical": "forecast_metric_55",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_55 from table/header context."
+    },
+    {
+      "id": "forecast_metric_56",
+      "canonical": "forecast_metric_56",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_56 from table/header context."
+    },
+    {
+      "id": "forecast_metric_57",
+      "canonical": "forecast_metric_57",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_57 from table/header context."
+    },
+    {
+      "id": "forecast_metric_58",
+      "canonical": "forecast_metric_58",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_58 from table/header context."
+    },
+    {
+      "id": "forecast_metric_59",
+      "canonical": "forecast_metric_59",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_59 from table/header context."
+    },
+    {
+      "id": "forecast_metric_60",
+      "canonical": "forecast_metric_60",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_60 from table/header context."
+    },
+    {
+      "id": "forecast_metric_61",
+      "canonical": "forecast_metric_61",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_61 from table/header context."
+    },
+    {
+      "id": "forecast_metric_62",
+      "canonical": "forecast_metric_62",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Forecast: forecast_metric_62 from table/header context."
     }
   ]
 }

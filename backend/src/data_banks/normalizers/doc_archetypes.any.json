@@ -1,347 +1,2051 @@
 {
   "_meta": {
     "id": "doc_archetypes",
-    "version": "2.0.0",
-    "description": "SSOT archetype definitions with default required sections, core entity types, and typical formats.",
+    "version": "2.1.0",
+    "description": "Domain-aware document archetypes with structure signatures.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "enforceDeterministicSort": true,
-    "dedupeCaseInsensitive": true
+    "dedupeCaseInsensitive": true,
+    "docTypeCount": 65
   },
   "archetypes": [
     {
-      "id": "accounting_close_control",
-      "domainId": "accounting",
-      "displayName": "Accounting Close & Control",
-      "defaultRequiredSections": [
-        "close calendar",
-        "control owners",
-        "review evidence",
-        "exceptions"
-      ],
-      "coreEntityTypes": [
-        "close_period",
-        "control_owner",
-        "exception_count",
-        "approval_timestamp"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "csv",
-        "pdf"
-      ]
-    },
-    {
-      "id": "accounting_ledger_journal",
-      "domainId": "accounting",
-      "displayName": "Accounting Ledger & Journal",
-      "defaultRequiredSections": [
-        "account headers",
-        "journal lines",
-        "supporting references",
-        "totals"
-      ],
-      "coreEntityTypes": [
-        "account_code",
-        "debit_amount",
-        "credit_amount",
-        "posting_date"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "csv",
-        "pdf"
-      ]
-    },
-    {
-      "id": "accounting_reconciliation_aging",
-      "domainId": "accounting",
-      "displayName": "Accounting Reconciliation & Aging",
-      "defaultRequiredSections": [
-        "book balance",
-        "external balance",
-        "reconciling items",
-        "aging buckets"
-      ],
-      "coreEntityTypes": [
-        "counterparty",
-        "aging_bucket",
-        "open_amount",
-        "reconciling_item"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "csv",
-        "pdf"
-      ]
-    },
-    {
-      "id": "accounting_reporting_tax",
-      "domainId": "accounting",
-      "displayName": "Accounting Reporting & Tax",
-      "defaultRequiredSections": [
-        "tax basis",
-        "reconciliation summary",
-        "jurisdiction notes",
-        "filing status"
-      ],
-      "coreEntityTypes": [
-        "tax_period",
-        "tax_jurisdiction",
-        "tax_amount",
-        "filing_deadline"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "pdf",
-        "docx"
-      ]
-    },
-    {
-      "id": "finance_capital_compliance",
+      "docTypeId": "fin_bank_statement",
       "domainId": "finance",
-      "displayName": "Finance Capital & Compliance",
-      "defaultRequiredSections": [
-        "capital structure",
-        "covenants",
-        "thresholds",
-        "breach status"
-      ],
-      "coreEntityTypes": [
-        "share_class",
-        "ownership_percent",
-        "covenant_ratio",
-        "breach_flag"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "pdf",
-        "pptx"
-      ]
+      "displayName": "Bank Statement",
+      "description": "Checking/cash account statement by period",
+      "structureSignatures": {
+        "headings": [
+          "Account Summary",
+          "Statement Period",
+          "Opening Balance",
+          "Transaction Details",
+          "Closing Balance"
+        ],
+        "tableSignatures": [
+          "Date/description/amount table",
+          "Debit-credit flow table",
+          "Balance progression table"
+        ],
+        "layoutCues": [
+          "time-ordered transaction rows",
+          "running ledger lines",
+          "signature/date footer"
+        ],
+        "metadataCues": [
+          "statement period",
+          "account identifier",
+          "statement generated date",
+          "institution"
+        ]
+      }
     },
     {
-      "id": "finance_filings_disclosure",
+      "docTypeId": "fin_cash_flow_statement",
       "domainId": "finance",
-      "displayName": "Finance Filings & Disclosures",
-      "defaultRequiredSections": [
-        "cover",
-        "risk factors",
-        "mda",
-        "notes"
-      ],
-      "coreEntityTypes": [
-        "issuer",
-        "fiscal_period",
-        "filing_date",
-        "material_event"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "docx",
-        "html"
-      ]
+      "displayName": "Cash Flow Statement",
+      "description": "Sources and uses of cash over time",
+      "structureSignatures": {
+        "headings": [
+          "Cash Flow Statement",
+          "Operating Activities",
+          "Investing Activities",
+          "Financing Activities",
+          "Net Cash Change"
+        ],
+        "tableSignatures": [
+          "Categorized cash movement grid",
+          "Rolling cash position table",
+          "Variance by period matrix"
+        ],
+        "layoutCues": [
+          "three-section block layout",
+          "period-over-period comparison",
+          "summary bars or totals"
+        ],
+        "metadataCues": [
+          "fiscal period",
+          "currency",
+          "reporting entity",
+          "prepared by"
+        ]
+      }
     },
     {
-      "id": "finance_planning_forecast",
+      "docTypeId": "fin_budget",
       "domainId": "finance",
-      "displayName": "Finance Planning & Forecast",
-      "defaultRequiredSections": [
-        "assumptions",
-        "scenario drivers",
-        "planned values",
-        "variance commentary"
-      ],
-      "coreEntityTypes": [
-        "scenario_name",
-        "plan_period",
-        "assumption",
-        "variance_percent"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "csv",
-        "pdf"
-      ]
+      "displayName": "Budget",
+      "description": "Planned budget by period and owner",
+      "structureSignatures": {
+        "headings": [
+          "Budget Overview",
+          "Variance Analysis",
+          "Assumptions",
+          "Department Totals",
+          "Approval"
+        ],
+        "tableSignatures": [
+          "Category by month table",
+          "Variance against actual table",
+          "Owner allocation matrix"
+        ],
+        "layoutCues": [
+          "pivoted planning tables",
+          "scenario column groups",
+          "approval signatures"
+        ],
+        "metadataCues": [
+          "fiscal year",
+          "owner",
+          "version",
+          "approval date"
+        ]
+      }
     },
     {
-      "id": "finance_statements_performance",
+      "docTypeId": "fin_invoice",
       "domainId": "finance",
-      "displayName": "Finance Statements & Performance",
-      "defaultRequiredSections": [
-        "income statement",
-        "balance sheet",
-        "cash flow",
-        "kpi summary"
-      ],
-      "coreEntityTypes": [
-        "revenue",
-        "ebitda",
-        "assets",
-        "operating_cash_flow"
-      ],
-      "typicalFormats": [
-        "xlsx",
-        "pdf",
-        "csv"
-      ]
+      "displayName": "Invoice",
+      "description": "Customer-facing invoice detail",
+      "structureSignatures": {
+        "headings": [
+          "Invoice Header",
+          "Bill To",
+          "Line Items",
+          "Tax",
+          "Total Due"
+        ],
+        "tableSignatures": [
+          "Itemized billing rows",
+          "subtotal/tax/total table",
+          "line-item discounts table"
+        ],
+        "layoutCues": [
+          "header with invoice number",
+          "line-item list with unit price",
+          "payment terms block"
+        ],
+        "metadataCues": [
+          "invoice number",
+          "issue date",
+          "due date",
+          "recipient"
+        ]
+      }
     },
     {
-      "id": "legal_contract_agreement",
+      "docTypeId": "fin_tax_return",
+      "domainId": "finance",
+      "displayName": "Tax Return",
+      "description": "Corporate or entity tax filing",
+      "structureSignatures": {
+        "headings": [
+          "Tax Return Summary",
+          "Income",
+          "Deductions",
+          "Credits",
+          "Tax Due"
+        ],
+        "tableSignatures": [
+          "Line-item tax worksheet table",
+          "filing box mapping table",
+          "reconciliation table"
+        ],
+        "layoutCues": [
+          "form-like sections",
+          "form field labels",
+          "computed footer totals"
+        ],
+        "metadataCues": [
+          "jurisdiction",
+          "tax period",
+          "filing entity",
+          "submission channel"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_expense_report",
+      "domainId": "finance",
+      "displayName": "Expense Report",
+      "description": "Expense submission with categories",
+      "structureSignatures": {
+        "headings": [
+          "Expense Header",
+          "Employee",
+          "Category Breakdown",
+          "Receipts",
+          "Reimbursement"
+        ],
+        "tableSignatures": [
+          "Expense line table",
+          "approver matrix",
+          "policy exception grid"
+        ],
+        "layoutCues": [
+          "per-person expense rows",
+          "receipt attachment list",
+          "totals row"
+        ],
+        "metadataCues": [
+          "employee id",
+          "department",
+          "submission date",
+          "approval status"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_earnings_release",
+      "domainId": "finance",
+      "displayName": "Earnings Release",
+      "description": "Financial release with KPIs and commentary",
+      "structureSignatures": {
+        "headings": [
+          "Release Header",
+          "Revenue Highlights",
+          "EBITDA",
+          "Guidance",
+          "Risk Factors"
+        ],
+        "tableSignatures": [
+          "KPI table",
+          "period comparison chart table",
+          "segment revenue matrix"
+        ],
+        "layoutCues": [
+          "narrative followed by table section",
+          "heading hierarchy",
+          "executive style formatting"
+        ],
+        "metadataCues": [
+          "publish date",
+          "company symbol",
+          "period",
+          "filing relation"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_cap_table",
+      "domainId": "finance",
+      "displayName": "Cap Table",
+      "description": "Ownership and dilution overview",
+      "structureSignatures": {
+        "headings": [
+          "Cap Table Summary",
+          "Shareholder",
+          "Class",
+          "Fully Diluted",
+          "Changes"
+        ],
+        "tableSignatures": [
+          "Ownership matrix table",
+          "pre/post dilution table",
+          "option pool table"
+        ],
+        "layoutCues": [
+          "columnar ownership sections",
+          "total percentage row",
+          "scenario columns"
+        ],
+        "metadataCues": [
+          "effective date",
+          "valuation cap",
+          "equity class",
+          "share count"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_loan_schedule",
+      "domainId": "finance",
+      "displayName": "Loan Schedule",
+      "description": "Debt amortization and repayment schedule",
+      "structureSignatures": {
+        "headings": [
+          "Loan Header",
+          "Amortization Schedule",
+          "Interest",
+          "Outstanding Balance",
+          "Payment Calendar"
+        ],
+        "tableSignatures": [
+          "Installment table",
+          "interest allocation table",
+          "balance run-down table"
+        ],
+        "layoutCues": [
+          "payment-period rows",
+          "principal/interest columns",
+          "final balance checksum"
+        ],
+        "metadataCues": [
+          "lender",
+          "loan id",
+          "currency",
+          "interest method"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_investor_presentation",
+      "domainId": "finance",
+      "displayName": "Investor Presentation",
+      "description": "Deck-style investor update",
+      "structureSignatures": {
+        "headings": [
+          "Executive Summary",
+          "Go-to-Market",
+          "Financial KPIs",
+          "Roadmap",
+          "Appendix"
+        ],
+        "tableSignatures": [
+          "KPI trend table",
+          "pipeline table",
+          "unit economics table"
+        ],
+        "layoutCues": [
+          "slide-like section breaks",
+          "title + body + chart style",
+          "appendix attachments"
+        ],
+        "metadataCues": [
+          "presenter",
+          "quarter covered",
+          "audience",
+          "version"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_cash_flow_forecast",
+      "domainId": "finance",
+      "displayName": "Cash Flow Forecast",
+      "description": "Projected liquidity forecast",
+      "structureSignatures": {
+        "headings": [
+          "Forecast Assumptions",
+          "Inflow",
+          "Outflow",
+          "Ending Runway",
+          "Sensitivity"
+        ],
+        "tableSignatures": [
+          "Monthly projection table",
+          "scenario table",
+          "runway projection"
+        ],
+        "layoutCues": [
+          "rolling periods columns",
+          "driver assumptions block",
+          "range bars or scenario tabs"
+        ],
+        "metadataCues": [
+          "forecast horizon",
+          "base date",
+          "currency",
+          "model version"
+        ]
+      }
+    },
+    {
+      "docTypeId": "fin_management_report",
+      "domainId": "finance",
+      "displayName": "Management Report",
+      "description": "Internal finance management report",
+      "structureSignatures": {
+        "headings": [
+          "Executive Notes",
+          "Performance Summary",
+          "Variance Commentary",
+          "Action Items",
+          "Sign-off"
+        ],
+        "tableSignatures": [
+          "Metric scorecard",
+          "departmental KPI matrix",
+          "issue tracker table"
+        ],
+        "layoutCues": [
+          "commentary plus tabular evidence",
+          "sectioned recommendations",
+          "action tracker rows"
+        ],
+        "metadataCues": [
+          "author",
+          "period",
+          "review cycle",
+          "confidentiality"
+        ]
+      }
+    },
+    {
+      "docTypeId": "legal_service_agreement",
       "domainId": "legal",
-      "displayName": "Legal Contract & Agreement",
-      "defaultRequiredSections": [
-        "definitions",
-        "term",
-        "payment",
-        "termination"
-      ],
-      "coreEntityTypes": [
-        "party",
-        "effective_date",
-        "governing_law",
-        "liability_cap"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "docx"
-      ]
+      "displayName": "Service Agreement",
+      "description": "Bilateral agreement and terms",
+      "structureSignatures": {
+        "headings": [
+          "Parties",
+          "Scope",
+          "Term and Termination",
+          "Obligations",
+          "Signatures"
+        ],
+        "tableSignatures": [
+          "SLA matrix",
+          "Fee schedule table",
+          "Responsible party table"
+        ],
+        "layoutCues": [
+          "sectioned legal clauses",
+          "signature block",
+          "amendment/change log"
+        ],
+        "metadataCues": [
+          "parties",
+          "effective date",
+          "governing law",
+          "jurisdiction"
+        ]
+      }
     },
     {
-      "id": "legal_dispute_regulatory",
+      "docTypeId": "legal_purchase_agreement",
       "domainId": "legal",
-      "displayName": "Legal Dispute & Regulatory",
-      "defaultRequiredSections": [
-        "background",
-        "issues",
-        "position",
-        "actions"
-      ],
-      "coreEntityTypes": [
-        "claim_type",
-        "forum",
-        "deadline",
-        "exposure_band"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "docx",
-        "eml"
-      ]
+      "displayName": "Purchase Agreement",
+      "description": "Acquisition or service purchase agreement",
+      "structureSignatures": {
+        "headings": [
+          "Purchase Subject",
+          "Representation",
+          "Price & Payment",
+          "Conditions",
+          "Closing",
+          "Signatures"
+        ],
+        "tableSignatures": [
+          "Item pricing table",
+          "payment milestone table",
+          "representation matrix"
+        ],
+        "layoutCues": [
+          "defined clause sections",
+          "purchase appendix",
+          "signature annexes"
+        ],
+        "metadataCues": [
+          "seller",
+          "buyer",
+          "effective date",
+          "closing date"
+        ]
+      }
     },
     {
-      "id": "legal_policy_governance",
+      "docTypeId": "legal_nda",
       "domainId": "legal",
-      "displayName": "Legal Policy & Governance",
-      "defaultRequiredSections": [
-        "scope",
-        "policy statements",
-        "roles",
-        "exceptions"
-      ],
-      "coreEntityTypes": [
-        "policy_owner",
-        "policy_version",
-        "effective_date",
-        "review_cycle"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "docx",
-        "html"
-      ]
+      "displayName": "Non-Disclosure Agreement",
+      "description": "Confidential information agreement",
+      "structureSignatures": {
+        "headings": [
+          "Confidential Information",
+          "Permitted Use",
+          "Duration",
+          "Remedies",
+          "Signatures"
+        ],
+        "tableSignatures": [
+          "Disclosure purpose matrix",
+          "Confidentiality exceptions table",
+          "Obligation matrix"
+        ],
+        "layoutCues": [
+          "definitions block",
+          "obligation section",
+          "penalty clause section"
+        ],
+        "metadataCues": [
+          "receiving party",
+          "disclosing party",
+          "effective term",
+          "termination trigger"
+        ]
+      }
     },
     {
-      "id": "medical_admin_claims",
-      "domainId": "medical",
-      "displayName": "Medical Administrative & Claims",
-      "defaultRequiredSections": [
-        "member details",
-        "provider details",
-        "claim lines",
-        "adjudication status"
-      ],
-      "coreEntityTypes": [
-        "patient_id",
-        "claim_id",
-        "payer",
-        "claim_status"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "csv",
-        "x12"
-      ]
+      "docTypeId": "legal_terms_of_service",
+      "domainId": "legal",
+      "displayName": "Terms of Service",
+      "description": "Platform service terms and usage policy",
+      "structureSignatures": {
+        "headings": [
+          "Definitions",
+          "Acceptable Use",
+          "Account Terms",
+          "Liability",
+          "Changes",
+          "Contact"
+        ],
+        "tableSignatures": [
+          "Service plan table",
+          "user responsibility matrix",
+          "risk classification table"
+        ],
+        "layoutCues": [
+          "numbered clauses",
+          "update section",
+          "policy notices"
+        ],
+        "metadataCues": [
+          "platform",
+          "publish date",
+          "version",
+          "jurisdiction"
+        ]
+      }
     },
     {
-      "id": "medical_clinical_notes",
-      "domainId": "medical",
-      "displayName": "Medical Clinical Notes",
-      "defaultRequiredSections": [
-        "history",
-        "assessment",
-        "plan",
-        "follow-up"
-      ],
-      "coreEntityTypes": [
-        "patient_id",
-        "encounter_date",
-        "provider",
-        "diagnosis_code"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "docx",
-        "txt"
-      ]
+      "docTypeId": "legal_privacy_policy",
+      "domainId": "legal",
+      "displayName": "Privacy Policy",
+      "description": "Data processing and privacy terms",
+      "structureSignatures": {
+        "headings": [
+          "Data Collection",
+          "Use of Data",
+          "Retention",
+          "Security",
+          "User Rights",
+          "Contact"
+        ],
+        "tableSignatures": [
+          "Data category table",
+          "Retention matrix",
+          "Legal basis table"
+        ],
+        "layoutCues": [
+          "legal style sections",
+          "cross reference links",
+          "cookie or consent appendix"
+        ],
+        "metadataCues": [
+          "data controller",
+          "privacy officer",
+          "publish date",
+          "revision number"
+        ]
+      }
     },
     {
-      "id": "medical_diagnostics_results",
-      "domainId": "medical",
-      "displayName": "Medical Diagnostics & Results",
-      "defaultRequiredSections": [
-        "indication",
-        "findings",
-        "impression",
-        "reference ranges"
-      ],
-      "coreEntityTypes": [
-        "test_name",
-        "result_value",
-        "unit",
-        "abnormal_flag"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "hl7",
-        "csv"
-      ]
+      "docTypeId": "legal_employment_agreement",
+      "domainId": "legal",
+      "displayName": "Employment Agreement",
+      "description": "Employee terms and obligations",
+      "structureSignatures": {
+        "headings": [
+          "Employment Terms",
+          "Compensation",
+          "Duties",
+          "Confidentiality",
+          "Termination"
+        ],
+        "tableSignatures": [
+          "Compensation table",
+          "vesting/equity table",
+          "benefits matrix"
+        ],
+        "layoutCues": [
+          "role and scope block",
+          "compensation clause block",
+          "sign-off block"
+        ],
+        "metadataCues": [
+          "employer",
+          "employee",
+          "effective date",
+          "position"
+        ]
+      }
     },
     {
-      "id": "medical_medication_care",
+      "docTypeId": "legal_lease_agreement",
+      "domainId": "legal",
+      "displayName": "Lease Agreement",
+      "description": "Leasing terms and occupancy conditions",
+      "structureSignatures": {
+        "headings": [
+          "Property Details",
+          "Lease Term",
+          "Rent",
+          "Maintenance",
+          "Renewal",
+          "Termination"
+        ],
+        "tableSignatures": [
+          "Rent schedule table",
+          "deposit and fees table",
+          "renewal milestones"
+        ],
+        "layoutCues": [
+          "property annexures",
+          "unit details",
+          "penalty annexure"
+        ],
+        "metadataCues": [
+          "property",
+          "lessor",
+          "lessee",
+          "term"
+        ]
+      }
+    },
+    {
+      "docTypeId": "legal_board_resolution",
+      "domainId": "legal",
+      "displayName": "Board Resolution",
+      "description": "Corporate governance resolution",
+      "structureSignatures": {
+        "headings": [
+          "Board Meeting",
+          "Resolution Text",
+          "Voting",
+          "Approvals",
+          "Attestation"
+        ],
+        "tableSignatures": [
+          "Voter attendance matrix",
+          "resolution motion table",
+          "compliance checklist"
+        ],
+        "layoutCues": [
+          "resolution resolution",
+          "meeting minutes style",
+          "signature witness block"
+        ],
+        "metadataCues": [
+          "meeting date",
+          "entity",
+          "quorum",
+          "chairperson"
+        ]
+      }
+    },
+    {
+      "docTypeId": "legal_settlement_agreement",
+      "domainId": "legal",
+      "displayName": "Settlement Agreement",
+      "description": "Dispute and remediation terms",
+      "structureSignatures": {
+        "headings": [
+          "Parties",
+          "Dispute Facts",
+          "Payments",
+          "Releases",
+          "Covenants",
+          "Signatures"
+        ],
+        "tableSignatures": [
+          "Payment schedule table",
+          "release obligations table",
+          "breach remedies matrix"
+        ],
+        "layoutCues": [
+          "resolution narrative",
+          "release language blocks",
+          "signature appendices"
+        ],
+        "metadataCues": [
+          "dispute id",
+          "settlement date",
+          "jurisdiction",
+          "dispute resolution forum"
+        ]
+      }
+    },
+    {
+      "docTypeId": "legal_patent_license",
+      "domainId": "legal",
+      "displayName": "License Agreement",
+      "description": "IP license grant and restrictions",
+      "structureSignatures": {
+        "headings": [
+          "Grant of Rights",
+          "Scope",
+          "Restrictions",
+          "Royalty",
+          "Termination",
+          "Governing Law"
+        ],
+        "tableSignatures": [
+          "IP asset list table",
+          "royalty table",
+          "territory matrix"
+        ],
+        "layoutCues": [
+          "grant clauses",
+          "IP definition section",
+          "signature and exhibit blocks"
+        ],
+        "metadataCues": [
+          "licensor",
+          "licensee",
+          "effective date",
+          "jurisdiction"
+        ]
+      }
+    },
+    {
+      "docTypeId": "legal_complaint",
+      "domainId": "legal",
+      "displayName": "Complaint",
+      "description": "Legal complaint filing",
+      "structureSignatures": {
+        "headings": [
+          "Caption",
+          "Jurisdiction",
+          "Allegations",
+          "Relief Sought",
+          "Prayer",
+          "Signature"
+        ],
+        "tableSignatures": [
+          "Case timeline table",
+          "damages table",
+          "claim index"
+        ],
+        "layoutCues": [
+          "court format filing style",
+          "claim paragraphs",
+          "annexure references"
+        ],
+        "metadataCues": [
+          "court",
+          "plaintiff",
+          "defendant",
+          "filing date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "legal_demand_letter",
+      "domainId": "legal",
+      "displayName": "Demand Letter",
+      "description": "Formal legal demand communication",
+      "structureSignatures": {
+        "headings": [
+          "Request",
+          "Background",
+          "Demand Terms",
+          "Deadline",
+          "Consequences",
+          "Signature"
+        ],
+        "tableSignatures": [
+          "Itemized demand table",
+          "timeline table",
+          "response tracker"
+        ],
+        "layoutCues": [
+          "formal letter blocks",
+          "deadline section",
+          "signature lines"
+        ],
+        "metadataCues": [
+          "recipient",
+          "sender",
+          "deadline",
+          "jurisdiction"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_lab_results",
       "domainId": "medical",
-      "displayName": "Medical Medication & Care Management",
-      "defaultRequiredSections": [
-        "medications",
-        "dosage",
-        "care goals",
-        "care actions"
-      ],
-      "coreEntityTypes": [
-        "medication_name",
-        "dose",
-        "frequency",
-        "care_goal"
-      ],
-      "typicalFormats": [
-        "pdf",
-        "docx",
-        "csv"
-      ]
+      "displayName": "Lab Results",
+      "description": "Laboratory analysis values and interpretation",
+      "structureSignatures": {
+        "headings": [
+          "Patient",
+          "Specimen",
+          "Test",
+          "Result",
+          "Reference Range",
+          "Interpretation",
+          "Signatory"
+        ],
+        "tableSignatures": [
+          "Result values table",
+          "Reference ranges table",
+          "Test panel table"
+        ],
+        "layoutCues": [
+          "ordered by analyte",
+          "value and unit columns",
+          "flags/abnormal markers"
+        ],
+        "metadataCues": [
+          "collection date",
+          "report date",
+          "lab name",
+          "ordering clinician"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_lab_order",
+      "domainId": "medical",
+      "displayName": "Lab Order",
+      "description": "Ordered tests and requisition request",
+      "structureSignatures": {
+        "headings": [
+          "Ordering Physician",
+          "Patient Information",
+          "Requested Tests",
+          "Priority",
+          "Delivery"
+        ],
+        "tableSignatures": [
+          "Ordered test table",
+          "diagnosis code table",
+          "sample source table"
+        ],
+        "layoutCues": [
+          "checklist style",
+          "ordered list sections",
+          "routing barcode line"
+        ],
+        "metadataCues": [
+          "order id",
+          "requesting physician",
+          "collection instructions",
+          "expected turnaround"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_radiology_report",
+      "domainId": "medical",
+      "displayName": "Radiology Report",
+      "description": "Imaging findings and impression",
+      "structureSignatures": {
+        "headings": [
+          "Patient",
+          "Exam",
+          "Findings",
+          "Impression",
+          "Recommendations"
+        ],
+        "tableSignatures": [
+          "Measurement table",
+          "Lesion list table",
+          "Procedure details table"
+        ],
+        "layoutCues": [
+          "sectioned radiology format",
+          "imaging modality heading",
+          "clinical indication block"
+        ],
+        "metadataCues": [
+          "modality",
+          "exam date",
+          "radiologist",
+          "accession number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_pathology_report",
+      "domainId": "medical",
+      "displayName": "Pathology Report",
+      "description": "Pathology diagnosis and microscopic findings",
+      "structureSignatures": {
+        "headings": [
+          "Specimen",
+          "Gross Description",
+          "Microscopic Description",
+          "Diagnosis",
+          "Margins"
+        ],
+        "tableSignatures": [
+          "Specimen list table",
+          "stain summary table",
+          "diagnostic details table"
+        ],
+        "layoutCues": [
+          "section heading sequence",
+          "diagnostic conclusion block",
+          "signature and stamp",
+          "case number"
+        ],
+        "metadataCues": [
+          "specimen id",
+          "pathologist",
+          "collection site",
+          "final diagnosis"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_prescription",
+      "domainId": "medical",
+      "displayName": "Prescription",
+      "description": "Medication order",
+      "structureSignatures": {
+        "headings": [
+          "Patient",
+          "Medication",
+          "Dosage",
+          "Directions",
+          "Refills",
+          "Provider Signature"
+        ],
+        "tableSignatures": [
+          "Medication list table",
+          "dosage schedule table",
+          "interaction flag table"
+        ],
+        "layoutCues": [
+          "header with prescriber",
+          "structured dose blocks",
+          "renewal footer"
+        ],
+        "metadataCues": [
+          "prescriber",
+          "patient id",
+          "issue date",
+          "DEA or license number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_discharge_summary",
+      "domainId": "medical",
+      "displayName": "Discharge Summary",
+      "description": "Hospital discharge overview",
+      "structureSignatures": {
+        "headings": [
+          "Admission",
+          "Hospital Course",
+          "Diagnoses",
+          "Discharge Meds",
+          "Follow-up"
+        ],
+        "tableSignatures": [
+          "Medication on discharge table",
+          "follow-up appointments table",
+          "vital timeline table"
+        ],
+        "layoutCues": [
+          "discharge workflow headings",
+          "summary blocks",
+          "signature and date"
+        ],
+        "metadataCues": [
+          "admit date",
+          "discharge date",
+          "attending provider",
+          "facility"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_medication_list",
+      "domainId": "medical",
+      "displayName": "Medication List",
+      "description": "Current medications and administration",
+      "structureSignatures": {
+        "headings": [
+          "Current Medications",
+          "Dose",
+          "Route",
+          "Frequency",
+          "Start Date",
+          "Indications"
+        ],
+        "tableSignatures": [
+          "Medication table",
+          "allergy crosswalk table",
+          "history table"
+        ],
+        "layoutCues": [
+          "list/tables by med",
+          "status markers",
+          "renewal indicator"
+        ],
+        "metadataCues": [
+          "patient id",
+          "author",
+          "review date",
+          "encounter id"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_allergy_list",
+      "domainId": "medical",
+      "displayName": "Allergy List",
+      "description": "Documented allergies and severity",
+      "structureSignatures": {
+        "headings": [
+          "Allergy",
+          "Severity",
+          "Reaction",
+          "Status",
+          "Last Verified",
+          "Notes"
+        ],
+        "tableSignatures": [
+          "Allergen table",
+          "reaction severity table",
+          "allergy history table"
+        ],
+        "layoutCues": [
+          "compact list section",
+          "alert icon indicators",
+          "verification timestamp"
+        ],
+        "metadataCues": [
+          "verifier",
+          "allergy onset date",
+          "patient id",
+          "clinical source"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_vitals_sheet",
+      "domainId": "medical",
+      "displayName": "Vitals Sheet",
+      "description": "Patient vitals with trend",
+      "structureSignatures": {
+        "headings": [
+          "Vitals Header",
+          "Time",
+          "Blood Pressure",
+          "Temperature",
+          "Pulse",
+          "Respiration"
+        ],
+        "tableSignatures": [
+          "Vital chart table",
+          "trend table",
+          "triage table"
+        ],
+        "layoutCues": [
+          "time-series rows",
+          "units column",
+          "abnormal highlight"
+        ],
+        "metadataCues": [
+          "measurement time",
+          "nurse",
+          "encounter id",
+          "unit"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_immunization_record",
+      "domainId": "medical",
+      "displayName": "Immunization Record",
+      "description": "Vaccines received and schedule",
+      "structureSignatures": {
+        "headings": [
+          "Immunization",
+          "Vaccine",
+          "Dose",
+          "Date",
+          "Lot Number",
+          "Site"
+        ],
+        "tableSignatures": [
+          "Vaccine table",
+          "booster schedule table",
+          "adverse event table"
+        ],
+        "layoutCues": [
+          "dose history list",
+          "manufacturer/lot block",
+          "schedule column"
+        ],
+        "metadataCues": [
+          "patient id",
+          "administered date",
+          "provider",
+          "location"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_insurance_claim",
+      "domainId": "medical",
+      "displayName": "Insurance Claim",
+      "description": "Clinical claim request and adjudication metadata",
+      "structureSignatures": {
+        "headings": [
+          "Claim Header",
+          "Provider",
+          "Services",
+          "Charges",
+          "Adjudication",
+          "Remittance"
+        ],
+        "tableSignatures": [
+          "CPT/HCPCS table",
+          "charge totals table",
+          "denial reason table"
+        ],
+        "layoutCues": [
+          "claim line sections",
+          "patient demographics block",
+          "payer decision block"
+        ],
+        "metadataCues": [
+          "claim id",
+          "payer",
+          "service dates",
+          "diagnosis codes"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_referral_letter",
+      "domainId": "medical",
+      "displayName": "Referral Letter",
+      "description": "Referral note and consultation request",
+      "structureSignatures": {
+        "headings": [
+          "Referral",
+          "Clinical Reason",
+          "Requested Specialty",
+          "Urgency",
+          "History",
+          "Sign-off"
+        ],
+        "tableSignatures": [
+          "History checklist table",
+          "medication table",
+          "test results list"
+        ],
+        "layoutCues": [
+          "formal letter style",
+          "clinical bullet sections",
+          "signature/authorship block"
+        ],
+        "metadataCues": [
+          "referring clinician",
+          "recipient specialist",
+          "patient id",
+          "priority"
+        ]
+      }
+    },
+    {
+      "docTypeId": "med_medical_imaging_report",
+      "domainId": "medical",
+      "displayName": "Imaging Report",
+      "description": "General imaging findings summary",
+      "structureSignatures": {
+        "headings": [
+          "Exam",
+          "Findings",
+          "Impression",
+          "Comparison",
+          "Recommendations"
+        ],
+        "tableSignatures": [
+          "Lesion list table",
+          "measurements table",
+          "comparison table"
+        ],
+        "layoutCues": [
+          "findings section first",
+          "impression bullets",
+          "recommendation appendix"
+        ],
+        "metadataCues": [
+          "modality",
+          "radiologist",
+          "facility",
+          "exam date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_chart_of_accounts",
+      "domainId": "accounting",
+      "displayName": "Chart of Accounts",
+      "description": "Account hierarchy mapping",
+      "structureSignatures": {
+        "headings": [
+          "Account Map",
+          "Account Number",
+          "Classification",
+          "Subaccount",
+          "Balance"
+        ],
+        "tableSignatures": [
+          "Account hierarchy table",
+          "normal balance table",
+          "parent child mapping"
+        ],
+        "layoutCues": [
+          "tree-like code list",
+          "balance column",
+          "classification columns"
+        ],
+        "metadataCues": [
+          "accounting policy",
+          "effective date",
+          "prepared by",
+          "currency"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_general_ledger",
+      "domainId": "accounting",
+      "displayName": "General Ledger",
+      "description": "Detailed accounting journal view",
+      "structureSignatures": {
+        "headings": [
+          "Ledger Header",
+          "Journal Entries",
+          "Debits",
+          "Credits",
+          "Closing"
+        ],
+        "tableSignatures": [
+          "Journal line table",
+          "posting code table",
+          "reconciliation table"
+        ],
+        "layoutCues": [
+          "chronological posting lines",
+          "journal reference blocks",
+          "control total row"
+        ],
+        "metadataCues": [
+          "period",
+          "book",
+          "entry id",
+          "entry date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_trial_balance",
+      "domainId": "accounting",
+      "displayName": "Trial Balance",
+      "description": "Debits and credits equality check",
+      "structureSignatures": {
+        "headings": [
+          "Trial Balance",
+          "Debits",
+          "Credits",
+          "Variance",
+          "Totals"
+        ],
+        "tableSignatures": [
+          "Debit/credit matrix",
+          "trial adjustment table",
+          "account totals table"
+        ],
+        "layoutCues": [
+          "two-column debit-credit",
+          "section totals",
+          "audit tie-out lines"
+        ],
+        "metadataCues": [
+          "as of date",
+          "currency",
+          "prepared by",
+          "fiscal period"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_journal_entry",
+      "domainId": "accounting",
+      "displayName": "Journal Entry",
+      "description": "Manual and automatic journal entries",
+      "structureSignatures": {
+        "headings": [
+          "Journal Header",
+          "Entry Lines",
+          "Debit/Credit",
+          "Narrative",
+          "Approvals"
+        ],
+        "tableSignatures": [
+          "Entry line table",
+          "cost center distribution",
+          "support reference table"
+        ],
+        "layoutCues": [
+          "voucher-like format",
+          "line-level support columns",
+          "approver signature"
+        ],
+        "metadataCues": [
+          "voucher id",
+          "creator",
+          "approval chain",
+          "posting date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_cash_flow_statement",
+      "domainId": "accounting",
+      "displayName": "Accounting Cash Flow Statement",
+      "description": "Prepared for statutory reporting",
+      "structureSignatures": {
+        "headings": [
+          "Cash Flow Statement",
+          "Operating",
+          "Investing",
+          "Financing",
+          "Reconciliation"
+        ],
+        "tableSignatures": [
+          "Operational cash table",
+          "statement bridge table",
+          "variance table"
+        ],
+        "layoutCues": [
+          "GAAP style sections",
+          "total row emphasis",
+          "subtotals"
+        ],
+        "metadataCues": [
+          "fiscal year",
+          "reporting entity",
+          "prepared by",
+          "currency"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_income_statement",
+      "domainId": "accounting",
+      "displayName": "Income Statement",
+      "description": "Profit and loss statement",
+      "structureSignatures": {
+        "headings": [
+          "Revenue",
+          "Expenses",
+          "Other Income",
+          "Net Income",
+          "Comparative"
+        ],
+        "tableSignatures": [
+          "Revenue schedule",
+          "expense schedule",
+          "comparison table"
+        ],
+        "layoutCues": [
+          "period columns",
+          "department totals",
+          "margin lines"
+        ],
+        "metadataCues": [
+          "period",
+          "entity",
+          "auditor review",
+          "currency"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_balance_sheet",
+      "domainId": "accounting",
+      "displayName": "Balance Sheet",
+      "description": "Assets/liabilities/equity snapshot",
+      "structureSignatures": {
+        "headings": [
+          "Assets",
+          "Liabilities",
+          "Equity",
+          "Notes",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Balance sheet matrix",
+          "comparison matrix",
+          "ratio input table"
+        ],
+        "layoutCues": [
+          "vertical sectioning",
+          "asset vs liability blocks",
+          "summary totals"
+        ],
+        "metadataCues": [
+          "as of date",
+          "accounting framework",
+          "entity",
+          "currency"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_inventory_valuation",
+      "domainId": "accounting",
+      "displayName": "Inventory Valuation",
+      "description": "Inventory quantities and valuation",
+      "structureSignatures": {
+        "headings": [
+          "Inventory Summary",
+          "Item",
+          "Quantity",
+          "Unit Cost",
+          "Valuation"
+        ],
+        "tableSignatures": [
+          "Stock movement table",
+          "valuation method table",
+          "aging table"
+        ],
+        "layoutCues": [
+          "SKU rows",
+          "valuation columns",
+          "adjustment section"
+        ],
+        "metadataCues": [
+          "inventory date",
+          "warehouse",
+          "valuation method",
+          "cost center"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_audit_workpaper",
+      "domainId": "accounting",
+      "displayName": "Audit Workpaper",
+      "description": "Audit evidence package",
+      "structureSignatures": {
+        "headings": [
+          "Control Test",
+          "Evidence",
+          "Exceptions",
+          "Conclusion",
+          "Reviewer"
+        ],
+        "tableSignatures": [
+          "Testing matrix",
+          "workpaper reference table",
+          "exception tracker"
+        ],
+        "layoutCues": [
+          "checklist style",
+          "control IDs",
+          "workpaper links"
+        ],
+        "metadataCues": [
+          "auditor",
+          "working paper number",
+          "review status",
+          "period"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_pbc_list",
+      "domainId": "accounting",
+      "displayName": "PBC List",
+      "description": "Prepared-by-client data request list",
+      "structureSignatures": {
+        "headings": [
+          "Request Item",
+          "Owner",
+          "Due Date",
+          "Source System",
+          "Status"
+        ],
+        "tableSignatures": [
+          "Request list table",
+          "priority matrix",
+          "completion tracker"
+        ],
+        "layoutCues": [
+          "tabular request board",
+          "owner assignment block",
+          "status flags"
+        ],
+        "metadataCues": [
+          "audit period",
+          "request owner",
+          "submission date",
+          "priority"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_phone_bill",
+      "domainId": "everyday",
+      "displayName": "Phone Bill",
+      "description": "Telecom usage and charges statement",
+      "structureSignatures": {
+        "headings": [
+          "Account Summary",
+          "Usage",
+          "Charges",
+          "Payments",
+          "Plan Changes"
+        ],
+        "tableSignatures": [
+          "Line-item usage table",
+          "plan charges table",
+          "call/text minutes table"
+        ],
+        "layoutCues": [
+          "telecom bill columns by service",
+          "due amount at bottom",
+          "usage summary block"
+        ],
+        "metadataCues": [
+          "account number",
+          "billing cycle",
+          "due date",
+          "provider"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_internet_bill",
+      "domainId": "everyday",
+      "displayName": "Internet Bill",
+      "description": "Internet provider monthly charge summary",
+      "structureSignatures": {
+        "headings": [
+          "Service Period",
+          "Usage",
+          "Speed Plan",
+          "Additional Charges",
+          "Payments"
+        ],
+        "tableSignatures": [
+          "Usage table",
+          "promotional credits table",
+          "invoice adjustments table"
+        ],
+        "layoutCues": [
+          "usage by plan section",
+          "invoice totals",
+          "service reference ids"
+        ],
+        "metadataCues": [
+          "subscriber id",
+          "billing date",
+          "due date",
+          "plan name"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_electricity_bill",
+      "domainId": "everyday",
+      "displayName": "Electricity Bill",
+      "description": "Utility power bill",
+      "structureSignatures": {
+        "headings": [
+          "Account Info",
+          "Consumption",
+          "Rate Details",
+          "Taxes",
+          "Total Due"
+        ],
+        "tableSignatures": [
+          "kWh usage table",
+          "rate tier table",
+          "billing period table"
+        ],
+        "layoutCues": [
+          "meter readings block",
+          "line item charge blocks",
+          "tax breakdown"
+        ],
+        "metadataCues": [
+          "utility account",
+          "billing period",
+          "meter id",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_water_bill",
+      "domainId": "everyday",
+      "displayName": "Water Bill",
+      "description": "Utility water charge summary",
+      "structureSignatures": {
+        "headings": [
+          "Meter Reading",
+          "Consumption",
+          "Tariff",
+          "Taxes",
+          "Amount"
+        ],
+        "tableSignatures": [
+          "Consumption table",
+          "penalty table",
+          "payment plan table"
+        ],
+        "layoutCues": [
+          "meter snapshot box",
+          "reading comparisons",
+          "charge table"
+        ],
+        "metadataCues": [
+          "service address",
+          "billing cycle",
+          "account holder",
+          "due date"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_gas_bill",
+      "domainId": "everyday",
+      "displayName": "Gas Bill",
+      "description": "Gas utility and service fee statement",
+      "structureSignatures": {
+        "headings": [
+          "Account Summary",
+          "Therms",
+          "Rate Plan",
+          "Adjustment",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Therm usage table",
+          "price tier table",
+          "fee breakdown"
+        ],
+        "layoutCues": [
+          "usage summary",
+          "fee breakdown lines",
+          "total due section"
+        ],
+        "metadataCues": [
+          "customer number",
+          "period",
+          "due date",
+          "provider"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_rental_receipt",
+      "domainId": "everyday",
+      "displayName": "Rental Receipt",
+      "description": "Rent payment proof",
+      "structureSignatures": {
+        "headings": [
+          "Tenant",
+          "Landlord",
+          "Payment",
+          "Period",
+          "Balance"
+        ],
+        "tableSignatures": [
+          "Rent line table",
+          "late fee table",
+          "payment history table"
+        ],
+        "layoutCues": [
+          "receipt header fields",
+          "payment method area",
+          "lease reference"
+        ],
+        "metadataCues": [
+          "tenant id",
+          "property",
+          "due date",
+          "receipt number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_grocery_receipt",
+      "domainId": "everyday",
+      "displayName": "Grocery Receipt",
+      "description": "Retail grocery transaction receipt",
+      "structureSignatures": {
+        "headings": [
+          "Store",
+          "Items",
+          "Subtotal",
+          "Tax",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Line-item item table",
+          "coupon table",
+          "payment split table"
+        ],
+        "layoutCues": [
+          "receipt narrow width",
+          "itemized lines",
+          "payment footer"
+        ],
+        "metadataCues": [
+          "store id",
+          "purchase time",
+          "payment type",
+          "register"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_restaurant_receipt",
+      "domainId": "everyday",
+      "displayName": "Restaurant Receipt",
+      "description": "Food service purchase record",
+      "structureSignatures": {
+        "headings": [
+          "Restaurant",
+          "Items",
+          "Service Charge",
+          "Tax",
+          "Tip",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Item table",
+          "service table",
+          "tip table"
+        ],
+        "layoutCues": [
+          "check-style format",
+          "itemized categories",
+          "subtotal and gratuity"
+        ],
+        "metadataCues": [
+          "venue",
+          "transaction time",
+          "payment method",
+          "table"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_gas_station_receipt",
+      "domainId": "everyday",
+      "displayName": "Gas Station Receipt",
+      "description": "Fuel and convenience store receipt",
+      "structureSignatures": {
+        "headings": [
+          "Station",
+          "Fuel Amount",
+          "Fuel Unit",
+          "Price",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Fuel detail table",
+          "fuel grade table",
+          "merchandise table"
+        ],
+        "layoutCues": [
+          "fuel row lines",
+          "odometer/reader block",
+          "pay-at-pump signature"
+        ],
+        "metadataCues": [
+          "station id",
+          "fuel type",
+          "time",
+          "pump number"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_parking_ticket",
+      "domainId": "everyday",
+      "displayName": "Parking Ticket",
+      "description": "Transportation parking pass",
+      "structureSignatures": {
+        "headings": [
+          "Vehicle",
+          "Entry Time",
+          "Exit Time",
+          "Rate",
+          "Amount"
+        ],
+        "tableSignatures": [
+          "Time interval table",
+          "rate matrix",
+          "payment table"
+        ],
+        "layoutCues": [
+          "compact ticket style",
+          "barcode block",
+          "zone field"
+        ],
+        "metadataCues": [
+          "parking id",
+          "license",
+          "zone",
+          "duration"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_shopping_receipt",
+      "domainId": "everyday",
+      "displayName": "Shopping Receipt",
+      "description": "Generic consumer purchase proof",
+      "structureSignatures": {
+        "headings": [
+          "Store",
+          "Products",
+          "Discount",
+          "Subtotal",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Line item table",
+          "promotion table",
+          "payment method table"
+        ],
+        "layoutCues": [
+          "multiple columns",
+          "coupon section",
+          "barcode footer"
+        ],
+        "metadataCues": [
+          "merchant",
+          "transaction id",
+          "timestamp",
+          "payment"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_toll_bill",
+      "domainId": "everyday",
+      "displayName": "Toll Bill",
+      "description": "Road toll or tag transaction bill",
+      "structureSignatures": {
+        "headings": [
+          "Toll Portal",
+          "Vehicle",
+          "Trips",
+          "Rate",
+          "Invoice"
+        ],
+        "tableSignatures": [
+          "Trip table",
+          "route table",
+          "charge class table"
+        ],
+        "layoutCues": [
+          "trip-line entries",
+          "distance and rate columns",
+          "balance block"
+        ],
+        "metadataCues": [
+          "tag id",
+          "vehicle",
+          "period",
+          "statement total"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_ticket_receipt",
+      "domainId": "everyday",
+      "displayName": "Event Ticket Receipt",
+      "description": "Event or transport ticket evidence",
+      "structureSignatures": {
+        "headings": [
+          "Event",
+          "Ticket",
+          "Seat",
+          "Date",
+          "Amount"
+        ],
+        "tableSignatures": [
+          "Ticket list table",
+          "tax table",
+          "refund table"
+        ],
+        "layoutCues": [
+          "ticket header",
+          "barcode/qr code area",
+          "price tier columns"
+        ],
+        "metadataCues": [
+          "event id",
+          "pass number",
+          "purchase date",
+          "seat"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_transport_receipt",
+      "domainId": "everyday",
+      "displayName": "Transport Receipt",
+      "description": "Transit or taxi purchase proof",
+      "structureSignatures": {
+        "headings": [
+          "Route",
+          "Distance",
+          "Fare",
+          "Tax",
+          "Total"
+        ],
+        "tableSignatures": [
+          "Fare matrix",
+          "distance table",
+          "payment table"
+        ],
+        "layoutCues": [
+          "trip summary block",
+          "fare detail rows",
+          "payment area"
+        ],
+        "metadataCues": [
+          "vehicle id",
+          "driver",
+          "start",
+          "end"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_controls_narrative",
+      "domainId": "accounting",
+      "displayName": "Controls Narrative",
+      "description": "Internal controls narrative and compliance statements.",
+      "structureSignatures": {
+        "headings": [
+          "Control Framework",
+          "Control Owners",
+          "Control Design",
+          "Testing Evidence"
+        ],
+        "tableSignatures": [
+          "Control mapping table",
+          "RMM test matrix",
+          "Exception tracker table"
+        ],
+        "layoutCues": [
+          "control narrative blocks",
+          "process flow diagram references",
+          "ownership matrix"
+        ],
+        "metadataCues": [
+          "control id",
+          "owner",
+          "effective date",
+          "review status"
+        ]
+      }
+    },
+    {
+      "docTypeId": "acct_management_rep_letter",
+      "domainId": "accounting",
+      "displayName": "Management Representation Letter",
+      "description": "Management certification letter for financial assertions.",
+      "structureSignatures": {
+        "headings": [
+          "Representation Header",
+          "Management Statements",
+          "Scope of Certainty",
+          "Executory Signature"
+        ],
+        "tableSignatures": [
+          "Representation checklist table",
+          "exception acknowledgment table",
+          "supporting reference table"
+        ],
+        "layoutCues": [
+          "letter-style format",
+          "statement-by-statement numbering",
+          "attestation signature"
+        ],
+        "metadataCues": [
+          "prepared date",
+          "signatory",
+          "period covered",
+          "audit period"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_subscription_receipt",
+      "domainId": "everyday",
+      "displayName": "Subscription Receipt",
+      "description": "Membership or subscription proof-of-payment receipt.",
+      "structureSignatures": {
+        "headings": [
+          "Subscriber",
+          "Plan",
+          "Billing Period",
+          "Amount",
+          "Payment"
+        ],
+        "tableSignatures": [
+          "Plan fee table",
+          "tax table",
+          "discount table"
+        ],
+        "layoutCues": [
+          "subscription plan section",
+          "recurring billing line",
+          "receipt metadata block"
+        ],
+        "metadataCues": [
+          "subscriber",
+          "period",
+          "plan name",
+          "payment method"
+        ]
+      }
+    },
+    {
+      "docTypeId": "everyday_cash_receipt",
+      "domainId": "everyday",
+      "displayName": "Cash Receipt",
+      "description": "Cash payment or deposit receipt.",
+      "structureSignatures": {
+        "headings": [
+          "Received From",
+          "Amount",
+          "Currency",
+          "Date",
+          "Reference"
+        ],
+        "tableSignatures": [
+          "Tender table",
+          "payment method table",
+          "cash summary table"
+        ],
+        "layoutCues": [
+          "voucher-like short form",
+          "payment totals",
+          "stamped total row"
+        ],
+        "metadataCues": [
+          "receipt id",
+          "payer",
+          "cash date",
+          "counterparty"
+        ]
+      }
     }
   ]
 }

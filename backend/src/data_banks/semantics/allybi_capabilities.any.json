@@ -64,6 +64,13 @@
     "DOCX_FIND_REPLACE":         { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_text_diff" },
     "DOCX_UPDATE_TOC":           { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
     "DOCX_ENRICH_FROM_SOURCES":  { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_text_diff" },
+    "DOCX_SET_HEADING_LEVEL":    { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
+    "DOCX_PAGE_BREAK":           { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
+    "DOCX_SECTION_BREAK":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
+    "DOCX_CREATE_TABLE":         { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
+    "DOCX_ADD_TABLE_ROW":        { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
+    "DOCX_DELETE_TABLE_ROW":     { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
+    "DOCX_SET_TABLE_CELL":       { "supported": true,  "filetype": "docx", "runtimeOperator": "EDIT_DOCX_BUNDLE", "engine": "local", "renderCard": "docx_structural_diff" },
 
     "XLSX_SET_CELL_VALUE":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "EDIT_CELL",      "engine": "local", "renderCard": "xlsx_cell_diff" },
     "XLSX_SET_RANGE_VALUES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "EDIT_RANGE",     "engine": "local", "renderCard": "xlsx_range_diff" },
@@ -101,7 +108,22 @@
     "XLSX_CHART_SET_TITLES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
     "XLSX_CHART_SET_AXES":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
     "XLSX_CHART_MOVE_RESIZE":    { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
-    "XLSX_CHART_DELETE":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" }
+    "XLSX_CHART_DELETE":         { "supported": true,  "filetype": "xlsx", "runtimeOperator": "CREATE_CHART",   "engine": "sheets_bridge_required", "renderCard": "xlsx_chart_diff" },
+
+    "XLSX_REMOVE_DUPLICATES":    { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_structural_diff" },
+    "XLSX_TRIM_WHITESPACE":      { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
+    "XLSX_NORMALIZE_VALUES":     { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_format_diff" },
+    "XLSX_SET_PROTECTION":       { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_security_diff" },
+    "XLSX_LOCK_CELLS":           { "supported": true,  "filetype": "xlsx", "runtimeOperator": "COMPUTE_BUNDLE", "engine": "local", "renderCard": "xlsx_security_diff" },
+
+    "PY_TIME_SERIES_FORECAST":    { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_STATS_DESCRIPTIVE":       { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_STATS_REGRESSION":        { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_CALC_DERIVE_COLUMN":      { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_CLEAN_MISSING_VALUES":    { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_OUTLIER_DETECT":          { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_PIVOT_TABLE":            { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" },
+    "PY_BINNING":                { "supported": true,  "filetype": "excel", "runtimeOperator": "PY_COMPUTE",   "engine": "python_bridge_required", "renderCard": "python_compute_diff" }
   },
   "alwaysConfirmOperators": [
     "DOCX_FIND_REPLACE",

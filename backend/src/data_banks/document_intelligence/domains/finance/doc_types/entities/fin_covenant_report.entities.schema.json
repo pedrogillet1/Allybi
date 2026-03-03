@@ -1,0 +1,1045 @@
+{
+  "_meta": {
+    "id": "di_finance_entities_fin_covenant_report",
+    "version": "2.1.0",
+    "description": "Entity schema for Covenant Report.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_covenant_report",
+    "strictMode": true
+  },
+  "schemaContract": {
+    "idType": "finance_doc_entity",
+    "requireEvidenceForNumeric": true,
+    "disallowUnresolvedUnits": true,
+    "requireTableContext": true
+  },
+  "entities": [
+    {
+      "id": "document_id",
+      "type": "string",
+      "required": true,
+      "evidenceRequirement": [
+        "header_id",
+        "source_table"
+      ],
+      "notes": "document-level evidence required"
+    },
+    {
+      "id": "source_file_name",
+      "type": "string",
+      "required": true,
+      "evidenceRequirement": [
+        "file_metadata"
+      ],
+      "notes": "source file provenance"
+    },
+    {
+      "id": "extraction_timestamp",
+      "type": "datetime",
+      "required": true,
+      "evidenceRequirement": [
+        "ingestion_metadata"
+      ],
+      "notes": "must include parse timestamp"
+    },
+    {
+      "id": "lender",
+      "canonical": "lender",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: lender from table/header context."
+    },
+    {
+      "id": "borrower",
+      "canonical": "borrower",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: borrower from table/header context."
+    },
+    {
+      "id": "agreement_id",
+      "canonical": "agreement_id",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: agreement_id from table/header context."
+    },
+    {
+      "id": "facility_name",
+      "canonical": "facility_name",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: facility_name from table/header context."
+    },
+    {
+      "id": "currency",
+      "canonical": "currency",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: currency from table/header context."
+    },
+    {
+      "id": "unit_scale",
+      "canonical": "unit_scale",
+      "type": "boolean",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: unit_scale from table/header context."
+    },
+    {
+      "id": "measurement_period",
+      "canonical": "measurement_period",
+      "type": "array",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: measurement_period from table/header context."
+    },
+    {
+      "id": "testing_metric",
+      "canonical": "testing_metric",
+      "type": "string",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: testing_metric from table/header context."
+    },
+    {
+      "id": "threshold_name",
+      "canonical": "threshold_name",
+      "type": "number",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: threshold_name from table/header context."
+    },
+    {
+      "id": "required_minimum",
+      "canonical": "required_minimum",
+      "type": "date",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: required_minimum from table/header context."
+    },
+    {
+      "id": "actual_metric",
+      "canonical": "actual_metric",
+      "type": "currency",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: actual_metric from table/header context."
+    },
+    {
+      "id": "compliance_status",
+      "canonical": "compliance_status",
+      "type": "percentage",
+      "required": true,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: compliance_status from table/header context."
+    },
+    {
+      "id": "variance_abs",
+      "canonical": "variance_abs",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: variance_abs from table/header context."
+    },
+    {
+      "id": "variance_pct",
+      "canonical": "variance_pct",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: variance_pct from table/header context."
+    },
+    {
+      "id": "breach_reason",
+      "canonical": "breach_reason",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: breach_reason from table/header context."
+    },
+    {
+      "id": "waiver_status",
+      "canonical": "waiver_status",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: waiver_status from table/header context."
+    },
+    {
+      "id": "waiver_type",
+      "canonical": "waiver_type",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: waiver_type from table/header context."
+    },
+    {
+      "id": "cure_period_days",
+      "canonical": "cure_period_days",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: cure_period_days from table/header context."
+    },
+    {
+      "id": "remedy_action",
+      "canonical": "remedy_action",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: remedy_action from table/header context."
+    },
+    {
+      "id": "next_test_date",
+      "canonical": "next_test_date",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: next_test_date from table/header context."
+    },
+    {
+      "id": "reporting_quarter",
+      "canonical": "reporting_quarter",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: reporting_quarter from table/header context."
+    },
+    {
+      "id": "covenant_id",
+      "canonical": "covenant_id",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_id from table/header context."
+    },
+    {
+      "id": "covenant_name",
+      "canonical": "covenant_name",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_name from table/header context."
+    },
+    {
+      "id": "source_table",
+      "canonical": "source_table",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: source_table from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_25",
+      "canonical": "covenant_report_metric_25",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_25 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_26",
+      "canonical": "covenant_report_metric_26",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_26 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_27",
+      "canonical": "covenant_report_metric_27",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_27 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_28",
+      "canonical": "covenant_report_metric_28",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_28 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_29",
+      "canonical": "covenant_report_metric_29",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_29 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_30",
+      "canonical": "covenant_report_metric_30",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_30 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_31",
+      "canonical": "covenant_report_metric_31",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_31 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_32",
+      "canonical": "covenant_report_metric_32",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_32 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_33",
+      "canonical": "covenant_report_metric_33",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_33 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_34",
+      "canonical": "covenant_report_metric_34",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_34 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_35",
+      "canonical": "covenant_report_metric_35",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_35 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_36",
+      "canonical": "covenant_report_metric_36",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_36 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_37",
+      "canonical": "covenant_report_metric_37",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_37 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_38",
+      "canonical": "covenant_report_metric_38",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_38 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_39",
+      "canonical": "covenant_report_metric_39",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_39 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_40",
+      "canonical": "covenant_report_metric_40",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_40 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_41",
+      "canonical": "covenant_report_metric_41",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_41 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_42",
+      "canonical": "covenant_report_metric_42",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_42 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_43",
+      "canonical": "covenant_report_metric_43",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_43 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_44",
+      "canonical": "covenant_report_metric_44",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_44 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_45",
+      "canonical": "covenant_report_metric_45",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_45 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_46",
+      "canonical": "covenant_report_metric_46",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_46 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_47",
+      "canonical": "covenant_report_metric_47",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_47 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_48",
+      "canonical": "covenant_report_metric_48",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_48 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_49",
+      "canonical": "covenant_report_metric_49",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_49 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_50",
+      "canonical": "covenant_report_metric_50",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_50 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_51",
+      "canonical": "covenant_report_metric_51",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_51 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_52",
+      "canonical": "covenant_report_metric_52",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_52 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_53",
+      "canonical": "covenant_report_metric_53",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_53 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_54",
+      "canonical": "covenant_report_metric_54",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_54 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_55",
+      "canonical": "covenant_report_metric_55",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_55 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_56",
+      "canonical": "covenant_report_metric_56",
+      "type": "array",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_56 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_57",
+      "canonical": "covenant_report_metric_57",
+      "type": "string",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_57 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_58",
+      "canonical": "covenant_report_metric_58",
+      "type": "number",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_58 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_59",
+      "canonical": "covenant_report_metric_59",
+      "type": "date",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_59 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_60",
+      "canonical": "covenant_report_metric_60",
+      "type": "currency",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_60 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_61",
+      "canonical": "covenant_report_metric_61",
+      "type": "percentage",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.55,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "period",
+        "row_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_61 from table/header context."
+    },
+    {
+      "id": "covenant_report_metric_62",
+      "canonical": "covenant_report_metric_62",
+      "type": "boolean",
+      "required": false,
+      "schema": {
+        "minConfidence": 0.7,
+        "allowAmbiguity": true
+      },
+      "evidenceRequirement": [
+        "table_header_context",
+        "currency",
+        "column_header"
+      ],
+      "notes": "Evidence for Covenant Report: covenant_report_metric_62 from table/header context."
+    }
+  ]
+}

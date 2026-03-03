@@ -64,6 +64,9 @@
     "benchmarks:index": "node scripts/benchmarks/run.mjs",
     "test:retrieval:doclock": "jest --config jest.config.cjs --runTestsByPath src/services/core/retrieval/retrievalDocLock.benchmark.test.ts --runInBand",
     "test:orchestrator-certification": "ts-node --transpile-only scripts/certification/run-orchestrator-certification.ts",
+    "policy:cert": "ts-node --transpile-only scripts/policy/run-certification.ts",
+    "policy:cert:strict": "ts-node --transpile-only scripts/policy/run-certification.ts --strict",
+    "policy:a-grade:assert": "ts-node --transpile-only scripts/policy/assert-a-grade.ts",
     "test:security": "jest --config jest.config.cjs security",
     "security:scan": "./scripts/security/run-all.sh",
     "security:rbac": "npx ts-node scripts/security/scan-rbac-protection.ts",
@@ -119,8 +122,8 @@
     "audit:reachability:triage": "node scripts/audit/reachability-triage.mjs",
     "audit:reachability:budget:strict": "node scripts/audit/reachability-budget.mjs --strict",
     "audit:sot:strict": "node scripts/audit/sot-owner-audit.mjs --strict",
-    "check:all": "npm run typecheck && npm run lint && npm run lint:routing && npm run lint:architecture && npm run lint:prompts && npm run audit:intent:strict && npm run audit:intent:parity && npm run audit:retrieval:strict && npm run audit:retrieval:doclock:strict && npm run audit:editing:strict && npm run audit:ocr:strict && npm run audit:memory:strict && npm run banks:audit-unused:strict && npm run format:check && npm run banks:integrity:check && npm run editing:validate-banks:ci && npm run audit:runtime-graph && npm run audit:reachability:triage && npm run audit:reachability:budget:strict && npm run audit:sot:strict && npm run test:cert:strict && npm run audit:p0:strict",
-    "predeploy:grade": "npm run check:all && node scripts/audit/runtime-import-graph.mjs --strict-runtime",
+    "check:all": "npm run typecheck && npm run lint && npm run lint:routing && npm run lint:architecture && npm run lint:prompts && npm run audit:intent:strict && npm run audit:intent:parity && npm run audit:retrieval:strict && npm run audit:retrieval:doclock:strict && npm run audit:editing:strict && npm run audit:ocr:strict && npm run audit:memory:strict && npm run banks:audit-unused:strict && npm run format:check && npm run banks:integrity:check && npm run editing:validate-banks:ci && npm run policy:cert:strict && npm run policy:a-grade:assert && npm run audit:runtime-graph && npm run audit:reachability:triage && npm run audit:reachability:budget:strict && npm run audit:sot:strict && npm run test:cert:strict && npm run audit:p0:strict",
+    "predeploy:grade": "npm run check:all && npm run policy:cert:strict && npm run policy:a-grade:assert && node scripts/audit/runtime-import-graph.mjs --strict-runtime",
     "fix:all": "npm run lint:fix && npm run format",
     "test:functionality": "bash scripts/test-functionality.sh",
     "test:chat": "bash scripts/test-chat-complete.sh",
@@ -156,7 +159,12 @@
     "test:editing:python-semantic": "jest --config jest.config.cjs --runInBand src/tests/editing/xlsx-semantic.test.ts src/tests/editing/bankMutationProof.test.ts",
     "audit:operators:grade": "node scripts/audit/operator-systems-grade.mjs",
     "audit:operators:grade:strict": "node scripts/audit/operator-systems-grade.mjs --strict",
-    "audit:operators:a-plus": "npm run test:cert:operator-gates && npm run integrations:agents:grade:strict && npm run audit:routing && npm run audit:editing:strict && npm run test:editing:python-semantic && npm run test:cert:editing-eval && npm run audit:p0:strict && npm run audit:operators:grade:strict"
+    "audit:operators:a-plus": "npm run test:cert:operator-gates && npm run integrations:agents:grade:strict && npm run audit:routing && npm run audit:editing:strict && npm run test:editing:python-semantic && npm run test:cert:editing-eval && npm run audit:p0:strict && npm run audit:operators:grade:strict",
+    "banks:audit:usage": "node scripts/audit-databanks.mjs",
+    "banks:compile-artifacts": "node scripts/compile-bank-artifacts.mjs",
+    "banks:check-collisions": "node scripts/check-bank-collisions.mjs",
+    "banks:report-staleness": "node scripts/report-bank-staleness.mjs",
+    "banks:quality:ci": "npm run banks:audit:usage && npm run banks:check-collisions && npm run banks:compile-artifacts && npm run banks:report-staleness"
   },
   "lint-staged": {
     "src/**/*.ts": [

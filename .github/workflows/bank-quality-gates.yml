@@ -1,0 +1,81 @@
+name: Bank Quality Gates
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - "backend/src/data_banks/**"
+      - "backend/src/services/core/banks/**"
+      - "backend/src/services/core/retrieval/**"
+      - "backend/src/modules/chat/runtime/**"
+      - "backend/scripts/audit-databanks.mjs"
+      - "backend/scripts/compile-bank-artifacts.mjs"
+      - "backend/scripts/check-bank-collisions.mjs"
+      - "backend/scripts/report-bank-staleness.mjs"
+      - ".github/workflows/bank-quality-gates.yml"
+  push:
+    branches: [ main, develop ]
+    paths:
+      - "backend/src/data_banks/**"
+      - "backend/src/services/core/banks/**"
+      - "backend/src/services/core/retrieval/**"
+      - "backend/src/modules/chat/runtime/**"
+      - "backend/scripts/audit-databanks.mjs"
+      - "backend/scripts/compile-bank-artifacts.mjs"
+      - "backend/scripts/check-bank-collisions.mjs"
+      - "backend/scripts/report-bank-staleness.mjs"
+      - ".github/workflows/bank-quality-gates.yml"
+
+jobs:
+  bank-gates:
+    name: Data-bank integrity and artifacts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run data-bank usage audit
+        run: node scripts/audit-databanks.mjs > /tmp/databank-audit.md
+
+      - name: Run bank collision threshold check
+        run: node scripts/check-bank-collisions.mjs > /tmp/databank-collisions.json
+
+      - name: Verify document-intelligence bank wiring (strict)
+        run: npm run docint:verify:banks:strict
+
+      - name: Build compiled bank artifacts
+        run: node scripts/compile-bank-artifacts.mjs
+
+      - name: Generate stale-content report
+        run: node scripts/report-bank-staleness.mjs
+
+      - name: Validate generated outputs
+        run: |
+          test -f src/data_banks/.compiled/compiled_manifest.any.json
+          test -f notes/BANK_STALENESS_REPORT.json
+          test -f notes/BANK_STALENESS_REPORT.md
+
+      - name: Upload audit and reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: bank-quality-reports
+          path: |
+            /tmp/databank-audit.md
+            /tmp/databank-collisions.json
+            backend/src/data_banks/.compiled/compiled_manifest.any.json
+            backend/notes/BANK_STALENESS_REPORT.json
+            backend/notes/BANK_STALENESS_REPORT.md
+          retention-days: 14

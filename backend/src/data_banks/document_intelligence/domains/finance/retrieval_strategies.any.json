@@ -1,70 +1,2369 @@
 {
   "_meta": {
     "id": "di_finance_retrieval_strategies",
-    "version": "1.0.0",
-    "description": "Retrieval strategies for finance domain — section prioritization, boost rules, and query expansion.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Finance retrieval strategies with section and table boost logic.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "maxBoostRules": 10,
-    "maxQueryExpansionTerms": 8
+    "maxBoostRules": 140,
+    "maxQueryExpansionTerms": 160
   },
   "domain": "finance",
   "sectionPriority": [
-    { "section": "management_discussion_and_analysis", "weight": 2.5, "operators": ["advise", "summarize", "evaluate"] },
-    { "section": "financial_statements", "weight": 3.0, "operators": ["extract", "calculate", "validate"] },
-    { "section": "notes_to_financial_statements", "weight": 2.8, "operators": ["extract", "locate", "validate"] },
-    { "section": "risk_factors", "weight": 2.0, "operators": ["advise", "evaluate", "monitor"] },
-    { "section": "executive_summary", "weight": 2.0, "operators": ["summarize", "navigate"] },
-    { "section": "auditor_report", "weight": 1.8, "operators": ["validate", "evaluate"] },
-    { "section": "revenue_breakdown", "weight": 2.2, "operators": ["extract", "calculate", "compare"] },
-    { "section": "segment_reporting", "weight": 2.0, "operators": ["extract", "compare"] },
-    { "section": "covenant_schedule", "weight": 2.5, "operators": ["validate", "monitor"] },
-    { "section": "cap_table", "weight": 2.5, "operators": ["extract", "calculate"] }
+    {
+      "section": "executive_summary",
+      "weight": 6.75,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "md&a",
+      "weight": 6.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "financial_statements",
+      "weight": 6.25,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "notes_to_financial_statements",
+      "weight": 6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "management_report",
+      "weight": 5.75,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "covenants",
+      "weight": 5.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "tax_notes",
+      "weight": 5.25,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "cash_flow_details",
+      "weight": 5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "variance_analysis",
+      "weight": 4.75,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "segment_reporting",
+      "weight": 4.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "kpi_dashboard",
+      "weight": 4.25,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "board_pack",
+      "weight": 4,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "budget_pack",
+      "weight": 3.75,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "forecast_pack",
+      "weight": 3.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "cap_table",
+      "weight": 3.25,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "debt_schedule",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "bank_statement_lines",
+      "weight": 2.75,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "liquidity_risk",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    },
+    {
+      "section": "revenue_churn",
+      "weight": 2.25,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "monitor",
+        "summarize"
+      ]
+    }
+  ],
+  "tablePriority": [
+    {
+      "table": "consolidated_income_statement",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "balance_sheet",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "cash_flow_statement",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "statement_of_stockholder_equity",
+      "weight": 3.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "trial_balance_detail",
+      "weight": 4,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "notes_to_financial_statements",
+      "weight": 4.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "revenue_bridge",
+      "weight": 5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "cogs_detail",
+      "weight": 5.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "segment_revenue",
+      "weight": 6,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "geographic_revenue",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "department_opex",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "budget_vs_actual_table",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "rolling_forecast",
+      "weight": 3.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "arr_mrr_cohort",
+      "weight": 4,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "churn_funnel",
+      "weight": 4.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "debt_schedule",
+      "weight": 5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "cash_flow_forecast",
+      "weight": 5.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "kpi_timeline",
+      "weight": 6,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "unit_economics",
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "cap_table_summary",
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    },
+    {
+      "table": "tax_schedule",
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate",
+        "validate",
+        "calculate"
+      ],
+      "reason": "table boost for structured retrieval"
+    }
   ],
   "boostRules": [
     {
-      "id": "fin_boost_001_numeric_extract",
-      "priority": 95,
-      "weight": 2.5,
-      "operators": ["extract", "calculate"],
-      "condition": "query mentions specific financial metric or line item",
-      "boostSections": ["financial_statements", "notes_to_financial_statements", "revenue_breakdown"]
+      "id": "fin_retrieval_boost_001",
+      "priority": 200,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 1 or explicit metric label",
+      "boostSections": [
+        "executive_summary"
+      ],
+      "tableBoost": [
+        "consolidated_income_statement"
+      ]
     },
     {
-      "id": "fin_boost_002_risk_evaluation",
-      "priority": 90,
-      "weight": 2.0,
-      "operators": ["evaluate", "advise"],
-      "condition": "query asks about risk, exposure, or downside",
-      "boostSections": ["risk_factors", "management_discussion_and_analysis", "notes_to_financial_statements"]
+      "id": "fin_retrieval_boost_002",
+      "priority": 199,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 2 or explicit metric label",
+      "boostSections": [
+        "md&a"
+      ],
+      "tableBoost": [
+        "balance_sheet"
+      ]
     },
     {
-      "id": "fin_boost_003_trend_comparison",
-      "priority": 85,
+      "id": "fin_retrieval_boost_003",
+      "priority": 198,
       "weight": 1.8,
-      "operators": ["compare", "monitor"],
-      "condition": "query involves period-over-period or peer comparison",
-      "boostSections": ["financial_statements", "segment_reporting", "management_discussion_and_analysis"]
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 3 or explicit metric label",
+      "boostSections": [
+        "financial_statements"
+      ],
+      "tableBoost": [
+        "cash_flow_statement"
+      ]
     },
     {
-      "id": "fin_boost_004_covenant_check",
-      "priority": 92,
-      "weight": 2.8,
-      "operators": ["validate", "monitor"],
-      "condition": "query references debt covenants or compliance ratios",
-      "boostSections": ["covenant_schedule", "notes_to_financial_statements"]
+      "id": "fin_retrieval_boost_004",
+      "priority": 197,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 4 or explicit metric label",
+      "boostSections": [
+        "notes_to_financial_statements"
+      ],
+      "tableBoost": [
+        "statement_of_stockholder_equity"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_005",
+      "priority": 196,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 5 or explicit metric label",
+      "boostSections": [
+        "management_report"
+      ],
+      "tableBoost": [
+        "trial_balance_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_006",
+      "priority": 195,
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 6 or explicit metric label",
+      "boostSections": [
+        "covenants"
+      ],
+      "tableBoost": [
+        "notes_to_financial_statements"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_007",
+      "priority": 194,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 7 or explicit metric label",
+      "boostSections": [
+        "tax_notes"
+      ],
+      "tableBoost": [
+        "revenue_bridge"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_008",
+      "priority": 193,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 8 or explicit metric label",
+      "boostSections": [
+        "cash_flow_details"
+      ],
+      "tableBoost": [
+        "cogs_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_009",
+      "priority": 192,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 9 or explicit metric label",
+      "boostSections": [
+        "variance_analysis"
+      ],
+      "tableBoost": [
+        "segment_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_010",
+      "priority": 191,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 10 or explicit metric label",
+      "boostSections": [
+        "segment_reporting"
+      ],
+      "tableBoost": [
+        "geographic_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_011",
+      "priority": 190,
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 11 or explicit metric label",
+      "boostSections": [
+        "kpi_dashboard"
+      ],
+      "tableBoost": [
+        "department_opex"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_012",
+      "priority": 189,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 12 or explicit metric label",
+      "boostSections": [
+        "board_pack"
+      ],
+      "tableBoost": [
+        "budget_vs_actual_table"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_013",
+      "priority": 188,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 13 or explicit metric label",
+      "boostSections": [
+        "budget_pack"
+      ],
+      "tableBoost": [
+        "rolling_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_014",
+      "priority": 187,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 14 or explicit metric label",
+      "boostSections": [
+        "forecast_pack"
+      ],
+      "tableBoost": [
+        "arr_mrr_cohort"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_015",
+      "priority": 186,
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 15 or explicit metric label",
+      "boostSections": [
+        "cap_table"
+      ],
+      "tableBoost": [
+        "churn_funnel"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_016",
+      "priority": 185,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 16 or explicit metric label",
+      "boostSections": [
+        "debt_schedule"
+      ],
+      "tableBoost": [
+        "debt_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_017",
+      "priority": 184,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 17 or explicit metric label",
+      "boostSections": [
+        "bank_statement_lines"
+      ],
+      "tableBoost": [
+        "cash_flow_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_018",
+      "priority": 183,
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 18 or explicit metric label",
+      "boostSections": [
+        "liquidity_risk"
+      ],
+      "tableBoost": [
+        "kpi_timeline"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_019",
+      "priority": 182,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 19 or explicit metric label",
+      "boostSections": [
+        "revenue_churn"
+      ],
+      "tableBoost": [
+        "unit_economics"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_020",
+      "priority": 181,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 20 or explicit metric label",
+      "boostSections": [
+        "executive_summary"
+      ],
+      "tableBoost": [
+        "cap_table_summary"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_021",
+      "priority": 180,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 21 or explicit metric label",
+      "boostSections": [
+        "md&a"
+      ],
+      "tableBoost": [
+        "tax_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_022",
+      "priority": 179,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 22 or explicit metric label",
+      "boostSections": [
+        "financial_statements"
+      ],
+      "tableBoost": [
+        "consolidated_income_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_023",
+      "priority": 178,
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 23 or explicit metric label",
+      "boostSections": [
+        "notes_to_financial_statements"
+      ],
+      "tableBoost": [
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_024",
+      "priority": 177,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 24 or explicit metric label",
+      "boostSections": [
+        "management_report"
+      ],
+      "tableBoost": [
+        "cash_flow_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_025",
+      "priority": 176,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 25 or explicit metric label",
+      "boostSections": [
+        "covenants"
+      ],
+      "tableBoost": [
+        "statement_of_stockholder_equity"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_026",
+      "priority": 175,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 26 or explicit metric label",
+      "boostSections": [
+        "tax_notes"
+      ],
+      "tableBoost": [
+        "trial_balance_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_027",
+      "priority": 174,
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 27 or explicit metric label",
+      "boostSections": [
+        "cash_flow_details"
+      ],
+      "tableBoost": [
+        "notes_to_financial_statements"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_028",
+      "priority": 173,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 28 or explicit metric label",
+      "boostSections": [
+        "variance_analysis"
+      ],
+      "tableBoost": [
+        "revenue_bridge"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_029",
+      "priority": 172,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 29 or explicit metric label",
+      "boostSections": [
+        "segment_reporting"
+      ],
+      "tableBoost": [
+        "cogs_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_030",
+      "priority": 171,
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 30 or explicit metric label",
+      "boostSections": [
+        "kpi_dashboard"
+      ],
+      "tableBoost": [
+        "segment_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_031",
+      "priority": 170,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 31 or explicit metric label",
+      "boostSections": [
+        "board_pack"
+      ],
+      "tableBoost": [
+        "geographic_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_032",
+      "priority": 169,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 32 or explicit metric label",
+      "boostSections": [
+        "budget_pack"
+      ],
+      "tableBoost": [
+        "department_opex"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_033",
+      "priority": 168,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 33 or explicit metric label",
+      "boostSections": [
+        "forecast_pack"
+      ],
+      "tableBoost": [
+        "budget_vs_actual_table"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_034",
+      "priority": 167,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 34 or explicit metric label",
+      "boostSections": [
+        "cap_table"
+      ],
+      "tableBoost": [
+        "rolling_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_035",
+      "priority": 166,
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 35 or explicit metric label",
+      "boostSections": [
+        "debt_schedule"
+      ],
+      "tableBoost": [
+        "arr_mrr_cohort"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_036",
+      "priority": 165,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 36 or explicit metric label",
+      "boostSections": [
+        "bank_statement_lines"
+      ],
+      "tableBoost": [
+        "churn_funnel"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_037",
+      "priority": 164,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 37 or explicit metric label",
+      "boostSections": [
+        "liquidity_risk"
+      ],
+      "tableBoost": [
+        "debt_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_038",
+      "priority": 163,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 38 or explicit metric label",
+      "boostSections": [
+        "revenue_churn"
+      ],
+      "tableBoost": [
+        "cash_flow_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_039",
+      "priority": 162,
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 39 or explicit metric label",
+      "boostSections": [
+        "executive_summary"
+      ],
+      "tableBoost": [
+        "kpi_timeline"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_040",
+      "priority": 161,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 40 or explicit metric label",
+      "boostSections": [
+        "md&a"
+      ],
+      "tableBoost": [
+        "unit_economics"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_041",
+      "priority": 160,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 41 or explicit metric label",
+      "boostSections": [
+        "financial_statements"
+      ],
+      "tableBoost": [
+        "cap_table_summary"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_042",
+      "priority": 159,
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 42 or explicit metric label",
+      "boostSections": [
+        "notes_to_financial_statements"
+      ],
+      "tableBoost": [
+        "tax_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_043",
+      "priority": 158,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 43 or explicit metric label",
+      "boostSections": [
+        "management_report"
+      ],
+      "tableBoost": [
+        "consolidated_income_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_044",
+      "priority": 157,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 44 or explicit metric label",
+      "boostSections": [
+        "covenants"
+      ],
+      "tableBoost": [
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_045",
+      "priority": 156,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 45 or explicit metric label",
+      "boostSections": [
+        "tax_notes"
+      ],
+      "tableBoost": [
+        "cash_flow_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_046",
+      "priority": 155,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 46 or explicit metric label",
+      "boostSections": [
+        "cash_flow_details"
+      ],
+      "tableBoost": [
+        "statement_of_stockholder_equity"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_047",
+      "priority": 154,
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 47 or explicit metric label",
+      "boostSections": [
+        "variance_analysis"
+      ],
+      "tableBoost": [
+        "trial_balance_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_048",
+      "priority": 153,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 48 or explicit metric label",
+      "boostSections": [
+        "segment_reporting"
+      ],
+      "tableBoost": [
+        "notes_to_financial_statements"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_049",
+      "priority": 152,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 49 or explicit metric label",
+      "boostSections": [
+        "kpi_dashboard"
+      ],
+      "tableBoost": [
+        "revenue_bridge"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_050",
+      "priority": 151,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 50 or explicit metric label",
+      "boostSections": [
+        "board_pack"
+      ],
+      "tableBoost": [
+        "cogs_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_051",
+      "priority": 150,
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 51 or explicit metric label",
+      "boostSections": [
+        "budget_pack"
+      ],
+      "tableBoost": [
+        "segment_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_052",
+      "priority": 149,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 52 or explicit metric label",
+      "boostSections": [
+        "forecast_pack"
+      ],
+      "tableBoost": [
+        "geographic_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_053",
+      "priority": 148,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 53 or explicit metric label",
+      "boostSections": [
+        "cap_table"
+      ],
+      "tableBoost": [
+        "department_opex"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_054",
+      "priority": 147,
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 54 or explicit metric label",
+      "boostSections": [
+        "debt_schedule"
+      ],
+      "tableBoost": [
+        "budget_vs_actual_table"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_055",
+      "priority": 146,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 55 or explicit metric label",
+      "boostSections": [
+        "bank_statement_lines"
+      ],
+      "tableBoost": [
+        "rolling_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_056",
+      "priority": 145,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 56 or explicit metric label",
+      "boostSections": [
+        "liquidity_risk"
+      ],
+      "tableBoost": [
+        "arr_mrr_cohort"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_057",
+      "priority": 144,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 57 or explicit metric label",
+      "boostSections": [
+        "revenue_churn"
+      ],
+      "tableBoost": [
+        "churn_funnel"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_058",
+      "priority": 143,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 58 or explicit metric label",
+      "boostSections": [
+        "executive_summary"
+      ],
+      "tableBoost": [
+        "debt_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_059",
+      "priority": 142,
+      "weight": 2.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 59 or explicit metric label",
+      "boostSections": [
+        "md&a"
+      ],
+      "tableBoost": [
+        "cash_flow_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_060",
+      "priority": 141,
+      "weight": 2.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 60 or explicit metric label",
+      "boostSections": [
+        "financial_statements"
+      ],
+      "tableBoost": [
+        "kpi_timeline"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_061",
+      "priority": 140,
+      "weight": 1.6,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 61 or explicit metric label",
+      "boostSections": [
+        "notes_to_financial_statements"
+      ],
+      "tableBoost": [
+        "unit_economics"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_062",
+      "priority": 139,
+      "weight": 1.7,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 62 or explicit metric label",
+      "boostSections": [
+        "management_report"
+      ],
+      "tableBoost": [
+        "cap_table_summary"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_063",
+      "priority": 138,
+      "weight": 1.8,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 63 or explicit metric label",
+      "boostSections": [
+        "covenants"
+      ],
+      "tableBoost": [
+        "tax_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_064",
+      "priority": 137,
+      "weight": 1.9,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 64 or explicit metric label",
+      "boostSections": [
+        "tax_notes"
+      ],
+      "tableBoost": [
+        "consolidated_income_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_065",
+      "priority": 136,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 65 or explicit metric label",
+      "boostSections": [
+        "cash_flow_details"
+      ],
+      "tableBoost": [
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_066",
+      "priority": 135,
+      "weight": 2.1,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 66 or explicit metric label",
+      "boostSections": [
+        "variance_analysis"
+      ],
+      "tableBoost": [
+        "cash_flow_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_067",
+      "priority": 134,
+      "weight": 2.2,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 67 or explicit metric label",
+      "boostSections": [
+        "segment_reporting"
+      ],
+      "tableBoost": [
+        "statement_of_stockholder_equity"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_068",
+      "priority": 133,
+      "weight": 2.3,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 68 or explicit metric label",
+      "boostSections": [
+        "kpi_dashboard"
+      ],
+      "tableBoost": [
+        "trial_balance_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_069",
+      "priority": 132,
+      "weight": 2.4,
+      "operators": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 69 or explicit metric label",
+      "boostSections": [
+        "board_pack"
+      ],
+      "tableBoost": [
+        "notes_to_financial_statements"
+      ]
+    },
+    {
+      "id": "fin_retrieval_boost_070",
+      "priority": 131,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "calculate",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "condition": "query contains finance domain phrase 70 or explicit metric label",
+      "boostSections": [
+        "budget_pack"
+      ],
+      "tableBoost": [
+        "revenue_bridge"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_001",
+      "priority": 260,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in revenue_bridge",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "notes_to_financial_statements"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_002",
+      "priority": 259,
+      "weight": 2.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in cogs_detail",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "revenue_bridge"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_003",
+      "priority": 258,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in segment_revenue",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "cogs_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_004",
+      "priority": 257,
+      "weight": 2.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in geographic_revenue",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "segment_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_005",
+      "priority": 256,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in department_opex",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "geographic_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_006",
+      "priority": 255,
+      "weight": 3.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in budget_vs_actual_table",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "department_opex"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_007",
+      "priority": 254,
+      "weight": 3.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in rolling_forecast",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "budget_vs_actual_table"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_008",
+      "priority": 253,
+      "weight": 3.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in arr_mrr_cohort",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "rolling_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_009",
+      "priority": 252,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in churn_funnel",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "arr_mrr_cohort"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_010",
+      "priority": 251,
+      "weight": 2.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in debt_schedule",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "churn_funnel"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_011",
+      "priority": 250,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in cash_flow_forecast",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "debt_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_012",
+      "priority": 249,
+      "weight": 2.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in kpi_timeline",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "cash_flow_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_013",
+      "priority": 248,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in unit_economics",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "kpi_timeline"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_014",
+      "priority": 247,
+      "weight": 3.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in cap_table_summary",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "unit_economics"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_015",
+      "priority": 246,
+      "weight": 3.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in tax_schedule",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "cap_table_summary"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_016",
+      "priority": 245,
+      "weight": 3.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in consolidated_income_statement",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "tax_schedule"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_017",
+      "priority": 244,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in balance_sheet",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "consolidated_income_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_018",
+      "priority": 243,
+      "weight": 2.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in cash_flow_statement",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "balance_sheet"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_019",
+      "priority": 242,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in statement_of_stockholder_equity",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "cash_flow_statement"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_020",
+      "priority": 241,
+      "weight": 2.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in trial_balance_detail",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "statement_of_stockholder_equity"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_021",
+      "priority": 240,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in notes_to_financial_statements",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "trial_balance_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_022",
+      "priority": 239,
+      "weight": 3.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in revenue_bridge",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "notes_to_financial_statements"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_023",
+      "priority": 238,
+      "weight": 3.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in cogs_detail",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "revenue_bridge"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_024",
+      "priority": 237,
+      "weight": 3.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in segment_revenue",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "cogs_detail"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_025",
+      "priority": 236,
+      "weight": 2,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in geographic_revenue",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "segment_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_026",
+      "priority": 235,
+      "weight": 2.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in department_opex",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "geographic_revenue"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_027",
+      "priority": 234,
+      "weight": 2.5,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in budget_vs_actual_table",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "department_opex"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_028",
+      "priority": 233,
+      "weight": 2.75,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in rolling_forecast",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "budget_vs_actual_table"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_029",
+      "priority": 232,
+      "weight": 3,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in arr_mrr_cohort",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "rolling_forecast"
+      ]
+    },
+    {
+      "id": "fin_retrieval_table_boost_030",
+      "priority": 231,
+      "weight": 3.25,
+      "operators": [
+        "extract",
+        "locate"
+      ],
+      "condition": "query asks for numerical values in churn_funnel",
+      "boostSections": [
+        "financial_statements",
+        "tables"
+      ],
+      "tableBoost": [
+        "arr_mrr_cohort"
+      ]
     }
   ],
   "queryExpansion": [
-    { "trigger": "\\brevenue\\b", "expansions": ["net revenue", "gross revenue", "top line", "receita"] },
-    { "trigger": "\\bprofit\\b", "expansions": ["net income", "operating income", "gross profit", "lucro"] },
-    { "trigger": "\\bdebt\\b", "expansions": ["long-term debt", "short-term borrowings", "notes payable", "dívida"] },
-    { "trigger": "\\bmargin\\b", "expansions": ["gross margin", "operating margin", "net margin", "EBITDA margin"] },
-    { "trigger": "\\bcash\\b", "expansions": ["cash and cash equivalents", "free cash flow", "operating cash flow"] },
-    { "trigger": "\\bEPS\\b", "expansions": ["earnings per share", "diluted EPS", "basic EPS"] }
+    {
+      "trigger": "\\brevenue\\b",
+      "expansions": [
+        "top line",
+        "net sales",
+        "turnover",
+        "earnings"
+      ],
+      "confidence": 1.5
+    },
+    {
+      "trigger": "\\bebitda\\b",
+      "expansions": [
+        "earnings before interest taxes depreciation amortization",
+        "adj ebitda",
+        "operating profitability"
+      ],
+      "confidence": 1.43
+    },
+    {
+      "trigger": "\\bgross margin\\b",
+      "expansions": [
+        "gross profit margin",
+        "margin analysis",
+        "margem bruta"
+      ],
+      "confidence": 1.3599999999999999
+    },
+    {
+      "trigger": "\\bworking capital\\b",
+      "expansions": [
+        "operating working capital",
+        "net working capital"
+      ],
+      "confidence": 1.29
+    },
+    {
+      "trigger": "\\bcash flow\\b",
+      "expansions": [
+        "statement of cash flows",
+        "cash position",
+        "free cash flow"
+      ],
+      "confidence": 1.22
+    },
+    {
+      "trigger": "\\brunway\\b",
+      "expansions": [
+        "cash runway",
+        "liquidity runway"
+      ],
+      "confidence": 1.15
+    },
+    {
+      "trigger": "\\bburn\\b",
+      "expansions": [
+        "burn rate",
+        "cash burn"
+      ],
+      "confidence": 1.08
+    },
+    {
+      "trigger": "\\bcovenant\\b",
+      "expansions": [
+        "covenant test",
+        "default covenant"
+      ],
+      "confidence": 1.01
+    },
+    {
+      "trigger": "\\bbudget\\b",
+      "expansions": [
+        "forecast",
+        "plan versus actual"
+      ],
+      "confidence": 0.94
+    },
+    {
+      "trigger": "\\bbalance sheet\\b",
+      "expansions": [
+        "assets",
+        "liabilities",
+        "equity"
+      ],
+      "confidence": 0.8699999999999999
+    }
   ]
 }

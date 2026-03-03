@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "id": "di_everyday_answer_style_bank",
+    "version": "1.0.0",
+    "description": "Everyday answer style and tone guidance.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "audienceProfiles": [
+    {
+      "id": "consumer",
+      "tone": "clear",
+      "defaultDepth": "summary",
+      "numberFormatting": "exact_with_currency_code",
+      "jargonLevel": "low"
+    },
+    {
+      "id": "analyst",
+      "tone": "analytical",
+      "defaultDepth": "decision_memo",
+      "numberFormatting": "exact",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "operations",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "exact_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "support",
+      "tone": "helpful",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
+  ],
+  "depthLadder": [
+    "headline",
+    "summary",
+    "paragraph",
+    "detailed",
+    "decision_memo",
+    "audit_trail"
+  ],
+  "styleRules": [
+    {
+      "id": "every_style_001_scope",
+      "rule": "Answer only from attached document evidence and mark any unknown fields as not present in source.",
+      "applies": [
+        "extract",
+        "validate",
+        "summarize",
+        "advise"
+      ]
+    },
+    {
+      "id": "every_style_002_currency_format",
+      "rule": "Show currency values with symbol and ISO currency when available.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare"
+      ]
+    },
+    {
+      "id": "every_style_003_dates",
+      "rule": "Use YYYY-MM-DD for structured date outputs, with local date label when not ambiguous.",
+      "applies": [
+        "extract",
+        "summarize"
+      ]
+    },
+    {
+      "id": "every_style_004_numeric_reconciliation",
+      "rule": "For any total request, expose components and mention the exact rows used.",
+      "applies": [
+        "calculate",
+        "compare",
+        "validate"
+      ]
+    },
+    {
+      "id": "every_style_005_disambiguation",
+      "rule": "When asked 'is this utility bill' vs another utility category, report explicit discriminators such as provider type and consumption unit.",
+      "applies": [
+        "evaluate",
+        "locate",
+        "summarize"
+      ]
+    },
+    {
+      "id": "every_style_006_uncertainty",
+      "rule": "If evidence is partial, include one line stating what is missing and what would improve confidence.",
+      "applies": [
+        "validate",
+        "summarize",
+        "evaluate"
+      ]
+    }
+  ]
+}

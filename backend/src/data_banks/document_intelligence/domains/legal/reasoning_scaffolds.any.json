@@ -1,82 +1,170 @@
 {
   "_meta": {
     "id": "legal_reasoning_scaffolds",
-    "version": "2.0.0",
-    "description": "Reasoning scaffolds for legal interpretation and extraction.",
+    "version": "2.1.0",
+    "description": "Legal reasoning scaffolds to force clause-first analysis, definition resolution, and bounded recommendations.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "legal"
   },
   "domain": "legal",
-  "scaffolds": [
+  "rules": [
     {
-      "id": "legal_scaffold_clause_extraction",
-      "name": "Clause-first extraction scaffold",
+      "id": "legal_scaffold_clause_fidelity",
+      "goal": "extract",
       "operators": [
         "extract",
         "locate",
         "validate"
       ],
+      "description": "Use exact clause extraction first, then map obligations, exceptions, and rights per party.",
       "steps": [
-        "identify candidate doc type",
-        "map required clauses",
-        "extract parties/dates/obligations",
-        "resolve cross-references",
-        "emit citation-backed fields",
-        "flag unresolved ambiguity"
-      ]
+        "Identify clause boundaries and section anchors.",
+        "Locate all definition blocks and map each defined term to every downstream clause.",
+        "Isolate obligations, permissions, conditions, and remedies in separate groups.",
+        "Require exact phrase + location capture for each legal claim.",
+        "Flag unresolved references before producing any summary."
+      ],
+      "requireCitations": true,
+      "requireCrossReferenceResolution": true
     },
     {
-      "id": "legal_scaffold_comparison",
-      "name": "Version/redline comparison scaffold",
+      "id": "legal_scaffold_risk_scoring",
+      "goal": "evaluate",
       "operators": [
-        "compare",
         "evaluate",
+        "extract",
         "summarize"
       ],
+      "description": "Build risk impacts from termination/liability/governance clauses only using source text.",
       "steps": [
-        "align sections by headings",
-        "detect additions/deletions",
-        "classify risk-impacting changes",
-        "quantify commercial/legal impact",
-        "produce diff summary with citations"
-      ]
-    },
-    {
-      "id": "legal_scaffold_policy_review",
-      "name": "Policy control review scaffold",
-      "operators": [
-        "evaluate",
-        "advise",
-        "monitor"
+        "Collect all termination triggers and cure periods with location.",
+        "Collect all indemnity, limitation, and remedy clauses with exceptions and caps.",
+        "Cross-validate governing law/forum/jurisdiction fields against defined terms.",
+        "Produce risk labels with confidence bands and explicit uncertainties.",
+        "Emit escalation recommendations only as options, never as certainties."
       ],
-      "steps": [
-        "extract policy controls",
-        "map to owner/frequency",
-        "identify control gaps",
-        "cross-check retention/security/privacy obligations",
-        "emit remediation actions"
-      ]
+      "requireCitations": true,
+      "requireObligationEvidence": true
     },
     {
-      "id": "legal_scaffold_dispute_analysis",
-      "name": "Dispute and litigation scaffold",
+      "id": "legal_scaffold_compare_delta",
+      "goal": "compare",
+      "operators": [
+        "compare",
+        "validate"
+      ],
+      "description": "Detect clause shifts across versioned docs and call out precedence language.",
+      "steps": [
+        "Align sections by heading, version, and clause reference IDs.",
+        "Compare term text for additions, deletions, and replaced obligations.",
+        "List clause-level differences with source anchors for both versions.",
+        "Mark conflicts where interpretation changes require legal review."
+      ],
+      "requirePrecedenceResolution": true
+    },
+    {
+      "id": "legal_scaffold_matter_navigation",
+      "goal": "monitor",
+      "operators": [
+        "monitor",
+        "locate",
+        "validate"
+      ],
+      "description": "Prioritize operational monitoring outputs with mandatory clause links.",
+      "steps": [
+        "Extract all time-bound commitments and notification requirements.",
+        "Map deadlines to source section and signature block.",
+        "Attach owner and fallback if owner is absent.",
+        "Mark tasks as incomplete when citations are missing."
+      ],
+      "requireCitations": true
+    }
+  ],
+  "scaffolds": [
+    {
+      "id": "legal_scaffold_default",
+      "goal": "interpret",
       "operators": [
         "extract",
-        "summarize",
-        "monitor"
+        "validate",
+        "evaluate"
       ],
+      "description": "Use the strongest supported interpretation backed by exact clauses and tagged uncertainty.",
       "steps": [
-        "extract procedural posture",
-        "capture claims/defenses",
-        "identify deadlines/orders",
-        "estimate risk exposure from cited text",
-        "draft next-step checklist"
+        "Prioritize definition sections before applying obligations.",
+        "Map all operative clause variants with evidence locations.",
+        "Resolve precedence and exception ordering before recommendation drafting.",
+        "Flag any inference beyond explicit text."
+      ],
+      "requireCitations": true,
+      "requireObligationEvidence": true
+    }
+  ],
+  "optionsFramework": [
+    {
+      "id": "legal_opt_001",
+      "label": "Conservative interpretation",
+      "description": "Default to strict text and flag ambiguities when any clause is unclear.",
+      "requiredBlocks": [
+        "obligations",
+        "exceptions",
+        "evidence",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "legal_opt_002",
+      "label": "Balanced interpretation",
+      "description": "Report likely intent with evidence-supported assumptions and explicit uncertainty windows.",
+      "requiredBlocks": [
+        "obligations",
+        "exceptions",
+        "evidence",
+        "assumptions",
+        "what_changes_my_mind"
+      ]
+    },
+    {
+      "id": "legal_opt_003",
+      "label": "Assertive interpretation",
+      "description": "Present strongest reasonable reading with clause priority rationale and conflict markers.",
+      "requiredBlocks": [
+        "obligations",
+        "exceptions",
+        "evidence",
+        "risk_impact",
+        "confidence_statement",
+        "what_changes_my_mind"
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "legal_tmpl_clause_matrix",
+      "audience": "legal",
+      "operator": "extract",
+      "format": "clause_matrix",
+      "rules": [
+        "Must include exact text and location for every obligation.",
+        "Must include party-role mapping for each row.",
+        "Must include contradiction markers for cross-references."
+      ]
+    },
+    {
+      "id": "legal_tmpl_termination_review",
+      "audience": "ops",
+      "operator": "evaluate",
+      "format": "risk_memo",
+      "rules": [
+        "Must include triggers, cure windows, and consequences.",
+        "Must cite governing law and dispute resolution where available.",
+        "Must include unresolved items as follow-up questions."
       ]
     }
   ]

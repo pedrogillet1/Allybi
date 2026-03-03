@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "id": "di_everyday_sections_every_identity_document",
+    "version": "1.0.0",
+    "description": "Section map for every_identity_document.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_identity_document"
+  },
+  "sections": [
+    { "id": "document_header", "name": { "en": "Document Header", "pt": "Cabecalho do Documento" }, "order": 1, "required": true, "mustHave": true, "headingAnchors": ["identity", "document", "identification"] },
+    { "id": "identity_fields", "name": { "en": "Identity Fields", "pt": "Dados de Identidade" }, "order": 2, "required": true, "mustHave": true, "headingAnchors": ["name", "document number", "id"] },
+    { "id": "issuer_and_validity", "name": { "en": "Issuer and Validity", "pt": "Emissor e Validade" }, "order": 3, "required": true, "mustHave": true, "headingAnchors": ["issuer", "authority", "validity", "expiry"] },
+    { "id": "security_features", "name": { "en": "Security Features", "pt": "Recursos de Seguranca" }, "order": 4, "required": false, "mustHave": false, "headingAnchors": ["security", "hologram", "features"] },
+    { "id": "photograph_or_biometric", "name": { "en": "Photo/Biometric", "pt": "Foto e Biometria" }, "order": 5, "required": false, "mustHave": false, "headingAnchors": ["photo", "biometric", "mrz"] },
+    { "id": "signatures_or_validity", "name": { "en": "Signatures", "pt": "Assinaturas" }, "order": 6, "required": false, "mustHave": false, "headingAnchors": ["signature", "assinatura", "seal"] },
+    { "id": "restrictions_or_notes", "name": { "en": "Restrictions and Notes", "pt": "Restricoes e Notas" }, "order": 7, "required": false, "mustHave": false, "headingAnchors": ["restrictions", "notes", "alerts"] },
+    { "id": "issue_renewal", "name": { "en": "Issue and Renewal", "pt": "Emissao e Renovacao" }, "order": 8, "required": false, "mustHave": false, "headingAnchors": ["issue", "issued", "renewal", "issued on"] },
+    { "id": "verification", "name": { "en": "Verification", "pt": "Verificacao" }, "order": 9, "required": false, "mustHave": false, "headingAnchors": ["verify", "check", "verification"] }
+  ]
+}

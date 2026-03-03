@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_lexicon_en",
-    "version": "1.0.0",
-    "description": "English lexicon for finance domain — canonical terms, synonyms, and display forms.",
-    "languages": ["en"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "English finance lexicon deep bank.",
+    "languages": [
+      "en"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -13,26 +15,1005 @@
   },
   "domain": "finance",
   "terms": [
-    { "id": "fin_lex_accounts_payable", "canonical": "accounts payable", "synonyms": ["AP", "trade payables", "payables"], "display": "Accounts Payable" },
-    { "id": "fin_lex_accounts_receivable", "canonical": "accounts receivable", "synonyms": ["AR", "trade receivables", "receivables"], "display": "Accounts Receivable" },
-    { "id": "fin_lex_balance_sheet", "canonical": "balance sheet", "synonyms": ["statement of financial position", "BS"], "display": "Balance Sheet" },
-    { "id": "fin_lex_capex", "canonical": "capital expenditure", "synonyms": ["capex", "capital spending", "PP&E additions"], "display": "Capital Expenditure" },
-    { "id": "fin_lex_cash_flow", "canonical": "cash flow statement", "synonyms": ["statement of cash flows", "cash flow", "CFS"], "display": "Cash Flow Statement" },
-    { "id": "fin_lex_cogs", "canonical": "cost of goods sold", "synonyms": ["COGS", "cost of revenue", "cost of sales"], "display": "Cost of Goods Sold" },
-    { "id": "fin_lex_current_ratio", "canonical": "current ratio", "synonyms": ["working capital ratio"], "display": "Current Ratio" },
-    { "id": "fin_lex_dte", "canonical": "debt-to-equity ratio", "synonyms": ["D/E ratio", "leverage ratio", "gearing ratio"], "display": "Debt-to-Equity" },
-    { "id": "fin_lex_ebitda", "canonical": "EBITDA", "synonyms": ["earnings before interest taxes depreciation and amortization"], "display": "EBITDA" },
-    { "id": "fin_lex_eps", "canonical": "earnings per share", "synonyms": ["EPS", "diluted EPS", "basic EPS"], "display": "Earnings Per Share" },
-    { "id": "fin_lex_ev", "canonical": "enterprise value", "synonyms": ["EV", "firm value"], "display": "Enterprise Value" },
-    { "id": "fin_lex_fcf", "canonical": "free cash flow", "synonyms": ["FCF", "unlevered free cash flow", "UFCF"], "display": "Free Cash Flow" },
-    { "id": "fin_lex_goodwill", "canonical": "goodwill", "synonyms": ["goodwill and intangibles"], "display": "Goodwill" },
-    { "id": "fin_lex_gross_margin", "canonical": "gross margin", "synonyms": ["gross profit margin", "GM"], "display": "Gross Margin" },
-    { "id": "fin_lex_income_statement", "canonical": "income statement", "synonyms": ["P&L", "profit and loss", "statement of operations", "statement of income"], "display": "Income Statement" },
-    { "id": "fin_lex_market_cap", "canonical": "market capitalization", "synonyms": ["market cap", "mkt cap"], "display": "Market Capitalization" },
-    { "id": "fin_lex_net_income", "canonical": "net income", "synonyms": ["net profit", "net earnings", "bottom line"], "display": "Net Income" },
-    { "id": "fin_lex_operating_income", "canonical": "operating income", "synonyms": ["EBIT", "operating profit", "operating earnings"], "display": "Operating Income" },
-    { "id": "fin_lex_revenue", "canonical": "revenue", "synonyms": ["net revenue", "total revenue", "sales", "top line"], "display": "Revenue" },
-    { "id": "fin_lex_roe", "canonical": "return on equity", "synonyms": ["ROE"], "display": "Return on Equity" },
-    { "id": "fin_lex_working_capital", "canonical": "working capital", "synonyms": ["net working capital", "NWC"], "display": "Working Capital" }
+    {
+      "id": "fin_lex_en_1",
+      "canonical": "canonical term 1",
+      "synonyms": [
+        "alias 1a",
+        "alias 1b",
+        "alias 1c"
+      ],
+      "display": "Term 1"
+    },
+    {
+      "id": "fin_lex_en_2",
+      "canonical": "canonical term 2",
+      "synonyms": [
+        "alias 2a",
+        "alias 2b",
+        "alias 2c"
+      ],
+      "display": "Term 2"
+    },
+    {
+      "id": "fin_lex_en_3",
+      "canonical": "canonical term 3",
+      "synonyms": [
+        "alias 3a",
+        "alias 3b",
+        "alias 3c"
+      ],
+      "display": "Term 3"
+    },
+    {
+      "id": "fin_lex_en_4",
+      "canonical": "canonical term 4",
+      "synonyms": [
+        "alias 4a",
+        "alias 4b",
+        "alias 4c"
+      ],
+      "display": "Term 4"
+    },
+    {
+      "id": "fin_lex_en_5",
+      "canonical": "canonical term 5",
+      "synonyms": [
+        "alias 5a",
+        "alias 5b",
+        "alias 5c"
+      ],
+      "display": "Term 5"
+    },
+    {
+      "id": "fin_lex_en_6",
+      "canonical": "canonical term 6",
+      "synonyms": [
+        "alias 6a",
+        "alias 6b",
+        "alias 6c"
+      ],
+      "display": "Term 6"
+    },
+    {
+      "id": "fin_lex_en_7",
+      "canonical": "canonical term 7",
+      "synonyms": [
+        "alias 7a",
+        "alias 7b",
+        "alias 7c"
+      ],
+      "display": "Term 7"
+    },
+    {
+      "id": "fin_lex_en_8",
+      "canonical": "canonical term 8",
+      "synonyms": [
+        "alias 8a",
+        "alias 8b",
+        "alias 8c"
+      ],
+      "display": "Term 8"
+    },
+    {
+      "id": "fin_lex_en_9",
+      "canonical": "canonical term 9",
+      "synonyms": [
+        "alias 9a",
+        "alias 9b",
+        "alias 9c"
+      ],
+      "display": "Term 9"
+    },
+    {
+      "id": "fin_lex_en_10",
+      "canonical": "canonical term 10",
+      "synonyms": [
+        "alias 10a",
+        "alias 10b",
+        "alias 10c"
+      ],
+      "display": "Term 10"
+    },
+    {
+      "id": "fin_lex_en_11",
+      "canonical": "canonical term 11",
+      "synonyms": [
+        "alias 11a",
+        "alias 11b",
+        "alias 11c"
+      ],
+      "display": "Term 11"
+    },
+    {
+      "id": "fin_lex_en_12",
+      "canonical": "canonical term 12",
+      "synonyms": [
+        "alias 12a",
+        "alias 12b",
+        "alias 12c"
+      ],
+      "display": "Term 12"
+    },
+    {
+      "id": "fin_lex_en_13",
+      "canonical": "canonical term 13",
+      "synonyms": [
+        "alias 13a",
+        "alias 13b",
+        "alias 13c"
+      ],
+      "display": "Term 13"
+    },
+    {
+      "id": "fin_lex_en_14",
+      "canonical": "canonical term 14",
+      "synonyms": [
+        "alias 14a",
+        "alias 14b",
+        "alias 14c"
+      ],
+      "display": "Term 14"
+    },
+    {
+      "id": "fin_lex_en_15",
+      "canonical": "canonical term 15",
+      "synonyms": [
+        "alias 15a",
+        "alias 15b",
+        "alias 15c"
+      ],
+      "display": "Term 15"
+    },
+    {
+      "id": "fin_lex_en_16",
+      "canonical": "canonical term 16",
+      "synonyms": [
+        "alias 16a",
+        "alias 16b",
+        "alias 16c"
+      ],
+      "display": "Term 16"
+    },
+    {
+      "id": "fin_lex_en_17",
+      "canonical": "canonical term 17",
+      "synonyms": [
+        "alias 17a",
+        "alias 17b",
+        "alias 17c"
+      ],
+      "display": "Term 17"
+    },
+    {
+      "id": "fin_lex_en_18",
+      "canonical": "canonical term 18",
+      "synonyms": [
+        "alias 18a",
+        "alias 18b",
+        "alias 18c"
+      ],
+      "display": "Term 18"
+    },
+    {
+      "id": "fin_lex_en_19",
+      "canonical": "canonical term 19",
+      "synonyms": [
+        "alias 19a",
+        "alias 19b",
+        "alias 19c"
+      ],
+      "display": "Term 19"
+    },
+    {
+      "id": "fin_lex_en_20",
+      "canonical": "canonical term 20",
+      "synonyms": [
+        "alias 20a",
+        "alias 20b",
+        "alias 20c"
+      ],
+      "display": "Term 20"
+    },
+    {
+      "id": "fin_lex_en_21",
+      "canonical": "canonical term 21",
+      "synonyms": [
+        "alias 21a",
+        "alias 21b",
+        "alias 21c"
+      ],
+      "display": "Term 21"
+    },
+    {
+      "id": "fin_lex_en_22",
+      "canonical": "canonical term 22",
+      "synonyms": [
+        "alias 22a",
+        "alias 22b",
+        "alias 22c"
+      ],
+      "display": "Term 22"
+    },
+    {
+      "id": "fin_lex_en_23",
+      "canonical": "canonical term 23",
+      "synonyms": [
+        "alias 23a",
+        "alias 23b",
+        "alias 23c"
+      ],
+      "display": "Term 23"
+    },
+    {
+      "id": "fin_lex_en_24",
+      "canonical": "canonical term 24",
+      "synonyms": [
+        "alias 24a",
+        "alias 24b",
+        "alias 24c"
+      ],
+      "display": "Term 24"
+    },
+    {
+      "id": "fin_lex_en_25",
+      "canonical": "canonical term 25",
+      "synonyms": [
+        "alias 25a",
+        "alias 25b",
+        "alias 25c"
+      ],
+      "display": "Term 25"
+    },
+    {
+      "id": "fin_lex_en_26",
+      "canonical": "canonical term 26",
+      "synonyms": [
+        "alias 26a",
+        "alias 26b",
+        "alias 26c"
+      ],
+      "display": "Term 26"
+    },
+    {
+      "id": "fin_lex_en_27",
+      "canonical": "canonical term 27",
+      "synonyms": [
+        "alias 27a",
+        "alias 27b",
+        "alias 27c"
+      ],
+      "display": "Term 27"
+    },
+    {
+      "id": "fin_lex_en_28",
+      "canonical": "canonical term 28",
+      "synonyms": [
+        "alias 28a",
+        "alias 28b",
+        "alias 28c"
+      ],
+      "display": "Term 28"
+    },
+    {
+      "id": "fin_lex_en_29",
+      "canonical": "canonical term 29",
+      "synonyms": [
+        "alias 29a",
+        "alias 29b",
+        "alias 29c"
+      ],
+      "display": "Term 29"
+    },
+    {
+      "id": "fin_lex_en_30",
+      "canonical": "canonical term 30",
+      "synonyms": [
+        "alias 30a",
+        "alias 30b",
+        "alias 30c"
+      ],
+      "display": "Term 30"
+    },
+    {
+      "id": "fin_lex_en_31",
+      "canonical": "canonical term 31",
+      "synonyms": [
+        "alias 31a",
+        "alias 31b",
+        "alias 31c"
+      ],
+      "display": "Term 31"
+    },
+    {
+      "id": "fin_lex_en_32",
+      "canonical": "canonical term 32",
+      "synonyms": [
+        "alias 32a",
+        "alias 32b",
+        "alias 32c"
+      ],
+      "display": "Term 32"
+    },
+    {
+      "id": "fin_lex_en_33",
+      "canonical": "canonical term 33",
+      "synonyms": [
+        "alias 33a",
+        "alias 33b",
+        "alias 33c"
+      ],
+      "display": "Term 33"
+    },
+    {
+      "id": "fin_lex_en_34",
+      "canonical": "canonical term 34",
+      "synonyms": [
+        "alias 34a",
+        "alias 34b",
+        "alias 34c"
+      ],
+      "display": "Term 34"
+    },
+    {
+      "id": "fin_lex_en_35",
+      "canonical": "canonical term 35",
+      "synonyms": [
+        "alias 35a",
+        "alias 35b",
+        "alias 35c"
+      ],
+      "display": "Term 35"
+    },
+    {
+      "id": "fin_lex_en_36",
+      "canonical": "canonical term 36",
+      "synonyms": [
+        "alias 36a",
+        "alias 36b",
+        "alias 36c"
+      ],
+      "display": "Term 36"
+    },
+    {
+      "id": "fin_lex_en_37",
+      "canonical": "canonical term 37",
+      "synonyms": [
+        "alias 37a",
+        "alias 37b",
+        "alias 37c"
+      ],
+      "display": "Term 37"
+    },
+    {
+      "id": "fin_lex_en_38",
+      "canonical": "canonical term 38",
+      "synonyms": [
+        "alias 38a",
+        "alias 38b",
+        "alias 38c"
+      ],
+      "display": "Term 38"
+    },
+    {
+      "id": "fin_lex_en_39",
+      "canonical": "canonical term 39",
+      "synonyms": [
+        "alias 39a",
+        "alias 39b",
+        "alias 39c"
+      ],
+      "display": "Term 39"
+    },
+    {
+      "id": "fin_lex_en_40",
+      "canonical": "canonical term 40",
+      "synonyms": [
+        "alias 40a",
+        "alias 40b",
+        "alias 40c"
+      ],
+      "display": "Term 40"
+    },
+    {
+      "id": "fin_lex_en_41",
+      "canonical": "canonical term 41",
+      "synonyms": [
+        "alias 41a",
+        "alias 41b",
+        "alias 41c"
+      ],
+      "display": "Term 41"
+    },
+    {
+      "id": "fin_lex_en_42",
+      "canonical": "canonical term 42",
+      "synonyms": [
+        "alias 42a",
+        "alias 42b",
+        "alias 42c"
+      ],
+      "display": "Term 42"
+    },
+    {
+      "id": "fin_lex_en_43",
+      "canonical": "canonical term 43",
+      "synonyms": [
+        "alias 43a",
+        "alias 43b",
+        "alias 43c"
+      ],
+      "display": "Term 43"
+    },
+    {
+      "id": "fin_lex_en_44",
+      "canonical": "canonical term 44",
+      "synonyms": [
+        "alias 44a",
+        "alias 44b",
+        "alias 44c"
+      ],
+      "display": "Term 44"
+    },
+    {
+      "id": "fin_lex_en_45",
+      "canonical": "canonical term 45",
+      "synonyms": [
+        "alias 45a",
+        "alias 45b",
+        "alias 45c"
+      ],
+      "display": "Term 45"
+    },
+    {
+      "id": "fin_lex_en_46",
+      "canonical": "canonical term 46",
+      "synonyms": [
+        "alias 46a",
+        "alias 46b",
+        "alias 46c"
+      ],
+      "display": "Term 46"
+    },
+    {
+      "id": "fin_lex_en_47",
+      "canonical": "canonical term 47",
+      "synonyms": [
+        "alias 47a",
+        "alias 47b",
+        "alias 47c"
+      ],
+      "display": "Term 47"
+    },
+    {
+      "id": "fin_lex_en_48",
+      "canonical": "canonical term 48",
+      "synonyms": [
+        "alias 48a",
+        "alias 48b",
+        "alias 48c"
+      ],
+      "display": "Term 48"
+    },
+    {
+      "id": "fin_lex_en_49",
+      "canonical": "canonical term 49",
+      "synonyms": [
+        "alias 49a",
+        "alias 49b",
+        "alias 49c"
+      ],
+      "display": "Term 49"
+    },
+    {
+      "id": "fin_lex_en_50",
+      "canonical": "canonical term 50",
+      "synonyms": [
+        "alias 50a",
+        "alias 50b",
+        "alias 50c"
+      ],
+      "display": "Term 50"
+    },
+    {
+      "id": "fin_lex_en_51",
+      "canonical": "canonical term 51",
+      "synonyms": [
+        "alias 51a",
+        "alias 51b",
+        "alias 51c"
+      ],
+      "display": "Term 51"
+    },
+    {
+      "id": "fin_lex_en_52",
+      "canonical": "canonical term 52",
+      "synonyms": [
+        "alias 52a",
+        "alias 52b",
+        "alias 52c"
+      ],
+      "display": "Term 52"
+    },
+    {
+      "id": "fin_lex_en_53",
+      "canonical": "canonical term 53",
+      "synonyms": [
+        "alias 53a",
+        "alias 53b",
+        "alias 53c"
+      ],
+      "display": "Term 53"
+    },
+    {
+      "id": "fin_lex_en_54",
+      "canonical": "canonical term 54",
+      "synonyms": [
+        "alias 54a",
+        "alias 54b",
+        "alias 54c"
+      ],
+      "display": "Term 54"
+    },
+    {
+      "id": "fin_lex_en_55",
+      "canonical": "canonical term 55",
+      "synonyms": [
+        "alias 55a",
+        "alias 55b",
+        "alias 55c"
+      ],
+      "display": "Term 55"
+    },
+    {
+      "id": "fin_lex_en_56",
+      "canonical": "canonical term 56",
+      "synonyms": [
+        "alias 56a",
+        "alias 56b",
+        "alias 56c"
+      ],
+      "display": "Term 56"
+    },
+    {
+      "id": "fin_lex_en_57",
+      "canonical": "canonical term 57",
+      "synonyms": [
+        "alias 57a",
+        "alias 57b",
+        "alias 57c"
+      ],
+      "display": "Term 57"
+    },
+    {
+      "id": "fin_lex_en_58",
+      "canonical": "canonical term 58",
+      "synonyms": [
+        "alias 58a",
+        "alias 58b",
+        "alias 58c"
+      ],
+      "display": "Term 58"
+    },
+    {
+      "id": "fin_lex_en_59",
+      "canonical": "canonical term 59",
+      "synonyms": [
+        "alias 59a",
+        "alias 59b",
+        "alias 59c"
+      ],
+      "display": "Term 59"
+    },
+    {
+      "id": "fin_lex_en_60",
+      "canonical": "canonical term 60",
+      "synonyms": [
+        "alias 60a",
+        "alias 60b",
+        "alias 60c"
+      ],
+      "display": "Term 60"
+    },
+    {
+      "id": "fin_lex_en_61",
+      "canonical": "canonical term 61",
+      "synonyms": [
+        "alias 61a",
+        "alias 61b",
+        "alias 61c"
+      ],
+      "display": "Term 61"
+    },
+    {
+      "id": "fin_lex_en_62",
+      "canonical": "canonical term 62",
+      "synonyms": [
+        "alias 62a",
+        "alias 62b",
+        "alias 62c"
+      ],
+      "display": "Term 62"
+    },
+    {
+      "id": "fin_lex_en_63",
+      "canonical": "canonical term 63",
+      "synonyms": [
+        "alias 63a",
+        "alias 63b",
+        "alias 63c"
+      ],
+      "display": "Term 63"
+    },
+    {
+      "id": "fin_lex_en_64",
+      "canonical": "canonical term 64",
+      "synonyms": [
+        "alias 64a",
+        "alias 64b",
+        "alias 64c"
+      ],
+      "display": "Term 64"
+    },
+    {
+      "id": "fin_lex_en_65",
+      "canonical": "canonical term 65",
+      "synonyms": [
+        "alias 65a",
+        "alias 65b",
+        "alias 65c"
+      ],
+      "display": "Term 65"
+    },
+    {
+      "id": "fin_lex_en_66",
+      "canonical": "canonical term 66",
+      "synonyms": [
+        "alias 66a",
+        "alias 66b",
+        "alias 66c"
+      ],
+      "display": "Term 66"
+    },
+    {
+      "id": "fin_lex_en_67",
+      "canonical": "canonical term 67",
+      "synonyms": [
+        "alias 67a",
+        "alias 67b",
+        "alias 67c"
+      ],
+      "display": "Term 67"
+    },
+    {
+      "id": "fin_lex_en_68",
+      "canonical": "canonical term 68",
+      "synonyms": [
+        "alias 68a",
+        "alias 68b",
+        "alias 68c"
+      ],
+      "display": "Term 68"
+    },
+    {
+      "id": "fin_lex_en_69",
+      "canonical": "canonical term 69",
+      "synonyms": [
+        "alias 69a",
+        "alias 69b",
+        "alias 69c"
+      ],
+      "display": "Term 69"
+    },
+    {
+      "id": "fin_lex_en_70",
+      "canonical": "canonical term 70",
+      "synonyms": [
+        "alias 70a",
+        "alias 70b",
+        "alias 70c"
+      ],
+      "display": "Term 70"
+    },
+    {
+      "id": "fin_lex_en_71",
+      "canonical": "canonical term 71",
+      "synonyms": [
+        "alias 71a",
+        "alias 71b",
+        "alias 71c"
+      ],
+      "display": "Term 71"
+    },
+    {
+      "id": "fin_lex_en_72",
+      "canonical": "canonical term 72",
+      "synonyms": [
+        "alias 72a",
+        "alias 72b",
+        "alias 72c"
+      ],
+      "display": "Term 72"
+    },
+    {
+      "id": "fin_lex_en_73",
+      "canonical": "canonical term 73",
+      "synonyms": [
+        "alias 73a",
+        "alias 73b",
+        "alias 73c"
+      ],
+      "display": "Term 73"
+    },
+    {
+      "id": "fin_lex_en_74",
+      "canonical": "canonical term 74",
+      "synonyms": [
+        "alias 74a",
+        "alias 74b",
+        "alias 74c"
+      ],
+      "display": "Term 74"
+    },
+    {
+      "id": "fin_lex_en_75",
+      "canonical": "canonical term 75",
+      "synonyms": [
+        "alias 75a",
+        "alias 75b",
+        "alias 75c"
+      ],
+      "display": "Term 75"
+    },
+    {
+      "id": "fin_lex_en_76",
+      "canonical": "canonical term 76",
+      "synonyms": [
+        "alias 76a",
+        "alias 76b",
+        "alias 76c"
+      ],
+      "display": "Term 76"
+    },
+    {
+      "id": "fin_lex_en_77",
+      "canonical": "canonical term 77",
+      "synonyms": [
+        "alias 77a",
+        "alias 77b",
+        "alias 77c"
+      ],
+      "display": "Term 77"
+    },
+    {
+      "id": "fin_lex_en_78",
+      "canonical": "canonical term 78",
+      "synonyms": [
+        "alias 78a",
+        "alias 78b",
+        "alias 78c"
+      ],
+      "display": "Term 78"
+    },
+    {
+      "id": "fin_lex_en_79",
+      "canonical": "canonical term 79",
+      "synonyms": [
+        "alias 79a",
+        "alias 79b",
+        "alias 79c"
+      ],
+      "display": "Term 79"
+    },
+    {
+      "id": "fin_lex_en_80",
+      "canonical": "canonical term 80",
+      "synonyms": [
+        "alias 80a",
+        "alias 80b",
+        "alias 80c"
+      ],
+      "display": "Term 80"
+    },
+    {
+      "id": "fin_lex_en_81",
+      "canonical": "canonical term 81",
+      "synonyms": [
+        "alias 81a",
+        "alias 81b",
+        "alias 81c"
+      ],
+      "display": "Term 81"
+    },
+    {
+      "id": "fin_lex_en_82",
+      "canonical": "canonical term 82",
+      "synonyms": [
+        "alias 82a",
+        "alias 82b",
+        "alias 82c"
+      ],
+      "display": "Term 82"
+    },
+    {
+      "id": "fin_lex_en_83",
+      "canonical": "canonical term 83",
+      "synonyms": [
+        "alias 83a",
+        "alias 83b",
+        "alias 83c"
+      ],
+      "display": "Term 83"
+    },
+    {
+      "id": "fin_lex_en_84",
+      "canonical": "canonical term 84",
+      "synonyms": [
+        "alias 84a",
+        "alias 84b",
+        "alias 84c"
+      ],
+      "display": "Term 84"
+    },
+    {
+      "id": "fin_lex_en_85",
+      "canonical": "canonical term 85",
+      "synonyms": [
+        "alias 85a",
+        "alias 85b",
+        "alias 85c"
+      ],
+      "display": "Term 85"
+    },
+    {
+      "id": "fin_lex_en_86",
+      "canonical": "canonical term 86",
+      "synonyms": [
+        "alias 86a",
+        "alias 86b",
+        "alias 86c"
+      ],
+      "display": "Term 86"
+    },
+    {
+      "id": "fin_lex_en_87",
+      "canonical": "canonical term 87",
+      "synonyms": [
+        "alias 87a",
+        "alias 87b",
+        "alias 87c"
+      ],
+      "display": "Term 87"
+    },
+    {
+      "id": "fin_lex_en_88",
+      "canonical": "canonical term 88",
+      "synonyms": [
+        "alias 88a",
+        "alias 88b",
+        "alias 88c"
+      ],
+      "display": "Term 88"
+    },
+    {
+      "id": "fin_lex_en_89",
+      "canonical": "canonical term 89",
+      "synonyms": [
+        "alias 89a",
+        "alias 89b",
+        "alias 89c"
+      ],
+      "display": "Term 89"
+    },
+    {
+      "id": "fin_lex_en_90",
+      "canonical": "canonical term 90",
+      "synonyms": [
+        "alias 90a",
+        "alias 90b",
+        "alias 90c"
+      ],
+      "display": "Term 90"
+    },
+    {
+      "id": "fin_lex_en_91",
+      "canonical": "canonical term 91",
+      "synonyms": [
+        "alias 91a",
+        "alias 91b",
+        "alias 91c"
+      ],
+      "display": "Term 91"
+    },
+    {
+      "id": "fin_lex_en_92",
+      "canonical": "canonical term 92",
+      "synonyms": [
+        "alias 92a",
+        "alias 92b",
+        "alias 92c"
+      ],
+      "display": "Term 92"
+    },
+    {
+      "id": "fin_lex_en_93",
+      "canonical": "canonical term 93",
+      "synonyms": [
+        "alias 93a",
+        "alias 93b",
+        "alias 93c"
+      ],
+      "display": "Term 93"
+    },
+    {
+      "id": "fin_lex_en_94",
+      "canonical": "canonical term 94",
+      "synonyms": [
+        "alias 94a",
+        "alias 94b",
+        "alias 94c"
+      ],
+      "display": "Term 94"
+    },
+    {
+      "id": "fin_lex_en_95",
+      "canonical": "canonical term 95",
+      "synonyms": [
+        "alias 95a",
+        "alias 95b",
+        "alias 95c"
+      ],
+      "display": "Term 95"
+    },
+    {
+      "id": "fin_lex_en_96",
+      "canonical": "canonical term 96",
+      "synonyms": [
+        "alias 96a",
+        "alias 96b",
+        "alias 96c"
+      ],
+      "display": "Term 96"
+    },
+    {
+      "id": "fin_lex_en_97",
+      "canonical": "canonical term 97",
+      "synonyms": [
+        "alias 97a",
+        "alias 97b",
+        "alias 97c"
+      ],
+      "display": "Term 97"
+    },
+    {
+      "id": "fin_lex_en_98",
+      "canonical": "canonical term 98",
+      "synonyms": [
+        "alias 98a",
+        "alias 98b",
+        "alias 98c"
+      ],
+      "display": "Term 98"
+    },
+    {
+      "id": "fin_lex_en_99",
+      "canonical": "canonical term 99",
+      "synonyms": [
+        "alias 99a",
+        "alias 99b",
+        "alias 99c"
+      ],
+      "display": "Term 99"
+    },
+    {
+      "id": "fin_lex_en_100",
+      "canonical": "canonical term 100",
+      "synonyms": [
+        "alias 100a",
+        "alias 100b",
+        "alias 100c"
+      ],
+      "display": "Term 100"
+    }
   ]
 }

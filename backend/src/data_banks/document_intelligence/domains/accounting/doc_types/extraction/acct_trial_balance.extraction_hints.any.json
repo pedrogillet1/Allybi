@@ -20,8 +20,10 @@
       "anchors": [
         "period",
         "reporting period",
+        "for period",
         "competencia",
-        "periodo"
+        "periodo",
+        "as of"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -33,7 +35,8 @@
         "entity",
         "company",
         "legal entity",
-        "empresa"
+        "empresa",
+        "subsidiary"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
@@ -45,9 +48,10 @@
         "currency",
         "moeda",
         "curr",
-        "reporting currency"
+        "currency used",
+        "presentation currency"
       ],
-      "location": "header",
+      "location": "currency_validation",
       "extractionMethod": "heading_proximity"
     },
     {
@@ -79,32 +83,72 @@
       "entity": "asOfDate",
       "anchors": [
         "as of date",
-        "as Of Date",
-        "asOfDate"
+        "as of",
+        "asOfDate",
+        "data de referencia",
+        "data referencia"
       ],
       "location": "header",
       "extractionMethod": "heading_proximity"
     },
     {
-      "id": "hint_totalDebits",
+      "id": "hint_totalDebits_primary",
       "entity": "totalDebits",
       "anchors": [
         "total debits",
-        "total Debits",
-        "totalDebits"
+        "debit total",
+        "sum of debits",
+        "total debito"
       ],
-      "location": "header",
-      "extractionMethod": "heading_proximity"
+      "location": "totals",
+      "extractionMethod": "table_row_match"
     },
     {
-      "id": "hint_totalCredits",
+      "id": "hint_totalDebits_row_shift",
+      "entity": "totalDebits",
+      "anchors": [
+        "total",
+        "debits",
+        "dr total",
+        "debit total line"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_totalCredits_primary",
       "entity": "totalCredits",
       "anchors": [
         "total credits",
-        "total Credits",
-        "totalCredits"
+        "credit total",
+        "sum of credits",
+        "total credito"
       ],
-      "location": "summary",
+      "location": "totals",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_totalCredits_row_shift",
+      "entity": "totalCredits",
+      "anchors": [
+        "total",
+        "credits",
+        "cr total",
+        "credit total line"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_totalBalance",
+      "entity": "totalBalance",
+      "anchors": [
+        "total balance",
+        "net balance",
+        "balanced total",
+        "saldo total"
+      ],
+      "location": "totals",
       "extractionMethod": "table_row_match"
     },
     {
@@ -112,10 +156,46 @@
       "entity": "outOfBalanceAmount",
       "anchors": [
         "out of balance amount",
-        "out Of Balance Amount",
-        "outOfBalanceAmount"
+        "difference",
+        "imbalanced"
       ],
-      "location": "summary",
+      "location": "totals",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_accountCount",
+      "entity": "accountCount",
+      "anchors": [
+        "account count",
+        "number of accounts",
+        "accounts count",
+        "total rows"
+      ],
+      "location": "line_items",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_currencyDiscrepancyCount",
+      "entity": "currencyDiscrepancyCount",
+      "anchors": [
+        "currency discrepancy",
+        "multi currency count",
+        "foreign currency rows"
+      ],
+      "location": "currency_validation",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_messy_export",
+      "entity": "totalBalance",
+      "anchors": [
+        "csv",
+        "excel export",
+        "messy layout",
+        "merged cells",
+        "column shift"
+      ],
+      "location": "line_items",
       "extractionMethod": "table_row_match"
     }
   ]

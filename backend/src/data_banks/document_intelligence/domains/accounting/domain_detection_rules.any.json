@@ -1,98 +1,248 @@
 {
   "_meta": {
-    "id": "di_accounting_domain_detection_rules",
-    "version": "1.0.0",
-    "description": "Rules for detecting accounting domain from document content, metadata, and structure.",
+    "id": "di_accounting_domain_detection_rules_v2",
+    "version": "2.0.0",
+    "description": "Accounting domain detection rules with high-precision discrimination for trial balance, general ledger, and journal-entry support docs.",
     "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "accounting",
-    "minScore": 0.6,
-    "maxRulesPerDocument": 20
+    "minScore": 0.66,
+    "maxRulesPerDocument": 28,
+    "aggregation": "weighted_max"
   },
   "domain": "accounting",
   "rules": [
     {
-      "id": "acct_detect_001_trial_balance",
-      "priority": 99,
-      "weight": 3.0,
+      "id": "acct_detect_tb_001_core",
+      "priority": 100,
+      "weight": 4.5,
       "signal": "heading_or_content",
-      "patterns": ["\\b(?:trial\\s+balance|balan(?:ç|c)ete\\s+de\\s+verifica(?:ç|c)[ãa]o)\\b"],
-      "description": "Trial balance heading or content"
+      "patterns": [
+        "\\btrial\\s+balance\\b",
+        "\\btrial\\s+balance\\s+sheet\\b",
+        "\\bbalancete\\s+de\\s+verifica(?:c|ç)[aã]o\\b",
+        "\\bbalancete\\b"
+      ],
+      "docTypeHint": ["acct_trial_balance"],
+      "negativeContext": ["\\bgeneral\\s+ledger\\b", "\\brazao\\s+geral\\b", "\\bjournal\\s+entry\\b", "\\bjournal\\s+entries?\\b"],
+      "description": "Strong explicit trial balance indicator."
     },
     {
-      "id": "acct_detect_002_general_ledger",
+      "id": "acct_detect_tb_002_tb_header",
       "priority": 98,
-      "weight": 3.0,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:general\\s+ledger|GL\\s+(?:export|detail|summary)|raz[ãa]o\\s+geral|livro\\s+raz[ãa]o)\\b"],
-      "description": "General ledger identifiers"
-    },
-    {
-      "id": "acct_detect_003_journal_entry",
-      "priority": 95,
-      "weight": 2.5,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:journal\\s+entr(?:y|ies)|JE\\s+\\d|adjusting\\s+entr(?:y|ies)|lan(?:ç|c)amento(?:s)?\\s+cont[áa]bei(?:s|l))\\b"],
-      "description": "Journal entry identifiers"
-    },
-    {
-      "id": "acct_detect_004_debit_credit",
-      "priority": 85,
-      "weight": 2.0,
+      "weight": 3.8,
       "signal": "table_header",
-      "patterns": ["\\b(?:debit|credit|d[ée]bito|cr[ée]dito)\\b.*\\b(?:debit|credit|d[ée]bito|cr[ée]dito)\\b"],
-      "description": "Debit/credit column pair in table headers"
+      "patterns": [
+        "\\b(?:account\\s+code|c[oô]digo\\s+cont[aá]bil|conta)\\b.*\\b(?:ending|final|saldo(?:\\s+final)?|debito|credito|d[eé]bito|cr[eé]dito|atual|initial|opening|closing)\\b",
+        "\\b(?:debit|credit)\\s+(?:balance|saldo)\\b"
+      ],
+      "description": "Header shape matching TB line format."
     },
     {
-      "id": "acct_detect_005_bank_rec",
-      "priority": 95,
-      "weight": 2.5,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:bank\\s+reconciliation|reconcilia(?:ç|c)[ãa]o\\s+banc[áa]ria|reconciling\\s+items)\\b"],
-      "description": "Bank reconciliation identifiers"
-    },
-    {
-      "id": "acct_detect_006_aging",
-      "priority": 90,
-      "weight": 2.0,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:(?:AR|AP|accounts\\s+(?:receivable|payable))\\s+aging|aging\\s+(?:report|schedule|summary))\\b"],
-      "description": "Aging report identifiers"
-    },
-    {
-      "id": "acct_detect_007_audit_workpaper",
-      "priority": 95,
-      "weight": 2.5,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:audit\\s+workpaper|working\\s+paper|PBC\\s+list|prepared\\s+by\\s+client|papel\\s+de\\s+trabalho)\\b"],
-      "description": "Audit workpaper identifiers"
-    },
-    {
-      "id": "acct_detect_008_coa",
-      "priority": 90,
-      "weight": 2.0,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:chart\\s+of\\s+accounts|plano\\s+de\\s+contas|account\\s+(?:code|number)\\s*:\\s*\\d{4,})\\b"],
-      "description": "Chart of accounts references"
-    },
-    {
-      "id": "acct_detect_009_controls",
-      "priority": 80,
-      "weight": 1.5,
-      "signal": "heading_or_content",
-      "patterns": ["\\b(?:internal\\s+controls?|controls?\\s+narrative|segregation\\s+of\\s+duties|controles?\\s+internos?)\\b"],
-      "description": "Internal controls terminology"
-    },
-    {
-      "id": "acct_detect_010_closing",
-      "priority": 75,
-      "weight": 1.2,
+      "id": "acct_detect_tb_003_tb_balance_check",
+      "priority": 96,
+      "weight": 3.6,
       "signal": "content",
-      "patterns": ["\\b(?:closing\\s+entr(?:y|ies)|period[- ]end\\s+close|month[- ]end\\s+close|fechamento\\s+(?:mensal|cont[áa]bil))\\b"],
-      "description": "Period close terminology"
+      "patterns": [
+        "\\btotal\\s+debit\\b.*\\btotal\\s+credit\\b",
+        "\\bsoma\\s+dos\\s+d[ée]bitos\\b",
+        "\\bsoma\\s+dos\\s+cr[eé]ditos\\b"
+      ],
+      "description": "Explicit debit-credit equality language points to TB-style evidence."
+    },
+    {
+      "id": "acct_detect_gl_001_core",
+      "priority": 100,
+      "weight": 4.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bgeneral\\s+ledger\\b",
+        "\\bgl\\b",
+        "\\brazao\\s+geral\\b",
+        "\\blivro\\s+razao\\b",
+        "\\braz[aã]o\\s+geral\\b"
+      ],
+      "docTypeHint": ["acct_general_ledger", "acct_gl_export"],
+      "negativeContext": ["\\btrial\\s+balance\\b", "\\bbalancete\\b"],
+      "description": "General ledger indicators requiring ledger-style context."
+    },
+    {
+      "id": "acct_detect_gl_002_gl_headers",
+      "priority": 98,
+      "weight": 3.7,
+      "signal": "table_header",
+      "patterns": [
+        "\\b(entry|posting)\\s+date\\b",
+        "\\btransaction\\s+date\\b",
+        "\\bjournal\\s+entry\\s+id\\b",
+        "\\b(voucher|document)\\s+(?:no|n[oº]|id)\\b",
+        "\\baccount\\s+description\\b",
+        "\\bdebit\\s+amount\\b",
+        "\\bcredit\\s+amount\\b"
+      ],
+      "description": "Table header pattern expected in account-level ledger exports."
+    },
+    {
+      "id": "acct_detect_gl_003_ledger_page",
+      "priority": 96,
+      "weight": 3.3,
+      "signal": "content",
+      "patterns": [
+        "\\bopening\\s+balance\\b.*\\bclosing\\s+balance\\b",
+        "\\bbalance\\s+forward\\b",
+        "\\brunning\\s+balance\\b"
+      ],
+      "description": "Ledger pages often contain running/ending balance progression."
+    },
+    {
+      "id": "acct_detect_je_001_core",
+      "priority": 99,
+      "weight": 4.2,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bjournal\\s+entries?\\b",
+        "\\bjournal\\s+entry\\b",
+        "\\bJE\\s+support\\b",
+        "\\bJE\\s+\\d{1,8}\\b",
+        "\\blan[cç]amento(?:s)?\\s+cont[aá]beis?\\b",
+        "\\blan[cç]amento\\s+cont[aá]bil\\b"
+      ],
+      "docTypeHint": ["acct_journal_entry_support", "acct_journal_entry_adjusting"],
+      "negativeContext": ["\\bbalancete\\b", "\\bstatement\\s+of\\s+cash\\s+flows\\b"],
+      "description": "Journal entry support signals."
+    },
+    {
+      "id": "acct_detect_je_002_je_table",
+      "priority": 97,
+      "weight": 3.8,
+      "signal": "table_header",
+      "patterns": [
+        "\\b(?:journal\\s+entry|transaction)\\s+number\\b",
+        "\\b(?:debit\\s+account|cr[eé]dito\\s+conta|d[eé]bito\\s+conta)\\b",
+        "\\b(?:credit\\s+account|d[eé]bito\\s+valor|cr[eé]dito\\s+valor)\\b",
+        "\\b(?:approved|approved\\s+by|prepared\\s+by|autorizad[oa]|aprovad[oa])\\b"
+      ],
+      "description": "Requires explicit account mapping fields seen in JE schedules."
+    },
+    {
+      "id": "acct_detect_je_003_adjusting_entries",
+      "priority": 94,
+      "weight": 3.4,
+      "signal": "content",
+      "patterns": [
+        "\\badjusting\\s+entries?\\b",
+        "\\breversal\\s+entries?\\b",
+        "\\bestornos?\\b",
+        "\\baccrual\\s+entries?\\b",
+        "\\bperiod[- ]end\\s+adjustments?\\b"
+      ],
+      "description": "Adjusting/reversing context disambiguates from TB/GL."
+    },
+    {
+      "id": "acct_detect_rec_001_bank",
+      "priority": 92,
+      "weight": 3.2,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bbank\\s+reconciliation\\b",
+        "\\bbank\\s+recon\\b",
+        "\\breconcilia[cç][aã]o\\s+banc[áa]ria\\b",
+        "\\breconcilia[cç][aã]o\\s+financeira\\b"
+      ],
+      "docTypeHint": ["acct_bank_reconciliation", "acct_cashbook"],
+      "description": "Bank reconciliation indicator."
+    },
+    {
+      "id": "acct_detect_rec_002_stmts",
+      "priority": 90,
+      "weight": 3.0,
+      "signal": "content",
+      "patterns": [
+        "\\bstatement\\s+balance\\b",
+        "\\bbank\\s+statement\\b",
+        "\\blivro\\s+bancario\\b",
+        "\\bdeposits?\\s+in\\s+transit\\b",
+        "\\boutstanding\\s+checks\\b"
+      ],
+      "description": "Pairing with statement/cheques confirms reconciliation context."
+    },
+    {
+      "id": "acct_detect_aging_001",
+      "priority": 89,
+      "weight": 2.8,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\baging\\b",
+        "\\baccounts\\s+receivable\\s+aging\\b",
+        "\\baging\\s+schedule\\b",
+        "\\bvencimento\\b",
+        "\\bandamento\\s+de\\s+inadimplencia\\b"
+      ],
+      "docTypeHint": ["acct_ar_aging", "acct_ap_aging"],
+      "description": "Aging reports for AR/AP schedules."
+    },
+    {
+      "id": "acct_detect_fixed_assets",
+      "priority": 88,
+      "weight": 2.4,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bfixed\\s+asset\\s+register\\b",
+        "\\basset\\s+register\\b",
+        "\\bativo\\s+imobilizado\\b",
+        "\\breconciliation\\s+of\\s+depreciation\\b"
+      ]
+    },
+    {
+      "id": "acct_detect_cashflow",
+      "priority": 84,
+      "weight": 2.2,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\bcash\\s+flow\\b",
+        "\\bfluxo\\s+de\\s+caixa\\b",
+        "\\bstatement\\s+of\\s+cash\\s+flows\\b"
+      ]
+    },
+    {
+      "id": "acct_detect_controls",
+      "priority": 82,
+      "weight": 2.0,
+      "signal": "content",
+      "patterns": [
+        "\\binternal\\s+controls?\\b",
+        "\\bcontrols?\\s+narrative\\b",
+        "\\bcontroles\\s+internos\\b",
+        "\\bsegregation\\s+of\\s+duties\\b"
+      ]
+    },
+    {
+      "id": "acct_detect_controls_001",
+      "priority": 81,
+      "weight": 2.1,
+      "signal": "content",
+      "patterns": [
+        "\\bmateriality\\b",
+        "\\bcutoff\\b",
+        "\\bcompetencia\\b",
+        "\\bcaixa\\b"
+      ],
+      "description": "Discriminates accrual vs cash review context." 
+    },
+    {
+      "id": "acct_detect_audit_workpaper",
+      "priority": 80,
+      "weight": 2.3,
+      "signal": "heading_or_content",
+      "patterns": [
+        "\\baudit\\s+workpaper\\b",
+        "\\bworking\\s+paper\\b",
+        "\\bpapel\\s+de\\s+trabalho\\b",
+        "\\bprepared\\s+by\\s+client\\b"
+      ]
     }
   ]
 }

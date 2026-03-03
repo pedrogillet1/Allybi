@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_accounting_entities_acct_je_support",
+    "version": "1.1.0",
     "description": "Entity extraction schema for journal entry support.",
-    "version": "1.0.0",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -14,6 +14,44 @@
     "docType": "acct_je_support"
   },
   "entities": [
+    {
+      "id": "period",
+      "type": "string",
+      "required": true,
+      "description": "Accounting period represented in the document"
+    },
+    {
+      "id": "entity",
+      "type": "string",
+      "required": true,
+      "description": "Legal entity, business unit, or reporting entity"
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Functional or presentation currency"
+    },
+    {
+      "id": "basis",
+      "type": "enum",
+      "required": true,
+      "description": "Accounting basis used in the document",
+      "values": [
+        "accrual",
+        "cash",
+        "ifrs",
+        "gaap",
+        "local_statutory",
+        "tax"
+      ]
+    },
+    {
+      "id": "sourceSystem",
+      "type": "string",
+      "required": true,
+      "description": "Source ERP/system of record for extracted data"
+    },
     {
       "id": "je_number",
       "type": "string",
@@ -53,7 +91,7 @@
     {
       "id": "prepared_by",
       "type": "string",
-      "required": true,
+      "required": false,
       "description": "Preparer name"
     },
     {
@@ -73,6 +111,18 @@
       "type": "string",
       "required": false,
       "description": "Reference to supporting schedule or ticket"
+    },
+    {
+      "id": "posting_status",
+      "type": "string",
+      "required": false,
+      "description": "Posting status if available"
+    },
+    {
+      "id": "batch_id",
+      "type": "string",
+      "required": false,
+      "description": "Batch identifier used for posting"
     }
   ]
 }

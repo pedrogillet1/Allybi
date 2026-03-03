@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "legal_evidence_requirements",
-    "version": "2.0.0",
-    "description": "Evidence standards and citation policy for legal domain responses.",
+    "version": "2.1.0",
+    "description": "Legal evidence policy emphasizing clause-level extraction, exact wording capture, and location anchoring.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -17,60 +17,60 @@
   "domain": "legal",
   "evidenceHierarchy": [
     {
-      "id": "legal_evidence_hierarchy_001",
+      "id": "legal_ev_h1",
       "rank": 1,
       "type": "signed_contract_clause",
       "label": {
-        "en": "Signed contract clause",
-        "pt": "Clausula contratual assinada"
+        "en": "Signed clause from agreement",
+        "pt": "Clausula assinada do contrato"
       },
       "trustLevel": "high"
     },
     {
-      "id": "legal_evidence_hierarchy_002",
+      "id": "legal_ev_h2",
       "rank": 2,
-      "type": "executed_policy_text",
-      "label": {
-        "en": "Executed policy text",
-        "pt": "Texto de politica vigente"
-      },
-      "trustLevel": "high"
-    },
-    {
-      "id": "legal_evidence_hierarchy_003",
-      "rank": 3,
-      "type": "board_or_court_order",
-      "label": {
-        "en": "Board/Court order",
-        "pt": "Ordem de conselho/justica"
-      },
-      "trustLevel": "high"
-    },
-    {
-      "id": "legal_evidence_hierarchy_004",
-      "rank": 4,
       "type": "schedule_or_annex",
       "label": {
         "en": "Schedule or annex",
-        "pt": "Anexo ou apenso"
+        "pt": "Anexo ou schedule"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "id": "legal_ev_h3",
+      "rank": 3,
+      "type": "signature_page",
+      "label": {
+        "en": "Signature page",
+        "pt": "Pagina de assinatura"
       },
       "trustLevel": "medium"
     },
     {
-      "id": "legal_evidence_hierarchy_005",
+      "id": "legal_ev_h4",
+      "rank": 4,
+      "type": "court_or_admin_order",
+      "label": {
+        "en": "Court or regulator order",
+        "pt": "Ordem judicial ou regulatoria"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "id": "legal_ev_h5",
       "rank": 5,
       "type": "draft_or_redline",
       "label": {
-        "en": "Draft or redline",
-        "pt": "Rascunho ou redline"
+        "en": "Draft/redline source",
+        "pt": "Rascunho/redline"
       },
       "trustLevel": "low"
     }
   ],
   "rules": [
     {
-      "id": "legal_evidence_exact_clause_for_obligations",
-      "description": "Obligations must cite exact clause text and location.",
+      "id": "legal_ev_001_obligations_require_exact_clause",
+      "description": "All obligation-level claims must include exact clause quotation and explicit location.",
       "applies": [
         "extract",
         "compare",
@@ -80,13 +80,125 @@
       "requiredTypes": [
         "signed_contract_clause"
       ],
+      "requiredFields": [
+        "obligation_text",
+        "obligation_type",
+        "source_clause_location",
+        "effective_scope"
+      ],
+      "requireStructuredCitation": true,
+      "requireExactClauseText": true,
+      "requireLocation": true
+    },
+    {
+      "id": "legal_ev_002_permissions_require_exact_clause",
+      "description": "Permissions, rights, and limitations must be sourced from exact clause wording with location.",
+      "applies": [
+        "extract",
+        "validate",
+        "summarize"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause"
+      ],
+      "requiredFields": [
+        "term_text",
+        "term_location",
+        "subject"
+      ],
+      "requireStructuredCitation": true,
+      "requireExactClauseText": true,
+      "requireLocation": true
+    },
+    {
+      "id": "legal_ev_003_obligations_fenced_from_definitions",
+      "description": "Cross-references that modify obligations must include resolved defined term and its defining clause.",
+      "applies": [
+        "extract",
+        "locate",
+        "compare",
+        "validate"
+      ],
+      "minEvidence": 2,
+      "requiredTypes": [
+        "signed_contract_clause"
+      ],
+      "requiredFields": [
+        "defined_term",
+        "defining_clause_location",
+        "applied_term_text"
+      ],
+      "requireStructuredCitation": true,
+      "tieOutDefinitions": true
+    },
+    {
+      "id": "legal_ev_004_dates_and_terms",
+      "description": "Term/termination and key date claims must cite both table/header and sentence-level clause context.",
+      "applies": [
+        "extract",
+        "validate",
+        "monitor"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause",
+        "schedule_or_annex"
+      ],
+      "requiredFields": [
+        "date_value",
+        "date_basis",
+        "term_source_location"
+      ],
       "requireStructuredCitation": true
     },
     {
-      "id": "legal_evidence_dual_source_for_dates",
-      "description": "Critical dates should be validated in body + signature/schedule where possible.",
+      "id": "legal_ev_005_liability_risk_caps",
+      "description": "Liability cap, indemnity, and limitation statements require explicit basis and citation span.",
+      "applies": [
+        "evaluate",
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause"
+      ],
+      "requiredFields": [
+        "clause_text",
+        "cap_value_or_formula",
+        "clause_location",
+        "exception_scope"
+      ],
+      "requireStructuredCitation": true
+    },
+    {
+      "id": "legal_ev_006_parties_roles",
+      "description": "Party-role claims require clause-level source and role assignment in same extraction unit.",
       "applies": [
         "extract",
+        "validate",
+        "locate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "signed_contract_clause",
+        "signature_page"
+      ],
+      "requiredFields": [
+        "party_name",
+        "party_role",
+        "role_source_location"
+      ],
+      "requireStructuredCitation": true
+    },
+    {
+      "id": "legal_ev_007_governing_law_gating",
+      "description": "Governing law and jurisdiction outputs must be sourced from explicit legal clause or definitive annex.",
+      "applies": [
+        "extract",
+        "summarize",
         "validate"
       ],
       "minEvidence": 1,
@@ -94,99 +206,78 @@
         "signed_contract_clause",
         "schedule_or_annex"
       ],
-      "requireDualSource": false
-    },
-    {
-      "id": "legal_evidence_no_inferred_parties",
-      "description": "Do not infer party identities or roles when ambiguous.",
-      "applies": [
-        "summarize",
-        "advise",
-        "validate"
-      ],
-      "minEvidence": 1,
-      "requiredTypes": [
-        "signed_contract_clause"
-      ],
-      "requireDualSource": false
-    },
-    {
-      "id": "legal_evidence_policy_version_control",
-      "description": "Policy interpretations must identify version/effective date evidence.",
-      "applies": [
-        "extract",
-        "summarize",
-        "evaluate"
-      ],
-      "minEvidence": 1,
-      "requiredTypes": [
-        "executed_policy_text"
+      "requiredFields": [
+        "governing_law_text",
+        "law_venue_scope",
+        "source_location"
       ],
       "requireStructuredCitation": true
     },
     {
-      "id": "legal_evidence_dispute_deadline_priority",
-      "description": "Litigation memo outputs must cite deadlines and court/order authority.",
+      "id": "legal_ev_008_conflicting_reads",
+      "description": "If conflicting clauses exist, both conflicting locations and precedence language must be cited.",
       "applies": [
-        "extract",
-        "locate",
-        "monitor"
+        "compare",
+        "validate",
+        "evaluate"
       ],
-      "minEvidence": 1,
+      "minEvidence": 2,
       "requiredTypes": [
-        "board_or_court_order"
+        "signed_contract_clause",
+        "court_or_admin_order"
+      ],
+      "requiredFields": [
+        "conflict_statement",
+        "clause_location_primary",
+        "clause_location_secondary",
+        "resolution_basis"
       ],
       "requireStructuredCitation": true
     }
   ],
   "requirements": [
     {
-      "id": "legal_requirement_parties",
-      "field": "party names and roles",
+      "id": "legal_req_entities_fields",
+      "field": "all party names and roles",
       "minSources": 1,
       "sourceTypes": [
-        "signed_contract_clause"
+        "signed_contract_clause",
+        "signature_page"
       ],
-      "failureBehavior": "ask_clarifying_question"
+      "failureBehavior": "ask_clarifying_question",
+      "requireSourceLocation": true
     },
     {
-      "id": "legal_requirement_dates",
-      "field": "effective/execution/termination dates",
+      "id": "legal_req_dates",
+      "field": "effective date, effective period, termination date",
       "minSources": 1,
       "sourceTypes": [
         "signed_contract_clause",
         "schedule_or_annex"
       ],
-      "failureBehavior": "mark_as_unverified"
+      "failureBehavior": "mark_as_unverified",
+      "requireSourceLocation": true
     },
     {
-      "id": "legal_requirement_money",
-      "field": "fees, penalties, credits",
+      "id": "legal_req_financials",
+      "field": "fees, penalties, credits, indemnity caps",
       "minSources": 1,
       "sourceTypes": [
         "signed_contract_clause",
         "schedule_or_annex"
       ],
-      "failureBehavior": "mark_as_unverified"
+      "failureBehavior": "mark_as_unverified",
+      "requireSourceLocation": true
     },
     {
-      "id": "legal_requirement_governing_law",
+      "id": "legal_req_liability",
       "field": "governing law and venue",
       "minSources": 1,
       "sourceTypes": [
         "signed_contract_clause"
       ],
-      "failureBehavior": "ask_clarifying_question"
-    },
-    {
-      "id": "legal_requirement_security_privacy",
-      "field": "security/privacy obligations",
-      "minSources": 1,
-      "sourceTypes": [
-        "signed_contract_clause",
-        "executed_policy_text"
-      ],
-      "failureBehavior": "mark_as_unverified"
+      "failureBehavior": "ask_clarifying_question",
+      "requireSourceLocation": true
     }
   ]
 }

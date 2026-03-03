@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "id": "di_everyday_extraction_every_insurance_claim",
+    "version": "1.0.0",
+    "description": "Extraction hints for every_insurance_claim.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_insurance_claim"
+  },
+  "hints": [
+    {
+      "id": "every_insurance_claim_hint_01",
+      "entity": "claim_number",
+      "anchors": ["claim number", "sinistro", "numero do sinistro", "claim id"],
+      "location": "claim_identity",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["header block", "claim heading"]
+    },
+    {
+      "id": "every_insurance_claim_hint_02",
+      "entity": "policy_number",
+      "anchors": ["policy", "apolice", "policy number"],
+      "location": "claim_identity",
+      "extractionMethod": "regex_capture",
+      "whereItHides": ["claim identity", "policy summary"]
+    },
+    {
+      "id": "every_insurance_claim_hint_03",
+      "entity": "claimant_name",
+      "anchors": ["claimant", "solicitante", "requerente"],
+      "location": "claim_identity",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["top profile", "identity fields"]
+    },
+    {
+      "id": "every_insurance_claim_hint_04",
+      "entity": "incident_date",
+      "anchors": ["incident date", "date of loss", "date", "ocorrencia"],
+      "location": "incident",
+      "extractionMethod": "date_parse",
+      "whereItHides": ["incident narrative", "date row"]
+    },
+    {
+      "id": "every_insurance_claim_hint_05",
+      "entity": "incident_description",
+      "anchors": ["description", "description of loss", "fatos", "detalhes"],
+      "location": "incident",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["incident block", "multi-line narrative"]
+    },
+    {
+      "id": "every_insurance_claim_hint_06",
+      "entity": "estimated_loss_amount",
+      "anchors": ["estimated loss", "estimated", "estimativa de perda"],
+      "location": "coverage_check",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["amount table", "coverage matrix"]
+    },
+    {
+      "id": "every_insurance_claim_hint_07",
+      "entity": "approved_loss_amount",
+      "anchors": ["approved", "approved amount", "valor aprovado"],
+      "location": "payments_and_status",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["payments table", "status summary"]
+    },
+    {
+      "id": "every_insurance_claim_hint_08",
+      "entity": "claim_status",
+      "anchors": ["status", "open", "approved", "denied", "closed", "status atual"],
+      "location": "payments_and_status",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["status line", "decision block"]
+    },
+    {
+      "id": "every_insurance_claim_hint_09",
+      "entity": "paid_amount",
+      "anchors": ["paid", "payment", "valor pago", "pago"],
+      "location": "payments_and_status",
+      "extractionMethod": "table_row_match",
+      "whereItHides": ["payment lines", "multi-currency table"]
+    },
+    {
+      "id": "every_insurance_claim_hint_10",
+      "entity": "adjustment_notes",
+      "anchors": ["adjustment", "revision", "history", "history note"],
+      "location": "adjustment_history",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": ["history section", "appendix"]
+    }
+  ]
+}

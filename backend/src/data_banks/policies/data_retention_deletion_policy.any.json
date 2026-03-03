@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "id": "data_retention_deletion_policy",
+    "version": "1.0.0",
+    "description": "Retention and deletion controls for runtime conversation artifacts.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "platform-data-governance",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Initial retention/deletion runtime policy bank"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": false
+  },
+  "retentionClasses": {
+    "chat_message": {
+      "ttlDays": 365,
+      "purgeMode": "soft_then_hard"
+    },
+    "audit_event": {
+      "ttlDays": 730,
+      "purgeMode": "hard"
+    },
+    "temporary_preview": {
+      "ttlDays": 14,
+      "purgeMode": "hard"
+    }
+  },
+  "rules": [
+    {
+      "id": "DRP_1000_legal_hold",
+      "priority": 1000,
+      "when": {
+        "path": "signals.legalHold",
+        "op": "eq",
+        "value": true
+      },
+      "then": {
+        "action": "retain",
+        "overrideTtlDays": null,
+        "reason": "legal_hold"
+      },
+      "reasonCode": "retention_legal_hold",
+      "terminal": true
+    },
+    {
+      "id": "DRP_900_user_erasure_request",
+      "priority": 900,
+      "when": {
+        "path": "signals.userErasureRequested",
+        "op": "eq",
+        "value": true
+      },
+      "then": {
+        "action": "purge_immediately",
+        "reason": "user_erasure"
+      },
+      "reasonCode": "retention_user_erasure",
+      "terminal": true
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DRP_T_001",
+        "runtime": {
+          "signals": {
+            "legalHold": true
+          }
+        },
+        "expect": {
+          "action": "retain"
+        }
+      }
+    ]
+  }
+}

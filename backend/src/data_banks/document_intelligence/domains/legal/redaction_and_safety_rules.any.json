@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "legal_redaction_and_safety_rules",
-    "version": "2.0.0",
-    "description": "Redaction rules and safety guardrails for legal content.",
+    "version": "2.1.0",
+    "description": "Legal redaction and safety rules to avoid exposing sensitive data and unsafe legal manipulation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,104 +15,90 @@
   "domain": "legal",
   "redactionRules": [
     {
-      "id": "legal_redaction_001",
+      "id": "legal_redact_001_pii_email",
       "dataType": "personal_email",
       "pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
       "action": "REDACT",
       "replacement": "[REDACTED_EMAIL]"
     },
     {
-      "id": "legal_redaction_002",
+      "id": "legal_redact_002_pii_phone",
       "dataType": "personal_phone",
       "pattern": "\\+?[0-9][0-9\\-() ]{7,}[0-9]",
       "action": "REDACT",
       "replacement": "[REDACTED_PHONE]"
     },
     {
-      "id": "legal_redaction_003",
-      "dataType": "tax_identifier",
-      "pattern": "\\b(?:EIN|CPF|CNPJ|SSN)[:# ]?[A-Z0-9./-]{6,}\\b",
+      "id": "legal_redact_003_pii_ids",
+      "dataType": "person_identifier",
+      "pattern": "\\b(?:SSN|CPF|EIN|RG|NI|NIF|TIN|passport)\\s*[:#-]?\\s*[A-Z0-9.-]{6,}\\b",
       "action": "REDACT",
-      "replacement": "[REDACTED_TAX_ID]"
+      "replacement": "[REDACTED_IDENTIFIER]"
     },
     {
-      "id": "legal_redaction_004",
+      "id": "legal_redact_004_bank_account",
       "dataType": "bank_account",
-      "pattern": "\\b(?:IBAN|account number|routing)[:# ]?[A-Z0-9-]{8,}\\b",
+      "pattern": "\\b(?:IBAN|acc(?:ount)?\\s*(?:no|number|#)|routing)[:# ]?[A-Z0-9-]{8,}\\b",
       "action": "REDACT",
       "replacement": "[REDACTED_ACCOUNT]"
     },
     {
-      "id": "legal_redaction_005",
-      "dataType": "signature_image_marker",
-      "pattern": "\\b(signature image|signed by)\\b",
-      "action": "MASK",
-      "replacement": "[SIGNATURE_PRESENT]"
-    },
-    {
-      "id": "legal_redaction_006",
+      "id": "legal_redact_005_address",
       "dataType": "home_address",
       "pattern": "\\b\\d{1,5}\\s+[A-Za-z0-9 .-]+\\s(?:Street|St|Avenue|Ave|Road|Rd|Rua|Av|Alameda)\\b",
       "action": "REDACT",
       "replacement": "[REDACTED_ADDRESS]"
     },
     {
-      "id": "legal_redaction_007",
-      "dataType": "passport_or_id",
-      "pattern": "\\b(?:passport|rg|driver license)[:# ]?[A-Z0-9-]{5,}\\b",
-      "action": "REDACT",
-      "replacement": "[REDACTED_ID]"
+      "id": "legal_redact_006_signature_mask",
+      "dataType": "signature_marker",
+      "pattern": "\\b(signature\\s+image|signed\\s+by|authorized\\s+representative)\\b",
+      "action": "MASK",
+      "replacement": "[SIGNATURE_PRESENT]"
     },
     {
-      "id": "legal_redaction_008",
-      "dataType": "secret_key_material",
-      "pattern": "\\b(?:api[_ -]?key|secret|private key)\\b",
+      "id": "legal_redact_007_financial_seed",
+      "dataType": "secret_key",
+      "pattern": "\\b(?:api[_ -]?key|secret|private\\s+key|token)\\b",
       "action": "REDACT",
       "replacement": "[REDACTED_SECRET]"
     }
   ],
   "safetyRules": [
     {
-      "id": "legal_safety_001",
+      "id": "legal_safe_001_block_source_mangling",
       "severity": "error",
-      "trigger": "user requests legal advice beyond source interpretation",
-      "description": "Block unsupported legal advice and provide limitation disclaimer.",
+      "trigger": "user asks to alter source wording or delete obligations",
+      "description": "Block claims that request rewriting clauses or hiding text without legal process context.",
       "action": "BLOCK_WITH_DISCLAIMER"
     },
     {
-      "id": "legal_safety_002",
-      "severity": "warning",
-      "trigger": "user asks to alter source wording without evidence",
-      "description": "Warn and request source citation before modification claims.",
-      "action": "DISCLAIMER"
-    },
-    {
-      "id": "legal_safety_003",
-      "severity": "warning",
-      "trigger": "ambiguous party/date/governing law fields",
-      "description": "Require ambiguity callout and clarifying question.",
-      "action": "DISCLAIMER"
-    },
-    {
-      "id": "legal_safety_004",
+      "id": "legal_safe_002_require_source_for_claims",
       "severity": "error",
-      "trigger": "request to hide or falsify obligations",
-      "description": "Refuse manipulation/fabrication requests.",
+      "trigger": "user request seeks legal interpretation without clause citation",
+      "description": "Require source-cited claims for all legal conclusions.",
       "action": "BLOCK_WITH_DISCLAIMER"
     },
     {
-      "id": "legal_safety_005",
+      "id": "legal_safe_003_ambiguity_followup",
       "severity": "warning",
-      "trigger": "high-risk litigation recommendation without cited order/motion",
-      "description": "Warn and require direct evidence.",
+      "trigger": "user asks to assign legal effect when fields are missing",
+      "description": "Require one focused clarifying question and structured uncertainty before any recommendation.",
       "action": "DISCLAIMER"
     },
     {
-      "id": "legal_safety_006",
+      "id": "legal_safe_004_redline_request",
       "severity": "warning",
-      "trigger": "sensitive personal data in response body",
-      "description": "Apply redaction policy before output.",
+      "trigger": "request to draft new legal text or legal edits",
+      "description": "Redirect to template/legal review workflow instead of generating unverified substitutions.",
       "action": "DISCLAIMER"
+    },
+    {
+      "id": "legal_safe_005_harmful_guidance",
+      "severity": "error",
+      "trigger": "request to bypass obligations or evade contractual commitments",
+      "description": "Refuse evasion guidance and require grounded compliance path.",
+      "action": "BLOCK_WITH_DISCLAIMER"
     }
   ]
 }

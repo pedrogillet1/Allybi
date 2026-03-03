@@ -1,182 +1,115 @@
 {
   "_meta": {
     "id": "legal_domain_detection_rules",
-    "version": "2.0.0",
-    "description": "Deterministic rules for legal domain detection using lexical, structural, and metadata signals.",
+    "version": "2.1.0",
+    "description": "Legal domain detection with explicit doc-type signatures and clause-driven legal signaling.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "legal",
-    "minScore": 0.62,
-    "maxRulesPerDocument": 60
+    "minScore": 0.68,
+    "maxRulesPerDocument": 80
   },
   "domain": "legal",
   "rules": [
     {
-      "id": "legal_detect_001",
-      "priority": 120,
-      "weight": 3.2,
-      "signal": "heading_or_content",
+      "id": "legal_detect_nda_signature",
+      "priority": 220,
+      "ruleType": "positive",
+      "weight": 4.5,
+      "signal": "doc_type_signature",
+      "docType": "legal_nda",
       "patterns": [
-        "\\bgoverning[ -]?law\\b",
-        "\\bjurisdiction\\b"
+        "\\bnon[- ]disclosure\\s+agreement\\b",
+        "\\bconfidential\\s+information\\s+agreement\\b",
+        "\\bconfidentiality\\s+and\\s+non[- ]disclosure\\b",
+        "\\bNDA\\b"
       ],
       "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
+        "\\bcourt\\s+order\\b",
+        "\\bsettlement\\s+agreement\\b",
+        "\\bterms\\s+of\\s+service\\b",
+        "\\bprivacy\\s+policy\\b"
       ],
-      "description": "Legal signal: governing law + jurisdiction"
+      "description": "Identify Non-Disclosure Agreements as primary legal subtype."
     },
     {
-      "id": "legal_detect_002",
-      "priority": 119,
-      "weight": 3.15,
-      "signal": "table_header",
+      "id": "legal_detect_msa_signature",
+      "priority": 219,
+      "ruleType": "positive",
+      "weight": 4.4,
+      "signal": "doc_type_signature",
+      "docType": "legal_msa",
       "patterns": [
-        "\\bindemnification\\b",
-        "\\blimitation[ -]?of[ -]?liability\\b"
+        "\\bmaster\\s+services\\s+agreement\\b",
+        "\\bmsa\\b",
+        "\\bmaster\\s+service\\s+agreement\\b",
+        "\\bagreement\\s+governing\\s+future\\s+services\\b"
       ],
       "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
+        "\\bstatement\\s+of\\s+work\\b",
+        "\\bstandalone\\s+supplier\\s+agreement\\b",
+        "\\bterms\\s+of\\s+service\\b"
       ],
-      "description": "Legal signal: indemnification + limitation of liability"
+      "description": "Identify Master Services Agreements via template and role markers."
     },
     {
-      "id": "legal_detect_003",
-      "priority": 118,
-      "weight": 3.1,
-      "signal": "content",
+      "id": "legal_detect_sow_signature",
+      "priority": 218,
+      "ruleType": "positive",
+      "weight": 4.3,
+      "signal": "doc_type_signature",
+      "docType": "legal_sow",
       "patterns": [
-        "\\bconfidential[ -]?information\\b",
-        "\\bnon[ -]?disclosure\\b"
+        "\\bstatement\\s+of\\s+work\\b",
+        "\\bso[wW]\\b",
+        "\\bwork\\s+order\\b",
+        "\\bscope\\s+of\\s+work\\b"
       ],
       "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
+        "\\bmaster\\s+services\\s+agreement\\b",
+        "\\bmaster\\s+service\\s+agreement\\b",
+        "\\brental\\s+agreement\\b"
       ],
-      "description": "Legal signal: confidential information + non-disclosure"
+      "description": "Identify Statement-of-Work documents and distinguish from master framework agreements."
     },
     {
-      "id": "legal_detect_004",
-      "priority": 117,
-      "weight": 3.05,
-      "signal": "heading_or_content",
+      "id": "legal_detect_dpa_signature",
+      "priority": 217,
+      "ruleType": "positive",
+      "weight": 4.2,
+      "signal": "doc_type_signature",
+      "docType": "legal_dpa",
       "patterns": [
-        "\\bdata[ -]?processing[ -]?agreement\\b",
-        "\\bsubprocessor\\b"
+        "\\bdata\\s+processing\\s+agreement\\b",
+        "\\bDPA\\b",
+        "\\bcontroller\\b",
+        "\\bprocessor\\b",
+        "\\bprocessor\\s+obligations\\b",
+        "\\bgdpr\\b",
+        "\\bLGPD\\b"
       ],
       "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
+        "\\bprivacy\\s+policy\\b",
+        "\\bprivacy\\s+notice\\b",
+        "\\bcookie\\s+policy\\b",
+        "\\bsecurity\\s+standards\\b"
       ],
-      "description": "Legal signal: data processing agreement + subprocessor"
+      "description": "Identify Data Processing Agreements by processing language and controller/processor structure."
     },
     {
-      "id": "legal_detect_005",
-      "priority": 116,
-      "weight": 3,
-      "signal": "table_header",
-      "patterns": [
-        "\\bservice[ -]?level[ -]?agreement\\b",
-        "\\buptime\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: service level agreement + uptime"
-    },
-    {
-      "id": "legal_detect_006",
-      "priority": 115,
-      "weight": 2.95,
-      "signal": "content",
-      "patterns": [
-        "\\bstatement[ -]?of[ -]?work\\b",
-        "\\bdeliverables\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: statement of work + deliverables"
-    },
-    {
-      "id": "legal_detect_007",
-      "priority": 114,
-      "weight": 2.9,
-      "signal": "heading_or_content",
-      "patterns": [
-        "\\bmaster[ -]?services[ -]?agreement\\b",
-        "\\border[ -]?form\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: master services agreement + order form"
-    },
-    {
-      "id": "legal_detect_008",
-      "priority": 113,
-      "weight": 2.85,
-      "signal": "table_header",
-      "patterns": [
-        "\\bboard[ -]?resolution\\b",
-        "\\bresolved[ -]?that\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: board resolution + resolved that"
-    },
-    {
-      "id": "legal_detect_009",
-      "priority": 112,
+      "id": "legal_detect_legal_core_001",
+      "priority": 140,
+      "ruleType": "positive",
       "weight": 2.8,
-      "signal": "content",
-      "patterns": [
-        "\\bboard[ -]?minutes\\b",
-        "\\battendees\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: board minutes + attendees"
-    },
-    {
-      "id": "legal_detect_010",
-      "priority": 111,
-      "weight": 2.75,
       "signal": "heading_or_content",
       "patterns": [
-        "\\bwritten[ -]?consent\\b",
-        "\\bconsent[ -]?in[ -]?lieu[ -]?of[ -]?meeting\\b"
+        "\\bgoverning\\s+law\\b",
+        "\\blimitation\\s+of\\s+liability\\b"
       ],
       "negativePatterns": [
         "\\bsoap note\\b",
@@ -184,16 +117,18 @@
         "\\blab result\\b",
         "\\bhemoglobin\\b"
       ],
-      "description": "Legal signal: written consent + consent in lieu of meeting"
+      "description": "General legal-domain anchor: clauses on law and liability."
     },
     {
-      "id": "legal_detect_011",
-      "priority": 110,
+      "id": "legal_detect_legal_core_002",
+      "priority": 139,
+      "ruleType": "positive",
       "weight": 2.7,
-      "signal": "table_header",
+      "signal": "heading_or_content",
       "patterns": [
-        "\\bprivacy[ -]?policy\\b",
-        "\\bpersonal[ -]?data\\b"
+        "\\btermination\\b",
+        "\\bterm\\s+and\\s+renewal\\b",
+        "\\bnotice\\s+period\\b"
       ],
       "negativePatterns": [
         "\\bsoap note\\b",
@@ -201,33 +136,18 @@
         "\\blab result\\b",
         "\\bhemoglobin\\b"
       ],
-      "description": "Legal signal: privacy policy + personal data"
+      "description": "Detect legal term/termination language for extraction routing."
     },
     {
-      "id": "legal_detect_012",
-      "priority": 109,
-      "weight": 2.65,
-      "signal": "content",
-      "patterns": [
-        "\\bterms[ -]?of[ -]?service\\b",
-        "\\buser[ -]?account\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: terms of service + user account"
-    },
-    {
-      "id": "legal_detect_013",
-      "priority": 108,
+      "id": "legal_detect_legal_core_003",
+      "priority": 138,
+      "ruleType": "positive",
       "weight": 2.6,
       "signal": "heading_or_content",
       "patterns": [
-        "\\bcookie[ -]?policy\\b",
-        "\\bcookie[ -]?categories\\b"
+        "\\bconfidential\\s+information\\b",
+        "\\bnon[- ]?disclosure\\b",
+        "\\bconfidentiality\\b"
       ],
       "negativePatterns": [
         "\\bsoap note\\b",
@@ -235,50 +155,18 @@
         "\\blab result\\b",
         "\\bhemoglobin\\b"
       ],
-      "description": "Legal signal: cookie policy + cookie categories"
+      "description": "Detect confidentiality-heavy contracts and clauses."
     },
     {
-      "id": "legal_detect_014",
-      "priority": 107,
-      "weight": 2.55,
-      "signal": "table_header",
-      "patterns": [
-        "\\bacceptable[ -]?use[ -]?policy\\b",
-        "\\bprohibited[ -]?conduct\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: acceptable use policy + prohibited conduct"
-    },
-    {
-      "id": "legal_detect_015",
-      "priority": 106,
+      "id": "legal_detect_legal_core_004",
+      "priority": 137,
+      "ruleType": "positive",
       "weight": 2.5,
-      "signal": "content",
-      "patterns": [
-        "\\bsecurity[ -]?policy\\b",
-        "\\baccess[ -]?control\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: security policy + access control"
-    },
-    {
-      "id": "legal_detect_016",
-      "priority": 105,
-      "weight": 2.45,
       "signal": "heading_or_content",
       "patterns": [
-        "\\bdata[ -]?retention[ -]?policy\\b",
-        "\\bretention[ -]?schedule\\b"
+        "\\bindemnify\\b",
+        "\\blimit\\s+liability\\b",
+        "\\bliability\\s+cap\\b"
       ],
       "negativePatterns": [
         "\\bsoap note\\b",
@@ -286,50 +174,18 @@
         "\\blab result\\b",
         "\\bhemoglobin\\b"
       ],
-      "description": "Legal signal: data retention policy + retention schedule"
+      "description": "Detect indemnity/loss allocation sections."
     },
     {
-      "id": "legal_detect_017",
-      "priority": 104,
+      "id": "legal_detect_legal_core_005",
+      "priority": 136,
+      "ruleType": "positive",
       "weight": 2.4,
-      "signal": "table_header",
-      "patterns": [
-        "\\bcomplaint\\b",
-        "\\bcause[ -]?of[ -]?action\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: complaint + cause of action"
-    },
-    {
-      "id": "legal_detect_018",
-      "priority": 103,
-      "weight": 2.35,
-      "signal": "content",
-      "patterns": [
-        "\\bmotion\\b",
-        "\\brelief[ -]?requested\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: motion + relief requested"
-    },
-    {
-      "id": "legal_detect_019",
-      "priority": 102,
-      "weight": 2.3,
       "signal": "heading_or_content",
       "patterns": [
-        "\\bcourt[ -]?order\\b",
-        "\\bit[ -]?is[ -]?ordered\\b"
+        "\\bdefinition\\b",
+        "\\bdefinitions\\b",
+        "\\bfor\\s+avoidance\\s+of\\s+doubt\\b"
       ],
       "negativePatterns": [
         "\\bsoap note\\b",
@@ -337,194 +193,7 @@
         "\\blab result\\b",
         "\\bhemoglobin\\b"
       ],
-      "description": "Legal signal: court order + it is ordered"
-    },
-    {
-      "id": "legal_detect_020",
-      "priority": 101,
-      "weight": 2.25,
-      "signal": "table_header",
-      "patterns": [
-        "\\bsettlement[ -]?agreement\\b",
-        "\\brelease[ -]?of[ -]?claims\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: settlement agreement + release of claims"
-    },
-    {
-      "id": "legal_detect_021",
-      "priority": 100,
-      "weight": 2.2,
-      "signal": "content",
-      "patterns": [
-        "\\blicense[ -]?agreement\\b",
-        "\\blicense[ -]?grant\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: license agreement + license grant"
-    },
-    {
-      "id": "legal_detect_022",
-      "priority": 99,
-      "weight": 2.15,
-      "signal": "heading_or_content",
-      "patterns": [
-        "\\beula\\b",
-        "\\bend[ -]?user\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: eula + end user"
-    },
-    {
-      "id": "legal_detect_023",
-      "priority": 98,
-      "weight": 2.1,
-      "signal": "table_header",
-      "patterns": [
-        "\\bemployment[ -]?agreement\\b",
-        "\\bat[ -]?will\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: employment agreement + at-will"
-    },
-    {
-      "id": "legal_detect_024",
-      "priority": 97,
-      "weight": 2.05,
-      "signal": "content",
-      "patterns": [
-        "\\boffer[ -]?letter\\b",
-        "\\bbase[ -]?salary\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: offer letter + base salary"
-    },
-    {
-      "id": "legal_detect_025",
-      "priority": 96,
-      "weight": 2,
-      "signal": "heading_or_content",
-      "patterns": [
-        "\\bip[ -]?assignment\\b",
-        "\\bassigns[ -]?all[ -]?rights\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: ip assignment + assigns all rights"
-    },
-    {
-      "id": "legal_detect_026",
-      "priority": 95,
-      "weight": 1.95,
-      "signal": "table_header",
-      "patterns": [
-        "\\bcontractor[ -]?agreement\\b",
-        "\\bindependent[ -]?contractor\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: contractor agreement + independent contractor"
-    },
-    {
-      "id": "legal_detect_027",
-      "priority": 94,
-      "weight": 1.9,
-      "signal": "content",
-      "patterns": [
-        "\\bconsulting[ -]?agreement\\b",
-        "\\bconsulting[ -]?services\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: consulting agreement + consulting services"
-    },
-    {
-      "id": "legal_detect_028",
-      "priority": 93,
-      "weight": 1.85,
-      "signal": "heading_or_content",
-      "patterns": [
-        "\\breseller[ -]?agreement\\b",
-        "\\bterritory\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: reseller agreement + territory"
-    },
-    {
-      "id": "legal_detect_029",
-      "priority": 92,
-      "weight": 1.8,
-      "signal": "table_header",
-      "patterns": [
-        "\\bpartnership[ -]?agreement\\b",
-        "\\bprofit[ -]?sharing\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: partnership agreement + profit sharing"
-    },
-    {
-      "id": "legal_detect_030",
-      "priority": 91,
-      "weight": 1.75,
-      "signal": "content",
-      "patterns": [
-        "\\bbaa\\b",
-        "\\bcovered[ -]?entity\\b"
-      ],
-      "negativePatterns": [
-        "\\bsoap note\\b",
-        "\\bradiology report\\b",
-        "\\blab result\\b",
-        "\\bhemoglobin\\b"
-      ],
-      "description": "Legal signal: baa + covered entity"
+      "description": "Prioritize documents with explicit definition sections."
     }
   ]
 }

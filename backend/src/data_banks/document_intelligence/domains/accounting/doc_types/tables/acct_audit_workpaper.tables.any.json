@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -20,17 +20,7 @@
       "dr",
       "dr.",
       "debit amount",
-      "debit amt",
-      "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
-      "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
+      "debit qty"
     ],
     "credit": [
       "credit",
@@ -38,125 +28,259 @@
       "cr",
       "cr.",
       "credit amount",
-      "credit amt",
-      "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
-      "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
+      "credit qty"
     ],
-    "balance": [
-      "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
-      "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
-    ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
+    "currency": [
+      "currency",
+      "currency code",
+      "moeda",
+      "ccy"
     ]
   },
   "tables": [
     {
-      "id": "acct_audit_workpaper_main_table",
+      "id": "acct_audit_workpaper_testing_table",
       "name": {
-        "en": "Audit Workpaper Main",
-        "pt": "Papel de Trabalho de Auditoria Principal"
+        "en": "Audit Workpaper Testing Steps",
+        "pt": "Passos de Teste da Auditoria"
       },
-      "section": "line_items",
+      "section": "testing_steps",
       "expectedColumns": [
         "test_id",
+        "assertion",
         "population",
         "sample_size",
         "exceptions",
+        "debit",
+        "credit",
         "status"
       ],
       "keyRows": [
+        "subtotal",
         "grand_total"
+      ],
+      "headerSynonyms": {
+        "test_id": [
+          "test id",
+          "procedure id",
+          "test id"
+        ],
+        "assertion": [
+          "assertion",
+          "objective",
+          "audit objective"
+        ],
+        "population": [
+          "population",
+          "sample population"
+        ],
+        "sample_size": [
+          "sample size",
+          "samples",
+          "sample count"
+        ],
+        "exceptions": [
+          "exceptions",
+          "exceptions found"
+        ],
+        "status": [
+          "status",
+          "result"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "sample_size",
+            "exceptions"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k",
+            "000"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m",
+            "mm"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "exceptions"
+        ],
+        "notes": "Some exports place debit and credit columns in opposite order for the same test"
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "USD",
+        "$",
+        "€",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Support shifted column order where sample_size appears after status",
+        "Allow for exports where headers wrap onto two rows"
+      ]
+    },
+    {
+      "id": "acct_audit_workpaper_tieout_table",
+      "name": {
+        "en": "Audit Workpaper Tie-outs",
+        "pt": "Conciliacao de Trabalho de Auditoria"
+      },
+      "section": "tie_outs",
+      "expectedColumns": [
+        "account_code",
+        "account_name",
+        "book_balance",
+        "subledger_balance",
+        "debit_adjustment",
+        "credit_adjustment",
+        "difference"
+      ],
+      "keyRows": [
+        "grand_total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "book_balance",
+            "subledger_balance",
+            "debit_adjustment",
+            "credit_adjustment",
+            "difference"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "book_balance",
+            "subledger_balance",
+            "debit_adjustment",
+            "credit_adjustment",
+            "difference"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit_adjustment"
+        ],
+        "creditColumns": [
+          "credit_adjustment"
+        ],
+        "balanceColumns": [
+          "book_balance",
+          "subledger_balance",
+          "difference"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "$",
+        "R$",
+        "JPY",
+        "CHF"
+      ],
+      "extractionNotes": [
+        "Handle pages where tie-out tables are concatenated without explicit section headings",
+        "Handle column swaps between book and subledger balances"
       ]
     },
     {
       "id": "acct_audit_workpaper_summary_table",
       "name": {
         "en": "Audit Workpaper Summary",
-        "pt": "Papel de Trabalho de Auditoria Resumo"
+        "pt": "Resumo de Trabalho de Auditoria"
       },
       "section": "summary",
       "expectedColumns": [
         "metric",
-        "value"
+        "value",
+        "currency"
       ],
       "keyRows": [
-        "total",
-        "subtotal",
-        "difference"
+        "issue_count",
+        "sample_size",
+        "conclusion",
+        "out_of_balance"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "metric"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "metric"
+        ],
+        "valueColumns": [
+          "value"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Accept summary rows appearing in different order",
+        "Handle summary tables where totals appear in merged cells"
       ]
     }
   ]

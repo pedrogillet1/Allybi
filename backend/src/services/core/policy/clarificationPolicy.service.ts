@@ -1,4 +1,5 @@
 import { getOptionalBank } from "../banks/bankLoader.service";
+import { PolicyRuntimeEngine } from "./policyRuntimeEngine.service";
 
 type ClarificationPolicyBank = {
   config?: {
@@ -10,6 +11,9 @@ type ClarificationPolicyBank = {
         maxOptions?: number;
       };
     };
+  };
+  policies?: {
+    rules?: Array<Record<string, unknown>>;
   };
 };
 
@@ -67,7 +71,11 @@ function normalizeLanguage(language?: string): "en" | "pt" | "es" {
 }
 
 export class ClarificationPolicyService {
-  resolveLimits(): ClarificationPolicyLimits {
+  private readonly engine = new PolicyRuntimeEngine();
+
+  resolveLimits(input?: {
+    runtime?: Record<string, unknown>;
+  }): ClarificationPolicyLimits {
     const bank = getOptionalBank<ClarificationPolicyBank>("clarification_policy");
     const phraseBank =
       getOptionalBank<ClarificationPhrasesBank>("clarification_phrases");
@@ -95,13 +103,36 @@ export class ClarificationPolicyService {
       clamp(disambiguationThresholds.maxOptions, 1, 12, 4),
       clamp(optionPolicy.maxOptions, 1, 12, 4),
     );
+    const overrides = this.resolveLimitOverridesFromPolicyRules({
+      bank,
+      runtime:
+        (input?.runtime as Record<string, unknown>) || {
+          signals: {},
+          metrics: {},
+        },
+    });
     const safeMinOptions = Math.min(minOptions, maxOptions);
+    const maxQuestionsWithOverride =
+      overrides.maxQuestions != null
+        ? clamp(overrides.maxQuestions, 0, 3, maxQuestions)
+        : maxQuestions;
+    const minOptionsWithOverride =
+      overrides.minOptions != null
+        ? Math.max(
+            safeMinOptions,
+            clamp(overrides.minOptions, 1, 8, safeMinOptions),
+          )
+        : safeMinOptions;
+    const maxOptionsWithOverride =
+      overrides.maxOptions != null
+        ? Math.min(maxOptions, clamp(overrides.maxOptions, 1, 12, maxOptions))
+        : maxOptions;
 
     return {
       enabled: bank?.config?.enabled !== false,
-      maxQuestions,
-      minOptions: safeMinOptions,
-      maxOptions,
+      maxQuestions: maxQuestionsWithOverride,
+      minOptions: Math.min(minOptionsWithOverride, maxOptionsWithOverride),
+      maxOptions: maxOptionsWithOverride,
     };
   }
 
@@ -111,7 +142,17 @@ export class ClarificationPolicyService {
     hasConcreteOptions?: boolean;
     options?: string[];
   }): string {
-    const limits = this.resolveLimits();
+    const limits = this.resolveLimits({
+      runtime: {
+        signals: {
+          hasConcreteOptions: input.hasConcreteOptions === true,
+        },
+        metrics: {
+          clarificationQuestionCount: 1,
+          candidateCount: Array.isArray(input.options) ? input.options.length : 0,
+        },
+      },
+    });
     const phraseBank =
       getOptionalBank<ClarificationPhrasesBank>("clarification_phrases");
     const normalized = String(input.question || "").trim();
@@ -168,7 +209,6 @@ export class ClarificationPolicyService {
   }
 
   enforceClarificationOptions(input: { options: string[] }): string[] {
-    const limits = this.resolveLimits();
     const deduped = Array.from(
       new Set(
         (input.options || [])
@@ -176,9 +216,68 @@ export class ClarificationPolicyService {
           .filter((value) => value.length > 0),
       ),
     );
+    const limits = this.resolveLimits({
+      runtime: {
+        signals: {
+          hasConcreteOptions: deduped.length > 0,
+        },
+        metrics: {
+          candidateCount: deduped.length,
+          clarificationQuestionCount: 0,
+        },
+      },
+    });
     const capped = deduped.slice(0, limits.maxOptions);
     if (capped.length < limits.minOptions) return [];
     return capped;
+  }
+
+  private resolveLimitOverridesFromPolicyRules(input: {
+    bank: ClarificationPolicyBank | null;
+    runtime: Record<string, unknown>;
+  }): {
+    maxQuestions?: number;
+    minOptions?: number;
+    maxOptions?: number;
+  } {
+    const match = this.engine.firstMatch({
+      policyBank: input.bank as Record<string, unknown>,
+      runtime: input.runtime,
+    });
+    if (!match || match.ruleId === "__default__") return {};
+
+    const then = (match.then || {}) as Record<string, unknown>;
+    const constraints =
+      then.constraints && typeof then.constraints === "object"
+        ? (then.constraints as Record<string, unknown>)
+        : {};
+    const transforms = Array.isArray(then.transform)
+      ? (then.transform as Array<Record<string, unknown>>)
+      : [];
+
+    let maxQuestions = Number(constraints.maxQuestions);
+    let minOptions = Number(constraints.minOptions);
+    let maxOptions = Number(constraints.maxOptions);
+
+    for (const transform of transforms) {
+      const type = String(transform?.type || "").trim();
+      if (type === "limit_questions") {
+        const max = Number(transform?.max);
+        if (Number.isFinite(max)) maxQuestions = max;
+      }
+      if (type === "limit_options") {
+        const min = Number(transform?.min);
+        const max = Number(transform?.max);
+        if (Number.isFinite(min)) minOptions = min;
+        if (Number.isFinite(max)) maxOptions = max;
+      }
+    }
+
+    return {
+      ...(Number.isFinite(maxQuestions) ? { maxQuestions } : {}),
+      ...(Number.isFinite(minOptions) ? { minOptions } : {}),
+      ...(Number.isFinite(maxOptions) ? { maxOptions } : {}),
+    };
   }
 
   private defaultQuestion(language?: string, optionPrompt = false): string {

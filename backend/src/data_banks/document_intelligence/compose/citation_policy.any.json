@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "id": "citation_policy",
+    "version": "1.0.0",
+    "description": "Citation and provenance rendering policy for doc-grounded composition.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "requireCitationsForClaims": true,
+    "defaultCitationFormat": "inline",
+    "maxCitationsPerClaim": 3,
+    "allowFootnotes": false
+  },
+  "formats": {
+    "inline": "[{{doc}} p.{{page}} {{section}}]",
+    "pill": "{{doc}} · {{section}} · {{location}}",
+    "tableCell": "{{doc}}/{{table}}/{{location}}"
+  },
+  "rules": [
+    {
+      "id": "CIT_001_require_any_citation_for_fact",
+      "trigger": "Output includes fact-like sentence",
+      "check": "output.claimType == 'fact' AND output.citationCount == 0",
+      "failureAction": "BLOCK_AND_REQUEST_EVIDENCE",
+      "severity": "error"
+    },
+    {
+      "id": "CIT_002_forbid_citation_of_unknown",
+      "trigger": "Citation id does not resolve to packaged evidence",
+      "check": "output.citationIds.any(id => evidence.indexedById[id] == null)",
+      "failureAction": "STRIP_INVALID_CITATION",
+      "severity": "error"
+    },
+    {
+      "id": "CIT_003_disallow_uncited_quote",
+      "trigger": "User asks for verbatim quote",
+      "check": "context.outputNeedsQuote == true AND output.quoteBlocks.any(q => q.citationMissing == true)",
+      "failureAction": "BLOCK_AND_REQUEST_QUOTE_SOURCE",
+      "severity": "error"
+    },
+    {
+      "id": "CIT_004_cite_per_doc_in_compare",
+      "trigger": "Compare output combines values from multiple docs",
+      "check": "context.intent == 'compare' AND output.citationCount < context.sourceDocs.count",
+      "failureAction": "FALLBACK_WEAK_EVIDENCE",
+      "severity": "warning"
+    },
+    {
+      "id": "CIT_005_single_doc_no_wrong_source",
+      "trigger": "Single-doc answer includes citation to non-scoped doc",
+      "check": "context.docLock.active == true AND output.sourceDocs.any(id => id != context.docLock.docId)",
+      "failureAction": "FILTER_WRONG_DOC_CITATIONS",
+      "severity": "error"
+    }
+  ],
+  "templates": [
+    {
+      "id": "CITATION_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in citation_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

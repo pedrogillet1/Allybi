@@ -18,7 +18,10 @@
       "check": "context.matchedEntities.count > 1 AND context.matchedEntities.allShareName == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["Which John Smith?", "There are 3 accounts named 'Alpha Corp'."]
+      "examples": [
+        "Which John Smith?",
+        "There are 3 accounts named 'Alpha Corp'."
+      ]
     },
     {
       "id": "AMB_002_ambiguous_date_range",
@@ -26,7 +29,10 @@
       "check": "context.dateRef.ambiguous == true AND context.dateRef.candidateRanges.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["Q3 could be calendar Q3 or fiscal Q3.", "Which year's March report?"]
+      "examples": [
+        "Q3 could be calendar Q3 or fiscal Q3.",
+        "Which year's March report?"
+      ]
     },
     {
       "id": "AMB_003_ambiguous_metric_name",
@@ -34,7 +40,10 @@
       "check": "context.metricRef.definitionCount > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["'Revenue' appears as gross and net in different tables.", "'Margin' has 3 definitions."]
+      "examples": [
+        "'Revenue' appears as gross and net in different tables.",
+        "'Margin' has 3 definitions."
+      ]
     },
     {
       "id": "AMB_004_pronoun_without_antecedent",
@@ -42,7 +51,10 @@
       "check": "context.pronounRef.resolved == false AND context.conversationHistory.lastDocRef == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["What does 'it' refer to?", "'That clause' — which clause?"]
+      "examples": [
+        "What does 'it' refer to?",
+        "'That clause' — which clause?"
+      ]
     },
     {
       "id": "AMB_005_version_conflict",
@@ -50,7 +62,10 @@
       "check": "context.docVersions.count > 1 AND context.explicitVersionRef == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["Contract v1 and v2 both exist.", "Draft vs final version?"]
+      "examples": [
+        "Contract v1 and v2 both exist.",
+        "Draft vs final version?"
+      ]
     },
     {
       "id": "AMB_006_currency_ambiguity",
@@ -58,7 +73,10 @@
       "check": "context.currencies.count > 1 AND context.queryCurrencyRef == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["Document has USD and BRL values.", "Is this in euros or dollars?"]
+      "examples": [
+        "Document has USD and BRL values.",
+        "Is this in euros or dollars?"
+      ]
     },
     {
       "id": "AMB_007_scope_too_broad",
@@ -66,7 +84,10 @@
       "check": "context.matchedDocs.count >= 5 AND context.narrowingSignals.count == 0",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Show me the report' matches 12 docs.", "'Find the contract' — which one?"]
+      "examples": [
+        "'Show me the report' matches 12 docs.",
+        "'Find the contract' — which one?"
+      ]
     },
     {
       "id": "AMB_008_conflicting_data_points",
@@ -74,7 +95,10 @@
       "check": "context.retrievedPassages.conflictDetected == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["Page 3 says $500k, page 7 says $450k.", "Clause 4.1 contradicts clause 6.2."]
+      "examples": [
+        "Page 3 says $500k, page 7 says $450k.",
+        "Clause 4.1 contradicts clause 6.2."
+      ]
     },
     {
       "id": "AMB_009_partial_name_match",
@@ -82,7 +106,10 @@
       "check": "context.nameRef.partialMatch == true AND context.nameRef.candidates.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'The Silva contract' — Maria Silva or João Silva?", "'Report from ABC' — ABC Ltd or ABC Inc?"]
+      "examples": [
+        "'The Silva contract' — Maria Silva or João Silva?",
+        "'Report from ABC' — ABC Ltd or ABC Inc?"
+      ]
     },
     {
       "id": "AMB_010_time_period_missing",
@@ -90,7 +117,10 @@
       "check": "context.timeSensitiveQuery == true AND context.periodRef == null AND context.availablePeriods.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["What's the revenue? (2024 or 2025?)", "Which quarter's expenses?"]
+      "examples": [
+        "What's the revenue? (2024 or 2025?)",
+        "Which quarter's expenses?"
+      ]
     },
     {
       "id": "AMB_011_abbreviation_collision",
@@ -98,7 +128,10 @@
       "check": "context.abbreviationRef.expansions.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'ROI' — Return on Investment or Region of Interest?", "'PM' — Project Manager or Post Meridiem?"]
+      "examples": [
+        "'ROI' — Return on Investment or Region of Interest?",
+        "'PM' — Project Manager or Post Meridiem?"
+      ]
     },
     {
       "id": "AMB_012_section_number_reuse",
@@ -106,7 +139,10 @@
       "check": "context.sectionRef.present == true AND context.sectionRef.docsContaining.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["Section 3.2 exists in both the lease and the amendment.", "Article 5 in which document?"]
+      "examples": [
+        "Section 3.2 exists in both the lease and the amendment.",
+        "Article 5 in which document?"
+      ]
     },
     {
       "id": "AMB_013_implicit_comparison_target",
@@ -114,7 +150,10 @@
       "check": "context.comparisonIntent == true AND context.comparisonTargets.count < 2",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'How does this compare?' — compare to what?", "'Is it higher?' — higher than which baseline?"]
+      "examples": [
+        "'How does this compare?' — compare to what?",
+        "'Is it higher?' — higher than which baseline?"
+      ]
     },
     {
       "id": "AMB_014_threshold_undefined",
@@ -122,7 +161,10 @@
       "check": "context.subjectiveQualifier.present == true AND context.thresholdDefined == false",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Show high-value transactions' — above what amount?", "'Significant variance' — what percentage?"]
+      "examples": [
+        "'Show high-value transactions' — above what amount?",
+        "'Significant variance' — what percentage?"
+      ]
     },
     {
       "id": "AMB_015_table_column_ambiguity",
@@ -130,7 +172,10 @@
       "check": "context.columnRef.tablesContaining.count > 1 AND context.tableRef == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Total' column exists in 4 tables.", "'Amount' — from which sheet?"]
+      "examples": [
+        "'Total' column exists in 4 tables.",
+        "'Amount' — from which sheet?"
+      ]
     },
     {
       "id": "AMB_016_language_mismatch",
@@ -138,7 +183,10 @@
       "check": "context.queryLang != context.docLang AND context.translationAmbiguity == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["EN query on PT doc: 'revenue' could be 'receita' or 'faturamento'.", "Technical term differs across languages."]
+      "examples": [
+        "EN query on PT doc: 'revenue' could be 'receita' or 'faturamento'.",
+        "Technical term differs across languages."
+      ]
     },
     {
       "id": "AMB_017_conditional_clause_uncertain",
@@ -146,7 +194,10 @@
       "check": "context.conditionalClause.present == true AND context.conditionStatus == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["'If the contract is renewed' — has it been renewed?", "'Subject to board approval' — was it approved?"]
+      "examples": [
+        "'If the contract is renewed' — has it been renewed?",
+        "'Subject to board approval' — was it approved?"
+      ]
     },
     {
       "id": "AMB_018_aggregation_level_unclear",
@@ -154,7 +205,10 @@
       "check": "context.aggregationAmbiguity == true AND context.aggregationLevel == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Total sales' — per product or overall?", "'Average cost' — per unit or per batch?"]
+      "examples": [
+        "'Total sales' — per product or overall?",
+        "'Average cost' — per unit or per batch?"
+      ]
     },
     {
       "id": "AMB_019_document_type_ambiguity",
@@ -162,7 +216,10 @@
       "check": "context.docTypeRef.matchCount > 1 AND context.disambiguators.count == 0",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'The report' — 5 reports are uploaded.", "'The spreadsheet' — which one?"]
+      "examples": [
+        "'The report' — 5 reports are uploaded.",
+        "'The spreadsheet' — which one?"
+      ]
     },
     {
       "id": "AMB_020_page_number_cross_doc",
@@ -170,7 +227,10 @@
       "check": "context.pageRef.present == true AND context.pageRef.docsWithPage.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["Page 5 exists in all 3 uploaded PDFs.", "Which document's page 12?"]
+      "examples": [
+        "Page 5 exists in all 3 uploaded PDFs.",
+        "Which document's page 12?"
+      ]
     },
     {
       "id": "AMB_021_formula_reference_ambiguity",
@@ -178,7 +238,10 @@
       "check": "context.formulaRef.definitions.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["'Net profit' formula differs between Sheet1 and Sheet2.", "'CAGR' computed with different base years."]
+      "examples": [
+        "'Net profit' formula differs between Sheet1 and Sheet2.",
+        "'CAGR' computed with different base years."
+      ]
     },
     {
       "id": "AMB_022_boolean_question_needs_context",
@@ -186,7 +249,10 @@
       "check": "context.booleanQuestion == true AND context.requiredContextMissing == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Is this compliant?' — compliant with which regulation?", "'Was it approved?' — by which authority?"]
+      "examples": [
+        "'Is this compliant?' — compliant with which regulation?",
+        "'Was it approved?' — by which authority?"
+      ]
     },
     {
       "id": "AMB_023_relative_reference_no_anchor",
@@ -194,7 +260,10 @@
       "check": "context.relativeRef.present == true AND context.relativeRef.anchor == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'The next section' — next after what?", "'Below that value' — which value?"]
+      "examples": [
+        "'The next section' — next after what?",
+        "'Below that value' — which value?"
+      ]
     },
     {
       "id": "AMB_024_multi_answer_single_question",
@@ -202,7 +271,10 @@
       "check": "context.validAnswerCount > 1 AND context.disambiguationNeeded == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["3 different effective dates found.", "Multiple payment terms apply."]
+      "examples": [
+        "3 different effective dates found.",
+        "Multiple payment terms apply."
+      ]
     },
     {
       "id": "AMB_025_unit_ambiguity",
@@ -210,7 +282,10 @@
       "check": "context.unitAmbiguity == true AND context.unitRef == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Weight is 50' — kg or lb?", "'Distance of 100' — miles or kilometers?"]
+      "examples": [
+        "'Weight is 50' — kg or lb?",
+        "'Distance of 100' — miles or kilometers?"
+      ]
     },
     {
       "id": "AMB_026_party_role_ambiguity",
@@ -218,7 +293,10 @@
       "check": "context.partyRoleRef.entities.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "error",
-      "examples": ["'The buyer' — contract has 2 co-buyers.", "'The client' — which subsidiary?"]
+      "examples": [
+        "'The buyer' — contract has 2 co-buyers.",
+        "'The client' — which subsidiary?"
+      ]
     },
     {
       "id": "AMB_027_status_field_multiple_values",
@@ -226,7 +304,10 @@
       "check": "context.statusRef.fieldCount > 1 OR context.statusRef.historyEntries > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["Current or historical status?", "'Status' — approval status or payment status?"]
+      "examples": [
+        "Current or historical status?",
+        "'Status' — approval status or payment status?"
+      ]
     },
     {
       "id": "AMB_028_mixed_granularity_data",
@@ -234,7 +315,10 @@
       "check": "context.dataGranularity.types.count > 1 AND context.requestedGranularity == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["Data available daily and monthly — which?", "Quarterly or annual figures?"]
+      "examples": [
+        "Data available daily and monthly — which?",
+        "Quarterly or annual figures?"
+      ]
     },
     {
       "id": "AMB_029_negation_scope_unclear",
@@ -242,7 +326,10 @@
       "check": "context.negation.present == true AND context.negation.scopeAmbiguous == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Not all employees received bonuses' — who didn't?", "'Exclude non-compliant items' — which are non-compliant?"]
+      "examples": [
+        "'Not all employees received bonuses' — who didn't?",
+        "'Exclude non-compliant items' — which are non-compliant?"
+      ]
     },
     {
       "id": "AMB_030_chart_vs_table_source",
@@ -250,7 +337,10 @@
       "check": "context.chartSource.present == true AND context.tableSource.present == true AND context.valuesConflict == true",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["Chart shows ~$5M, table shows $4,982,341.", "Should I use the chart or table value?"]
+      "examples": [
+        "Chart shows ~$5M, table shows $4,982,341.",
+        "Should I use the chart or table value?"
+      ]
     },
     {
       "id": "AMB_031_implicit_filter_missing",
@@ -258,7 +348,10 @@
       "check": "context.implicitFilter.detected == true AND context.explicitFilter == null",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'List employees' — all or only active?", "'Show contracts' — including expired ones?"]
+      "examples": [
+        "'List employees' — all or only active?",
+        "'Show contracts' — including expired ones?"
+      ]
     },
     {
       "id": "AMB_032_geographic_ambiguity",
@@ -266,7 +359,10 @@
       "check": "context.geoRef.candidates.count > 1",
       "failureAction": "ASK_CLARIFY_ONE",
       "severity": "warning",
-      "examples": ["'Springfield office' — IL or MO?", "'São Paulo' — city or state?"]
+      "examples": [
+        "'Springfield office' — IL or MO?",
+        "'São Paulo' — city or state?"
+      ]
     }
   ],
   "questions": [
@@ -480,5 +576,8 @@
       "Report from {{dateOptions}}. Which date range?",
       "Threshold not specified — what value defines '{{qualifier}}'?"
     ]
-  }
+  },
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ]
 }

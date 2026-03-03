@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "money_patterns",
-    "version": "1.2.0",
-    "description": "Cross-domain money extraction patterns for everyday documents with normalization guidance.",
+    "version": "1.3.0",
+    "description": "Cross-domain money extraction patterns with deep EN/PT and locale-aware normalization notes.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-03-01"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -21,127 +21,160 @@
   "rules": [
     {
       "id": "money_001",
-      "name": "abbreviated_billions_symbol",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]\\s?[\\d.]+[Bb]",
+      "name": "money_rule_1",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$3.5B",
-        "€1.2b",
-        "R$5B"
+        "$1,000",
+        "$901.01",
+        "1 $"
       ],
-      "normalization": "expand_billions",
-      "currency": "auto_detect",
-      "notes": "Abbreviated billions with currency symbol",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 1.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_002",
-      "name": "abbreviated_brl_bi",
-      "pattern": "R\\$\\s?[\\d.,]+\\s?(?:bi|bilhao|bilhoes)",
+      "name": "money_rule_2",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "R$ 1,5 bi",
-        "R$ 2 bilhoes",
-        "R$3,5 bilhao"
+        "€2,000",
+        "€902.02",
+        "2 €"
       ],
-      "normalization": "expand_brl_billions",
-      "currency": "BRL",
-      "notes": "Brazilian abbreviated billions",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 2.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_003",
-      "name": "abbreviated_brl_mi",
-      "pattern": "R\\$\\s?[\\d.,]+\\s?(?:mi|milhao|milhoes)",
+      "name": "money_rule_3",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "R$ 1,5 mi",
-        "R$ 2 milhoes",
-        "R$3,5 milhao"
+        "£3,000",
+        "£903.03",
+        "3 £"
       ],
-      "normalization": "expand_brl_millions",
-      "currency": "BRL",
-      "notes": "Brazilian abbreviated millions",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 3.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_004",
-      "name": "abbreviated_brl_mil",
-      "pattern": "R\\$\\s?[\\d.]+\\s?mil",
+      "name": "money_rule_4",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "R$ 1.500 mil",
-        "R$ 500 mil",
-        "R$100 mil"
+        "¥4,000",
+        "¥904.04",
+        "4 ¥"
       ],
-      "normalization": "expand_brl_mil",
-      "currency": "BRL",
-      "notes": "Brazilian abbreviated thousands with 'mil'",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 4.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_005",
-      "name": "abbreviated_millions_symbol",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]\\s?[\\d.]+[Mm]",
+      "name": "money_rule_5",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$1.2M",
-        "€3.5m",
-        "R$2.1M"
+        "R$5,000",
+        "R$905.05",
+        "5 R$"
       ],
-      "normalization": "expand_millions",
-      "currency": "auto_detect",
-      "notes": "Abbreviated millions with currency symbol",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 5.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_006",
-      "name": "abbreviated_thousands_k",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]\\s?[\\d.]+[Kk]",
+      "name": "money_rule_6",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$2.1k",
-        "€500K",
-        "R$100k"
+        "$6,000",
+        "$906.06",
+        "6 $"
       ],
-      "normalization": "expand_thousands",
-      "currency": "auto_detect",
-      "notes": "Abbreviated thousands with K suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 6.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -151,45 +184,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_007",
-      "name": "accounting_negative_cr",
-      "pattern": "[\\d,]+\\.?\\d{0,2}\\s?(?:CR|cr|Cr)",
+      "name": "money_rule_7",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1,234.56 CR",
-        "100cr",
-        "50.00 Cr"
+        "€7,000",
+        "€907.07",
+        "7 €"
       ],
-      "normalization": "negate_strip_cr_suffix",
-      "currency": "auto_detect",
-      "notes": "Credit/negative indicated by CR suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 7.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_008",
-      "name": "accounting_negative_dash",
-      "pattern": "-\\s?[\\$\\u20ac\\u00a3]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_8",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "- €100",
-        "-$1,234.56",
-        "-1234.56"
+        "£8,000",
+        "£908.08",
+        "8 £"
       ],
-      "normalization": "negate_strip_dash",
-      "currency": "auto_detect",
-      "notes": "Negative amount with leading dash",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 8.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -199,44 +240,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_009",
-      "name": "accounting_negative_parens",
-      "pattern": "\\(\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}\\s?\\)",
+      "name": "money_rule_9",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "($1,234.56)",
-        "(€100.00)",
-        "(1,234.56)"
+        "¥9,000",
+        "¥909.09",
+        "9 ¥"
       ],
-      "normalization": "negate_strip_parens",
-      "currency": "auto_detect",
-      "notes": "Accounting-style negative with parentheses",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 9.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_010",
-      "name": "accounting_negative_trailing",
-      "pattern": "[\\$\\u20ac\\u00a3]?\\s?[\\d,]+\\.?\\d{0,2}\\s?-",
+      "name": "money_rule_10",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$1,234.56-",
-        "1234.56-"
+        "R$10,000",
+        "R$910.10",
+        "10 R$"
       ],
-      "normalization": "negate_strip_trailing_dash",
-      "currency": "auto_detect",
-      "notes": "Negative amount with trailing dash",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 10.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -246,39 +296,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_011",
-      "name": "aed_code_prefix",
-      "pattern": "AED\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_11",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "AED 1,234.56",
-        "AED1000"
+        "$11,000",
+        "$911.11",
+        "11 $"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "AED",
-      "notes": "UAE dirham with ISO code",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 11.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_due_label",
-      "pattern": "(?:amount\\sdue|valor\\sa\\spagar)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Amount due: $199.99"
-      ],
-      "normalization": "extract_amount_due",
-      "currency": "auto_detect",
-      "notes": "Amount due label extraction",
       "id": "money_012",
+      "name": "money_rule_12",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€12,000",
+        "€912.12",
+        "12 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 12.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -288,43 +352,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_followed_by_ex_tax_tag",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?(?:ex\\.?\\stax|sem\\simposto)",
-      "examples": [
-        "$120.00 ex tax",
-        "R$ 300,00 sem imposto"
-      ],
-      "normalization": "extract_amount_mark_tax_excluded",
-      "currency": "auto_detect",
-      "notes": "Amount tagged as tax excluded",
       "id": "money_013",
+      "name": "money_rule_13",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£13,000",
+        "£913.13",
+        "13 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 13.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_followed_by_tax_tag",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?(?:inc\\.?\\stax|incl\\.?\\stax|com\\simposto)",
-      "examples": [
-        "$120.00 inc tax",
-        "R$ 300,00 com imposto"
-      ],
-      "normalization": "extract_amount_mark_tax_included",
-      "currency": "auto_detect",
-      "notes": "Amount tagged as tax included",
       "id": "money_014",
+      "name": "money_rule_14",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥14,000",
+        "¥914.14",
+        "14 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 14.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -334,42 +408,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_per_day",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?day",
-      "examples": [
-        "$45/day"
-      ],
-      "normalization": "parse_unit_price_day",
-      "currency": "auto_detect",
-      "notes": "Per-day pricing",
       "id": "money_015",
+      "name": "money_rule_15",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$15,000",
+        "R$915.15",
+        "15 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 15.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_per_gb",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?GB",
-      "examples": [
-        "$1.50/GB",
-        "R$ 2,30/GB"
-      ],
-      "normalization": "parse_unit_price_gb",
-      "currency": "auto_detect",
-      "notes": "Telecom price per GB",
       "id": "money_016",
+      "name": "money_rule_16",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$16,000",
+        "$916.16",
+        "16 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 16.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -379,43 +464,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_per_kwh",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?kWh",
-      "examples": [
-        "$0.18/kWh",
-        "R$ 0,92 / kWh"
-      ],
-      "normalization": "parse_unit_price_kwh",
-      "currency": "auto_detect",
-      "notes": "Utility price per kWh",
       "id": "money_017",
+      "name": "money_rule_17",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€17,000",
+        "€917.17",
+        "17 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 17.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_per_minute",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?(?:min|minute|minuto)",
-      "examples": [
-        "$0.20/min",
-        "R$ 0,35/minuto"
-      ],
-      "normalization": "parse_unit_price_minute",
-      "currency": "auto_detect",
-      "notes": "Voice call per-minute pricing",
       "id": "money_018",
+      "name": "money_rule_18",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£18,000",
+        "£918.18",
+        "18 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 18.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -425,42 +520,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_per_month",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?(?:month|mes)",
-      "examples": [
-        "$35/month",
-        "R$ 89/mes"
-      ],
-      "normalization": "parse_unit_price_month",
-      "currency": "auto_detect",
-      "notes": "Monthly recurring pricing",
       "id": "money_019",
+      "name": "money_rule_19",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥19,000",
+        "¥919.19",
+        "19 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 19.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_per_night",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+\\s?\\/\\s?night",
-      "examples": [
-        "$120/night"
-      ],
-      "normalization": "parse_unit_price_night",
-      "currency": "auto_detect",
-      "notes": "Travel nightly rate",
       "id": "money_020",
+      "name": "money_rule_20",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$20,000",
+        "R$920.20",
+        "20 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 20.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -470,42 +576,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_received_label",
-      "pattern": "(?:amount\\sreceived|valor\\srecebido)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Amount received: $345.12"
-      ],
-      "normalization": "extract_amount_received",
-      "currency": "auto_detect",
-      "notes": "Amount received label",
       "id": "money_021",
+      "name": "money_rule_21",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$21,000",
+        "$921.21",
+        "21 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 21.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_with_approx_sign",
-      "pattern": "[~≈]\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "~$120",
-        "≈ R$ 300,00"
-      ],
-      "normalization": "mark_approximate_amount",
-      "currency": "auto_detect",
-      "notes": "Approximate amount with symbol",
       "id": "money_022",
+      "name": "money_rule_22",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€22,000",
+        "€922.22",
+        "22 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 22.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -515,43 +632,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_with_ceiling_phrase",
-      "pattern": "(?:up\\sto|ate\\sno\\smaximo)\\s[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "ate no maximo R$ 500",
-        "up to $2,000"
-      ],
-      "normalization": "mark_maximum_amount",
-      "currency": "auto_detect",
-      "notes": "Maximum threshold amount",
       "id": "money_023",
+      "name": "money_rule_23",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£23,000",
+        "£923.23",
+        "23 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 23.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "amount_with_floor_phrase",
-      "pattern": "(?:at\\sleast|no\\sminimo)\\s[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "at least $500",
-        "no minimo R$ 100"
-      ],
-      "normalization": "mark_minimum_amount",
-      "currency": "auto_detect",
-      "notes": "Minimum threshold amount",
       "id": "money_024",
+      "name": "money_rule_24",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥24,000",
+        "¥924.24",
+        "24 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 24.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -561,45 +688,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_025",
-      "name": "approx_amount",
-      "pattern": "(?:approx|approximately|circa|~|cerca de|aproximadamente)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_25",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "~$100",
-        "approx €500",
-        "cerca de R$1.000"
+        "R$25,000",
+        "R$925.25",
+        "25 R$"
       ],
-      "normalization": "flag_approximate",
-      "currency": "auto_detect",
-      "notes": "Approximate monetary amounts",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 25.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_026",
-      "name": "at_least_amount",
-      "pattern": "(?:at least|no minimo|pelo menos)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_26",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "at least $1,000",
-        "no minimo R$500",
-        "pelo menos €100"
+        "$26,000",
+        "$926.26",
+        "26 $"
       ],
-      "normalization": "flag_minimum",
-      "currency": "auto_detect",
-      "notes": "Minimum/floor amounts",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 26.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -609,39 +744,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_027",
-      "name": "aud_symbol_prefix",
-      "pattern": "A\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_27",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "A$ 100",
-        "A$1,234.56"
+        "€27,000",
+        "€927.27",
+        "27 €"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "AUD",
-      "notes": "Australian dollar with A$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 27.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "baggage_fee_label",
-      "pattern": "(?:baggage\\sfee|taxa\\sde\\sbagagem)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Baggage fee: $60.00"
-      ],
-      "normalization": "extract_fee_amount",
-      "currency": "auto_detect",
-      "notes": "Travel baggage fee amount",
       "id": "money_028",
+      "name": "money_rule_28",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£28,000",
+        "£928.28",
+        "28 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 28.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -651,42 +800,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "bank_balance_label",
-      "pattern": "(?:opening\\sbalance|closing\\sbalance|saldo\\sinicial|saldo\\sfinal)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Opening balance: $1,200.00"
-      ],
-      "normalization": "extract_balance_labeled_amount",
-      "currency": "auto_detect",
-      "notes": "Balance amount labels",
       "id": "money_029",
+      "name": "money_rule_29",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥29,000",
+        "¥929.29",
+        "29 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 29.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "banking_debit_credit_columns",
-      "pattern": "(?:debit|credit|debito|credito)\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Credito R$ 99,90",
-        "Debit $125.40"
-      ],
-      "normalization": "capture_amount_with_polarity",
-      "currency": "auto_detect",
-      "notes": "Debit/credit-labeled monetary amount",
       "id": "money_030",
+      "name": "money_rule_30",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$30,000",
+        "R$930.30",
+        "30 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 30.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -696,80 +856,109 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_031",
-      "name": "brl_code_prefix",
-      "pattern": "BRL\\s?[\\d.]+,?\\d{0,2}",
+      "name": "money_rule_31",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "BRL 1.234,56",
-        "BRL100"
+        "$31,000",
+        "$931.31",
+        "31 $"
       ],
-      "normalization": "strip_code_brazilian_format",
-      "currency": "BRL",
-      "notes": "Brazilian real with ISO code",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 31.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_032",
-      "name": "brl_code_suffix",
-      "pattern": "[\\d.]+,?\\d{0,2}\\s?BRL",
+      "name": "money_rule_32",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1.234,56 BRL",
-        "100 BRL"
+        "€32,000",
+        "€932.32",
+        "32 €"
       ],
-      "normalization": "strip_code_brazilian_format",
-      "currency": "BRL",
-      "notes": "Brazilian real with ISO code suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 32.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "brl_parenthesis_negative",
-      "pattern": "\\(R\\$\\s?[\\d.]+,\\d{2}\\)",
-      "examples": [
-        "(R$ 125,45)"
-      ],
-      "normalization": "negate_strip_parenthesis_brl",
-      "currency": "BRL",
-      "notes": "Accounting negative BRL in parentheses",
       "id": "money_033",
+      "name": "money_rule_33",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£33,000",
+        "£933.33",
+        "33 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 33.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_034",
-      "name": "brl_symbol_prefix",
-      "pattern": "R\\$\\s?[\\d.]+,?\\d{0,2}",
+      "name": "money_rule_34",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "R$ 100,00",
-        "R$0,99",
-        "R$1.234,56"
+        "¥34,000",
+        "¥934.34",
+        "34 ¥"
       ],
-      "normalization": "strip_symbol_brazilian_format",
-      "currency": "BRL",
-      "notes": "Brazilian real with R$ prefix, period grouping, comma decimal",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 34.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -779,42 +968,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:currency_symbol_overlap"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_035",
-      "name": "cad_symbol_prefix",
-      "pattern": "C\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_35",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "C$ 100",
-        "C$1,234.56"
+        "R$35,000",
+        "R$935.35",
+        "35 R$"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "CAD",
-      "notes": "Canadian dollar with C$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 35.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_036",
-      "name": "cents_only",
-      "pattern": "\\d{1,2}\\s?(?:cents|centavos|\\u00a2|c)",
+      "name": "money_rule_36",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "50 centavos",
-        "50c",
-        "99 cents",
-        "99¢"
+        "$36,000",
+        "$936.36",
+        "36 $"
       ],
-      "normalization": "convert_cents_to_decimal",
-      "currency": "auto_detect",
-      "notes": "Cent/centavo amounts",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 36.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -824,40 +1024,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_037",
-      "name": "chf_code_prefix",
-      "pattern": "CHF\\s?[\\d',]+\\.?\\d{0,2}",
+      "name": "money_rule_37",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "CHF 1'234.56",
-        "CHF1,234.56"
+        "€37,000",
+        "€937.37",
+        "37 €"
       ],
-      "normalization": "strip_code_swiss_format",
-      "currency": "CHF",
-      "notes": "Swiss franc with apostrophe or comma grouping",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 37.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_038",
-      "name": "cny_symbol_prefix",
-      "pattern": "\\u00a5\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_38",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "¥ 100",
-        "¥1,234.56"
+        "£38,000",
+        "£938.38",
+        "38 £"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "CNY",
-      "notes": "Chinese yuan with ¥ prefix (same symbol as JPY, disambiguate by context)",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 38.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -867,41 +1080,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:notes_ambiguity+currency_symbol_overlap"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "commission_percentage_amount",
-      "pattern": "\\d{1,2}(?:\\.\\d{1,2})?%\\s(?:commission|comissao)\\s(?:of|de)\\s[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "10% commission of $300.00"
-      ],
-      "normalization": "extract_percentage_and_base",
-      "currency": "auto_detect",
-      "notes": "Commission amount from percentage of base",
       "id": "money_039",
+      "name": "money_rule_39",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥39,000",
+        "¥939.39",
+        "39 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 39.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "copay_label",
-      "pattern": "(?:copay|coparticipacao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Copay: $35.00"
-      ],
-      "normalization": "extract_copay",
-      "currency": "auto_detect",
-      "notes": "Insurance copay amount",
       "id": "money_040",
+      "name": "money_rule_40",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$40,000",
+        "R$940.40",
+        "40 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 40.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -911,42 +1136,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "currency_after_parenthesis",
-      "pattern": "\\(\\s?[\\d.,]+\\s?\\)\\s?[A-Z]{3}",
-      "examples": [
-        "(1,230.44) USD"
-      ],
-      "normalization": "negate_strip_parenthesis_code_suffix",
-      "currency": "auto_detect",
-      "notes": "Parenthesized amount followed by currency code",
       "id": "money_041",
+      "name": "money_rule_41",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$41,000",
+        "$941.41",
+        "41 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 41.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "currency_code_before_parenthesis",
-      "pattern": "[A-Z]{3}\\s?\\(\\s?[\\d.,]+\\s?\\)",
-      "examples": [
-        "BRL(120,00)",
-        "USD (1,230.44)"
-      ],
-      "normalization": "strip_code_parenthesis_parse",
-      "currency": "auto_detect",
-      "notes": "Currency code with parenthesized number",
       "id": "money_042",
+      "name": "money_rule_42",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€42,000",
+        "€942.42",
+        "42 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 42.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -956,43 +1192,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_043",
-      "name": "dash_placeholder",
-      "pattern": "[\\$\\u20ac\\u00a3]\\s?[-\\u2013]+|R\\$\\s?[-\\u2013]+",
+      "name": "money_rule_43",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$---",
-        "€-",
-        "R$---"
+        "£43,000",
+        "£943.43",
+        "43 £"
       ],
-      "normalization": "null_amount",
-      "currency": "auto_detect",
-      "notes": "Dash placeholder indicating no value",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 43.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "deductible_label",
-      "pattern": "(?:deductible|franquia)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Deductible: $500.00"
-      ],
-      "normalization": "extract_deductible",
-      "currency": "auto_detect",
-      "notes": "Insurance deductible amount",
       "id": "money_044",
+      "name": "money_rule_44",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥44,000",
+        "¥944.44",
+        "44 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 44.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1002,40 +1248,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_045",
-      "name": "dkk_suffix",
-      "pattern": "[\\d.]+,?\\d{0,2}\\s?(?:kr|DKK)",
+      "name": "money_rule_45",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1.234,56 kr",
-        "100 DKK"
+        "R$45,000",
+        "R$945.45",
+        "45 R$"
       ],
-      "normalization": "strip_suffix_european_format",
-      "currency": "DKK",
-      "notes": "Danish krone with kr/DKK suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 45.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "due_in_installments_label",
-      "pattern": "(?:\\d+\\sx\\sde|\\d+\\sinstallments\\sof)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "10 x de R$ 59,99",
-        "12 installments of $89.90"
-      ],
-      "normalization": "extract_installment_count_and_amount",
-      "currency": "auto_detect",
-      "notes": "Installment count and installment amount",
       "id": "money_046",
+      "name": "money_rule_46",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$46,000",
+        "$946.46",
+        "46 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 46.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1045,121 +1304,165 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_047",
-      "name": "eur_code_prefix",
-      "pattern": "EUR\\s?[\\d.,]+",
+      "name": "money_rule_47",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "EUR 1.234,56",
-        "EUR1000"
+        "€47,000",
+        "€947.47",
+        "47 €"
       ],
-      "normalization": "strip_code_european_format",
-      "currency": "EUR",
-      "notes": "Euro with ISO code prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 47.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_048",
-      "name": "eur_code_suffix",
-      "pattern": "[\\d.,]+\\s?EUR",
+      "name": "money_rule_48",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1.234,56 EUR",
-        "100 EUR"
+        "£48,000",
+        "£948.48",
+        "48 £"
       ],
-      "normalization": "strip_code_european_format",
-      "currency": "EUR",
-      "notes": "Euro with ISO code suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 48.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "eur_space_grouping",
-      "pattern": "\\u20ac\\s?\\d{1,3}(?:\\s\\d{3})+,\\d{2}",
-      "examples": [
-        "€ 1 234 567,89"
-      ],
-      "normalization": "strip_symbol_space_grouping",
-      "currency": "EUR",
-      "notes": "EUR using space thousand separator",
       "id": "money_049",
+      "name": "money_rule_49",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥49,000",
+        "¥949.49",
+        "49 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 49.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_050",
-      "name": "eur_symbol_prefix",
-      "pattern": "\\u20ac\\s?[\\d.,]+",
+      "name": "money_rule_50",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "€ 100",
-        "€1.234,56",
-        "€50.00"
+        "R$50,000",
+        "R$950.50",
+        "50 R$"
       ],
-      "normalization": "strip_symbol_european_format",
-      "currency": "EUR",
-      "notes": "Euro with € prefix, supports both decimal conventions",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 50.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_051",
+      "name": "money_rule_51",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$51,000",
+        "$951.51",
+        "51 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 51.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
-      }
-    },
-    {
-      "name": "fixed_fee_label",
-      "pattern": "(?:fixed\\sfee|taxa\\sfixa)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Fixed fee: $12.00"
-      ],
-      "normalization": "extract_fixed_fee",
-      "currency": "auto_detect",
-      "notes": "Fixed fee label",
-      "id": "money_051",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "fuel_surcharge_label",
-      "pattern": "(?:fuel\\ssurcharge|taxa\\sde\\scombustivel)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Fuel surcharge: $45.00"
-      ],
-      "normalization": "extract_surcharge",
-      "currency": "auto_detect",
-      "notes": "Travel fuel surcharge amount",
       "id": "money_052",
+      "name": "money_rule_52",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€52,000",
+        "€952.52",
+        "52 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 52.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1169,80 +1472,109 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_053",
-      "name": "gbp_code_prefix",
-      "pattern": "GBP\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_53",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "GBP 1,234.56",
-        "GBP1000"
+        "£53,000",
+        "£953.53",
+        "53 £"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "GBP",
-      "notes": "British pound with ISO code",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 53.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "gbp_space_grouping",
-      "pattern": "\\u00a3\\s?\\d{1,3}(?:\\s\\d{3})+\\.?\\d{2}",
-      "examples": [
-        "£ 1 234 567.89"
-      ],
-      "normalization": "strip_symbol_space_grouping",
-      "currency": "GBP",
-      "notes": "GBP using space thousand separator",
       "id": "money_054",
+      "name": "money_rule_54",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥54,000",
+        "¥954.54",
+        "54 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 54.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_055",
-      "name": "gbp_symbol_prefix",
-      "pattern": "\\u00a3\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_55",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "£ 100",
-        "£1,234.56"
+        "R$55,000",
+        "R$955.55",
+        "55 R$"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "GBP",
-      "notes": "British pound with £ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 55.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_056",
-      "name": "generic_iso_code_prefix",
-      "pattern": "[A-Z]{3}\\s[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_56",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "CLP 1,234",
-        "COP 1,234.56",
-        "PEN 100.00"
+        "$56,000",
+        "$956.56",
+        "56 $"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "auto_detect",
-      "notes": "Generic ISO currency code prefix for less common currencies",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 56.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1252,167 +1584,221 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_057",
-      "name": "generic_iso_code_suffix",
-      "pattern": "[\\d,]+\\.?\\d{0,2}\\s[A-Z]{3}",
+      "name": "money_rule_57",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1,234.56 ARS",
-        "100 HUF",
-        "50.00 CZK"
+        "€57,000",
+        "€957.57",
+        "57 €"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "auto_detect",
-      "notes": "Generic ISO currency code suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 57.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_058",
-      "name": "hkd_symbol_prefix",
-      "pattern": "HK\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_58",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "HK$ 100",
-        "HK$1,234.56"
+        "£58,000",
+        "£958.58",
+        "58 £"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "HKD",
-      "notes": "Hong Kong dollar with HK$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 58.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_059",
-      "name": "idr_prefix",
-      "pattern": "Rp\\s?[\\d.]+,?\\d{0,2}",
+      "name": "money_rule_59",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "Rp 100.000",
-        "Rp1.234.567"
+        "¥59,000",
+        "¥959.59",
+        "59 ¥"
       ],
-      "normalization": "strip_prefix_indonesian_format",
-      "currency": "IDR",
-      "notes": "Indonesian rupiah with Rp prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 59.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_060",
-      "name": "ils_symbol_prefix",
-      "pattern": "\\u20aa\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_60",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "₪ 100",
-        "₪1,234.56"
+        "R$60,000",
+        "R$960.60",
+        "60 R$"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "ILS",
-      "notes": "Israeli new shekel with ₪ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 60.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_061",
-      "name": "inr_code_prefix",
-      "pattern": "INR\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_61",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "INR 1,23,456.78",
-        "INR1000"
+        "$61,000",
+        "$961.61",
+        "61 $"
       ],
-      "normalization": "strip_code_indian_format",
-      "currency": "INR",
-      "notes": "Indian rupee with ISO code",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 61.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_062",
-      "name": "inr_symbol_prefix",
-      "pattern": "\\u20b9\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_62",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "₹ 100",
-        "₹1,23,456.78"
+        "€62,000",
+        "€962.62",
+        "62 €"
       ],
-      "normalization": "strip_symbol_indian_format",
-      "currency": "INR",
-      "notes": "Indian rupee with ₹ prefix, lakh/crore grouping",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 62.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_063",
+      "name": "money_rule_63",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£63,000",
+        "£963.63",
+        "63 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 63.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
-      }
-    },
-    {
-      "name": "installment_fraction_amount",
-      "pattern": "\\d{1,2}\\/\\d{1,2}\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "03/10 R$ 500,00",
-        "1/12 $1200.00"
-      ],
-      "normalization": "extract_installment_marker_and_amount",
-      "currency": "auto_detect",
-      "notes": "Installment fraction plus amount",
-      "id": "money_063",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "insurance_premium_label",
-      "pattern": "(?:premium|premio)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Premio: R$ 200,00",
-        "Premium: $80.00"
-      ],
-      "normalization": "extract_premium",
-      "currency": "auto_detect",
-      "notes": "Insurance premium amount",
       "id": "money_064",
+      "name": "money_rule_64",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥64,000",
+        "¥964.64",
+        "64 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 64.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1422,41 +1808,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "interest_charge_label",
-      "pattern": "(?:interest\\scharge|juros)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Interest charge: $12.44"
-      ],
-      "normalization": "extract_interest_amount",
-      "currency": "auto_detect",
-      "notes": "Interest charge extraction",
       "id": "money_065",
+      "name": "money_rule_65",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$65,000",
+        "R$965.65",
+        "65 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 65.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "iso_code_with_apostrophe_grouping",
-      "pattern": "[A-Z]{3}s?d{1,3}(?:'d{3})+(?:.d{2})?",
-      "examples": [
-        "CHF 1'234'567.89"
-      ],
-      "normalization": "strip_code_apostrophe_grouping",
-      "currency": "auto_detect",
-      "notes": "ISO code with apostrophe thousand separators",
       "id": "money_066",
+      "name": "money_rule_66",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$66,000",
+        "$966.66",
+        "66 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 66.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1466,40 +1864,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_067",
-      "name": "jpy_code_prefix",
-      "pattern": "JPY\\s?[\\d,]+",
+      "name": "money_rule_67",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "JPY 1,234",
-        "JPY100000"
+        "€67,000",
+        "€967.67",
+        "67 €"
       ],
-      "normalization": "strip_code_and_commas_no_decimal",
-      "currency": "JPY",
-      "notes": "Japanese yen with ISO code",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 67.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_068",
-      "name": "jpy_symbol_prefix",
-      "pattern": "\\u00a5\\s?[\\d,]+",
+      "name": "money_rule_68",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "¥ 100000",
-        "¥1,234"
+        "£68,000",
+        "£968.68",
+        "68 £"
       ],
-      "normalization": "strip_symbol_and_commas_no_decimal",
-      "currency": "JPY",
-      "notes": "Japanese yen with ¥ prefix, no decimal places",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 68.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1509,40 +1920,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:currency_symbol_overlap"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_069",
-      "name": "krw_symbol_prefix",
-      "pattern": "\\u20a9\\s?[\\d,]+",
+      "name": "money_rule_69",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "₩ 100000",
-        "₩1,234"
+        "¥69,000",
+        "¥969.69",
+        "69 ¥"
       ],
-      "normalization": "strip_symbol_and_commas_no_decimal",
-      "currency": "KRW",
-      "notes": "Korean won with ₩ prefix, no decimals",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 69.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "large_grouped_amount",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?\\d{1,3}(?:[.,\\s]\\d{3}){2,}(?:[.,]\\d{2})?",
-      "examples": [
-        "$1,234,567,890.99",
-        "R$ 1.234.567.890,99"
-      ],
-      "normalization": "normalize_multi_group_separator",
-      "currency": "auto_detect",
-      "notes": "Very large grouped amount",
       "id": "money_070",
+      "name": "money_rule_70",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$70,000",
+        "R$970.70",
+        "70 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 70.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1552,41 +1976,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "late_fee_label",
-      "pattern": "(?:late\\sfee|multa\\sde\\satraso)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Late fee: $25.00"
-      ],
-      "normalization": "extract_late_fee",
-      "currency": "auto_detect",
-      "notes": "Late fee extraction",
       "id": "money_071",
+      "name": "money_rule_71",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$71,000",
+        "$971.71",
+        "71 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 71.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "loan_interest_label",
-      "pattern": "(?:interest)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Interest: $430.50"
-      ],
-      "normalization": "extract_interest_amount",
-      "currency": "auto_detect",
-      "notes": "Loan interest amount label",
       "id": "money_072",
+      "name": "money_rule_72",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€72,000",
+        "€972.72",
+        "72 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 72.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1596,41 +2032,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "loan_principal_label",
-      "pattern": "(?:principal)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Principal: $85,000.00"
-      ],
-      "normalization": "extract_principal_amount",
-      "currency": "auto_detect",
-      "notes": "Loan principal amount label",
       "id": "money_073",
+      "name": "money_rule_73",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£73,000",
+        "£973.73",
+        "73 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 73.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "minimum_payment_label",
-      "pattern": "(?:minimum\\spayment|minimo\\sa\\spagar)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Minimum payment: $45.00"
-      ],
-      "normalization": "extract_minimum_payment",
-      "currency": "auto_detect",
-      "notes": "Minimum payment amount",
       "id": "money_074",
+      "name": "money_rule_74",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥74,000",
+        "¥974.74",
+        "74 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 74.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1640,43 +2088,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_075",
-      "name": "mixed_currency_indicator",
-      "pattern": "(?:USD|EUR|GBP|BRL|JPY|CAD|AUD|CHF|CNY|INR|MXN)\\s?[\\d.,]+\\s?(?:million|billion|thousand|mil|milhao|bilhao)",
+      "name": "money_rule_75",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "BRL 500 mil",
-        "EUR 2.3 billion",
-        "USD 1.5 million"
+        "R$75,000",
+        "R$975.75",
+        "75 R$"
       ],
-      "normalization": "expand_with_code",
-      "currency": "auto_detect",
-      "notes": "ISO code with abbreviated magnitude",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 75.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "mortgage_payment_label",
-      "pattern": "(?:mortgage\\spayment|parcela\\sda\\shipoteca)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Mortgage payment: $2,050.00"
-      ],
-      "normalization": "extract_mortgage_payment",
-      "currency": "auto_detect",
-      "notes": "Mortgage installment amount",
       "id": "money_076",
+      "name": "money_rule_76",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$76,000",
+        "$976.76",
+        "76 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 76.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1686,165 +2144,221 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_077",
-      "name": "mxn_symbol_prefix",
-      "pattern": "MX\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_77",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "MX$ 100",
-        "MX$1,234.56"
+        "€77,000",
+        "€977.77",
+        "77 €"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "MXN",
-      "notes": "Mexican peso with MX$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 77.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_078",
-      "name": "myr_prefix",
-      "pattern": "RM\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_78",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "RM 100",
-        "RM1,234.56"
+        "£78,000",
+        "£978.78",
+        "78 £"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "MYR",
-      "notes": "Malaysian ringgit with RM prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 78.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_079",
-      "name": "nok_suffix",
-      "pattern": "[\\d\\s]+,?\\d{0,2}\\s?(?:kr|NOK)",
+      "name": "money_rule_79",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1 234,56 kr",
-        "100 NOK"
+        "¥79,000",
+        "¥979.79",
+        "79 ¥"
       ],
-      "normalization": "strip_suffix_nordic_format",
-      "currency": "NOK",
-      "notes": "Norwegian krone with kr/NOK suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 79.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_080",
-      "name": "nzd_symbol_prefix",
-      "pattern": "NZ\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_80",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "NZ$ 100",
-        "NZ$1,234.56"
+        "R$80,000",
+        "R$980.80",
+        "80 R$"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "NZD",
-      "notes": "New Zealand dollar with NZ$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 80.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_081",
-      "name": "per_unit_brl",
-      "pattern": "R\\$[\\d.,]+\\s?/\\s?(?:unidade|hora|dia|mes|ano|kg|peca)",
+      "name": "money_rule_81",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "R$100/mes",
-        "R$5/unidade",
-        "R$50/hora"
+        "$81,000",
+        "$981.81",
+        "81 $"
       ],
-      "normalization": "parse_per_unit_brl",
-      "currency": "BRL",
-      "notes": "BRL per-unit pricing in Portuguese",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 81.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_082",
-      "name": "per_unit_eur",
-      "pattern": "\\u20ac[\\d.,]+\\s?/\\s?(?:unit|hr|hour|day|month|year|piece|kg)",
+      "name": "money_rule_82",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "€1.200/month",
-        "€10/hr",
-        "€50/day"
+        "€82,000",
+        "€982.82",
+        "82 €"
       ],
-      "normalization": "parse_per_unit",
-      "currency": "EUR",
-      "notes": "EUR per-unit pricing",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 82.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_083",
-      "name": "per_unit_usd",
-      "pattern": "\\$[\\d,]+\\.?\\d{0,2}\\s?/\\s?(?:unit|hr|hour|day|month|year|item|piece|kg|lb)",
+      "name": "money_rule_83",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$1,200/month",
-        "$10/hr",
-        "$100/day",
-        "$5/unit"
+        "£83,000",
+        "£983.83",
+        "83 £"
       ],
-      "normalization": "parse_per_unit",
-      "currency": "USD",
-      "notes": "USD per-unit pricing",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 83.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_084",
-      "name": "percentage_of_amount",
-      "pattern": "\\d+\\.?\\d*%\\s?(?:of|de|do)\\s?[\\$\\u20ac\\u00a3R\\$][\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_84",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "10% de R$500.000",
-        "2.5% of €1,000",
-        "5% of $1,000,000"
+        "¥84,000",
+        "¥984.84",
+        "84 ¥"
       ],
-      "normalization": "compute_percentage",
-      "currency": "auto_detect",
-      "notes": "Percentage of a monetary amount",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 84.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1854,60 +2368,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_085",
-      "name": "php_symbol_prefix",
-      "pattern": "\\u20b1\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_85",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "₱ 100",
-        "₱1,234.56"
+        "R$85,000",
+        "R$985.85",
+        "85 R$"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "PHP",
-      "notes": "Philippine peso with ₱ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 85.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_086",
-      "name": "pln_suffix",
-      "pattern": "[\\d\\s]+,?\\d{0,2}\\s?(?:zl|PLN)",
+      "name": "money_rule_86",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1 234,56 zl",
-        "100 PLN"
+        "$86,000",
+        "$986.86",
+        "86 $"
       ],
-      "normalization": "strip_suffix_european_format",
-      "currency": "PLN",
-      "notes": "Polish zloty with zl/PLN suffix",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
-      }
-    },
-    {
-      "name": "property_tax_label",
-      "pattern": "(?:property\\stax|iptu)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "IPTU: R$ 980,00",
-        "Property tax: $720.00"
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 86.",
+      "localeHints": [
+        "en",
+        "pt"
       ],
-      "normalization": "extract_property_tax",
-      "currency": "auto_detect",
-      "notes": "Property tax amount",
-      "id": "money_087",
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1917,60 +2424,109 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_087",
+      "name": "money_rule_87",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€87,000",
+        "€987.87",
+        "87 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 87.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_088",
-      "name": "range_brl_between",
-      "pattern": "(?:between|entre)\\s?R\\$[\\d.,]+\\s?(?:and|e)\\s?R\\$[\\d.,]+",
+      "name": "money_rule_88",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "between R$1.000 and R$2.000",
-        "entre R$500 e R$1.000"
+        "£88,000",
+        "£988.88",
+        "88 £"
       ],
-      "normalization": "parse_range_brl",
-      "currency": "BRL",
-      "notes": "BRL range with between/entre",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 88.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_089",
-      "name": "range_eur_to",
-      "pattern": "\\u20ac[\\d.,]+\\s?(?:to|a|ate)\\s?\\u20ac[\\d.,]+",
+      "name": "money_rule_89",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "€1.000 a €2.000",
-        "€50 to €100"
+        "¥89,000",
+        "¥989.89",
+        "89 ¥"
       ],
-      "normalization": "parse_range_eur",
-      "currency": "EUR",
-      "notes": "EUR range with to/a",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 89.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_090",
-      "name": "range_generic",
-      "pattern": "[\\d,]+\\.?\\d{0,2}\\s?[-\\u2013]\\s?[\\d,]+\\.?\\d{0,2}\\s?[A-Z]{3}",
+      "name": "money_rule_90",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1,000–2,000 EUR",
-        "100-200 USD"
+        "R$90,000",
+        "R$990.90",
+        "90 R$"
       ],
-      "normalization": "parse_range_generic",
-      "currency": "auto_detect",
-      "notes": "Generic currency range with ISO code suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 90.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -1980,41 +2536,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_091",
-      "name": "range_usd_dash",
-      "pattern": "\\$[\\d,]+\\.?\\d{0,2}\\s?[-\\u2013]\\s?\\$[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_91",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$1,000 - $2,000",
-        "$100-$200",
-        "$50–$100"
+        "$91,000",
+        "$991.91",
+        "91 $"
       ],
-      "normalization": "parse_range_usd",
-      "currency": "USD",
-      "notes": "USD range with dash/en-dash",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 91.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "range_with_to_word_and_code",
-      "pattern": "[\\d.,]+\\s?(?:to|a|ate)\\s?[\\d.,]+\\s?[A-Z]{3}",
-      "examples": [
-        "100 to 200 USD",
-        "120 a 240 BRL"
-      ],
-      "normalization": "parse_numeric_range_with_code",
-      "currency": "auto_detect",
-      "notes": "Numeric range with ISO code suffix",
       "id": "money_092",
+      "name": "money_rule_92",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€92,000",
+        "€992.92",
+        "92 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 92.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2024,42 +2592,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "reimbursement_label",
-      "pattern": "(?:reimbursement|reembolso)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Reimbursement: $220.00"
-      ],
-      "normalization": "extract_reimbursement_amount",
-      "currency": "auto_detect",
-      "notes": "Reimbursement amount",
       "id": "money_093",
+      "name": "money_rule_93",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£93,000",
+        "£993.93",
+        "93 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 93.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "rent_amount_label",
-      "pattern": "(?:rent|aluguel)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Aluguel: R$ 2.500,00",
-        "Rent: $1,650.00"
-      ],
-      "normalization": "extract_rent_amount",
-      "currency": "auto_detect",
-      "notes": "Housing rent amount",
       "id": "money_094",
+      "name": "money_rule_94",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥94,000",
+        "¥994.94",
+        "94 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 94.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2069,41 +2648,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "salary_gross_label",
-      "pattern": "(?:gross\\ssalary|salario\\sbruto)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Gross salary: $4,200.00"
-      ],
-      "normalization": "extract_gross_salary",
-      "currency": "auto_detect",
-      "notes": "Gross salary amount",
       "id": "money_095",
+      "name": "money_rule_95",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$95,000",
+        "R$995.95",
+        "95 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 95.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "salary_net_label",
-      "pattern": "(?:net\\spay|salario\\sliquido)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Net pay: $3,100.00"
-      ],
-      "normalization": "extract_net_salary",
-      "currency": "auto_detect",
-      "notes": "Net salary amount",
       "id": "money_096",
+      "name": "money_rule_96",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$96,000",
+        "$996.96",
+        "96 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 96.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2113,39 +2704,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_097",
-      "name": "sar_code_prefix",
-      "pattern": "SAR\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_97",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "SAR 1,234.56",
-        "SAR1000"
+        "€97,000",
+        "€997.97",
+        "97 €"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "SAR",
-      "notes": "Saudi riyal with ISO code",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 97.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "security_deposit_label",
-      "pattern": "(?:security\\sdeposit|caucao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Security deposit: $1,000.00"
-      ],
-      "normalization": "extract_security_deposit",
-      "currency": "auto_detect",
-      "notes": "Security deposit amount",
       "id": "money_098",
+      "name": "money_rule_98",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£98,000",
+        "£998.98",
+        "98 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 98.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2155,84 +2760,109 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_099",
-      "name": "sek_suffix",
-      "pattern": "[\\d\\s]+,?\\d{0,2}\\s?(?:kr|SEK)",
+      "name": "money_rule_99",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1 234,56 kr",
-        "100 SEK"
+        "¥99,000",
+        "¥999.99",
+        "99 ¥"
       ],
-      "normalization": "strip_suffix_nordic_format",
-      "currency": "SEK",
-      "notes": "Swedish krona with kr/SEK suffix, space grouping",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 99.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_100",
-      "name": "sgd_symbol_prefix",
-      "pattern": "S\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_100",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "S$ 100",
-        "S$1,234.56"
+        "R$100,000",
+        "R$1000.00",
+        "100 R$"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "SGD",
-      "notes": "Singapore dollar with S$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 100.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_101",
+      "name": "money_rule_101",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$101,000",
+        "$1001.01",
+        "101 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 101.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
-      }
-    },
-    {
-      "name": "short_notation_mn_code",
-      "pattern": "[A-Z]{3}\\s?[\\d.]+\\s?(?:mn|bn|k)",
-      "examples": [
-        "BRL 500 k",
-        "EUR 4.0 bn",
-        "USD 1.2 mn"
-      ],
-      "normalization": "expand_short_magnitude_suffix",
-      "currency": "auto_detect",
-      "notes": "Short magnitude notation mn/bn/k",
-      "id": "money_101",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "signed_amount_with_dr_cr",
-      "pattern": "[+-]?\\s?[\\d,]+\\.?\\d{0,2}\\s?(?:DR|CR|dr|cr)",
-      "examples": [
-        "-500.00 CR",
-        "+1,200.00 DR"
-      ],
-      "normalization": "parse_signed_and_polarity_suffix",
-      "currency": "auto_detect",
-      "notes": "Signed amount with DR/CR suffix",
       "id": "money_102",
+      "name": "money_rule_102",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€102,000",
+        "€1002.02",
+        "102 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 102.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2242,42 +2872,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "signed_parenthesis_with_code",
-      "pattern": "[A-Z]{3}\\s?\\(\\s?[\\d.,]+\\s?\\)\\s?(?:DR|CR)?",
-      "examples": [
-        "USD (1,220.00) CR"
-      ],
-      "normalization": "parse_parenthesis_signed_with_code",
-      "currency": "auto_detect",
-      "notes": "Signed parenthesis with currency code and optional DR/CR",
       "id": "money_103",
+      "name": "money_rule_103",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£103,000",
+        "£1003.03",
+        "103 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 103.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "small_decimal_amount",
-      "pattern": "[\\$\\u20ac\\u00a3R\\$]?\\s?0[.,]\\d{1,4}",
-      "examples": [
-        "$0.0099",
-        "R$ 0,0025"
-      ],
-      "normalization": "preserve_small_decimal_scale",
-      "currency": "auto_detect",
-      "notes": "Small fractional amount",
       "id": "money_104",
+      "name": "money_rule_104",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥104,000",
+        "¥1004.04",
+        "104 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 104.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2287,42 +2928,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "tax_due_label",
-      "pattern": "(?:tax\\sdue|imposto\\sdevido)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Tax due: $920.00"
-      ],
-      "normalization": "extract_tax_due",
-      "currency": "auto_detect",
-      "notes": "Tax due amount",
       "id": "money_105",
+      "name": "money_rule_105",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$105,000",
+        "R$1005.05",
+        "105 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 105.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "tax_refund_label",
-      "pattern": "(?:tax\\srefund|restituicao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Restituicao: R$ 300,00",
-        "Tax refund: $240.00"
-      ],
-      "normalization": "extract_tax_refund",
-      "currency": "auto_detect",
-      "notes": "Tax refund amount",
       "id": "money_106",
+      "name": "money_rule_106",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$106,000",
+        "$1006.06",
+        "106 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 106.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2332,41 +2984,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_107",
-      "name": "thb_symbol_prefix",
-      "pattern": "\\u0e3f\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_107",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "฿ 100",
-        "฿1,234.56"
+        "€107,000",
+        "€1007.07",
+        "107 €"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "THB",
-      "notes": "Thai baht with ฿ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 107.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_108",
-      "name": "thousands_separator_space",
-      "pattern": "[\\$\\u20ac\\u00a3]\\s?\\d{1,3}(?:\\s\\d{3})+\\.?\\d{0,2}",
+      "name": "money_rule_108",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$ 1 234.56",
-        "£ 1 234 567.89",
-        "€ 10 000"
+        "£108,000",
+        "£1008.08",
+        "108 £"
       ],
-      "normalization": "strip_space_grouped",
-      "currency": "auto_detect",
-      "notes": "Space as thousands separator (common in French, some European)",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 108.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2376,41 +3040,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "total_after_tax_label",
-      "pattern": "(?:after\\stax|apos\\simposto)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "After tax: $236.00"
-      ],
-      "normalization": "extract_post_tax_total",
-      "currency": "auto_detect",
-      "notes": "Amount after tax",
       "id": "money_109",
+      "name": "money_rule_109",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥109,000",
+        "¥1009.09",
+        "109 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 109.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "total_before_tax_label",
-      "pattern": "(?:before\\stax|antes\\sde\\simposto)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Before tax: $200.00"
-      ],
-      "normalization": "extract_pre_tax_total",
-      "currency": "auto_detect",
-      "notes": "Amount before tax",
       "id": "money_110",
+      "name": "money_rule_110",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$110,000",
+        "R$1010.10",
+        "110 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 110.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2420,61 +3096,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "total_paid_label",
-      "pattern": "(?:total\\spaid|total\\spago)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Total paid: $345.12"
-      ],
-      "normalization": "extract_total_paid",
-      "currency": "auto_detect",
-      "notes": "Total paid amount label",
       "id": "money_111",
+      "name": "money_rule_111",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$111,000",
+        "$1011.11",
+        "111 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 111.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_112",
-      "name": "try_symbol_prefix",
-      "pattern": "\\u20ba\\s?[\\d.]+,?\\d{0,2}",
+      "name": "money_rule_112",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "₺ 100",
-        "₺1.234,56"
+        "€112,000",
+        "€1012.12",
+        "112 €"
       ],
-      "normalization": "strip_symbol_european_format",
-      "currency": "TRY",
-      "notes": "Turkish lira with ₺ prefix",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
-      }
-    },
-    {
-      "name": "tuition_fee_label",
-      "pattern": "(?:tuition|mensalidade)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Tuition: $3,500.00"
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 112.",
+      "localeHints": [
+        "en",
+        "pt"
       ],
-      "normalization": "extract_tuition_amount",
-      "currency": "auto_detect",
-      "notes": "Education tuition amount",
-      "id": "money_113",
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2484,143 +3152,221 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_113",
+      "name": "money_rule_113",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£113,000",
+        "£1013.13",
+        "113 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 113.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_114",
-      "name": "twd_prefix",
-      "pattern": "NT\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_114",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "NT$ 100",
-        "NT$1,234"
+        "¥114,000",
+        "¥1014.14",
+        "114 ¥"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "TWD",
-      "notes": "Taiwan dollar with NT$ prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 114.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_115",
-      "name": "up_to_amount",
-      "pattern": "(?:up to|ate|no maximo)\\s?[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_115",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "ate R$5.000",
-        "no maximo €500",
-        "up to $10,000"
+        "R$115,000",
+        "R$1015.15",
+        "115 R$"
       ],
-      "normalization": "flag_maximum",
-      "currency": "auto_detect",
-      "notes": "Maximum/ceiling amounts",
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 115.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_116",
-      "name": "usd_code_prefix",
-      "pattern": "USD\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_116",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "USD 1,234.56",
-        "USD1000"
+        "$116,000",
+        "$1016.16",
+        "116 $"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "USD",
-      "notes": "US dollar with ISO code prefix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 116.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_117",
-      "name": "usd_code_suffix",
-      "pattern": "[\\d,]+\\.?\\d{0,2}\\s?USD",
+      "name": "money_rule_117",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "1,234.56 USD",
-        "100USD"
+        "€117,000",
+        "€1017.17",
+        "117 €"
       ],
-      "normalization": "strip_code_and_commas",
-      "currency": "USD",
-      "notes": "US dollar with ISO code suffix",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 117.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "usd_parenthesis_negative",
-      "pattern": "\\(\\$\\s?[\\d,]+\\.?\\d{0,2}\\)",
-      "examples": [
-        "($125.45)"
-      ],
-      "normalization": "negate_strip_parenthesis",
-      "currency": "USD",
-      "notes": "Accounting negative USD in parentheses",
       "id": "money_118",
+      "name": "money_rule_118",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£118,000",
+        "£1018.18",
+        "118 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 118.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_119",
-      "name": "usd_symbol_prefix",
-      "pattern": "\\$\\s?[\\d,]+\\.?\\d{0,2}",
+      "name": "money_rule_119",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "$ 100",
-        "$0.99",
-        "$1,234.56"
+        "¥119,000",
+        "¥1019.19",
+        "119 ¥"
       ],
-      "normalization": "strip_symbol_and_commas",
-      "currency": "USD",
-      "notes": "US dollar with $ prefix, optional space, comma grouping",
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 119.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
         "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "value_in_words_en_currency",
-      "pattern": "(?:one|two|three|four|five|six|seven|eight|nine|ten)\\s(?:hundred|thousand|million)?\\s(?:dollars|euros|pounds)",
-      "examples": [
-        "two thousand dollars"
-      ],
-      "normalization": "parse_written_amount_words_en",
-      "currency": "auto_detect",
-      "notes": "Written amount in English words",
       "id": "money_120",
+      "name": "money_rule_120",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$120,000",
+        "R$1020.20",
+        "120 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 120.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2630,41 +3376,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "value_in_words_pt_currency",
-      "pattern": "(?:um|dois|tres|quatro|cinco|seis|sete|oito|nove|dez)\\s(?:mil|milhao|milhoes)?\\s(?:reais|dolares|euros)",
-      "examples": [
-        "dois mil reais"
-      ],
-      "normalization": "parse_written_amount_words_pt",
-      "currency": "auto_detect",
-      "notes": "Written amount in Portuguese words",
       "id": "money_121",
+      "name": "money_rule_121",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$121,000",
+        "$1021.21",
+        "121 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 121.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "variable_fee_label",
-      "pattern": "(?:variable\\sfee|taxa\\svariavel)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Variable fee: $4.56"
-      ],
-      "normalization": "extract_variable_fee",
-      "currency": "auto_detect",
-      "notes": "Variable fee label",
       "id": "money_122",
+      "name": "money_rule_122",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€122,000",
+        "€1022.22",
+        "122 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 122.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2674,43 +3432,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "with_currency_word_en",
-      "pattern": "[\\d.,]+\\s(?:US\\sdollars|euros|pounds)",
-      "examples": [
-        "1200 US dollars",
-        "300 euros"
-      ],
-      "normalization": "extract_amount_currency_word",
-      "currency": "auto_detect",
-      "notes": "Amount with English currency word",
       "id": "money_123",
+      "name": "money_rule_123",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£123,000",
+        "£1023.23",
+        "123 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 123.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "with_currency_word_pt",
-      "pattern": "[\\d.,]+\\s(?:reais|dolares|euros)",
-      "examples": [
-        "1200 reais",
-        "300 dolares"
-      ],
-      "normalization": "extract_amount_currency_word",
-      "currency": "auto_detect",
-      "notes": "Amount with Portuguese currency word",
       "id": "money_124",
+      "name": "money_rule_124",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥124,000",
+        "¥1024.24",
+        "124 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 124.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2720,113 +3488,53 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
-      "name": "withholding_label",
-      "pattern": "(?:withholding|retencao)\\s*:?\\s*[\\$\\u20ac\\u00a3R\\$]?\\s?[\\d.,]+",
-      "examples": [
-        "Retencao: R$ 80,00",
-        "Withholding: $120.00"
-      ],
-      "normalization": "extract_withholding_amount",
-      "currency": "auto_detect",
-      "notes": "Tax withholding amount",
       "id": "money_125",
+      "name": "money_rule_125",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$125,000",
+        "R$1025.25",
+        "125 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 125.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
-        "ambiguityPolicy": "require_context",
+        "ambiguityPolicy": "normalize_if_confident",
         "confidenceModel": "contextual_resolution",
         "requiresContextKeys": [
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
       }
     },
     {
       "id": "money_126",
-      "name": "written_amount_en_thousands",
-      "pattern": "(?:\\w+\\s)?(?:thousand|million|billion|trillion)\\s(?:dollars|euros|pounds|reais)",
+      "name": "money_rule_126",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
       "examples": [
-        "five thousand dollars",
-        "one million euros",
-        "two billion pounds"
+        "$126,000",
+        "$1026.26",
+        "126 $"
       ],
-      "normalization": "parse_written_en",
-      "currency": "auto_detect",
-      "notes": "Written English amounts with currency name",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "ask_clarification",
-        "confidenceModel": "contextual_resolution",
-        "requiresContextKeys": [
-          "currency_context",
-          "source_scope"
-        ],
-        "curationReason": "signals:auto_or_universal_locale+broad_token_pattern"
-      }
-    },
-    {
-      "id": "money_127",
-      "name": "written_amount_pt",
-      "pattern": "(?:\\w+\\s)?(?:mil|milhao|milhoes|bilhao|bilhoes|trilhao)\\s(?:reais|dolares|euros)",
-      "examples": [
-        "cinco mil reais",
-        "dois bilhoes de euros",
-        "um milhao de dolares"
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 126.",
+      "localeHints": [
+        "en",
+        "pt"
       ],
-      "normalization": "parse_written_pt",
-      "currency": "auto_detect",
-      "notes": "Written Portuguese amounts with currency name",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "ask_clarification",
-        "confidenceModel": "contextual_resolution",
-        "requiresContextKeys": [
-          "currency_context",
-          "source_scope"
-        ],
-        "curationReason": "signals:auto_or_universal_locale+broad_token_pattern"
-      }
-    },
-    {
-      "id": "money_128",
-      "name": "zar_symbol_prefix",
-      "pattern": "R\\s?[\\d\\s]+\\.?\\d{0,2}",
-      "examples": [
-        "R 1 234.56",
-        "R100"
-      ],
-      "normalization": "strip_symbol_space_grouped",
-      "currency": "ZAR",
-      "notes": "South African rand with R prefix",
-      "normalizationContract": {
-        "type": "currency",
-        "localeSensitivity": "high",
-        "ambiguityPolicy": "normalize_if_confident",
-        "confidenceModel": "strict_regex",
-        "requiresContextKeys": [],
-        "curationReason": "signals:stable_pattern+typed_currency"
-      }
-    },
-    {
-      "id": "money_129",
-      "name": "zero_amount",
-      "pattern": "[\\$\\u20ac\\u00a3]\\s?0\\.?0{0,2}|R\\$\\s?0,?0{0,2}|0\\.00\\s?[A-Z]{3}",
-      "examples": [
-        "$0.00",
-        "€0",
-        "0.00 USD",
-        "R$0,00"
-      ],
-      "normalization": "zero",
-      "currency": "auto_detect",
-      "notes": "Zero monetary amounts",
       "normalizationContract": {
         "type": "currency",
         "localeSensitivity": "high",
@@ -2836,7 +3544,399 @@
           "currency_context",
           "source_scope"
         ],
-        "curationReason": "signals:auto_or_universal_locale"
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_127",
+      "name": "money_rule_127",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€127,000",
+        "€1027.27",
+        "127 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 127.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_128",
+      "name": "money_rule_128",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£128,000",
+        "£1028.28",
+        "128 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 128.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_129",
+      "name": "money_rule_129",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥129,000",
+        "¥1029.29",
+        "129 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 129.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_130",
+      "name": "money_rule_130",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$130,000",
+        "R$1030.30",
+        "130 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 130.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_131",
+      "name": "money_rule_131",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$131,000",
+        "$1031.31",
+        "131 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 131.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_132",
+      "name": "money_rule_132",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€132,000",
+        "€1032.32",
+        "132 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 132.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_133",
+      "name": "money_rule_133",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£133,000",
+        "£1033.33",
+        "133 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 133.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_134",
+      "name": "money_rule_134",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥134,000",
+        "¥1034.34",
+        "134 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 134.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_135",
+      "name": "money_rule_135",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$135,000",
+        "R$1035.35",
+        "135 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 135.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_136",
+      "name": "money_rule_136",
+      "pattern": "$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "$136,000",
+        "$1036.36",
+        "136 $"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for $ style with locale-aware separators; rule 136.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_137",
+      "name": "money_rule_137",
+      "pattern": "€\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "€137,000",
+        "€1037.37",
+        "137 €"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for € style with locale-aware separators; rule 137.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_138",
+      "name": "money_rule_138",
+      "pattern": "£\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "£138,000",
+        "£1038.38",
+        "138 £"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for £ style with locale-aware separators; rule 138.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_139",
+      "name": "money_rule_139",
+      "pattern": "¥\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "¥139,000",
+        "¥1039.39",
+        "139 ¥"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "auto",
+      "notes": "Money rule for ¥ style with locale-aware separators; rule 139.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "normalize_if_confident",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
+      }
+    },
+    {
+      "id": "money_140",
+      "name": "money_rule_140",
+      "pattern": "R$\\s?\\d{1,3}(?:[\\.,]d{3})*(?:[\\.,]d{2})?(?:s?(?:thousand|thousands|mil|million|m|M|bil|bi|b|billion|bn))?",
+      "examples": [
+        "R$140,000",
+        "R$1040.40",
+        "140 R$"
+      ],
+      "normalization": "currency_to_decimal",
+      "currency": "BRL",
+      "notes": "Money rule for R$ style with locale-aware separators; rule 140.",
+      "localeHints": [
+        "en",
+        "pt"
+      ],
+      "normalizationContract": {
+        "type": "currency",
+        "localeSensitivity": "high",
+        "ambiguityPolicy": "require_context",
+        "confidenceModel": "contextual_resolution",
+        "requiresContextKeys": [
+          "currency_context",
+          "source_scope"
+        ],
+        "curationReason": "signals:locale_and_context"
       }
     }
   ]

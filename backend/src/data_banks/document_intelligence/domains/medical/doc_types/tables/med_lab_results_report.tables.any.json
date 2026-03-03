@@ -2,11 +2,11 @@
   "_meta": {
     "id": "medical_med_lab_results_report_tables",
     "version": "2.0.0",
-    "description": "Expected table signatures for Lab Results Report.",
+    "description": "Expected table signatures for laboratory result documents with unit/range/flag handling.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,110 +15,197 @@
   },
   "tables": [
     {
-      "id": "med_lab_results_report_vitals_trend_table",
+      "id": "med_lab_results_report_core_table",
       "name": {
-        "en": "Lab Results Report Vitals Trend Table",
-        "pt": "Laudo de Exames Laboratoriais Vitals Trend Table"
+        "en": "Laboratory Core Results",
+        "pt": "Resultados Laboratoriais Principais"
       },
-      "section": "document_header",
-      "expectedColumns": [
-        "timestamp",
-        "heart_rate_bpm",
-        "bp_mmHg",
-        "temp_c",
-        "spo2_percent"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "timestamp": [
-          "timestamp",
-          "timestamp",
-          "timestamp_value"
-        ],
-        "heart_rate_bpm": [
-          "heart_rate_bpm",
-          "heart rate bpm",
-          "heart_rate_bpm_value"
-        ],
-        "bp_mmHg": [
-          "bp_mmHg",
-          "bp mmHg",
-          "bp_mmHg_value"
-        ],
-        "temp_c": [
-          "temp_c",
-          "temp c",
-          "temp_c_value"
-        ],
-        "spo2_percent": [
-          "spo2_percent",
-          "spo2 percent",
-          "spo2_percent_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": []
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_lab_results_report_lab_results_table",
-      "name": {
-        "en": "Lab Results Report Lab Results Table",
-        "pt": "Laudo de Exames Laboratoriais Lab Results Table"
-      },
-      "section": "patient_identification",
+      "section": "results_table",
       "expectedColumns": [
         "test_name",
         "result_value",
         "unit",
         "reference_range",
-        "flag"
+        "flag",
+        "interpretation"
       ],
       "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
+        "hemoglobin",
+        "glucose",
+        "creatinine"
       ],
       "headerSynonyms": {
         "test_name": [
-          "test_name",
+          "test",
           "test name",
-          "test_name_value"
+          "lab test",
+          "ensaios"
         ],
         "result_value": [
-          "result_value",
+          "result",
           "result value",
-          "result_value_value"
+          "value",
+          "valor"
         ],
         "unit": [
           "unit",
-          "unit",
-          "unit_value"
+          "uom",
+          "unidade"
         ],
         "reference_range": [
-          "reference_range",
+          "ref range",
           "reference range",
-          "reference_range_value"
+          "normal range",
+          "intervalo"
         ],
         "flag": [
           "flag",
-          "flag",
-          "flag_value"
+          "abnormal",
+          "high",
+          "low",
+          "critical"
+        ],
+        "interpretation": [
+          "interpretation",
+          "comment",
+          "notes"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "result_value",
+            "reference_range"
+          ]
+        },
+        {
+          "unitId": "g/dL",
+          "appliesToColumns": [
+            "result_value"
+          ]
+        },
+        {
+          "unitId": "mg/dL",
+          "appliesToColumns": [
+            "result_value"
+          ]
+        },
+        {
+          "unitId": "mmol/L",
+          "appliesToColumns": [
+            "result_value"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "Map multi-line headers before column body by row/shape cues.",
+        "Preserve reference range text including units and superscripts",
+        "Footnote cells should be linked to the nearest result row when flag appears separately"
+      ]
+    },
+    {
+      "id": "med_lab_results_report_ordered_panels",
+      "name": {
+        "en": "Ordered Panel Summary",
+        "pt": "Resumo de Painel Solicitado"
+      },
+      "section": "requested_panels",
+      "expectedColumns": [
+        "panel_name",
+        "order_source",
+        "specimen",
+        "result_status",
+        "comment"
+      ],
+      "keyRows": [
+        "chemistry",
+        "hematology",
+        "urinalysis",
+        "thyroid",
+        "lipid"
+      ],
+      "headerSynonyms": {
+        "panel_name": [
+          "panel",
+          "panel name",
+          "ordered panel"
+        ],
+        "order_source": [
+          "order source",
+          "source",
+          "requested by"
+        ],
+        "specimen": [
+          "specimen",
+          "sample",
+          "material"
+        ],
+        "result_status": [
+          "status",
+          "result status",
+          "estado"
+        ],
+        "comment": [
+          "comment",
+          "note",
+          "notes"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": []
+        }
+      ],
+      "extractionNotes": [
+        "Capture panel-level status and map to component rows in the same page footprint.",
+        "Use appendix/appendix-like blocks as continuation headers in multi-page PDFs."
+      ]
+    },
+    {
+      "id": "med_lab_results_report_sample_table",
+      "name": {
+        "en": "Sample and Collection Table",
+        "pt": "Amostra e Tabela de Coleta"
+      },
+      "section": "sample_collection",
+      "expectedColumns": [
+        "sample_id",
+        "specimen_type",
+        "collection_time",
+        "received_time",
+        "quality"
+      ],
+      "keyRows": [
+        "sample_id",
+        "collection_time"
+      ],
+      "headerSynonyms": {
+        "sample_id": [
+          "sample id",
+          "specimen id",
+          "amostra"
+        ],
+        "specimen_type": [
+          "specimen",
+          "sample type",
+          "matriz"
+        ],
+        "collection_time": [
+          "collection",
+          "collected",
+          "coleta"
+        ],
+        "received_time": [
+          "received",
+          "recebido"
+        ],
+        "quality": [
+          "quality",
+          "integrity",
+          "hemolyzed",
+          "hemolysis"
         ]
       },
       "unitsRules": [
@@ -127,395 +214,185 @@
           "appliesToColumns": []
         },
         {
-          "unitId": "day",
-          "appliesToColumns": []
+          "unitId": "hour",
+          "appliesToColumns": [
+            "collection_time",
+            "received_time"
+          ]
         }
       ],
       "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
+        "Keep both collection and receipt timestamps; tie both to later result rows."
       ]
     },
     {
-      "id": "med_lab_results_report_medication_administration_table",
+      "id": "med_lab_results_report_reference_table",
       "name": {
-        "en": "Lab Results Report Medication Administration Table",
-        "pt": "Laudo de Exames Laboratoriais Medication Administration Table"
+        "en": "Reference and Flag Table",
+        "pt": "Referencia e Tabela de Flag"
       },
-      "section": "encounter_context",
+      "section": "critical_values",
+      "expectedColumns": [
+        "test_name",
+        "patient_group",
+        "reference_range",
+        "critical_low",
+        "critical_high",
+        "flag"
+      ],
+      "keyRows": [
+        "reference_range",
+        "critical_high",
+        "critical_low"
+      ],
+      "headerSynonyms": {
+        "test_name": [
+          "test",
+          "test name"
+        ],
+        "patient_group": [
+          "age group",
+          "population",
+          "patient group"
+        ],
+        "reference_range": [
+          "reference range",
+          "normal range",
+          "intervalo"
+        ],
+        "critical_low": [
+          "critical low"
+        ],
+        "critical_high": [
+          "critical high"
+        ],
+        "flag": [
+          "flag",
+          "status"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "reference_range",
+            "critical_low",
+            "critical_high"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "When the table is split into footnotes, preserve units in separate column and join by test name."
+      ]
+    },
+    {
+      "id": "med_lab_results_report_trend_table",
+      "name": {
+        "en": "Trend Comparison Table",
+        "pt": "Tabela de Tendencia"
+      },
+      "section": "followup_and_disposition",
+      "expectedColumns": [
+        "test_name",
+        "current",
+        "previous",
+        "delta",
+        "trend_note"
+      ],
+      "keyRows": [
+        "trend",
+        "delta"
+      ],
+      "headerSynonyms": {
+        "test_name": [
+          "test",
+          "test name"
+        ],
+        "current": [
+          "current",
+          "latest"
+        ],
+        "previous": [
+          "previous",
+          "prior"
+        ],
+        "delta": [
+          "delta",
+          "change"
+        ],
+        "trend_note": [
+          "trend note",
+          "trend",
+          "note"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "current",
+            "previous",
+            "delta"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "Use previous row context from adjacent pages when trend table continues.",
+        "Carry forward decimal precision when present."
+      ]
+    },
+    {
+      "id": "med_lab_results_report_medication_table",
+      "name": {
+        "en": "Medication and Allergy Context",
+        "pt": "Medicacoes e Alergias no Exame"
+      },
+      "section": "medications_allergies",
       "expectedColumns": [
         "medication",
         "dose",
-        "route",
-        "frequency",
-        "start_stop"
+        "status",
+        "allergy",
+        "notes"
       ],
       "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
+        "medication",
+        "allergy"
       ],
       "headerSynonyms": {
         "medication": [
           "medication",
-          "medication",
-          "medication_value"
+          "drug",
+          "medicamento"
         ],
         "dose": [
           "dose",
-          "dose",
-          "dose_value"
-        ],
-        "route": [
-          "route",
-          "route",
-          "route_value"
-        ],
-        "frequency": [
-          "frequency",
-          "frequency",
-          "frequency_value"
-        ],
-        "start_stop": [
-          "start_stop",
-          "start stop",
-          "start_stop_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": []
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_lab_results_report_allergy_and_reaction_table",
-      "name": {
-        "en": "Lab Results Report Allergy And Reaction Table",
-        "pt": "Laudo de Exames Laboratoriais Allergy And Reaction Table"
-      },
-      "section": "chief_complaint_reason",
-      "expectedColumns": [
-        "substance",
-        "reaction",
-        "severity",
-        "status",
-        "last_updated"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "substance": [
-          "substance",
-          "substance",
-          "substance_value"
-        ],
-        "reaction": [
-          "reaction",
-          "reaction",
-          "reaction_value"
-        ],
-        "severity": [
-          "severity",
-          "severity",
-          "severity_value"
+          "dosage"
         ],
         "status": [
           "status",
-          "status",
-          "status_value"
+          "state"
         ],
-        "last_updated": [
-          "last_updated",
-          "last updated",
-          "last_updated_value"
+        "allergy": [
+          "allergy",
+          "alergia"
+        ],
+        "notes": [
+          "note",
+          "comment"
         ]
       },
       "unitsRules": [
         {
           "unitId": "unitless",
           "appliesToColumns": [
+            "dose",
             "status"
           ]
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "last_updated"
-          ]
         }
       ],
       "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_lab_results_report_problem_list_table",
-      "name": {
-        "en": "Lab Results Report Problem List Table",
-        "pt": "Laudo de Exames Laboratoriais Problem List Table"
-      },
-      "section": "history_background",
-      "expectedColumns": [
-        "problem",
-        "status",
-        "onset_date",
-        "resolution_date",
-        "note"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "problem": [
-          "problem",
-          "problem",
-          "problem_value"
-        ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
-        ],
-        "onset_date": [
-          "onset_date",
-          "onset date",
-          "onset_date_value"
-        ],
-        "resolution_date": [
-          "resolution_date",
-          "resolution date",
-          "resolution_date_value"
-        ],
-        "note": [
-          "note",
-          "note",
-          "note_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": [
-            "status",
-            "note"
-          ]
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "onset_date",
-            "resolution_date"
-          ]
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_lab_results_report_care_plan_goals_table",
-      "name": {
-        "en": "Lab Results Report Care Plan Goals Table",
-        "pt": "Laudo de Exames Laboratoriais Care Plan Goals Table"
-      },
-      "section": "objective_findings",
-      "expectedColumns": [
-        "goal",
-        "intervention",
-        "owner",
-        "target_date",
-        "status"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "goal": [
-          "goal",
-          "goal",
-          "goal_value"
-        ],
-        "intervention": [
-          "intervention",
-          "intervention",
-          "intervention_value"
-        ],
-        "owner": [
-          "owner",
-          "owner",
-          "owner_value"
-        ],
-        "target_date": [
-          "target_date",
-          "target date",
-          "target_date_value"
-        ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": [
-            "status"
-          ]
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "target_date"
-          ]
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_lab_results_report_followup_tasks_table",
-      "name": {
-        "en": "Lab Results Report Followup Tasks Table",
-        "pt": "Laudo de Exames Laboratoriais Followup Tasks Table"
-      },
-      "section": "vitals_and_measurements",
-      "expectedColumns": [
-        "task",
-        "responsible_party",
-        "due_window",
-        "priority",
-        "completion"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "task": [
-          "task",
-          "task",
-          "task_value"
-        ],
-        "responsible_party": [
-          "responsible_party",
-          "responsible party",
-          "responsible_party_value"
-        ],
-        "due_window": [
-          "due_window",
-          "due window",
-          "due_window_value"
-        ],
-        "priority": [
-          "priority",
-          "priority",
-          "priority_value"
-        ],
-        "completion": [
-          "completion",
-          "completion",
-          "completion_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "due_window"
-          ]
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_lab_results_report_document_signoff_table",
-      "name": {
-        "en": "Lab Results Report Document Signoff Table",
-        "pt": "Laudo de Exames Laboratoriais Document Signoff Table"
-      },
-      "section": "labs_imaging",
-      "expectedColumns": [
-        "clinician",
-        "role",
-        "timestamp",
-        "location",
-        "method"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "clinician": [
-          "clinician",
-          "clinician",
-          "clinician_value"
-        ],
-        "role": [
-          "role",
-          "role",
-          "role_value"
-        ],
-        "timestamp": [
-          "timestamp",
-          "timestamp",
-          "timestamp_value"
-        ],
-        "location": [
-          "location",
-          "location",
-          "location_value"
-        ],
-        "method": [
-          "method",
-          "method",
-          "method_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": []
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
+        "Useful for interference interpretation when meds are expected to affect lab interpretation."
       ]
     }
   ]

@@ -1,0 +1,3980 @@
+{
+  "_meta": {
+    "id": "doc_aliases_everyday",
+    "version": "2.1.0",
+    "description": "Alias mapping for everyday documents with EN/PT coverage.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "minAliasConfidence": 0.72,
+    "caseInsensitive": true
+  },
+  "domain": "everyday",
+  "aliases": [
+    {
+      "phrase": "agua mensal",
+      "normalized": "agua mensal",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre agua mensal",
+        "encontre agua mensal"
+      ]
+    },
+    {
+      "phrase": "agua mensal 2025",
+      "normalized": "agua mensal 2025",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostre agua mensal 2025",
+        "encontre agua mensal 2025"
+      ]
+    },
+    {
+      "phrase": "agua mensal 2026",
+      "normalized": "agua mensal 2026",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre agua mensal 2026",
+        "encontre agua mensal 2026"
+      ]
+    },
+    {
+      "phrase": "agua mensal arquivo",
+      "normalized": "agua mensal arquivo",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre agua mensal arquivo",
+        "encontre agua mensal arquivo"
+      ]
+    },
+    {
+      "phrase": "agua mensal comprovante",
+      "normalized": "agua mensal comprovante",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre agua mensal comprovante",
+        "encontre agua mensal comprovante"
+      ]
+    },
+    {
+      "phrase": "agua mensal do periodo",
+      "normalized": "agua mensal do periodo",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre agua mensal do periodo",
+        "encontre agua mensal do periodo"
+      ]
+    },
+    {
+      "phrase": "agua mensal fatura",
+      "normalized": "agua mensal fatura",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre agua mensal fatura",
+        "encontre agua mensal fatura"
+      ]
+    },
+    {
+      "phrase": "agua mensal por periodo",
+      "normalized": "agua mensal por periodo",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre agua mensal por periodo",
+        "encontre agua mensal por periodo"
+      ]
+    },
+    {
+      "phrase": "agua mensal q1",
+      "normalized": "agua mensal q1",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre agua mensal q1",
+        "encontre agua mensal q1"
+      ]
+    },
+    {
+      "phrase": "agua mensal q2",
+      "normalized": "agua mensal q2",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostre agua mensal q2",
+        "encontre agua mensal q2"
+      ]
+    },
+    {
+      "phrase": "agua mensal relatorio",
+      "normalized": "agua mensal relatorio",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre agua mensal relatorio",
+        "encontre agua mensal relatorio"
+      ]
+    },
+    {
+      "phrase": "agua mensal resumo",
+      "normalized": "agua mensal resumo",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre agua mensal resumo",
+        "encontre agua mensal resumo"
+      ]
+    },
+    {
+      "phrase": "annual apartment rental receipt",
+      "normalized": "annual apartment rental receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual apartment rental receipt",
+        "compare annual apartment rental receipt"
+      ]
+    },
+    {
+      "phrase": "annual bistro receipt",
+      "normalized": "annual bistro receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual bistro receipt",
+        "compare annual bistro receipt"
+      ]
+    },
+    {
+      "phrase": "annual bridge toll invoice",
+      "normalized": "annual bridge toll invoice",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual bridge toll invoice",
+        "compare annual bridge toll invoice"
+      ]
+    },
+    {
+      "phrase": "annual broadband bill",
+      "normalized": "annual broadband bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual broadband bill",
+        "compare annual broadband bill"
+      ]
+    },
+    {
+      "phrase": "annual cab receipt",
+      "normalized": "annual cab receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show annual cab receipt",
+        "compare annual cab receipt"
+      ]
+    },
+    {
+      "phrase": "annual cafe receipt",
+      "normalized": "annual cafe receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual cafe receipt",
+        "compare annual cafe receipt"
+      ]
+    },
+    {
+      "phrase": "annual carrier bill",
+      "normalized": "annual carrier bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "show annual carrier bill",
+        "compare annual carrier bill"
+      ]
+    },
+    {
+      "phrase": "annual cash memo",
+      "normalized": "annual cash memo",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual cash memo",
+        "compare annual cash memo"
+      ]
+    },
+    {
+      "phrase": "annual cash payment receipt",
+      "normalized": "annual cash payment receipt",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show annual cash payment receipt",
+        "compare annual cash payment receipt"
+      ]
+    },
+    {
+      "phrase": "annual cash receipt",
+      "normalized": "annual cash receipt",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual cash receipt",
+        "compare annual cash receipt"
+      ]
+    },
+    {
+      "phrase": "annual cash voucher",
+      "normalized": "annual cash voucher",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show annual cash voucher",
+        "compare annual cash voucher"
+      ]
+    },
+    {
+      "phrase": "annual cell phone bill",
+      "normalized": "annual cell phone bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual cell phone bill",
+        "compare annual cell phone bill"
+      ]
+    },
+    {
+      "phrase": "annual cell plan bill",
+      "normalized": "annual cell plan bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual cell plan bill",
+        "compare annual cell plan bill"
+      ]
+    },
+    {
+      "phrase": "annual dining receipt",
+      "normalized": "annual dining receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual dining receipt",
+        "compare annual dining receipt"
+      ]
+    },
+    {
+      "phrase": "annual e-ticket",
+      "normalized": "annual e-ticket",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show annual e-ticket",
+        "compare annual e-ticket"
+      ]
+    },
+    {
+      "phrase": "annual eatery receipt",
+      "normalized": "annual eatery receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual eatery receipt",
+        "compare annual eatery receipt"
+      ]
+    },
+    {
+      "phrase": "annual electric company bill",
+      "normalized": "annual electric company bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show annual electric company bill",
+        "compare annual electric company bill"
+      ]
+    },
+    {
+      "phrase": "annual electricity bill",
+      "normalized": "annual electricity bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual electricity bill",
+        "compare annual electricity bill"
+      ]
+    },
+    {
+      "phrase": "annual energy gas bill",
+      "normalized": "annual energy gas bill",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show annual energy gas bill",
+        "compare annual energy gas bill"
+      ]
+    },
+    {
+      "phrase": "annual event ticket receipt",
+      "normalized": "annual event ticket receipt",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual event ticket receipt",
+        "compare annual event ticket receipt"
+      ]
+    },
+    {
+      "phrase": "annual fare receipt",
+      "normalized": "annual fare receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual fare receipt",
+        "compare annual fare receipt"
+      ]
+    },
+    {
+      "phrase": "annual fiber bill",
+      "normalized": "annual fiber bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual fiber bill",
+        "compare annual fiber bill"
+      ]
+    },
+    {
+      "phrase": "annual food receipt",
+      "normalized": "annual food receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual food receipt",
+        "compare annual food receipt"
+      ]
+    },
+    {
+      "phrase": "annual fuel purchase receipt",
+      "normalized": "annual fuel purchase receipt",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show annual fuel purchase receipt",
+        "compare annual fuel purchase receipt"
+      ]
+    },
+    {
+      "phrase": "annual fuel receipt",
+      "normalized": "annual fuel receipt",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual fuel receipt",
+        "compare annual fuel receipt"
+      ]
+    },
+    {
+      "phrase": "annual garage ticket",
+      "normalized": "annual garage ticket",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual garage ticket",
+        "compare annual garage ticket"
+      ]
+    },
+    {
+      "phrase": "annual gas bill",
+      "normalized": "annual gas bill",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual gas bill",
+        "compare annual gas bill"
+      ]
+    },
+    {
+      "phrase": "annual gas pump receipt",
+      "normalized": "annual gas pump receipt",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual gas pump receipt",
+        "compare annual gas pump receipt"
+      ]
+    },
+    {
+      "phrase": "annual gas receipt",
+      "normalized": "annual gas receipt",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual gas receipt",
+        "compare annual gas receipt"
+      ]
+    },
+    {
+      "phrase": "annual gas station receipt",
+      "normalized": "annual gas station receipt",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual gas station receipt",
+        "compare annual gas station receipt"
+      ]
+    },
+    {
+      "phrase": "annual grocer receipt",
+      "normalized": "annual grocer receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual grocer receipt",
+        "compare annual grocer receipt"
+      ]
+    },
+    {
+      "phrase": "annual grocery receipt",
+      "normalized": "annual grocery receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual grocery receipt",
+        "compare annual grocery receipt"
+      ]
+    },
+    {
+      "phrase": "annual grocery store receipt",
+      "normalized": "annual grocery store receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual grocery store receipt",
+        "compare annual grocery store receipt"
+      ]
+    },
+    {
+      "phrase": "annual housing receipt",
+      "normalized": "annual housing receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show annual housing receipt",
+        "compare annual housing receipt"
+      ]
+    },
+    {
+      "phrase": "annual internet bill",
+      "normalized": "annual internet bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual internet bill",
+        "compare annual internet bill"
+      ]
+    },
+    {
+      "phrase": "annual internet invoice",
+      "normalized": "annual internet invoice",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual internet invoice",
+        "compare annual internet invoice"
+      ]
+    },
+    {
+      "phrase": "annual internet provider bill",
+      "normalized": "annual internet provider bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual internet provider bill",
+        "compare annual internet provider bill"
+      ]
+    },
+    {
+      "phrase": "annual lease receipt",
+      "normalized": "annual lease receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show annual lease receipt",
+        "compare annual lease receipt"
+      ]
+    },
+    {
+      "phrase": "annual market receipt",
+      "normalized": "annual market receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual market receipt",
+        "compare annual market receipt"
+      ]
+    },
+    {
+      "phrase": "annual membership receipt",
+      "normalized": "annual membership receipt",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show annual membership receipt",
+        "compare annual membership receipt"
+      ]
+    },
+    {
+      "phrase": "annual meter ticket",
+      "normalized": "annual meter ticket",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "show annual meter ticket",
+        "compare annual meter ticket"
+      ]
+    },
+    {
+      "phrase": "annual mobile bill",
+      "normalized": "annual mobile bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show annual mobile bill",
+        "compare annual mobile bill"
+      ]
+    },
+    {
+      "phrase": "annual monthly electric bill",
+      "normalized": "annual monthly electric bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual monthly electric bill",
+        "compare annual monthly electric bill"
+      ]
+    },
+    {
+      "phrase": "annual municipal water bill",
+      "normalized": "annual municipal water bill",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual municipal water bill",
+        "compare annual municipal water bill"
+      ]
+    },
+    {
+      "phrase": "annual natural gas bill",
+      "normalized": "annual natural gas bill",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual natural gas bill",
+        "compare annual natural gas bill"
+      ]
+    },
+    {
+      "phrase": "annual paid cash receipt",
+      "normalized": "annual paid cash receipt",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show annual paid cash receipt",
+        "compare annual paid cash receipt"
+      ]
+    },
+    {
+      "phrase": "annual parking pass",
+      "normalized": "annual parking pass",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual parking pass",
+        "compare annual parking pass"
+      ]
+    },
+    {
+      "phrase": "annual parking payment",
+      "normalized": "annual parking payment",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual parking payment",
+        "compare annual parking payment"
+      ]
+    },
+    {
+      "phrase": "annual parking receipt",
+      "normalized": "annual parking receipt",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual parking receipt",
+        "compare annual parking receipt"
+      ]
+    },
+    {
+      "phrase": "annual parking ticket",
+      "normalized": "annual parking ticket",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual parking ticket",
+        "compare annual parking ticket"
+      ]
+    },
+    {
+      "phrase": "annual petroleum receipt",
+      "normalized": "annual petroleum receipt",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "show annual petroleum receipt",
+        "compare annual petroleum receipt"
+      ]
+    },
+    {
+      "phrase": "annual phone bill",
+      "normalized": "annual phone bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual phone bill",
+        "compare annual phone bill"
+      ]
+    },
+    {
+      "phrase": "annual phone invoice",
+      "normalized": "annual phone invoice",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show annual phone invoice",
+        "compare annual phone invoice"
+      ]
+    },
+    {
+      "phrase": "annual power bill",
+      "normalized": "annual power bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show annual power bill",
+        "compare annual power bill"
+      ]
+    },
+    {
+      "phrase": "annual purchase receipt",
+      "normalized": "annual purchase receipt",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual purchase receipt",
+        "compare annual purchase receipt"
+      ]
+    },
+    {
+      "phrase": "annual rent receipt",
+      "normalized": "annual rent receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual rent receipt",
+        "compare annual rent receipt"
+      ]
+    },
+    {
+      "phrase": "annual rental payment receipt",
+      "normalized": "annual rental payment receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual rental payment receipt",
+        "compare annual rental payment receipt"
+      ]
+    },
+    {
+      "phrase": "annual rental receipt",
+      "normalized": "annual rental receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual rental receipt",
+        "compare annual rental receipt"
+      ]
+    },
+    {
+      "phrase": "annual restaurant receipt",
+      "normalized": "annual restaurant receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual restaurant receipt",
+        "compare annual restaurant receipt"
+      ]
+    },
+    {
+      "phrase": "annual retail receipt",
+      "normalized": "annual retail receipt",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual retail receipt",
+        "compare annual retail receipt"
+      ]
+    },
+    {
+      "phrase": "annual ride receipt",
+      "normalized": "annual ride receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual ride receipt",
+        "compare annual ride receipt"
+      ]
+    },
+    {
+      "phrase": "annual ride ticket",
+      "normalized": "annual ride ticket",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show annual ride ticket",
+        "compare annual ride ticket"
+      ]
+    },
+    {
+      "phrase": "annual road toll bill",
+      "normalized": "annual road toll bill",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual road toll bill",
+        "compare annual road toll bill"
+      ]
+    },
+    {
+      "phrase": "annual sales receipt",
+      "normalized": "annual sales receipt",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual sales receipt",
+        "compare annual sales receipt"
+      ]
+    },
+    {
+      "phrase": "annual shopping receipt",
+      "normalized": "annual shopping receipt",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show annual shopping receipt",
+        "compare annual shopping receipt"
+      ]
+    },
+    {
+      "phrase": "annual store receipt",
+      "normalized": "annual store receipt",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show annual store receipt",
+        "compare annual store receipt"
+      ]
+    },
+    {
+      "phrase": "annual subscription bill",
+      "normalized": "annual subscription bill",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual subscription bill",
+        "compare annual subscription bill"
+      ]
+    },
+    {
+      "phrase": "annual subscription invoice",
+      "normalized": "annual subscription invoice",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show annual subscription invoice",
+        "compare annual subscription invoice"
+      ]
+    },
+    {
+      "phrase": "annual subscription payment",
+      "normalized": "annual subscription payment",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual subscription payment",
+        "compare annual subscription payment"
+      ]
+    },
+    {
+      "phrase": "annual subscription receipt",
+      "normalized": "annual subscription receipt",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual subscription receipt",
+        "compare annual subscription receipt"
+      ]
+    },
+    {
+      "phrase": "annual supermarket receipt",
+      "normalized": "annual supermarket receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual supermarket receipt",
+        "compare annual supermarket receipt"
+      ]
+    },
+    {
+      "phrase": "annual taxi receipt",
+      "normalized": "annual taxi receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual taxi receipt",
+        "compare annual taxi receipt"
+      ]
+    },
+    {
+      "phrase": "annual telecom bill",
+      "normalized": "annual telecom bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show annual telecom bill",
+        "compare annual telecom bill"
+      ]
+    },
+    {
+      "phrase": "annual ticket receipt",
+      "normalized": "annual ticket receipt",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show annual ticket receipt",
+        "compare annual ticket receipt"
+      ]
+    },
+    {
+      "phrase": "annual toll bill",
+      "normalized": "annual toll bill",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual toll bill",
+        "compare annual toll bill"
+      ]
+    },
+    {
+      "phrase": "annual toll receipt",
+      "normalized": "annual toll receipt",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "show annual toll receipt",
+        "compare annual toll receipt"
+      ]
+    },
+    {
+      "phrase": "annual toll statement",
+      "normalized": "annual toll statement",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show annual toll statement",
+        "compare annual toll statement"
+      ]
+    },
+    {
+      "phrase": "annual transit receipt",
+      "normalized": "annual transit receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual transit receipt",
+        "compare annual transit receipt"
+      ]
+    },
+    {
+      "phrase": "annual transport receipt",
+      "normalized": "annual transport receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual transport receipt",
+        "compare annual transport receipt"
+      ]
+    },
+    {
+      "phrase": "annual transport ticket",
+      "normalized": "annual transport ticket",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show annual transport ticket",
+        "compare annual transport ticket"
+      ]
+    },
+    {
+      "phrase": "annual utility electric bill",
+      "normalized": "annual utility electric bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual utility electric bill",
+        "compare annual utility electric bill"
+      ]
+    },
+    {
+      "phrase": "annual utility gas invoice",
+      "normalized": "annual utility gas invoice",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show annual utility gas invoice",
+        "compare annual utility gas invoice"
+      ]
+    },
+    {
+      "phrase": "annual utility water bill",
+      "normalized": "annual utility water bill",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show annual utility water bill",
+        "compare annual utility water bill"
+      ]
+    },
+    {
+      "phrase": "annual water bill",
+      "normalized": "annual water bill",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual water bill",
+        "compare annual water bill"
+      ]
+    },
+    {
+      "phrase": "annual water invoice",
+      "normalized": "annual water invoice",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show annual water invoice",
+        "compare annual water invoice"
+      ]
+    },
+    {
+      "phrase": "annual water statement",
+      "normalized": "annual water statement",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show annual water statement",
+        "compare annual water statement"
+      ]
+    },
+    {
+      "phrase": "annual wifi bill",
+      "normalized": "annual wifi bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "show annual wifi bill",
+        "compare annual wifi bill"
+      ]
+    },
+    {
+      "phrase": "annual wireless bill",
+      "normalized": "annual wireless bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show annual wireless bill",
+        "compare annual wireless bill"
+      ]
+    },
+    {
+      "phrase": "anual agua mensal",
+      "normalized": "anual agua mensal",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual agua mensal",
+        "encontre anual agua mensal"
+      ]
+    },
+    {
+      "phrase": "anual boleta de internet",
+      "normalized": "anual boleta de internet",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual boleta de internet",
+        "encontre anual boleta de internet"
+      ]
+    },
+    {
+      "phrase": "anual boleto de passagem",
+      "normalized": "anual boleto de passagem",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual boleto de passagem",
+        "encontre anual boleto de passagem"
+      ]
+    },
+    {
+      "phrase": "anual boleto de pedagio",
+      "normalized": "anual boleto de pedagio",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual boleto de pedagio",
+        "encontre anual boleto de pedagio"
+      ]
+    },
+    {
+      "phrase": "anual boleto de telefonia",
+      "normalized": "anual boleto de telefonia",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostre anual boleto de telefonia",
+        "encontre anual boleto de telefonia"
+      ]
+    },
+    {
+      "phrase": "anual cobranca de pedagio",
+      "normalized": "anual cobranca de pedagio",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual cobranca de pedagio",
+        "encontre anual cobranca de pedagio"
+      ]
+    },
+    {
+      "phrase": "anual cobro de assinatura",
+      "normalized": "anual cobro de assinatura",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual cobro de assinatura",
+        "encontre anual cobro de assinatura"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de abastecimento",
+      "normalized": "anual comprovante de abastecimento",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostre anual comprovante de abastecimento",
+        "encontre anual comprovante de abastecimento"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de aluguel",
+      "normalized": "anual comprovante de aluguel",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual comprovante de aluguel",
+        "encontre anual comprovante de aluguel"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de compras",
+      "normalized": "anual comprovante de compras",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual comprovante de compras",
+        "encontre anual comprovante de compras"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de corrida",
+      "normalized": "anual comprovante de corrida",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre anual comprovante de corrida",
+        "encontre anual comprovante de corrida"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de deposito",
+      "normalized": "anual comprovante de deposito",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual comprovante de deposito",
+        "encontre anual comprovante de deposito"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de estacionamento",
+      "normalized": "anual comprovante de estacionamento",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual comprovante de estacionamento",
+        "encontre anual comprovante de estacionamento"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de ingresso",
+      "normalized": "anual comprovante de ingresso",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostre anual comprovante de ingresso",
+        "encontre anual comprovante de ingresso"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de locacao",
+      "normalized": "anual comprovante de locacao",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual comprovante de locacao",
+        "encontre anual comprovante de locacao"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de mensalidade",
+      "normalized": "anual comprovante de mensalidade",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual comprovante de mensalidade",
+        "encontre anual comprovante de mensalidade"
+      ]
+    },
+    {
+      "phrase": "anual comprovante de refeicao",
+      "normalized": "anual comprovante de refeicao",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "mostre anual comprovante de refeicao",
+        "encontre anual comprovante de refeicao"
+      ]
+    },
+    {
+      "phrase": "anual comprovante em dinheiro",
+      "normalized": "anual comprovante em dinheiro",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual comprovante em dinheiro",
+        "encontre anual comprovante em dinheiro"
+      ]
+    },
+    {
+      "phrase": "anual conta de agua",
+      "normalized": "anual conta de agua",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual conta de agua",
+        "encontre anual conta de agua"
+      ]
+    },
+    {
+      "phrase": "anual conta de celular",
+      "normalized": "anual conta de celular",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual conta de celular",
+        "encontre anual conta de celular"
+      ]
+    },
+    {
+      "phrase": "anual conta de energia",
+      "normalized": "anual conta de energia",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostre anual conta de energia",
+        "encontre anual conta de energia"
+      ]
+    },
+    {
+      "phrase": "anual conta de gas",
+      "normalized": "anual conta de gas",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual conta de gas",
+        "encontre anual conta de gas"
+      ]
+    },
+    {
+      "phrase": "anual conta de gas natural",
+      "normalized": "anual conta de gas natural",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual conta de gas natural",
+        "encontre anual conta de gas natural"
+      ]
+    },
+    {
+      "phrase": "anual conta de internet",
+      "normalized": "anual conta de internet",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual conta de internet",
+        "encontre anual conta de internet"
+      ]
+    },
+    {
+      "phrase": "anual conta de luz",
+      "normalized": "anual conta de luz",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual conta de luz",
+        "encontre anual conta de luz"
+      ]
+    },
+    {
+      "phrase": "anual conta do celular",
+      "normalized": "anual conta do celular",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual conta do celular",
+        "encontre anual conta do celular"
+      ]
+    },
+    {
+      "phrase": "anual cupom de loja",
+      "normalized": "anual cupom de loja",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre anual cupom de loja",
+        "encontre anual cupom de loja"
+      ]
+    },
+    {
+      "phrase": "anual cupom de refeicao",
+      "normalized": "anual cupom de refeicao",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual cupom de refeicao",
+        "encontre anual cupom de refeicao"
+      ]
+    },
+    {
+      "phrase": "anual cupom de supermercado",
+      "normalized": "anual cupom de supermercado",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual cupom de supermercado",
+        "encontre anual cupom de supermercado"
+      ]
+    },
+    {
+      "phrase": "anual fatura abastecimento",
+      "normalized": "anual fatura abastecimento",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual fatura abastecimento",
+        "encontre anual fatura abastecimento"
+      ]
+    },
+    {
+      "phrase": "anual fatura de agua",
+      "normalized": "anual fatura de agua",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual fatura de agua",
+        "encontre anual fatura de agua"
+      ]
+    },
+    {
+      "phrase": "anual fatura de assinatura",
+      "normalized": "anual fatura de assinatura",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual fatura de assinatura",
+        "encontre anual fatura de assinatura"
+      ]
+    },
+    {
+      "phrase": "anual fatura de banda larga",
+      "normalized": "anual fatura de banda larga",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual fatura de banda larga",
+        "encontre anual fatura de banda larga"
+      ]
+    },
+    {
+      "phrase": "anual fatura de eletricidade",
+      "normalized": "anual fatura de eletricidade",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual fatura de eletricidade",
+        "encontre anual fatura de eletricidade"
+      ]
+    },
+    {
+      "phrase": "anual fatura de fibra",
+      "normalized": "anual fatura de fibra",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual fatura de fibra",
+        "encontre anual fatura de fibra"
+      ]
+    },
+    {
+      "phrase": "anual fatura de gas",
+      "normalized": "anual fatura de gas",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual fatura de gas",
+        "encontre anual fatura de gas"
+      ]
+    },
+    {
+      "phrase": "anual fatura de internet",
+      "normalized": "anual fatura de internet",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre anual fatura de internet",
+        "encontre anual fatura de internet"
+      ]
+    },
+    {
+      "phrase": "anual fatura de linha",
+      "normalized": "anual fatura de linha",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual fatura de linha",
+        "encontre anual fatura de linha"
+      ]
+    },
+    {
+      "phrase": "anual fatura de luz",
+      "normalized": "anual fatura de luz",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre anual fatura de luz",
+        "encontre anual fatura de luz"
+      ]
+    },
+    {
+      "phrase": "anual fatura de pedágio",
+      "normalized": "anual fatura de pedágio",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual fatura de pedágio",
+        "encontre anual fatura de pedágio"
+      ]
+    },
+    {
+      "phrase": "anual fatura de telefone",
+      "normalized": "anual fatura de telefone",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostre anual fatura de telefone",
+        "encontre anual fatura de telefone"
+      ]
+    },
+    {
+      "phrase": "anual fatura do celular",
+      "normalized": "anual fatura do celular",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre anual fatura do celular",
+        "encontre anual fatura do celular"
+      ]
+    },
+    {
+      "phrase": "anual fatura eletrica",
+      "normalized": "anual fatura eletrica",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre anual fatura eletrica",
+        "encontre anual fatura eletrica"
+      ]
+    },
+    {
+      "phrase": "anual fatura energetica de gas",
+      "normalized": "anual fatura energetica de gas",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "mostre anual fatura energetica de gas",
+        "encontre anual fatura energetica de gas"
+      ]
+    },
+    {
+      "phrase": "anual fatura mobil",
+      "normalized": "anual fatura mobil",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre anual fatura mobil",
+        "encontre anual fatura mobil"
+      ]
+    },
+    {
+      "phrase": "anual ingresso de estacionamento",
+      "normalized": "anual ingresso de estacionamento",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual ingresso de estacionamento",
+        "encontre anual ingresso de estacionamento"
+      ]
+    },
+    {
+      "phrase": "anual nota de compra",
+      "normalized": "anual nota de compra",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "mostre anual nota de compra",
+        "encontre anual nota de compra"
+      ]
+    },
+    {
+      "phrase": "anual nota de posto",
+      "normalized": "anual nota de posto",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual nota de posto",
+        "encontre anual nota de posto"
+      ]
+    },
+    {
+      "phrase": "anual nota de restaurante",
+      "normalized": "anual nota de restaurante",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual nota de restaurante",
+        "encontre anual nota de restaurante"
+      ]
+    },
+    {
+      "phrase": "anual nota de supermercado",
+      "normalized": "anual nota de supermercado",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual nota de supermercado",
+        "encontre anual nota de supermercado"
+      ]
+    },
+    {
+      "phrase": "anual nota de venda",
+      "normalized": "anual nota de venda",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual nota de venda",
+        "encontre anual nota de venda"
+      ]
+    },
+    {
+      "phrase": "anual nota fiscal de compra",
+      "normalized": "anual nota fiscal de compra",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "mostre anual nota fiscal de compra",
+        "encontre anual nota fiscal de compra"
+      ]
+    },
+    {
+      "phrase": "anual pagamento de assinatura",
+      "normalized": "anual pagamento de assinatura",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre anual pagamento de assinatura",
+        "encontre anual pagamento de assinatura"
+      ]
+    },
+    {
+      "phrase": "anual recibo de agua",
+      "normalized": "anual recibo de agua",
+      "docTypeIds": [
+        "everyday_water_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual recibo de agua",
+        "encontre anual recibo de agua"
+      ]
+    },
+    {
+      "phrase": "anual recibo de aluguel",
+      "normalized": "anual recibo de aluguel",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual recibo de aluguel",
+        "encontre anual recibo de aluguel"
+      ]
+    },
+    {
+      "phrase": "anual recibo de aluguel mensal",
+      "normalized": "anual recibo de aluguel mensal",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre anual recibo de aluguel mensal",
+        "encontre anual recibo de aluguel mensal"
+      ]
+    },
+    {
+      "phrase": "anual recibo de assinatura",
+      "normalized": "anual recibo de assinatura",
+      "docTypeIds": [
+        "everyday_subscription_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual recibo de assinatura",
+        "encontre anual recibo de assinatura"
+      ]
+    },
+    {
+      "phrase": "anual recibo de combustivel",
+      "normalized": "anual recibo de combustivel",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual recibo de combustivel",
+        "encontre anual recibo de combustivel"
+      ]
+    },
+    {
+      "phrase": "anual recibo de compra",
+      "normalized": "anual recibo de compra",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual recibo de compra",
+        "encontre anual recibo de compra"
+      ]
+    },
+    {
+      "phrase": "anual recibo de corrida",
+      "normalized": "anual recibo de corrida",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "mostre anual recibo de corrida",
+        "encontre anual recibo de corrida"
+      ]
+    },
+    {
+      "phrase": "anual recibo de internet",
+      "normalized": "anual recibo de internet",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual recibo de internet",
+        "encontre anual recibo de internet"
+      ]
+    },
+    {
+      "phrase": "anual recibo de jantar",
+      "normalized": "anual recibo de jantar",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual recibo de jantar",
+        "encontre anual recibo de jantar"
+      ]
+    },
+    {
+      "phrase": "anual recibo de locacao",
+      "normalized": "anual recibo de locacao",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual recibo de locacao",
+        "encontre anual recibo de locacao"
+      ]
+    },
+    {
+      "phrase": "anual recibo de mercado",
+      "normalized": "anual recibo de mercado",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "mostre anual recibo de mercado",
+        "encontre anual recibo de mercado"
+      ]
+    },
+    {
+      "phrase": "anual recibo de pagamento",
+      "normalized": "anual recibo de pagamento",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual recibo de pagamento",
+        "encontre anual recibo de pagamento"
+      ]
+    },
+    {
+      "phrase": "anual recibo de parque",
+      "normalized": "anual recibo de parque",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "mostre anual recibo de parque",
+        "encontre anual recibo de parque"
+      ]
+    },
+    {
+      "phrase": "anual recibo de passagem",
+      "normalized": "anual recibo de passagem",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual recibo de passagem",
+        "encontre anual recibo de passagem"
+      ]
+    },
+    {
+      "phrase": "anual recibo de pedágio",
+      "normalized": "anual recibo de pedágio",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual recibo de pedágio",
+        "encontre anual recibo de pedágio"
+      ]
+    },
+    {
+      "phrase": "anual recibo de restaurante",
+      "normalized": "anual recibo de restaurante",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "mostre anual recibo de restaurante",
+        "encontre anual recibo de restaurante"
+      ]
+    },
+    {
+      "phrase": "anual recibo de taxi",
+      "normalized": "anual recibo de taxi",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual recibo de taxi",
+        "encontre anual recibo de taxi"
+      ]
+    },
+    {
+      "phrase": "anual recibo de telefone",
+      "normalized": "anual recibo de telefone",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "mostre anual recibo de telefone",
+        "encontre anual recibo de telefone"
+      ]
+    },
+    {
+      "phrase": "anual recibo de transporte",
+      "normalized": "anual recibo de transporte",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "pt"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "mostre anual recibo de transporte",
+        "encontre anual recibo de transporte"
+      ]
+    },
+    {
+      "phrase": "anual recibo de viagem",
+      "normalized": "anual recibo de viagem",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre anual recibo de viagem",
+        "encontre anual recibo de viagem"
+      ]
+    },
+    {
+      "phrase": "anual recibo em dinheiro",
+      "normalized": "anual recibo em dinheiro",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual recibo em dinheiro",
+        "encontre anual recibo em dinheiro"
+      ]
+    },
+    {
+      "phrase": "anual recibo posto de gasolina",
+      "normalized": "anual recibo posto de gasolina",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "mostre anual recibo posto de gasolina",
+        "encontre anual recibo posto de gasolina"
+      ]
+    },
+    {
+      "phrase": "anual recibo varejo",
+      "normalized": "anual recibo varejo",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual recibo varejo",
+        "encontre anual recibo varejo"
+      ]
+    },
+    {
+      "phrase": "anual resumo de energia",
+      "normalized": "anual resumo de energia",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual resumo de energia",
+        "encontre anual resumo de energia"
+      ]
+    },
+    {
+      "phrase": "anual saldo de pedagio",
+      "normalized": "anual saldo de pedagio",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "mostre anual saldo de pedagio",
+        "encontre anual saldo de pedagio"
+      ]
+    },
+    {
+      "phrase": "anual ticket de abastecimento",
+      "normalized": "anual ticket de abastecimento",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "mostre anual ticket de abastecimento",
+        "encontre anual ticket de abastecimento"
+      ]
+    },
+    {
+      "phrase": "anual ticket de estacionamento",
+      "normalized": "anual ticket de estacionamento",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "pt"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "mostre anual ticket de estacionamento",
+        "encontre anual ticket de estacionamento"
+      ]
+    },
+    {
+      "phrase": "anual ticket de parqueo",
+      "normalized": "anual ticket de parqueo",
+      "docTypeIds": [
+        "everyday_parking_ticket"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "pt"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "mostre anual ticket de parqueo",
+        "encontre anual ticket de parqueo"
+      ]
+    },
+    {
+      "phrase": "anual ticket do evento",
+      "normalized": "anual ticket do evento",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "pt"
+      },
+      "confidence": 0.78,
+      "examples": [
+        "mostre anual ticket do evento",
+        "encontre anual ticket do evento"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt",
+      "normalized": "apartment rental receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show apartment rental receipt",
+        "compare apartment rental receipt"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt 2025",
+      "normalized": "apartment rental receipt 2025",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show apartment rental receipt 2025",
+        "compare apartment rental receipt 2025"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt 2026",
+      "normalized": "apartment rental receipt 2026",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show apartment rental receipt 2026",
+        "compare apartment rental receipt 2026"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt by period",
+      "normalized": "apartment rental receipt by period",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show apartment rental receipt by period",
+        "compare apartment rental receipt by period"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt copy",
+      "normalized": "apartment rental receipt copy",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show apartment rental receipt copy",
+        "compare apartment rental receipt copy"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt file",
+      "normalized": "apartment rental receipt file",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show apartment rental receipt file",
+        "compare apartment rental receipt file"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt for q4",
+      "normalized": "apartment rental receipt for q4",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show apartment rental receipt for q4",
+        "compare apartment rental receipt for q4"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt pdf",
+      "normalized": "apartment rental receipt pdf",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show apartment rental receipt pdf",
+        "compare apartment rental receipt pdf"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt q1",
+      "normalized": "apartment rental receipt q1",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show apartment rental receipt q1",
+        "compare apartment rental receipt q1"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt q2",
+      "normalized": "apartment rental receipt q2",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show apartment rental receipt q2",
+        "compare apartment rental receipt q2"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt report",
+      "normalized": "apartment rental receipt report",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.83,
+      "examples": [
+        "show apartment rental receipt report",
+        "compare apartment rental receipt report"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt statement",
+      "normalized": "apartment rental receipt statement",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show apartment rental receipt statement",
+        "compare apartment rental receipt statement"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt summary",
+      "normalized": "apartment rental receipt summary",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show apartment rental receipt summary",
+        "compare apartment rental receipt summary"
+      ]
+    },
+    {
+      "phrase": "apartment rental receipt xlsx",
+      "normalized": "apartment rental receipt xlsx",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show apartment rental receipt xlsx",
+        "compare apartment rental receipt xlsx"
+      ]
+    },
+    {
+      "phrase": "approved apartment rental receipt",
+      "normalized": "approved apartment rental receipt",
+      "docTypeIds": [
+        "everyday_rental_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show approved apartment rental receipt",
+        "compare approved apartment rental receipt"
+      ]
+    },
+    {
+      "phrase": "approved bistro receipt",
+      "normalized": "approved bistro receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show approved bistro receipt",
+        "compare approved bistro receipt"
+      ]
+    },
+    {
+      "phrase": "approved bridge toll invoice",
+      "normalized": "approved bridge toll invoice",
+      "docTypeIds": [
+        "everyday_toll_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show approved bridge toll invoice",
+        "compare approved bridge toll invoice"
+      ]
+    },
+    {
+      "phrase": "approved broadband bill",
+      "normalized": "approved broadband bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show approved broadband bill",
+        "compare approved broadband bill"
+      ]
+    },
+    {
+      "phrase": "approved cab receipt",
+      "normalized": "approved cab receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.86,
+      "examples": [
+        "show approved cab receipt",
+        "compare approved cab receipt"
+      ]
+    },
+    {
+      "phrase": "approved cafe receipt",
+      "normalized": "approved cafe receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show approved cafe receipt",
+        "compare approved cafe receipt"
+      ]
+    },
+    {
+      "phrase": "approved carrier bill",
+      "normalized": "approved carrier bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.8,
+      "examples": [
+        "show approved carrier bill",
+        "compare approved carrier bill"
+      ]
+    },
+    {
+      "phrase": "approved cash memo",
+      "normalized": "approved cash memo",
+      "docTypeIds": [
+        "everyday_shopping_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.9,
+      "examples": [
+        "show approved cash memo",
+        "compare approved cash memo"
+      ]
+    },
+    {
+      "phrase": "approved cash payment receipt",
+      "normalized": "approved cash payment receipt",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show approved cash payment receipt",
+        "compare approved cash payment receipt"
+      ]
+    },
+    {
+      "phrase": "approved cash receipt",
+      "normalized": "approved cash receipt",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.89,
+      "examples": [
+        "show approved cash receipt",
+        "compare approved cash receipt"
+      ]
+    },
+    {
+      "phrase": "approved cash voucher",
+      "normalized": "approved cash voucher",
+      "docTypeIds": [
+        "everyday_cash_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show approved cash voucher",
+        "compare approved cash voucher"
+      ]
+    },
+    {
+      "phrase": "approved cell phone bill",
+      "normalized": "approved cell phone bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show approved cell phone bill",
+        "compare approved cell phone bill"
+      ]
+    },
+    {
+      "phrase": "approved cell plan bill",
+      "normalized": "approved cell plan bill",
+      "docTypeIds": [
+        "everyday_phone_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show approved cell plan bill",
+        "compare approved cell plan bill"
+      ]
+    },
+    {
+      "phrase": "approved dining receipt",
+      "normalized": "approved dining receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show approved dining receipt",
+        "compare approved dining receipt"
+      ]
+    },
+    {
+      "phrase": "approved e-ticket",
+      "normalized": "approved e-ticket",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "billing_period",
+        "entityHint": "consumer",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show approved e-ticket",
+        "compare approved e-ticket"
+      ]
+    },
+    {
+      "phrase": "approved eatery receipt",
+      "normalized": "approved eatery receipt",
+      "docTypeIds": [
+        "everyday_restaurant_receipt"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "email",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show approved eatery receipt",
+        "compare approved eatery receipt"
+      ]
+    },
+    {
+      "phrase": "approved electric company bill",
+      "normalized": "approved electric company bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.87,
+      "examples": [
+        "show approved electric company bill",
+        "compare approved electric company bill"
+      ]
+    },
+    {
+      "phrase": "approved electricity bill",
+      "normalized": "approved electricity bill",
+      "docTypeIds": [
+        "everyday_electricity_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.84,
+      "examples": [
+        "show approved electricity bill",
+        "compare approved electricity bill"
+      ]
+    },
+    {
+      "phrase": "approved energy gas bill",
+      "normalized": "approved energy gas bill",
+      "docTypeIds": [
+        "everyday_gas_bill"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show approved energy gas bill",
+        "compare approved energy gas bill"
+      ]
+    },
+    {
+      "phrase": "approved event ticket receipt",
+      "normalized": "approved event ticket receipt",
+      "docTypeIds": [
+        "everyday_ticket_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "sms",
+        "languageHint": "en"
+      },
+      "confidence": 0.82,
+      "examples": [
+        "show approved event ticket receipt",
+        "compare approved event ticket receipt"
+      ]
+    },
+    {
+      "phrase": "approved fare receipt",
+      "normalized": "approved fare receipt",
+      "docTypeIds": [
+        "everyday_transport_receipt"
+      ],
+      "hints": {
+        "periodHint": "monthly",
+        "entityHint": "merchant",
+        "formatHint": "receipt",
+        "languageHint": "en"
+      },
+      "confidence": 0.79,
+      "examples": [
+        "show approved fare receipt",
+        "compare approved fare receipt"
+      ]
+    },
+    {
+      "phrase": "approved fiber bill",
+      "normalized": "approved fiber bill",
+      "docTypeIds": [
+        "everyday_internet_bill"
+      ],
+      "hints": {
+        "periodHint": "receipt_period",
+        "entityHint": "payer",
+        "formatHint": "pdf",
+        "languageHint": "en"
+      },
+      "confidence": 0.88,
+      "examples": [
+        "show approved fiber bill",
+        "compare approved fiber bill"
+      ]
+    },
+    {
+      "phrase": "approved food receipt",
+      "normalized": "approved food receipt",
+      "docTypeIds": [
+        "everyday_grocery_receipt"
+      ],
+      "hints": {
+        "periodHint": "travel_period",
+        "entityHint": "account_owner",
+        "formatHint": "invoice",
+        "languageHint": "en"
+      },
+      "confidence": 0.85,
+      "examples": [
+        "show approved food receipt",
+        "compare approved food receipt"
+      ]
+    },
+    {
+      "phrase": "approved fuel purchase receipt",
+      "normalized": "approved fuel purchase receipt",
+      "docTypeIds": [
+        "everyday_gas_station_receipt"
+      ],
+      "hints": {
+        "periodHint": "due_period",
+        "entityHint": "service_provider",
+        "formatHint": "ticket",
+        "languageHint": "en"
+      },
+      "confidence": 0.81,
+      "examples": [
+        "show approved fuel purchase receipt",
+        "compare approved fuel purchase receipt"
+      ]
+    }
+  ]
+}

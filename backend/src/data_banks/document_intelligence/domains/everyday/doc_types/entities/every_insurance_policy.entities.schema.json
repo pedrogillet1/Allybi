@@ -1,0 +1,253 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_insurance_policy",
+    "version": "1.0.0",
+    "description": "Entity schema for every_insurance_policy.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_insurance_policy"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "policy_number",
+      "type": "string",
+      "required": true,
+      "description": "Insurance policy number.",
+      "section": "policy_holder",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["policy", "policy number", "apolice", "apolice numero"],
+        "disallowInference": true,
+        "preferredSources": ["header", "policy_holder"]
+      }
+    },
+    {
+      "id": "policy_type",
+      "type": "string",
+      "required": true,
+      "description": "Policy type.",
+      "section": "coverage_details",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["policy type", "coverage type", "seguro", "tipo"],
+        "disallowInference": false,
+        "preferredSources": ["coverage_details"]
+      }
+    },
+    {
+      "id": "insurer_name",
+      "type": "string",
+      "required": true,
+      "description": "Insurance carrier name.",
+      "section": "header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["insurer", "seguradora", "company"],
+        "disallowInference": true,
+        "preferredSources": ["header", "policy_holder"]
+      }
+    },
+    {
+      "id": "insurer_tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Insurer tax id.",
+      "section": "header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["insurer id", "cnpj", "tax id"],
+        "disallowInference": true,
+        "preferredSources": ["header"]
+      }
+    },
+    {
+      "id": "policy_holder_name",
+      "type": "string",
+      "required": true,
+      "description": "Policyholder name.",
+      "section": "policy_holder",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["holder", "tomador", "policy holder", "nome"],
+        "disallowInference": true,
+        "preferredSources": ["policy_holder"]
+      }
+    },
+    {
+      "id": "insured_name",
+      "type": "string",
+      "required": false,
+      "description": "Insured person or entity.",
+      "section": "policy_holder",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["insured", "segurado", "insured person", "beneficiary"],
+        "disallowInference": true,
+        "preferredSources": ["policy_holder"]
+      }
+    },
+    {
+      "id": "beneficiary_name",
+      "type": "string",
+      "required": false,
+      "description": "Named beneficiary.",
+      "section": "policy_holder",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["beneficiary", "beneficiario", "benefit name"],
+        "disallowInference": true,
+        "preferredSources": ["policy_holder"]
+      }
+    },
+    {
+      "id": "coverage_start_date",
+      "type": "date",
+      "required": true,
+      "description": "Coverage start date.",
+      "section": "coverage_details",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["effective", "start date", "inicio", "vigencia inicio"],
+        "disallowInference": true,
+        "preferredSources": ["coverage_details"]
+      }
+    },
+    {
+      "id": "coverage_end_date",
+      "type": "date",
+      "required": true,
+      "description": "Coverage end date.",
+      "section": "coverage_details",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["end date", "expiration", "fim", "vigencia fim"],
+        "disallowInference": true,
+        "preferredSources": ["coverage_details"]
+      }
+    },
+    {
+      "id": "coverage_limit",
+      "type": "currency",
+      "required": true,
+      "description": "Coverage limit.",
+      "section": "coverage_details",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["coverage limit", "soma segurada", "limite"],
+        "disallowInference": true,
+        "preferredSources": ["coverage_details", "benefits_or_addons"]
+      }
+    },
+    {
+      "id": "deductible",
+      "type": "currency",
+      "required": false,
+      "description": "Deductible amount.",
+      "section": "coverage_details",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["deductible", "franquia", "deductible"],
+        "disallowInference": true,
+        "preferredSources": ["coverage_details"]
+      }
+    },
+    {
+      "id": "premium_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Scheduled premium amount.",
+      "section": "premium_schedule",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["premium", "premio", "valor do premio"],
+        "disallowInference": true,
+        "preferredSources": ["premium_schedule"]
+      }
+    },
+    {
+      "id": "premium_frequency",
+      "type": "enum",
+      "values": ["monthly", "quarterly", "semiannual", "annual", "one_time", "unknown"],
+      "required": false,
+      "description": "Premium payment frequency.",
+      "section": "premium_schedule",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["monthly", "anual", "quarterly", "semestral", "frequency"],
+        "disallowInference": false,
+        "preferredSources": ["premium_schedule"]
+      }
+    },
+    {
+      "id": "policy_status",
+      "type": "enum",
+      "values": ["active", "lapsed", "pending", "cancelled", "expired", "unknown"],
+      "required": true,
+      "description": "Current policy status.",
+      "section": "renewal_terms",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["status", "active", "cancelled", "vencida", "cancelada"],
+        "disallowInference": false,
+        "preferredSources": ["renewal_terms"]
+      }
+    },
+    {
+      "id": "next_renewal_date",
+      "type": "date",
+      "required": false,
+      "description": "Next renewal date if listed.",
+      "section": "renewal_terms",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["renewal", "renovacao", "next renewal", "revisao"],
+        "disallowInference": true,
+        "preferredSources": ["renewal_terms"]
+      }
+    },
+    {
+      "id": "benefit_notes",
+      "type": "string",
+      "required": false,
+      "description": "Key benefit notes and summaries.",
+      "section": "benefits_or_addons",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["benefits", "coverage", "addons", "extras"],
+        "disallowInference": false,
+        "preferredSources": ["benefits_or_addons"]
+      }
+    },
+    {
+      "id": "exclusions_summary",
+      "type": "string",
+      "required": false,
+      "description": "Key exclusions summary.",
+      "section": "exclusions",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["exclusions", "not covered", "excluido"],
+        "disallowInference": false,
+        "preferredSources": ["exclusions"]
+      }
+    },
+    {
+      "id": "claim_reference",
+      "type": "string",
+      "required": false,
+      "description": "Most recent claim identifier if present.",
+      "section": "claim_reference",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["claim", "sinistro", "claim id"],
+        "disallowInference": true,
+        "preferredSources": ["claim_reference"]
+      }
+    }
+  ]
+}

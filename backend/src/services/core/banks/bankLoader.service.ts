@@ -23,8 +23,19 @@ import {
   DataBankLoaderOptions,
   DataBankError,
 } from "./dataBankLoader.service";
+import { getBankTierPolicyInstance } from "./bankTierPolicy.service";
+import {
+  getBankLoadPlannerInstance,
+  type BankLoadPlanResult,
+} from "./bankLoadPlanner.service";
 
 type EnvName = "production" | "staging" | "dev" | "local";
+
+function normalizeEnv(value: string): EnvName {
+  if (value === "development") return "dev";
+  if (value === "test") return "dev";
+  return (value as EnvName) || "local";
+}
 
 export interface BankLoaderLogger {
   info: (msg: string, meta?: Record<string, unknown>) => void;
@@ -78,6 +89,7 @@ export interface BankLoaderHealth {
   env: EnvName;
   loadedCount: number;
   loadedIdsSample: string[];
+  tierCounts?: Record<string, number>;
   missingCritical?: string[];
   lastLoadedAt?: string;
   lastReloadAt?: string;
@@ -128,7 +140,12 @@ export class BankLoaderService {
     this.loader = new DataBankLoaderService(loaderOpts);
 
     try {
-      await this.loader.loadAll();
+      const lazyBootEnabled = process.env.BANK_LAZY_BOOT_ENABLED === "true";
+      if (lazyBootEnabled) {
+        await this.loader.preloadUniversalBanks();
+      } else {
+        await this.loader.loadAll();
+      }
       this.lastLoadedAt = new Date().toISOString();
       this.lastError = null;
       logger.info("BankLoader initialized", {
@@ -137,6 +154,7 @@ export class BankLoaderService {
         validateSchemas,
         rootDir: opts.rootDir,
         loadedCount: this.loader.listLoadedIds().length,
+        lazyBootEnabled,
       });
     } catch (err: unknown) {
       const errRecord = err as Record<string, unknown> | null;
@@ -244,6 +262,28 @@ export class BankLoaderService {
     return this.loader!.listLoadedIds();
   }
 
+  async ensureBanksLoaded(bankIds: string[]): Promise<{
+    loadedBankIds: string[];
+    missingBankIds: string[];
+  }> {
+    this.assertReady();
+    return this.loader!.loadByIds(bankIds);
+  }
+
+  planBankLoad(bankIds: string[]): BankLoadPlanResult {
+    this.assertReady();
+    return getBankLoadPlannerInstance().plan({ rootBankIds: bankIds });
+  }
+
+  getBankUsageStats(): {
+    usageCounts: Record<string, number>;
+    loadDurationsMs: Record<string, number>;
+    loadP95Ms: Record<string, number>;
+  } {
+    this.assertReady();
+    return this.loader!.getBankUsageStats();
+  }
+
   /**
    * Get registry metadata for a bank (if registry is loaded).
    */
@@ -265,18 +305,24 @@ export class BankLoaderService {
     const critical = [
       "bank_registry",
       "ui_contracts",
-      "fallback_policy",
       "clarification_policy",
       "retrieval_ranker_config",
       "semantic_search_config",
     ];
     const missingCritical = critical.filter((id) => !loadedIds.includes(id));
+    const tierPolicy = getBankTierPolicyInstance();
+    const tierCounts: Record<string, number> = { hot: 0, warm: 0, cold: 0 };
+    for (const bankId of loadedIds) {
+      const tier = tierPolicy.decide(bankId).tier;
+      tierCounts[tier] = (tierCounts[tier] || 0) + 1;
+    }
 
     return {
       ok: ok && missingCritical.length === 0,
       env,
       loadedCount: loadedIds.length,
       loadedIdsSample: loadedIds.slice(0, 20),
+      tierCounts,
       missingCritical: missingCritical.length ? missingCritical : undefined,
       lastLoadedAt: this.lastLoadedAt ?? undefined,
       lastReloadAt: this.lastReloadAt ?? undefined,
@@ -339,8 +385,7 @@ export async function initializeBanks(
   const instance = getBankLoaderInstance();
 
   const env = (process.env.NODE_ENV || "local") as EnvName;
-  const resolvedEnv = (opts?.env ??
-    ((env as string) === "development" ? "dev" : env)) as EnvName;
+  const resolvedEnv = (opts?.env ?? normalizeEnv(env)) as EnvName;
   const strictEnv = resolvedEnv === "production" || resolvedEnv === "staging";
   const fullOpts: BankLoaderInitOptions = {
     env: resolvedEnv,
@@ -394,6 +439,25 @@ export function hasBank(bankId: string): boolean {
  */
 export function listLoadedBanks(): string[] {
   return getBankLoaderInstance().listLoaded();
+}
+
+export async function ensureBanksLoaded(bankIds: string[]): Promise<{
+  loadedBankIds: string[];
+  missingBankIds: string[];
+}> {
+  return getBankLoaderInstance().ensureBanksLoaded(bankIds);
+}
+
+export function planBankLoad(bankIds: string[]): BankLoadPlanResult {
+  return getBankLoaderInstance().planBankLoad(bankIds);
+}
+
+export function getBankUsageStats(): {
+  usageCounts: Record<string, number>;
+  loadDurationsMs: Record<string, number>;
+  loadP95Ms: Record<string, number>;
+} {
+  return getBankLoaderInstance().getBankUsageStats();
 }
 
 /**

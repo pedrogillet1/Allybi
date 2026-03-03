@@ -2,11 +2,11 @@
   "_meta": {
     "id": "medical_med_radiology_report_tables",
     "version": "2.0.0",
-    "description": "Expected table signatures for Radiology Report.",
+    "description": "Expected table signatures for radiology reports with modality context and findings/impression cells.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,492 +15,355 @@
   },
   "tables": [
     {
-      "id": "med_radiology_report_vitals_trend_table",
+      "id": "med_radiology_report_study_metadata",
       "name": {
-        "en": "Radiology Report Vitals Trend Table",
-        "pt": "Laudo de Radiologia Vitals Trend Table"
+        "en": "Study Metadata Table",
+        "pt": "Metadados do Estudo"
       },
-      "section": "document_header",
+      "section": "study_information",
       "expectedColumns": [
-        "timestamp",
-        "heart_rate_bpm",
-        "bp_mmHg",
-        "temp_c",
-        "spo2_percent"
+        "accession",
+        "modality",
+        "body_part",
+        "technique",
+        "contrast",
+        "study_date"
       ],
       "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
+        "modality",
+        "body_part",
+        "contrast"
       ],
       "headerSynonyms": {
-        "timestamp": [
-          "timestamp",
-          "timestamp",
-          "timestamp_value"
+        "accession": [
+          "accession",
+          "study id",
+          "exam id"
         ],
-        "heart_rate_bpm": [
-          "heart_rate_bpm",
-          "heart rate bpm",
-          "heart_rate_bpm_value"
+        "modality": [
+          "modality",
+          "exam type",
+          "modality"
         ],
-        "bp_mmHg": [
-          "bp_mmHg",
-          "bp mmHg",
-          "bp_mmHg_value"
+        "body_part": [
+          "body part",
+          "region",
+          "anatomic part"
         ],
-        "temp_c": [
-          "temp_c",
-          "temp c",
-          "temp_c_value"
+        "technique": [
+          "technique",
+          "protocol"
         ],
-        "spo2_percent": [
-          "spo2_percent",
-          "spo2 percent",
-          "spo2_percent_value"
+        "contrast": [
+          "contrast",
+          "contrast used",
+          "iood"
+        ],
+        "study_date": [
+          "study date",
+          "date"
         ]
       },
       "unitsRules": [
         {
           "unitId": "unitless",
           "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": []
         }
       ],
       "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
+        "Use this table for modality/body part disambiguation before findings parsing."
       ]
     },
     {
-      "id": "med_radiology_report_lab_results_table",
+      "id": "med_radiology_report_findings_table",
       "name": {
-        "en": "Radiology Report Lab Results Table",
-        "pt": "Laudo de Radiologia Lab Results Table"
+        "en": "Findings Table",
+        "pt": "Tabela de Achados"
       },
-      "section": "patient_identification",
+      "section": "findings",
       "expectedColumns": [
-        "test_name",
-        "result_value",
-        "unit",
-        "reference_range",
-        "flag"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "test_name": [
-          "test_name",
-          "test name",
-          "test_name_value"
-        ],
-        "result_value": [
-          "result_value",
-          "result value",
-          "result_value_value"
-        ],
-        "unit": [
-          "unit",
-          "unit",
-          "unit_value"
-        ],
-        "reference_range": [
-          "reference_range",
-          "reference range",
-          "reference_range_value"
-        ],
-        "flag": [
-          "flag",
-          "flag",
-          "flag_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": []
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_radiology_report_medication_administration_table",
-      "name": {
-        "en": "Radiology Report Medication Administration Table",
-        "pt": "Laudo de Radiologia Medication Administration Table"
-      },
-      "section": "encounter_context",
-      "expectedColumns": [
-        "medication",
-        "dose",
-        "route",
-        "frequency",
-        "start_stop"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "medication": [
-          "medication",
-          "medication",
-          "medication_value"
-        ],
-        "dose": [
-          "dose",
-          "dose",
-          "dose_value"
-        ],
-        "route": [
-          "route",
-          "route",
-          "route_value"
-        ],
-        "frequency": [
-          "frequency",
-          "frequency",
-          "frequency_value"
-        ],
-        "start_stop": [
-          "start_stop",
-          "start stop",
-          "start_stop_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": []
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_radiology_report_allergy_and_reaction_table",
-      "name": {
-        "en": "Radiology Report Allergy And Reaction Table",
-        "pt": "Laudo de Radiologia Allergy And Reaction Table"
-      },
-      "section": "chief_complaint_reason",
-      "expectedColumns": [
-        "substance",
-        "reaction",
+        "location",
+        "finding",
         "severity",
-        "status",
-        "last_updated"
+        "measurement",
+        "comments"
       ],
       "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
+        "finding",
+        "lesion",
+        "mass"
       ],
       "headerSynonyms": {
-        "substance": [
-          "substance",
-          "substance",
-          "substance_value"
+        "location": [
+          "location",
+          "site",
+          "localizacao"
         ],
-        "reaction": [
-          "reaction",
-          "reaction",
-          "reaction_value"
+        "finding": [
+          "finding",
+          "achievement",
+          "achado"
         ],
         "severity": [
           "severity",
-          "severity",
-          "severity_value"
+          "severity score",
+          "grade"
         ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
+        "measurement": [
+          "measurement",
+          "size",
+          "diameter"
         ],
-        "last_updated": [
-          "last_updated",
-          "last updated",
-          "last_updated_value"
+        "comments": [
+          "comments",
+          "comment",
+          "notes"
         ]
       },
       "unitsRules": [
         {
           "unitId": "unitless",
           "appliesToColumns": [
-            "status"
+            "location",
+            "finding",
+            "severity",
+            "comments"
           ]
         },
         {
-          "unitId": "day",
+          "unitId": "cm",
           "appliesToColumns": [
-            "last_updated"
+            "measurement"
+          ]
+        },
+        {
+          "unitId": "mm",
+          "appliesToColumns": [
+            "measurement"
           ]
         }
       ],
       "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
+        "Support table split across pages: keep row order and include continuation row markers for measurement units."
       ]
     },
     {
-      "id": "med_radiology_report_problem_list_table",
+      "id": "med_radiology_report_impression_table",
       "name": {
-        "en": "Radiology Report Problem List Table",
-        "pt": "Laudo de Radiologia Problem List Table"
+        "en": "Impression Table",
+        "pt": "Tabela de Conclusao"
       },
-      "section": "history_background",
+      "section": "impression",
       "expectedColumns": [
-        "problem",
-        "status",
-        "onset_date",
-        "resolution_date",
-        "note"
+        "impression_line",
+        "rank",
+        "evidence",
+        "recommendation",
+        "urgency"
       ],
       "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
+        "impression_line",
+        "recommendation"
       ],
       "headerSynonyms": {
-        "problem": [
-          "problem",
-          "problem",
-          "problem_value"
+        "impression_line": [
+          "impression",
+          "finding",
+          "conclusao"
         ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
-        ],
-        "onset_date": [
-          "onset_date",
-          "onset date",
-          "onset_date_value"
-        ],
-        "resolution_date": [
-          "resolution_date",
-          "resolution date",
-          "resolution_date_value"
-        ],
-        "note": [
-          "note",
-          "note",
-          "note_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": [
-            "status",
-            "note"
-          ]
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "onset_date",
-            "resolution_date"
-          ]
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_radiology_report_care_plan_goals_table",
-      "name": {
-        "en": "Radiology Report Care Plan Goals Table",
-        "pt": "Laudo de Radiologia Care Plan Goals Table"
-      },
-      "section": "objective_findings",
-      "expectedColumns": [
-        "goal",
-        "intervention",
-        "owner",
-        "target_date",
-        "status"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "goal": [
-          "goal",
-          "goal",
-          "goal_value"
-        ],
-        "intervention": [
-          "intervention",
-          "intervention",
-          "intervention_value"
-        ],
-        "owner": [
-          "owner",
-          "owner",
-          "owner_value"
-        ],
-        "target_date": [
-          "target_date",
-          "target date",
-          "target_date_value"
-        ],
-        "status": [
-          "status",
-          "status",
-          "status_value"
-        ]
-      },
-      "unitsRules": [
-        {
-          "unitId": "unitless",
-          "appliesToColumns": [
-            "status"
-          ]
-        },
-        {
-          "unitId": "day",
-          "appliesToColumns": [
-            "target_date"
-          ]
-        }
-      ],
-      "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
-      ]
-    },
-    {
-      "id": "med_radiology_report_followup_tasks_table",
-      "name": {
-        "en": "Radiology Report Followup Tasks Table",
-        "pt": "Laudo de Radiologia Followup Tasks Table"
-      },
-      "section": "vitals_and_measurements",
-      "expectedColumns": [
-        "task",
-        "responsible_party",
-        "due_window",
-        "priority",
-        "completion"
-      ],
-      "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
-      ],
-      "headerSynonyms": {
-        "task": [
-          "task",
-          "task",
-          "task_value"
-        ],
-        "responsible_party": [
-          "responsible_party",
-          "responsible party",
-          "responsible_party_value"
-        ],
-        "due_window": [
-          "due_window",
-          "due window",
-          "due_window_value"
-        ],
-        "priority": [
+        "rank": [
           "priority",
-          "priority",
-          "priority_value"
+          "rank"
         ],
-        "completion": [
-          "completion",
-          "completion",
-          "completion_value"
+        "evidence": [
+          "evidence",
+          "supporting"
+        ],
+        "recommendation": [
+          "recommendation",
+          "follow-up"
+        ],
+        "urgency": [
+          "urgency",
+          "critical",
+          "timeframe"
         ]
       },
       "unitsRules": [
         {
           "unitId": "unitless",
-          "appliesToColumns": []
-        },
-        {
-          "unitId": "day",
           "appliesToColumns": [
-            "due_window"
+            "impression_line",
+            "evidence",
+            "recommendation",
+            "urgency",
+            "rank"
           ]
         }
       ],
       "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
+        "If impression is a prose block, map it into single-row impression_line."
       ]
     },
     {
-      "id": "med_radiology_report_document_signoff_table",
+      "id": "med_radiology_report_measurements",
       "name": {
-        "en": "Radiology Report Document Signoff Table",
-        "pt": "Laudo de Radiologia Document Signoff Table"
+        "en": "Imaging Measurements Table",
+        "pt": "Medidas de Imagem"
       },
-      "section": "labs_imaging",
+      "section": "measurements",
       "expectedColumns": [
-        "clinician",
-        "role",
-        "timestamp",
-        "location",
-        "method"
+        "target",
+        "dimension_a",
+        "dimension_b",
+        "unit",
+        "comment"
       ],
       "keyRows": [
-        "baseline",
-        "abnormal",
-        "latest"
+        "target",
+        "dimension_a"
       ],
       "headerSynonyms": {
-        "clinician": [
-          "clinician",
-          "clinician",
-          "clinician_value"
+        "target": [
+          "target",
+          "lesion",
+          "estrutura"
         ],
-        "role": [
-          "role",
-          "role",
-          "role_value"
+        "dimension_a": [
+          "size a",
+          "measurement a",
+          "largura"
         ],
-        "timestamp": [
-          "timestamp",
-          "timestamp",
-          "timestamp_value"
+        "dimension_b": [
+          "size b",
+          "measurement b",
+          "altura"
         ],
-        "location": [
-          "location",
-          "location",
-          "location_value"
+        "unit": [
+          "unit",
+          "unidade"
         ],
-        "method": [
-          "method",
-          "method",
-          "method_value"
+        "comment": [
+          "comment",
+          "notes"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "mm",
+          "appliesToColumns": [
+            "dimension_a",
+            "dimension_b"
+          ]
+        },
+        {
+          "unitId": "cm",
+          "appliesToColumns": [
+            "dimension_a",
+            "dimension_b"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "Join measurement rows across page breaks with same target identity."
+      ]
+    },
+    {
+      "id": "med_radiology_report_recommendations",
+      "name": {
+        "en": "Follow-up Recommendations Table",
+        "pt": "Tabela de Recomendacoes"
+      },
+      "section": "recommendations",
+      "expectedColumns": [
+        "timeframe",
+        "action",
+        "ordering_provider",
+        "followup_modality",
+        "notes"
+      ],
+      "keyRows": [
+        "followup",
+        "repeat imaging"
+      ],
+      "headerSynonyms": {
+        "timeframe": [
+          "timeframe",
+          "within",
+          "when"
+        ],
+        "action": [
+          "action",
+          "recommend",
+          "recommendation"
+        ],
+        "ordering_provider": [
+          "provider",
+          "responsible"
+        ],
+        "followup_modality": [
+          "modality",
+          "exam type"
+        ],
+        "notes": [
+          "notes",
+          "comment"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "timeframe",
+            "action",
+            "ordering_provider",
+            "followup_modality",
+            "notes"
+          ]
+        }
+      ],
+      "extractionNotes": [
+        "Detect embedded follow-up recommendations outside table via section-level prose and merge."
+      ]
+    },
+    {
+      "id": "med_radiology_report_images_metadata",
+      "name": {
+        "en": "Image Metadata",
+        "pt": "Metadados de Imagem"
+      },
+      "section": "study_information",
+      "expectedColumns": [
+        "image_quality",
+        "motion_artifact",
+        "dose",
+        "comparison_available",
+        "comparison_ref"
+      ],
+      "keyRows": [
+        "image_quality",
+        "motion_artifact"
+      ],
+      "headerSynonyms": {
+        "image_quality": [
+          "image quality",
+          "quality"
+        ],
+        "motion_artifact": [
+          "motion",
+          "artifact"
+        ],
+        "dose": [
+          "dose",
+          "dose index"
+        ],
+        "comparison_available": [
+          "comparison available",
+          "prior study"
+        ],
+        "comparison_ref": [
+          "comparison reference",
+          "comparison id"
         ]
       },
       "unitsRules": [
@@ -509,13 +372,14 @@
           "appliesToColumns": []
         },
         {
-          "unitId": "day",
-          "appliesToColumns": []
+          "unitId": "mGy",
+          "appliesToColumns": [
+            "dose"
+          ]
         }
       ],
       "extractionNotes": [
-        "preserve original unit cells",
-        "preserve reference range text when present"
+        "Capture image quality notes for report reliability and mention when exam is limited."
       ]
     }
   ]

@@ -1,10 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_answer_style_bank",
-    "version": "1.0.0",
-    "description": "Answer styling rules for finance domain — tone, depth, audience adaptation.",
-    "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "version": "2.1.0",
+    "description": "Finance answer style bank for analyst-grade response behavior.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -12,14 +14,58 @@
   },
   "domain": "finance",
   "audienceProfiles": [
-    { "id": "executive", "tone": "concise", "defaultDepth": "executive_brief", "numberFormatting": "rounded_with_units", "jargonLevel": "high" },
-    { "id": "analyst", "tone": "precise", "defaultDepth": "detailed", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
-    { "id": "auditor", "tone": "skeptical", "defaultDepth": "audit_trail", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
-    { "id": "board_member", "tone": "strategic", "defaultDepth": "summary", "numberFormatting": "rounded_with_units", "jargonLevel": "medium" },
-    { "id": "general", "tone": "explanatory", "defaultDepth": "paragraph", "numberFormatting": "rounded_with_units", "jargonLevel": "low" }
+    {
+      "id": "cfo",
+      "tone": "formal",
+      "defaultDepth": "detailed",
+      "numberFormatting": "absolute_exact",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "analyst",
+      "tone": "precise",
+      "defaultDepth": "detailed",
+      "numberFormatting": "absolute_exact",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "investor",
+      "tone": "concise",
+      "defaultDepth": "decision_oriented",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "board",
+      "tone": "strategic",
+      "defaultDepth": "executive",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "auditor",
+      "tone": "skeptical",
+      "defaultDepth": "audit_trail",
+      "numberFormatting": "exact_with_decimals",
+      "jargonLevel": "high"
+    },
+    {
+      "id": "finance_ops",
+      "tone": "actionable",
+      "defaultDepth": "operational",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "medium"
+    },
+    {
+      "id": "general",
+      "tone": "explanatory",
+      "defaultDepth": "paragraph",
+      "numberFormatting": "rounded_with_units",
+      "jargonLevel": "low"
+    }
   ],
   "depthLadder": [
-    "executive_brief",
+    "executive",
     "summary",
     "paragraph",
     "detailed",
@@ -28,39 +74,895 @@
   ],
   "styleRules": [
     {
-      "id": "fin_style_001_currency",
-      "rule": "Always include currency symbol and units (e.g., $1.2M, R$500K). Never present bare numbers for monetary values.",
-      "applies": ["extract", "calculate", "compare", "summarize"]
+      "id": "fin_style_001",
+      "rule": "For numeric outputs in query class 1, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_1"
     },
     {
-      "id": "fin_style_002_period_label",
-      "rule": "Always label the fiscal period (e.g., FY2025, Q3 2025, YTD). Never present financial data without period context.",
-      "applies": ["extract", "calculate", "compare", "monitor"]
+      "id": "fin_style_002",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 2.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_2"
     },
     {
-      "id": "fin_style_003_direction",
-      "rule": "For changes, always indicate direction and magnitude (e.g., 'increased 12% YoY', 'declined $3.2M QoQ').",
-      "applies": ["compare", "monitor", "summarize"]
+      "id": "fin_style_003",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (3).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_3"
     },
     {
-      "id": "fin_style_004_rounding",
-      "rule": "Round to appropriate precision: millions for revenue/assets >$10M, thousands for smaller items. Preserve cents only for per-share figures.",
-      "applies": ["extract", "calculate", "summarize"]
+      "id": "fin_style_004",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 4.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_4"
     },
     {
-      "id": "fin_style_005_negative_numbers",
-      "rule": "Use parentheses for losses/deficits per accounting convention: ($2.3M) not -$2.3M.",
-      "applies": ["extract", "calculate"]
+      "id": "fin_style_005",
+      "rule": "For numeric outputs in query class 5, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_5"
     },
     {
-      "id": "fin_style_006_uncertainty",
-      "rule": "For estimates, forecasts, or unaudited figures, prefix with qualifier: 'estimated', 'projected', 'unaudited'.",
-      "applies": ["advise", "evaluate", "summarize"]
+      "id": "fin_style_006",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 6.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_6"
     },
     {
-      "id": "fin_style_007_gaap_label",
-      "rule": "When presenting non-GAAP metrics (adjusted EBITDA, etc.), explicitly label as 'non-GAAP' and note the adjustment.",
-      "applies": ["extract", "calculate", "compare"]
+      "id": "fin_style_007",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (7).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_7"
+    },
+    {
+      "id": "fin_style_008",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 8.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_8"
+    },
+    {
+      "id": "fin_style_009",
+      "rule": "For numeric outputs in query class 9, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_9"
+    },
+    {
+      "id": "fin_style_010",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 10.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_10"
+    },
+    {
+      "id": "fin_style_011",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (11).",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_11"
+    },
+    {
+      "id": "fin_style_012",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 12.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_12"
+    },
+    {
+      "id": "fin_style_013",
+      "rule": "For numeric outputs in query class 13, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_13"
+    },
+    {
+      "id": "fin_style_014",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 14.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_14"
+    },
+    {
+      "id": "fin_style_015",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (15).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_15"
+    },
+    {
+      "id": "fin_style_016",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 16.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_16"
+    },
+    {
+      "id": "fin_style_017",
+      "rule": "For numeric outputs in query class 17, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_17"
+    },
+    {
+      "id": "fin_style_018",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 18.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_18"
+    },
+    {
+      "id": "fin_style_019",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (19).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_19"
+    },
+    {
+      "id": "fin_style_020",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 20.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_20"
+    },
+    {
+      "id": "fin_style_021",
+      "rule": "For numeric outputs in query class 21, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_21"
+    },
+    {
+      "id": "fin_style_022",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 22.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_22"
+    },
+    {
+      "id": "fin_style_023",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (23).",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_23"
+    },
+    {
+      "id": "fin_style_024",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 24.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_24"
+    },
+    {
+      "id": "fin_style_025",
+      "rule": "For numeric outputs in query class 25, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_25"
+    },
+    {
+      "id": "fin_style_026",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 26.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_26"
+    },
+    {
+      "id": "fin_style_027",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (27).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_27"
+    },
+    {
+      "id": "fin_style_028",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 28.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_28"
+    },
+    {
+      "id": "fin_style_029",
+      "rule": "For numeric outputs in query class 29, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_29"
+    },
+    {
+      "id": "fin_style_030",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 30.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_30"
+    },
+    {
+      "id": "fin_style_031",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (31).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_31"
+    },
+    {
+      "id": "fin_style_032",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 32.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_32"
+    },
+    {
+      "id": "fin_style_033",
+      "rule": "For numeric outputs in query class 33, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_33"
+    },
+    {
+      "id": "fin_style_034",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 34.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_34"
+    },
+    {
+      "id": "fin_style_035",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (35).",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_35"
+    },
+    {
+      "id": "fin_style_036",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 36.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_36"
+    },
+    {
+      "id": "fin_style_037",
+      "rule": "For numeric outputs in query class 37, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_37"
+    },
+    {
+      "id": "fin_style_038",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 38.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_38"
+    },
+    {
+      "id": "fin_style_039",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (39).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_39"
+    },
+    {
+      "id": "fin_style_040",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 40.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_40"
+    },
+    {
+      "id": "fin_style_041",
+      "rule": "For numeric outputs in query class 41, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_41"
+    },
+    {
+      "id": "fin_style_042",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 42.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_42"
+    },
+    {
+      "id": "fin_style_043",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (43).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_43"
+    },
+    {
+      "id": "fin_style_044",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 44.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_44"
+    },
+    {
+      "id": "fin_style_045",
+      "rule": "For numeric outputs in query class 45, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_45"
+    },
+    {
+      "id": "fin_style_046",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 46.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_46"
+    },
+    {
+      "id": "fin_style_047",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (47).",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_47"
+    },
+    {
+      "id": "fin_style_048",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 48.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_48"
+    },
+    {
+      "id": "fin_style_049",
+      "rule": "For numeric outputs in query class 49, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_49"
+    },
+    {
+      "id": "fin_style_050",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 50.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_50"
+    },
+    {
+      "id": "fin_style_051",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (51).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_51"
+    },
+    {
+      "id": "fin_style_052",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 52.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_52"
+    },
+    {
+      "id": "fin_style_053",
+      "rule": "For numeric outputs in query class 53, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_53"
+    },
+    {
+      "id": "fin_style_054",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 54.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_54"
+    },
+    {
+      "id": "fin_style_055",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (55).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_55"
+    },
+    {
+      "id": "fin_style_056",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 56.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_56"
+    },
+    {
+      "id": "fin_style_057",
+      "rule": "For numeric outputs in query class 57, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_57"
+    },
+    {
+      "id": "fin_style_058",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 58.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_58"
+    },
+    {
+      "id": "fin_style_059",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (59).",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_59"
+    },
+    {
+      "id": "fin_style_060",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 60.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_60"
+    },
+    {
+      "id": "fin_style_061",
+      "rule": "For numeric outputs in query class 61, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_61"
+    },
+    {
+      "id": "fin_style_062",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 62.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_62"
+    },
+    {
+      "id": "fin_style_063",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (63).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_63"
+    },
+    {
+      "id": "fin_style_064",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 64.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_64"
+    },
+    {
+      "id": "fin_style_065",
+      "rule": "For numeric outputs in query class 65, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_65"
+    },
+    {
+      "id": "fin_style_066",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 66.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_66"
+    },
+    {
+      "id": "fin_style_067",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (67).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_67"
+    },
+    {
+      "id": "fin_style_068",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 68.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_68"
+    },
+    {
+      "id": "fin_style_069",
+      "rule": "For numeric outputs in query class 69, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_69"
+    },
+    {
+      "id": "fin_style_070",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 70.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_70"
+    },
+    {
+      "id": "fin_style_071",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (71).",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_71"
+    },
+    {
+      "id": "fin_style_072",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 72.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_72"
+    },
+    {
+      "id": "fin_style_073",
+      "rule": "For numeric outputs in query class 73, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_73"
+    },
+    {
+      "id": "fin_style_074",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 74.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_74"
+    },
+    {
+      "id": "fin_style_075",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (75).",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_75"
+    },
+    {
+      "id": "fin_style_076",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 76.",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_76"
+    },
+    {
+      "id": "fin_style_077",
+      "rule": "For numeric outputs in query class 77, always report currency, unit, and period with one verification sentence.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_77"
+    },
+    {
+      "id": "fin_style_078",
+      "rule": "When discussing trend changes, provide both absolute and percentage deltas and cite source table/section context for 78.",
+      "applies": [
+        "extract",
+        "calculate",
+        "evaluate",
+        "summarize"
+      ],
+      "rationale": "finance_style_78"
+    },
+    {
+      "id": "fin_style_079",
+      "rule": "Use conservative wording for forward-looking outputs: stated as estimate when assumptions are present (79).",
+      "applies": [
+        "calculate",
+        "compare",
+        "summarize",
+        "monitor"
+      ],
+      "rationale": "finance_style_79"
+    },
+    {
+      "id": "fin_style_080",
+      "rule": "Keep sign conventions consistent: positive operating inflows, negative outflows, and explicit basis (GAAP/non-GAAP) when metric is 80.",
+      "applies": [
+        "extract",
+        "compare",
+        "evaluate",
+        "monitor"
+      ],
+      "rationale": "finance_style_80"
     }
-  ]
+  ],
+  "numberPolicy": {
+    "defaultLocale": "en",
+    "unitNormalization": "auto_currency_scale",
+    "decimalsByOperator": {
+      "extract": 2,
+      "calculate": 4,
+      "compare": 2,
+      "summarize": 2
+    },
+    "allowScientificNotation": false
+  }
 }

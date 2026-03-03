@@ -3,9 +3,19 @@
     "id": "editing_agent_policy",
     "version": "1.0.0",
     "description": "Routing and safety policy for domain-specific editing agents.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-02-27",
-    "owner": "koda-policies"
+    "owner": "koda-policies",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -15,13 +25,22 @@
       "docx": "edit_agent_docx",
       "sheets": "edit_agent_sheets"
     },
-    "fallbackForDomains": ["slides", "unknown"]
+    "fallbackForDomains": [
+      "slides",
+      "unknown"
+    ]
   },
   "rules": [
     {
       "id": "route_docx_to_docx_agent",
       "when": {
-        "all": [{ "path": "domain", "op": "eq", "value": "docx" }]
+        "all": [
+          {
+            "path": "domain",
+            "op": "eq",
+            "value": "docx"
+          }
+        ]
       },
       "then": {
         "agentId": "edit_agent_docx"
@@ -30,7 +49,13 @@
     {
       "id": "route_sheets_to_sheets_agent",
       "when": {
-        "all": [{ "path": "domain", "op": "eq", "value": "sheets" }]
+        "all": [
+          {
+            "path": "domain",
+            "op": "eq",
+            "value": "sheets"
+          }
+        ]
       },
       "then": {
         "agentId": "edit_agent_sheets"
@@ -38,10 +63,25 @@
     },
     {
       "id": "fallback_to_default_agent",
-      "when": { "any": true },
+      "when": {
+        "any": true
+      },
       "then": {
         "agentId": "edit_agent_default"
       }
     }
-  ]
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "EAP_T_001",
+        "runtime": {
+          "domain": "docx"
+        },
+        "expect": {
+          "agentId": "edit_agent_docx"
+        }
+      }
+    ]
+  }
 }

@@ -1,10 +1,10 @@
 {
   "_meta": {
-    "id": "di_accounting_answer_style_bank",
-    "version": "1.0.0",
-    "description": "Answer styling rules for accounting domain — tone, depth, audience adaptation.",
+    "id": "di_accounting_answer_style_bank_v2",
+    "version": "2.0.0",
+    "description": "Answer style policy for accounting domain with strict numeric and reconciliation-aware phrasing.",
     "languages": ["any"],
-    "lastUpdated": "2026-02-27"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -12,11 +12,11 @@
   },
   "domain": "accounting",
   "audienceProfiles": [
-    { "id": "accountant", "tone": "precise", "defaultDepth": "detailed", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
     { "id": "auditor", "tone": "skeptical", "defaultDepth": "audit_trail", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
     { "id": "controller", "tone": "analytical", "defaultDepth": "detailed", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
+    { "id": "accountant", "tone": "precise", "defaultDepth": "detailed", "numberFormatting": "exact_with_decimals", "jargonLevel": "high" },
     { "id": "manager", "tone": "explanatory", "defaultDepth": "summary", "numberFormatting": "rounded_with_units", "jargonLevel": "medium" },
-    { "id": "general", "tone": "explanatory", "defaultDepth": "paragraph", "numberFormatting": "rounded_with_units", "jargonLevel": "low" }
+    { "id": "general", "tone": "plain", "defaultDepth": "paragraph", "numberFormatting": "rounded_with_units", "jargonLevel": "low" }
   ],
   "depthLadder": [
     "executive_brief",
@@ -27,40 +27,17 @@
     "audit_trail"
   ],
   "styleRules": [
-    {
-      "id": "acct_style_001_account_ref",
-      "rule": "Always include GL account number when referencing an account (e.g., 'Cash (1010)', 'Accounts Receivable (1200)').",
-      "applies": ["extract", "locate", "calculate"]
-    },
-    {
-      "id": "acct_style_002_debit_credit",
-      "rule": "Present journal entries in standard debit/credit format. Debits listed first, then credits indented.",
-      "applies": ["extract", "locate"]
-    },
-    {
-      "id": "acct_style_003_exact_decimals",
-      "rule": "Use exact decimals (2 decimal places) for all monetary values. Accounting requires precision to the cent.",
-      "applies": ["extract", "calculate", "compare"]
-    },
-    {
-      "id": "acct_style_004_date_format",
-      "rule": "Include posting date or period for every transaction reference. Format: YYYY-MM-DD or period label (e.g., 'Jan 2026').",
-      "applies": ["extract", "locate", "validate"]
-    },
-    {
-      "id": "acct_style_005_balance_direction",
-      "rule": "State whether an account has a debit or credit normal balance when presenting balances.",
-      "applies": ["extract", "validate"]
-    },
-    {
-      "id": "acct_style_006_reconciliation_format",
-      "rule": "Present reconciliations in standard format: Book Balance → +/- Adjustments → Adjusted Balance = Bank/External Balance.",
-      "applies": ["validate", "compare"]
-    },
-    {
-      "id": "acct_style_007_aging_buckets",
-      "rule": "Present aging in standard buckets: Current, 1-30, 31-60, 61-90, 90+ days. Include totals.",
-      "applies": ["extract", "monitor"]
-    }
+    { "id": "acct_style_001_ref", "rule": "Always include source table header and period for every numeric value; include units (currency/time/units) explicitly.", "applies": ["extract", "calculate", "compare", "validate"] },
+    { "id": "acct_style_002_account_ref", "rule": "State account both by name and code on first mention, e.g., Cash (1010) or Caixa (1010).", "applies": ["extract", "locate", "calculate"] },
+    { "id": "acct_style_003_dr_cr", "rule": "Render accounting movements in debit/credit convention used by source; if ambiguous, state assumption and flag uncertainty.", "applies": ["extract", "locate", "validate", "evaluate"] },
+    { "id": "acct_style_004_dates", "rule": "For every balance or movement, include posting period (date or month-end).", "applies": ["extract", "locate", "validate"] },
+    { "id": "acct_style_005_reconciliation", "rule": "Report reconciliation as Book Balance +/- Adjustments = Adjusted Balance, with both bank/external and book subtotals.", "applies": ["validate", "compare", "evaluate"] },
+    { "id": "acct_style_006_aging", "rule": "Aging outputs must include all buckets and a total; if 90+ exceeds threshold, call out concentration with top counterparty names.", "applies": ["extract", "monitor", "evaluate"] },
+    { "id": "acct_style_007_decimals", "rule": "Use locale-aware decimal separators and thousands formatting according to query language.", "applies": ["extract", "calculate", "compare"] },
+    { "id": "acct_style_008_authority", "rule": "For journal entries include approval status and authorizer when available.", "applies": ["extract", "validate", "evaluate"] },
+    { "id": "acct_style_009_controls", "rule": "Control opinions should use evidence language only (effective/partially effective/not effective) with test basis.", "applies": ["evaluate", "validate"] },
+    { "id": "acct_style_010_variance", "rule": "Variance statements must show both absolute change and percentage change, with period comparison context.", "applies": ["compare", "calculate", "monitor"] },
+    { "id": "acct_style_011_conflict", "rule": "If source tables conflict, present both figures with precedence and rationale for selected baseline.", "applies": ["evaluate", "validate", "extract"] },
+    { "id": "acct_style_012_pt_br", "rule": "In Portuguese, prefer accounting terms: balancete, razão, reconciliação, competência, caixa; map to English in parentheses if needed.", "applies": ["extract", "summarize"] }
   ]
 }

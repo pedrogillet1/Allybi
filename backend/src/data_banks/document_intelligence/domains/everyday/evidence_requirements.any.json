@@ -1,0 +1,170 @@
+{
+  "_meta": {
+    "id": "di_everyday_evidence_requirements",
+    "version": "1.0.0",
+    "description": "Evidence policies for everyday documents with explicit numeric validation requirements.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "minCitationsPerClaim": 1,
+    "maxClaimsWithoutEvidence": 0
+  },
+  "domain": "everyday",
+  "evidenceHierarchy": [
+    {
+      "rank": 1,
+      "type": "document_header",
+      "label": {
+        "en": "Document header",
+        "pt": "Cabecalho do documento"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 2,
+      "type": "section_block",
+      "label": {
+        "en": "Section block",
+        "pt": "Secao do documento"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 3,
+      "type": "line_item_table",
+      "label": {
+        "en": "Line item or transaction table",
+        "pt": "Tabela de itens"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 4,
+      "type": "totals_or_balance_table",
+      "label": {
+        "en": "Totals/balance table",
+        "pt": "Tabela de totais"
+      },
+      "trustLevel": "high"
+    },
+    {
+      "rank": 5,
+      "type": "period_block",
+      "label": {
+        "en": "Period block",
+        "pt": "Periodo"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 6,
+      "type": "unit_scale_block",
+      "label": {
+        "en": "Unit and scale block",
+        "pt": "Bloco de unidade e escala"
+      },
+      "trustLevel": "medium"
+    },
+    {
+      "rank": 7,
+      "type": "footnote_or_notice",
+      "label": {
+        "en": "Footnote/notice",
+        "pt": "Rodape/aviso"
+      },
+      "trustLevel": "low"
+    }
+  ],
+  "rules": [
+    {
+      "id": "every_ev_001_key_identity",
+      "description": "Identity fields should cite document header and identity section.",
+      "applies": [
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "document_header",
+        "section_block"
+      ]
+    },
+    {
+      "id": "every_ev_002_numeric_requires_unit_period_table",
+      "description": "Numeric answers must cite a table header context and period plus unit or scale from the same document.",
+      "applies": [
+        "extract",
+        "calculate",
+        "compare",
+        "validate"
+      ],
+      "minEvidence": 2,
+      "requiredTypes": [
+        "totals_or_balance_table",
+        "line_item_table",
+        "period_block",
+        "unit_scale_block"
+      ]
+    },
+    {
+      "id": "every_ev_003_due_date_numeric",
+      "description": "Due-date and deadline answers should cite period and payment sections.",
+      "applies": [
+        "extract",
+        "summarize",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "period_block",
+        "section_block"
+      ]
+    },
+    {
+      "id": "every_ev_004_claim_status_with_evidence",
+      "description": "Claims status responses require claim section and payment/settlement section support.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "minEvidence": 2,
+      "requiredTypes": [
+        "section_block",
+        "totals_or_balance_table"
+      ]
+    },
+    {
+      "id": "every_ev_005_policy_terms",
+      "description": "Policy terms and exclusions should cite explicit terms or coverage sections.",
+      "applies": [
+        "extract",
+        "summarize",
+        "evaluate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "section_block"
+      ]
+    },
+    {
+      "id": "every_ev_006_footnote_supported_numbers",
+      "description": "If totals are adjusted by footnotes, include footnote or notice citation.",
+      "applies": [
+        "calculate",
+        "extract",
+        "validate"
+      ],
+      "minEvidence": 1,
+      "requiredTypes": [
+        "footnote_or_notice",
+        "totals_or_balance_table"
+      ]
+    }
+  ]
+}

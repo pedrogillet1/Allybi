@@ -3,8 +3,19 @@
     "id": "llm_builder_policy",
     "version": "1.0.0",
     "description": "Central policy for LLM request-builder token floors and prompt payload caps.",
-    "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-03-02"
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
+    "lastUpdated": "2026-03-02",
+    "owner": "platform-llm",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -14,7 +25,11 @@
       "doc_grounded_quote": 700,
       "doc_grounded_table": 1000
     },
-    "styleClampModes": ["rank_disambiguate", "scoped_not_found", "refusal"],
+    "styleClampModes": [
+      "rank_disambiguate",
+      "scoped_not_found",
+      "refusal"
+    ],
     "payloadCaps": {
       "memoryCharsDefault": 4800,
       "memoryCharsDocGrounded": 6800,

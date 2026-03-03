@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_tax_return",
+    "version": "1.0.0",
+    "description": "Tables expected in every_tax_return.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_return"
+  },
+  "tableHeaderSynonyms": {
+    "amount": ["amount", "valor", "total", "value"],
+    "period": ["period", "fiscal year", "ano", "month"],
+    "code": ["code", "code number", "tipo", "item"],
+    "status": ["status", "state", "situation"],
+    "unit": ["unit", "scale", "unit of measure"]
+  },
+  "tables": [
+    {
+      "id": "tax_return_income_table",
+      "canonicalName": {
+        "en": "Income Table",
+        "pt": "Tabela de Rendimentos"
+      },
+      "section": "income_section",
+      "signaturePatterns": [
+        "\\bincome\\s+table\\b",
+        "\\bwages\\b",
+        "\\brendimentos"
+      ],
+      "requiredHeaders": ["code", "description", "amount", "unit"],
+      "headerAliases": [
+        ["code", "codigo", "item"],
+        ["description", "descricao", "title"],
+        ["amount", "valor", "value", "quantia"],
+        ["unit", "unidade", "moeda"]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": false,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["tax_return_note_001", "tax_return_note_002"],
+      "extractionNotes": "Use table headers to extract numeric income and deduction subtotals."
+    },
+    {
+      "id": "tax_return_deduction_table",
+      "canonicalName": {
+        "en": "Deduction Table",
+        "pt": "Tabela de Deducoes"
+      },
+      "section": "deductions",
+      "signaturePatterns": [
+        "\\bdeduction\\b",
+        "\\bdeducoes\\b"
+      ],
+      "requiredHeaders": ["code", "description", "amount", "unit"],
+      "headerAliases": [
+        ["code", "codigo", "class"],
+        ["description", "descricao", "rubro"],
+        ["amount", "valor", "amount"],
+        ["unit", "escala", "unidade"]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": false,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["tax_return_note_003"],
+      "extractionNotes": "Cross-check deductions against filing summary."
+    },
+    {
+      "id": "tax_return_summary_table",
+      "canonicalName": {
+        "en": "Tax Summary Table",
+        "pt": "Tabela de Resumo"
+      },
+      "section": "tax_summary",
+      "signaturePatterns": [
+        "\\btax\\s+summary\\b",
+        "\\bresumo\\s+imposto\\b"
+      ],
+      "requiredHeaders": ["metric", "value", "period", "unit"],
+      "headerAliases": [
+        ["metric", "item", "descricao"],
+        ["value", "valor", "amount"],
+        ["period", "periodo", "reference period"],
+        ["unit", "unidade", "moeda"]
+      ],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands", "millions"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_smallest_common_scale"
+      },
+      "footnotes": ["tax_return_note_004", "tax_return_note_005", "tax_return_note_006"],
+      "extractionNotes": "Numeric claims require this table plus period and currency context."
+    }
+  ]
+}

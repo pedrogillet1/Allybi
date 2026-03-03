@@ -1,0 +1,251 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_invoice",
+    "version": "1.0.0",
+    "description": "Entity schema for every_invoice.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_invoice"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "invoice_number",
+      "type": "string",
+      "required": true,
+      "description": "Invoice number.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["invoice", "number", "factura", "nota"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "invoice_series",
+      "type": "string",
+      "required": false,
+      "description": "Invoice series or batch.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["series", "serie", "batch"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "vendor_name",
+      "type": "string",
+      "required": true,
+      "description": "Invoice issuer.",
+      "section": "vendor_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["vendor", "supplier", "issuer", "emissor"],
+        "disallowInference": true,
+        "preferredSources": ["vendor_profile"]
+      }
+    },
+    {
+      "id": "vendor_tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Issuer tax identifier.",
+      "section": "vendor_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["cnpj", "cpf", "vendor id", "tax id"],
+        "disallowInference": true,
+        "preferredSources": ["vendor_profile"]
+      }
+    },
+    {
+      "id": "customer_name",
+      "type": "string",
+      "required": true,
+      "description": "Invoice recipient name.",
+      "section": "customer_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["customer", "client", "cliente", "bill to"],
+        "disallowInference": true,
+        "preferredSources": ["customer_profile"]
+      }
+    },
+    {
+      "id": "customer_tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Recipient tax id.",
+      "section": "customer_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["customer id", "client id", "cpf", "cnpj"],
+        "disallowInference": true,
+        "preferredSources": ["customer_profile"]
+      }
+    },
+    {
+      "id": "issue_date",
+      "type": "date",
+      "required": true,
+      "description": "Invoice issue date.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["issued", "issue date", "data emissao"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "due_date",
+      "type": "date",
+      "required": false,
+      "description": "Payment due date.",
+      "section": "payment_terms",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["due date", "due", "vencimento"],
+        "disallowInference": true,
+        "preferredSources": ["payment_terms"]
+      }
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Invoice currency code.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["currency", "moeda", "currency code"],
+        "disallowInference": false,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "line_item_count",
+      "type": "number",
+      "required": false,
+      "description": "Number of invoiced line items.",
+      "section": "line_items",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["items", "linha", "qtd", "linhas"],
+        "disallowInference": false,
+        "preferredSources": ["line_items"]
+      }
+    },
+    {
+      "id": "subtotal_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Invoice subtotal.",
+      "section": "subtotal_and_discounts",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["subtotal", "sub-total", "subtotal amount"],
+        "disallowInference": true,
+        "preferredSources": ["subtotal_and_discounts", "line_items"]
+      }
+    },
+    {
+      "id": "discount_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total invoice discount.",
+      "section": "subtotal_and_discounts",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["discount", "desconto", "abatimento"],
+        "disallowInference": true,
+        "preferredSources": ["subtotal_and_discounts"]
+      }
+    },
+    {
+      "id": "tax_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Total invoice tax.",
+      "section": "tax_summary",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["tax", "impostos", "vat", "icms", "iss"],
+        "disallowInference": true,
+        "preferredSources": ["tax_summary"]
+      }
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Grand total amount.",
+      "section": "totals",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["total", "grand total", "total amount"],
+        "disallowInference": true,
+        "preferredSources": ["totals"]
+      }
+    },
+    {
+      "id": "paid_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Amount already paid.",
+      "section": "totals",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["paid", "pago", "paid amount"],
+        "disallowInference": false,
+        "preferredSources": ["totals", "payment_terms"]
+      }
+    },
+    {
+      "id": "outstanding_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Remaining amount outstanding.",
+      "section": "totals",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["outstanding", "saldo", "remaining", "saldo devedor"],
+        "disallowInference": true,
+        "preferredSources": ["totals"]
+      }
+    },
+    {
+      "id": "po_reference",
+      "type": "string",
+      "required": false,
+      "description": "Purchase order reference.",
+      "section": "payment_terms",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["po", "purchase order", "pedido", "ordem de compra"],
+        "disallowInference": true,
+        "preferredSources": ["attachments", "payment_terms"]
+      }
+    },
+    {
+      "id": "payment_terms",
+      "type": "string",
+      "required": false,
+      "description": "Payment terms text.",
+      "section": "payment_terms",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["payment terms", "terms", "due in", "condicoes de pagamento"],
+        "disallowInference": false,
+        "preferredSources": ["payment_terms"]
+      }
+    }
+  ]
+}

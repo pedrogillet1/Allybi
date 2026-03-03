@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "id": "scope_resolution_rules",
+    "version": "1.0.0",
+    "description": "Deterministic scope resolution for doc lock, follow-up inheritance, and broad-versus-single scope decisions.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "defaultScope": "documentual",
+    "followupInheritanceMinutes": 90,
+    "allowScopeShiftWithEvidence": true
+  },
+  "scopeModes": [
+    "single",
+    "cross",
+    "discovery",
+    "compare",
+    "any"
+  ],
+  "priority": {
+    "explicit_doc_ref": 100,
+    "active_lock": 95,
+    "followup_context": 90,
+    "compare_intent": 85,
+    "discovery_intent": 70,
+    "default": 60
+  },
+  "rules": [
+    {
+      "id": "SCOPE_001_explicit_doc_filename",
+      "trigger": "Query explicitly mentions a filename or exact doc phrase",
+      "check": "context.explicitDocMention == true AND context.explicitDocMatched == false",
+      "failureAction": "RESOLVE_AND_ACTIVATE_DOC_LOCK",
+      "severity": "error",
+      "explanatory": "A filename reference must anchor to an attached document and lock that document."
+    },
+    {
+      "id": "SCOPE_002_locked_followup_inheritance",
+      "trigger": "Follow-up query without a new document reference while lock is active",
+      "check": "context.docLock.active == true AND context.currentQuery.docRef == null AND context.conversation.turnsSinceDocRef <= 4",
+      "failureAction": "INHERIT_ACTIVE_DOC_SCOPE",
+      "severity": "warning",
+      "explanatory": "Keep single-doc scope for conversational follow-up unless user explicitly widens scope."
+    },
+    {
+      "id": "SCOPE_003_compare_requires_explicit_docs",
+      "trigger": "Compare operator is used with only one explicit doc in scope",
+      "check": "context.intent == 'compare' AND context.explicitDocs.count < 2",
+      "failureAction": "ASK_FOR_ADDITIONAL_DOC",
+      "severity": "error",
+      "explanatory": "Cross-document compare requires explicit anchors for both sides unless user asked global trend comparison."
+    },
+    {
+      "id": "SCOPE_004_discovery_broad_query",
+      "trigger": "Query includes 'all'/'any' and asks broad discovery",
+      "check": "context.intentFamily == 'discovery' OR context.queryText.matches('(across all|across any|list all|em todos|todos os)')",
+      "failureAction": "RELEASE_SINGLE_DOC_LOCK",
+      "severity": "warning",
+      "explanatory": "Discovery and broad scan should ignore single-doc lock unless explicitly contraindicated."
+    },
+    {
+      "id": "SCOPE_005_no_scope_anchored_by_alias_only",
+      "trigger": "Query uses a document alias that does not map to a unique attached doc",
+      "check": "context.docAlias != null AND context.docAliasResolution.count != 1",
+      "failureAction": "ASK_DOC_ALIAS_QUESTION",
+      "severity": "error",
+      "explanatory": "Require explicit disambiguation before applying scope."
+    },
+    {
+      "id": "SCOPE_006_sheet_or_slide_locality",
+      "trigger": "Query references a sheet/slide/page while no single doc lock exists",
+      "check": "context.locationAnchor.type IN ['sheet','slide','page'] AND context.docLock.active == false",
+      "failureAction": "LIMIT_SCOPE_TO_BEST_LOCATED_DOC",
+      "severity": "warning",
+      "explanatory": "Use top retrieval candidate with highest location-signal confidence, but remain explicit in response."
+    },
+    {
+      "id": "SCOPE_007_period_shift_guard",
+      "trigger": "Query introduces a period not mentioned in existing lock context",
+      "check": "context.periodRef.present == true AND context.lockedPeriod != context.periodRef.value",
+      "failureAction": "UPDATE_SCOPE_PERIOD",
+      "severity": "info",
+      "explanatory": "Keep doc lock but change period boundary explicitly."
+    },
+    {
+      "id": "SCOPE_008_navigation_followup_preserve_scope",
+      "trigger": "Clarifying follow-up asks for the previous answer location context",
+      "check": "context.intent == 'locate_content' AND context.currentQuery.isFollowup == true",
+      "failureAction": "KEEP_SCOPE_AND_BROADEN_WINDOW",
+      "severity": "info",
+      "explanatory": "Preserve scope, but widen retrieval window around prior location."
+    }
+  ],
+  "templates": [
+    {
+      "id": "SCOPE_RESOLUTION_RULES_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in scope_resolution_rules.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

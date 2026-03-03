@@ -172,6 +172,35 @@ export class EditOrchestratorService {
         preservePass,
         this.shouldEnforceSimilarity(request),
       );
+      const extractedHints = Array.isArray(
+        request.plan?.diagnostics?.extractedHints,
+      )
+        ? request.plan.diagnostics.extractedHints
+        : [];
+      const policyDecision = this.policyService.decideRuntimeAction({
+        operator: request.plan.operator,
+        targetConfidence: request.target.confidence,
+        decisionMargin: request.target.decisionMargin,
+        userConfirmed: false,
+        destructiveEdit:
+          /DELETE_|BULK_DELETE|REPLACE_IMAGE|MOVE_COLUMN/.test(
+            request.plan.operator,
+          ),
+        strictMode: false,
+        similarityScore: sim,
+        styleOnlyEdit:
+          extractedHints.includes("style_only") ||
+          extractedHints.includes("style"),
+        numericTokensPreserved: preservePass,
+        entitiesPreserved: preservePass,
+        commitRequested: false,
+        revisionCreated: false,
+        newFactsIntroduced: 0,
+      });
+      if (policyDecision.matched && policyDecision.action !== "allow") {
+        const reason = policyDecision.reasonCode || policyDecision.action;
+        blockedReasons.push(`policy decision: ${reason}`);
+      }
       const requiresConfirmation =
         blockedReasons.length > 0 || request.target.isAmbiguous;
 

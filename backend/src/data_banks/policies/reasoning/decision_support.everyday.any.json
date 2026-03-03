@@ -1,0 +1,139 @@
+{
+  "_meta": {
+    "id": "decision_support_everyday",
+    "version": "1.0.0",
+    "description": "Decision-support policy for everyday document recommendations with evidence-aware framing.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Added machine-actionable rules for everyday domain"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday"
+  },
+  "domain": "everyday",
+  "rules": [
+    {
+      "id": "EVERYDAY_DEC_001_missing_period_guard",
+      "trigger": "Everyday query asks a value comparison but no period is provided",
+      "check": "context.domain == 'everyday' AND context.queryNeedsTimeScope == true AND context.periodRef == null",
+      "failureAction": "ASK_CLARIFY_PERIOD",
+      "severity": "error"
+    },
+    {
+      "id": "EVERYDAY_DEC_002_compare_requires_two_docs",
+      "trigger": "Compare intent without two explicit documents",
+      "check": "context.domain == 'everyday' AND context.intent == 'compare' AND context.explicitDocs.count < 2",
+      "failureAction": "ASK_FOR_SECOND_DOC",
+      "severity": "error"
+    },
+    {
+      "id": "EVERYDAY_DEC_003_bill_type_ambiguity",
+      "trigger": "User mentions 'bill' with multiple possible categories",
+      "check": "context.domain == 'everyday' AND context.docTypeHint IN ['bill','receipt'] AND context.docTypeRefined == null",
+      "failureAction": "ASK_DISAMBIGUATE_BILL_TYPE",
+      "severity": "warning"
+    },
+    {
+      "id": "EVERYDAY_DEC_004_no_extrapolation_without_values",
+      "trigger": "Everyday recommendation depends on an inferred conversion without numbers",
+      "check": "context.domain == 'everyday' AND context.convertsWithoutSource == true",
+      "failureAction": "DO_NOT_INFER",
+      "severity": "error"
+    },
+    {
+      "id": "EVERYDAY_DEC_005_currency_units_priority",
+      "trigger": "Everyday query returns mixed currency/unit not requested",
+      "check": "context.domain == 'everyday' AND context.sourceCurrency != context.queryCurrency AND context.currencyConversionRequested == false",
+      "failureAction": "PRESERVE_ORIG_CURRENCY",
+      "severity": "warning"
+    },
+    {
+      "id": "EVERYDAY_DEC_006_summarize_bill_with_gaps",
+      "trigger": "Bill or receipt has missing page/section required for safe summary",
+      "check": "context.domain == 'everyday' AND context.missingCriticalSection == true",
+      "failureAction": "ASK_FOR_ADDITIONAL_PAGE",
+      "severity": "warning"
+    }
+  ],
+  "framework": {
+    "requireOptions": true,
+    "requireRiskTradeoffs": true,
+    "requireEvidenceSummary": true,
+    "forbidFalseCertainty": true,
+    "requireUncertaintyStatement": true,
+    "requireWhatChangesMyMind": true,
+    "minimumOptionCount": 2,
+    "optionsFramework": [
+      {
+        "id": "EVERYDAY_OF_001",
+        "name": "document_status_path",
+        "language": "en",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "evidenceThreshold": "high",
+        "evidenceTypes": [
+          "receipt",
+          "invoice",
+          "statement"
+        ],
+        "uncertaintyPrompt": "State known facts, unknowns, and confidence range.",
+        "whatChangesMyMindPrompt": "List one concrete signal that would materially alter recommendation.",
+        "optionScaffold": "Option A: Base on current doc only. Option B: Cross-doc average."
+      },
+      {
+        "id": "EVERYDAY_OF_002",
+        "name": "period_comparison_path",
+        "language": "pt",
+        "minOptions": 2,
+        "requiredBlocks": [
+          "options",
+          "risks",
+          "evidence_threshold",
+          "uncertainty",
+          "what_changes_my_mind"
+        ],
+        "evidenceThreshold": "medium",
+        "evidenceTypes": [
+          "receipt",
+          "invoice",
+          "statement"
+        ],
+        "uncertaintyPrompt": "Declare fatos conhecidos, lacunas e faixa de confianca.",
+        "whatChangesMyMindPrompt": "Liste sinais concretos que fariam mudar a recomendacao.",
+        "optionScaffold": "Opcao A: Analisar apenas o periodo atual. Opcao B: analisar periodo anterior para tendencia."
+      }
+    ]
+  },
+  "templates": [
+    {
+      "id": "DECISION_SUPPORT.EVERYDAY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in decision_support.everyday.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "EVERYDAY_DEC_SMOKE_001"
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_tax_notice",
+    "version": "1.0.0",
+    "description": "Entity schema for every_tax_notice.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_notice"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    { "id": "taxpayer_name", "type": "string", "required": true, "description": "Taxpayer name.", "section": "document_header", "evidence": {"minCitations": 1, "anchors": ["taxpayer", "contribuinte"], "disallowInference": true, "preferredSources": ["document_header"]} },
+    { "id": "taxpayer_id", "type": "string", "required": true, "description": "Taxpayer ID from notice.", "section": "document_header", "evidence": {"minCitations": 1, "anchors": ["cnpj", "cpf", "id"], "disallowInference": true, "preferredSources": ["document_header"]} },
+    { "id": "notice_number", "type": "string", "required": true, "description": "Notice or reference number.", "section": "notice_reference", "evidence": {"minCitations": 1, "anchors": ["notice", "reference", "notification number"], "disallowInference": true, "preferredSources": ["notice_reference"]} },
+    { "id": "notice_date", "type": "date", "required": true, "description": "Notice issue date.", "section": "document_header", "evidence": {"minCitations": 1, "anchors": ["notice date", "issued", "emissao"], "disallowInference": true, "preferredSources": ["document_header"]} },
+    { "id": "assessed_base", "type": "currency", "required": true, "description": "Assessed base value.", "section": "assessed_amounts", "evidence": {"minCitations": 1, "anchors": ["assessed base", "base amount"], "disallowInference": true, "preferredSources": ["assessed_amounts", "notice_summary"]} },
+    { "id": "tax_due", "type": "currency", "required": true, "description": "Tax amount due from notice.", "section": "assessed_amounts", "evidence": {"minCitations": 1, "anchors": ["tax due", "amount due"], "disallowInference": true, "preferredSources": ["assessed_amounts"]} },
+    { "id": "penalty", "type": "currency", "required": false, "description": "Penalty amount if present.", "section": "penalties", "evidence": {"minCitations": 1, "anchors": ["penalty", "multa"], "disallowInference": true, "preferredSources": ["penalties"]} },
+    { "id": "interest", "type": "currency", "required": false, "description": "Interest amount if present.", "section": "penalties", "evidence": {"minCitations": 1, "anchors": ["interest", "juros"], "disallowInference": true, "preferredSources": ["penalties"]} },
+    { "id": "amount_total", "type": "currency", "required": true, "description": "Total amount payable under notice.", "section": "notice_summary", "evidence": {"minCitations": 1, "anchors": ["total amount", "total due"], "disallowInference": true, "preferredSources": ["notice_summary", "assessed_amounts"]} },
+    { "id": "payment_deadline", "type": "date", "required": true, "description": "Deadline for payment/appeal depending context.", "section": "due_dates", "evidence": {"minCitations": 1, "anchors": ["due date", "deadline", "vencimento"], "disallowInference": true, "preferredSources": ["due_dates", "payment_instructions"]} },
+    { "id": "payment_instructions", "type": "string", "required": false, "description": "Payment instruction summary.", "section": "payment_instructions", "evidence": {"minCitations": 1, "anchors": ["pay here", "payment instructions"], "disallowInference": false, "preferredSources": ["payment_instructions"]} },
+    { "id": "appeal_deadline", "type": "date", "required": false, "description": "Appeal deadline for this notice.", "section": "appeal_rights", "evidence": {"minCitations": 1, "anchors": ["appeal", "objection", "recurso"], "disallowInference": true, "preferredSources": ["appeal_rights", "due_dates"]} },
+    { "id": "document_currency", "type": "string", "required": true, "description": "Document currency.", "section": "document_header", "evidence": {"minCitations": 0, "anchors": ["currency", "moeda"], "disallowInference": false, "preferredSources": ["document_header"]} },
+    { "id": "source_tax_authority", "type": "string", "required": false, "description": "Issuing authority for the notice.", "section": "document_header", "evidence": {"minCitations": 1, "anchors": ["issuer", "authority", "organ"], "disallowInference": true, "preferredSources": ["document_header"]} }
+  ]
+}

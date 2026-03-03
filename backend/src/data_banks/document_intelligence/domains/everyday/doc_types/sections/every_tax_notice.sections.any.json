@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "id": "di_everyday_sections_every_tax_notice",
+    "version": "1.0.0",
+    "description": "Section map for every_tax_notice.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_tax_notice"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "order": 1,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["tax notice", "notificacao", "notice of assessment"]
+    },
+    {
+      "id": "notice_reference",
+      "name": {
+        "en": "Notice Reference",
+        "pt": "Referencia da Notificacao"
+      },
+      "order": 2,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["notice number", "reference", "notice id", "protocolo"]
+    },
+    {
+      "id": "notice_summary",
+      "name": {
+        "en": "Assessment Summary",
+        "pt": "Resumo da Atribuicao"
+      },
+      "order": 3,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["assessment", "summary", "resumo", "total assessed"]
+    },
+    {
+      "id": "assessed_amounts",
+      "name": {
+        "en": "Assessed Amounts",
+        "pt": "Valores Avaliados"
+      },
+      "order": 4,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["assessed", "tax due", "amount due", "base"]
+    },
+    {
+      "id": "penalties",
+      "name": {
+        "en": "Penalties and Interest",
+        "pt": "Multas e Juros"
+      },
+      "order": 5,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["penalty", "interest", "late fee", "juros"]
+    },
+    {
+      "id": "payment_instructions",
+      "name": {
+        "en": "Payment Instructions",
+        "pt": "Instrucoes de Pagamento"
+      },
+      "order": 6,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["how to pay", "instructions", "pay here", "pagamento"]
+    },
+    {
+      "id": "due_dates",
+      "name": {
+        "en": "Due Dates",
+        "pt": "Datas de Vencimento"
+      },
+      "order": 7,
+      "required": true,
+      "mustHave": true,
+      "headingAnchors": ["due date", "expiry", "deadline", "vencimento"]
+    },
+    {
+      "id": "appeal_rights",
+      "name": {
+        "en": "Appeal Rights",
+        "pt": "Direitos de Recurso"
+      },
+      "order": 8,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["appeal", "contest", "recurso", "objection"]
+    },
+    {
+      "id": "supporting_docs",
+      "name": {
+        "en": "Supporting Documents",
+        "pt": "Documentos de Apoio"
+      },
+      "order": 9,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["attachments", "annexes", "supporting documents", "anexos"]
+    },
+    {
+      "id": "contact_office",
+      "name": {
+        "en": "Contact and Office",
+        "pt": "Contato e Atendimento"
+      },
+      "order": 10,
+      "required": false,
+      "mustHave": false,
+      "headingAnchors": ["contact", "office", "atendimento", "tax office"]
+    }
+  ]
+}

@@ -11,7 +11,7 @@
   "config": {
     "enabled": true,
     "domain": "legal",
-    "docType": "dpa"
+    "docType": "legal_dpa"
   },
   "tables": [
     {

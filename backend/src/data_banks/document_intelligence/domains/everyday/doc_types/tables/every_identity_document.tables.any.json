@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_identity_document",
+    "version": "1.0.0",
+    "description": "Tables expected in every_identity_document.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_identity_document"
+  },
+  "tableHeaderSynonyms": {
+    "document": ["document", "id", "documento", "document number"],
+    "name": ["name", "nome", "full name", "nome completo"],
+    "number": ["number", "numero", "id number", "numero do documento"],
+    "date": ["date", "data", "issued", "valid until", "expiry"]
+  },
+  "tables": [
+    {
+      "id": "identity_main_data_table",
+      "canonicalName": {
+        "en": "Identity Fields",
+        "pt": "Dados de Identidade"
+      },
+      "section": "identity_fields",
+      "signaturePatterns": ["\\bname\\b", "\\bdocument\\b", "\\bid\\b", "\\bnome\\b"],
+      "requiredHeaders": ["document_type", "document_number", "full_name", "date_of_birth", "nationality"],
+      "headerAliases": [["document_type", "tipo"], ["document_number", "numero"], ["full_name", "nome"], ["date_of_birth", "data nascimento"], ["nationality", "nacionalidade"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["identity_fn_01"]
+    },
+    {
+      "id": "identity_validity_table",
+      "canonicalName": {
+        "en": "Issuer and Validity",
+        "pt": "Emissor e Validade"
+      },
+      "section": "issuer_and_validity",
+      "signaturePatterns": ["\\bissue\\b", "\\bissued\\b", "\\bvalidity\\b", "\\bvalidade\\b"],
+      "requiredHeaders": ["issuing_authority", "issue_date", "expiry_date", "issuing_country", "document_number"],
+      "headerAliases": [["issuing_authority", "orgao"], ["issue_date", "emissao"], ["expiry_date", "vencimento"], ["issuing_country", "pais"], ["document_number", "numero"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["identity_fn_02"]
+    },
+    {
+      "id": "identity_security_features_table",
+      "canonicalName": {
+        "en": "Security Features",
+        "pt": "Recursos de Seguranca"
+      },
+      "section": "security_features",
+      "signaturePatterns": ["\\bhologram\\b", "\\bbarcode\\b", "\\bwatermark\\b", "\\bmicrotext\\b", "\\bsecurity\\b"],
+      "requiredHeaders": ["feature", "description", "location", "status"],
+      "headerAliases": [["feature", "feature"], ["description", "descricao"], ["location", "local"], ["status", "status"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["identity_fn_03"]
+    },
+    {
+      "id": "identity_biometrics_table",
+      "canonicalName": {
+        "en": "Biometric and Photo",
+        "pt": "Foto e Biometria"
+      },
+      "section": "photograph_or_biometric",
+      "signaturePatterns": ["\\bphoto\\b", "\\bbiometric\\b", "\\bfingerprint\\b", "\\bmrz\\b"],
+      "requiredHeaders": ["photo_present", "biometric_present", "mrz_line", "verification_status"],
+      "headerAliases": [["photo_present", "foto"], ["biometric_present", "biometria"], ["mrz_line", "mrz"], ["verification_status", "status"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units"],
+        "requiresScaleEvidence": false
+      },
+      "footnotes": ["identity_fn_04"]
+    }
+  ]
+}

@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -1513,5 +1519,47 @@
         "allowInferenceWhenLabeled": true
       }
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "FIN_DEC_001_compare_docs_required",
+      "trigger": "compare intent without at least two explicit docs",
+      "check": "context.domain=='finance' && context.intent=='compare' && context.explicitDocs.count < 2",
+      "failureAction": "ASK_FOR_SECOND_DOC"
+    },
+    {
+      "id": "FIN_DEC_002_period_disambiguation",
+      "trigger": "finance query has high time-sensitivity but missing period",
+      "check": "context.domain=='finance' && context.queryNeedsPeriod == true && context.periodRef == null",
+      "failureAction": "ASK_CLARIFY_PERIOD"
+    },
+    {
+      "id": "FIN_DEC_003_currency_mismatch_policy",
+      "trigger": "finance output changes currency unit without explicit request",
+      "check": "context.domain=='finance' && context.currencyMismatch == true && context.currencyConversionRequested == false",
+      "failureAction": "PRESERVE_SOURCE_CURRENCY"
+    },
+    {
+      "id": "FIN_DEC_004_low_evidence_low_confidence",
+      "trigger": "finance recommendation from too few evidence items",
+      "check": "context.domain=='finance' && output.evidenceCount < 2 && output.confidence > 0.82",
+      "failureAction": "REDUCE_CONFIDENCE_BAND"
+    },
+    {
+      "id": "FIN_DEC_005_unit_conversion_guard",
+      "trigger": "finance numeric answer uses converted units without consent",
+      "check": "context.domain=='finance' && output.unitConverted == true && context.userRequestedUnitConversion == false",
+      "failureAction": "BLOCK_UNLESS_ASKED"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FIN_DEC_SMOKE_001"
+      }
+    ]
+  }
 }

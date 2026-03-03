@@ -1,11 +1,20 @@
 /**
  * Cache Service
- * Provides intelligent caching for embeddings, search results, and frequent queries
- * Uses node-cache for fast in-memory caching without Redis dependency
+ * Provides intelligent caching for embeddings, search results, and frequent queries.
+ * Uses node-cache for fast in-memory caching without Redis dependency.
  */
 
 import NodeCache from "node-cache";
-import crypto from "crypto";
+
+import {
+  buildCacheKey,
+  buildDocumentBufferKey,
+  buildQueryResponseKey,
+} from "./cache/cache.keys";
+import type {
+  CachedQueryResponse,
+  CacheStatsResult,
+} from "./cache/cache.types";
 
 export class CacheService {
   private cache: NodeCache;
@@ -13,14 +22,12 @@ export class CacheService {
   private readonly EMBEDDING_TTL = 3600; // 1 hour (reduced from 7 days for memory)
   private readonly SEARCH_TTL = 300; // 5 minutes
   private readonly ANSWER_TTL = 300; // 5 minutes
-  private readonly DOCUMENT_LIST_TTL = 60; // 1 minute
-  private readonly CONVERSATION_TTL = 120; // 2 minutes
 
   constructor() {
     this.cache = new NodeCache({
       stdTTL: this.DEFAULT_TTL,
       checkperiod: 60,
-      useClones: false, // Better performance
+      useClones: false,
       deleteOnExpire: true,
     });
 
@@ -30,182 +37,133 @@ export class CacheService {
   }
 
   /**
-   * Generate cache key from multiple arguments
+   * Generate cache key from multiple arguments.
    */
   generateKey(prefix: string, ...args: any[]): string {
-    const dataString = args
-      .map((arg) =>
-        typeof arg === "object" ? JSON.stringify(arg) : String(arg),
-      )
-      .join("|");
-
-    const hash = crypto.createHash("md5").update(dataString).digest("hex");
-
-    return `${prefix}:${hash}`;
+    return buildCacheKey(prefix, ...args);
   }
 
-  /**
-   * Cache an embedding
-   */
-  async cacheEmbedding(text: string, embedding: number[]): Promise<void> {
+  private preview(value: string): string {
+    return String(value || "").substring(0, 50);
+  }
+
+  private async safeWrite(op: () => void, errorLabel: string): Promise<void> {
     try {
+      op();
+    } catch (error) {
+      console.error(errorLabel, error);
+    }
+  }
+
+  private async safeRead<T>(op: () => T | null, errorLabel: string): Promise<T | null> {
+    try {
+      return op();
+    } catch (error) {
+      console.error(errorLabel, error);
+      return null;
+    }
+  }
+
+  async cacheEmbedding(text: string, embedding: number[]): Promise<void> {
+    await this.safeWrite(() => {
       const key = this.generateKey("embedding", text);
       this.cache.set(key, embedding, this.EMBEDDING_TTL);
       console.log(
         `💾 [Cache] Cached embedding for text (length: ${text.length})`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error caching embedding:", error);
-    }
+    }, "❌ [Cache] Error caching embedding:");
   }
 
-  /**
-   * Get cached embedding
-   */
   async getCachedEmbedding(text: string): Promise<number[] | null> {
-    try {
+    return this.safeRead(() => {
       const key = this.generateKey("embedding", text);
       const cached = this.cache.get<number[]>(key);
-
       if (cached) {
         console.log(`✅ [Cache] HIT for embedding (length: ${text.length})`);
         return cached;
       }
-
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached embedding:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached embedding:");
   }
 
-  /**
-   * Cache search results
-   */
   async cacheSearchResults(
     userId: string,
     query: string,
     results: any[],
   ): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const key = this.generateKey("search", userId, query);
       this.cache.set(key, results, this.SEARCH_TTL);
       console.log(
-        `💾 [Cache] Cached search results for query: "${query.substring(0, 50)}..."`,
+        `💾 [Cache] Cached search results for query: "${this.preview(query)}..."`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error caching search results:", error);
-    }
+    }, "❌ [Cache] Error caching search results:");
   }
 
-  /**
-   * Get cached search results
-   */
   async getCachedSearchResults(
     userId: string,
     query: string,
   ): Promise<any[] | null> {
-    try {
+    return this.safeRead(() => {
       const key = this.generateKey("search", userId, query);
       const cached = this.cache.get<any[]>(key);
-
       if (cached) {
-        console.log(
-          `✅ [Cache] HIT for search: "${query.substring(0, 50)}..."`,
-        );
+        console.log(`✅ [Cache] HIT for search: "${this.preview(query)}..."`);
         return cached;
       }
-
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached search results:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached search results:");
   }
 
-  /**
-   * Cache RAG answer
-   */
   async cacheAnswer(userId: string, query: string, answer: any): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const key = this.generateKey("answer", userId, query);
       this.cache.set(key, answer, this.ANSWER_TTL);
-      console.log(
-        `💾 [Cache] Cached answer for query: "${query.substring(0, 50)}..."`,
-      );
-    } catch (error) {
-      console.error("❌ [Cache] Error caching answer:", error);
-    }
+      console.log(`💾 [Cache] Cached answer for query: "${this.preview(query)}..."`);
+    }, "❌ [Cache] Error caching answer:");
   }
 
-  /**
-   * Get cached answer
-   */
   async getCachedAnswer(userId: string, query: string): Promise<any | null> {
-    try {
+    return this.safeRead(() => {
       const key = this.generateKey("answer", userId, query);
       const cached = this.cache.get<any>(key);
-
       if (cached) {
-        console.log(
-          `✅ [Cache] HIT for answer: "${query.substring(0, 50)}..."`,
-        );
+        console.log(`✅ [Cache] HIT for answer: "${this.preview(query)}..."`);
         return cached;
       }
-
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached answer:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached answer:");
   }
 
-  /**
-   * Cache query expansion results
-   */
   async cacheQueryExpansion(
     query: string,
     expandedQueries: string[],
   ): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const key = this.generateKey("query_expansion", query);
       this.cache.set(key, expandedQueries, this.SEARCH_TTL);
       console.log(
-        `💾 [Cache] Cached query expansion for: "${query.substring(0, 50)}..."`,
+        `💾 [Cache] Cached query expansion for: "${this.preview(query)}..."`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error caching query expansion:", error);
-    }
+    }, "❌ [Cache] Error caching query expansion:");
   }
 
-  /**
-   * Get cached query expansion
-   */
   async getCachedQueryExpansion(query: string): Promise<string[] | null> {
-    try {
+    return this.safeRead(() => {
       const key = this.generateKey("query_expansion", query);
       const cached = this.cache.get<string[]>(key);
-
       if (cached) {
         console.log(
-          `✅ [Cache] HIT for query expansion: "${query.substring(0, 50)}..."`,
+          `✅ [Cache] HIT for query expansion: "${this.preview(query)}..."`,
         );
         return cached;
       }
-
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached query expansion:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached query expansion:");
   }
 
-  /**
-   * Invalidate cache for a user (when they upload/delete documents)
-   */
   async invalidateUserCache(userId: string): Promise<void> {
-    try {
-      // Invalidate ALL cache entries that could be affected by document changes
+    await this.safeWrite(() => {
       const allKeys = this.cache.keys();
       const keysToDelete = allKeys.filter(
         (key) =>
@@ -222,242 +180,143 @@ export class CacheService {
           `🗑️  [Cache] Invalidated ${keysToDelete.length} cache entries for user ${userId}`,
         );
       }
-    } catch (error) {
-      console.error("❌ [Cache] Error invalidating user cache:", error);
-    }
+    }, "❌ [Cache] Error invalidating user cache:");
   }
 
-  /**
-   * ⚡ OPTIMIZED: Invalidate cache for SPECIFIC conversation only (not all conversations)
-   */
   async invalidateConversationCache(
     userId: string,
     conversationId: string,
   ): Promise<void> {
-    try {
-      // Only invalidate THIS conversation's cache
-      const conversationKey = this.generateKey(
-        "conversation",
-        conversationId,
-        userId,
-      );
-      this.cache.del(conversationKey);
-
-      // Also invalidate conversation list cache (it shows message counts)
+    await this.safeWrite(() => {
+      const conversationKey = this.generateKey("conversation", conversationId, userId);
       const listKey = this.generateKey("conversations_list", userId);
-      this.cache.del(listKey);
-
+      this.cache.del([conversationKey, listKey]);
       console.log(
         `🗑️  [Cache] Invalidated cache for conversation ${conversationId.substring(0, 8)}... (user: ${userId.substring(0, 8)}...)`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error invalidating conversation cache:", error);
-    }
+    }, "❌ [Cache] Error invalidating conversation cache:");
   }
 
-  /**
-   * Invalidate document list cache for a user
-   */
   async invalidateDocumentListCache(userId: string): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const keys = this.cache
         .keys()
-        .filter(
-          (key) => key.startsWith("documents_list:") && key.includes(userId),
-        );
-
+        .filter((key) => key.startsWith("documents_list:") && key.includes(userId));
       if (keys.length > 0) {
         this.cache.del(keys);
         console.log(
           `🗑️  [Cache] Invalidated ${keys.length} document list cache entries for user ${userId}`,
         );
       }
-    } catch (error) {
-      console.error(
-        "❌ [Cache] Error invalidating document list cache:",
-        error,
-      );
-    }
+    }, "❌ [Cache] Error invalidating document list cache:");
   }
 
-  /**
-   * Invalidate folder tree cache for a user
-   */
   async invalidateFolderTreeCache(userId: string): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const keys = this.cache
         .keys()
-        .filter(
-          (key) => key.startsWith("folder_tree:") && key.includes(userId),
-        );
-
+        .filter((key) => key.startsWith("folder_tree:") && key.includes(userId));
       if (keys.length > 0) {
         this.cache.del(keys);
         console.log(
           `🗑️  [Cache] Invalidated ${keys.length} folder tree cache entries for user ${userId}`,
         );
       }
-    } catch (error) {
-      console.error("❌ [Cache] Error invalidating folder tree cache:", error);
-    }
+    }, "❌ [Cache] Error invalidating folder tree cache:");
   }
 
-  /**
-   * Invalidate specific document cache
-   */
   async invalidateDocumentCache(documentId: string): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const keys = this.cache.keys().filter((key) => key.includes(documentId));
-
       if (keys.length > 0) {
         this.cache.del(keys);
         console.log(
           `🗑️  [Cache] Invalidated ${keys.length} cache entries for document ${documentId}`,
         );
       }
-    } catch (error) {
-      console.error("❌ [Cache] Error invalidating document cache:", error);
-    }
+    }, "❌ [Cache] Error invalidating document cache:");
   }
 
-  /**
-   * Cache document buffer for fast preview loading
-   * TTL: 30 minutes (frequent access documents stay cached)
-   */
   async cacheDocumentBuffer(documentId: string, buffer: Buffer): Promise<void> {
-    try {
-      const key = `document_buffer:${documentId}`;
-      this.cache.set(key, buffer, 1800); // 30 minutes
+    await this.safeWrite(() => {
+      const key = buildDocumentBufferKey(documentId);
+      this.cache.set(key, buffer, 1800);
       console.log(
         `💾 [Cache] Cached document buffer for ${documentId} (${(buffer.length / 1024 / 1024).toFixed(2)} MB)`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error caching document buffer:", error);
-    }
+    }, "❌ [Cache] Error caching document buffer:");
   }
 
-  /**
-   * Get cached document buffer
-   */
   async getCachedDocumentBuffer(documentId: string): Promise<Buffer | null> {
-    try {
-      const key = `document_buffer:${documentId}`;
+    return this.safeRead(() => {
+      const key = buildDocumentBufferKey(documentId);
       const cached = this.cache.get<Buffer>(key);
-
       if (cached) {
         console.log(
           `✅ [Cache] HIT for document buffer ${documentId} (${(cached.length / 1024 / 1024).toFixed(2)} MB)`,
         );
         return cached;
       }
-
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached document buffer:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached document buffer:");
   }
 
-  /**
-   * Get cache statistics
-   */
-  async getCacheStats(): Promise<{
-    keys: number;
-    user_preferences_memory: string;
-    hitRate: number;
-  }> {
-    try {
-      const stats = this.cache.getStats();
-      const keys = this.cache.keys().length;
-
-      return {
-        keys,
-        user_preferences_memory: `${stats.ksize} keys`,
-        hitRate: (stats.hits / (stats.hits + stats.misses)) * 100 || 0,
-      };
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cache stats:", error);
-      return {
+  async getCacheStats(): Promise<CacheStatsResult> {
+    return (
+      (await this.safeRead(() => {
+        const stats = this.cache.getStats();
+        const keys = this.cache.keys().length;
+        return {
+          keys,
+          user_preferences_memory: `${stats.ksize} keys`,
+          hitRate: (stats.hits / (stats.hits + stats.misses)) * 100 || 0,
+        };
+      }, "❌ [Cache] Error getting cache stats:")) || {
         keys: 0,
         user_preferences_memory: "Unknown",
         hitRate: 0,
-      };
-    }
+      }
+    );
   }
 
-  /**
-   * Generic get method for any cache key
-   */
-  async get<T>(key: string, options?: { ttl?: number }): Promise<T | null> {
-    try {
+  async get<T>(key: string, _options?: { ttl?: number }): Promise<T | null> {
+    return this.safeRead(() => {
       const cached = this.cache.get<T>(key);
       if (cached) {
-        console.log(`✅ [Cache] HIT for key: ${key.substring(0, 50)}...`);
+        console.log(`✅ [Cache] HIT for key: ${this.preview(key)}...`);
         return cached;
       }
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached value:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached value:");
   }
 
-  /**
-   * Generic set method for any cache key
-   */
-  async set<T>(
-    key: string,
-    value: T,
-    options?: { ttl?: number },
-  ): Promise<void> {
-    try {
+  async set<T>(key: string, value: T, options?: { ttl?: number }): Promise<void> {
+    await this.safeWrite(() => {
       const ttl = options?.ttl || this.DEFAULT_TTL;
       this.cache.set(key, value, ttl);
-      console.log(`💾 [Cache] SET: ${key.substring(0, 50)}... (TTL: ${ttl}s)`);
-    } catch (error) {
-      console.error("❌ [Cache] Error caching value:", error);
-    }
+      console.log(`💾 [Cache] SET: ${this.preview(key)}... (TTL: ${ttl}s)`);
+    }, "❌ [Cache] Error caching value:");
   }
 
-  /**
-   * Clear all cache (use with caution!)
-   */
-  /**
-   * Delete a specific cache key
-   */
   async del(key: string): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       this.cache.del(key);
-      console.log(`🗑️  [Cache] Deleted key: ${key.substring(0, 50)}...`);
-    } catch (error) {
-      console.error("❌ [Cache] Error deleting key:", error);
-    }
+      console.log(`🗑️  [Cache] Deleted key: ${this.preview(key)}...`);
+    }, "❌ [Cache] Error deleting key:");
   }
 
   async clearAll(): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       this.cache.flushAll();
       console.log("🗑️  [Cache] Cleared all cache");
-    } catch (error) {
-      console.error("❌ [Cache] Error clearing cache:", error);
-    }
+    }, "❌ [Cache] Error clearing cache:");
   }
 
-  /**
-   * Close cache service (for graceful shutdown)
-   */
   async close(): Promise<void> {
     this.cache.close();
     console.log("✅ [Cache] Cache service closed");
   }
 
-  // ============================================================================
-  // MODE-BASED QUERY RESPONSE CACHING
-  // ============================================================================
-
-  /**
-   * Cache query response with mode-specific TTL
-   */
   async cacheQueryResponse(
     userId: string,
     query: string,
@@ -465,50 +324,28 @@ export class CacheService {
     response: { answer: string; sources: any[] },
     ttl: number,
   ): Promise<void> {
-    try {
-      const normalizedQuery = query.toLowerCase().trim();
-      const key = `query_response:${userId}:${mode}:${this.generateKey("qr", normalizedQuery)}`;
-
-      const cachedData = {
+    await this.safeWrite(() => {
+      const key = buildQueryResponseKey(userId, mode, query);
+      const cachedData: CachedQueryResponse = {
         ...response,
         mode,
         timestamp: Date.now(),
       };
-
       this.cache.set(key, cachedData, ttl);
-
       console.log(
         `✅ [Cache] Cached query response (mode: ${mode}, TTL: ${ttl}s)`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error caching query response:", error);
-    }
+    }, "❌ [Cache] Error caching query response:");
   }
 
-  /**
-   * Get cached query response
-   */
   async getCachedQueryResponse(
     userId: string,
     query: string,
     mode: string,
-  ): Promise<{
-    answer: string;
-    sources: any[];
-    mode: string;
-    timestamp: number;
-  } | null> {
-    try {
-      const normalizedQuery = query.toLowerCase().trim();
-      const key = `query_response:${userId}:${mode}:${this.generateKey("qr", normalizedQuery)}`;
-
-      const cached = this.cache.get<{
-        answer: string;
-        sources: any[];
-        mode: string;
-        timestamp: number;
-      }>(key);
-
+  ): Promise<CachedQueryResponse | null> {
+    return this.safeRead(() => {
+      const key = buildQueryResponseKey(userId, mode, query);
+      const cached = this.cache.get<CachedQueryResponse>(key);
       if (cached) {
         const age = (Date.now() - cached.timestamp) / 1000;
         console.log(
@@ -516,41 +353,27 @@ export class CacheService {
         );
         return cached;
       }
-
       console.log(`❌ [Cache MISS] Query response (mode: ${mode})`);
       return null;
-    } catch (error) {
-      console.error("❌ [Cache] Error getting cached query response:", error);
-      return null;
-    }
+    }, "❌ [Cache] Error getting cached query response:");
   }
 
-  /**
-   * Invalidate all cached query responses for a user
-   */
   async invalidateUserQueryCache(userId: string): Promise<void> {
-    try {
+    await this.safeWrite(() => {
       const keys = this.cache.keys();
       let invalidated = 0;
-
       for (const key of keys) {
         if (key.startsWith(`query_response:${userId}:`)) {
           this.cache.del(key);
           invalidated++;
         }
       }
-
       console.log(
         `🗑️  [Cache] Invalidated ${invalidated} cached query responses for user ${userId}`,
       );
-    } catch (error) {
-      console.error("❌ [Cache] Error invalidating user query cache:", error);
-    }
+    }, "❌ [Cache] Error invalidating user query cache:");
   }
 
-  /**
-   * Get cache statistics with hit rate
-   */
   getCacheStatsSync() {
     const stats = this.cache.getStats();
     return {
@@ -562,6 +385,5 @@ export class CacheService {
   }
 }
 
-// Infrastructure singleton - kept for backward compatibility
-// Can also be accessed via container.getCache()
+// Infrastructure singleton - kept for backward compatibility.
 export default new CacheService();

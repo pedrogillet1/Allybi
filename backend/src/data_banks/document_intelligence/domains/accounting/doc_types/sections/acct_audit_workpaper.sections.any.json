@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -24,24 +24,58 @@
       "order": 1,
       "headingAnchors": [
         "Audit Workpaper",
-        "Papel de Trabalho de Auditoria",
-        "Period",
-        "Entity"
+        "Papel de Trabalho",
+        "Audit Period",
+        "Entity",
+        "Company"
       ]
     },
     {
-      "id": "line_items",
+      "id": "testing_steps",
       "name": {
-        "en": "Line Items",
-        "pt": "Itens"
+        "en": "Testing Steps",
+        "pt": "Passos de Teste"
       },
       "required": true,
       "order": 2,
       "headingAnchors": [
-        "Detail",
-        "Transactions",
-        "Lines",
-        "Detalhes"
+        "Testing",
+        "Procedure",
+        "Step",
+        "Passo",
+        "Assertion"
+      ]
+    },
+    {
+      "id": "findings",
+      "name": {
+        "en": "Findings",
+        "pt": "Achados"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Findings",
+        "Issues",
+        "Exceptions",
+        "Achados",
+        "Deficiency"
+      ]
+    },
+    {
+      "id": "tie_outs",
+      "name": {
+        "en": "Tie-outs",
+        "pt": "Conciliacoes"
+      },
+      "required": false,
+      "order": 4,
+      "headingAnchors": [
+        "Tie out",
+        "Reconciliation",
+        "Roll-forward",
+        "Conciliacao",
+        "Reconcil"
       ]
     },
     {
@@ -51,7 +85,7 @@
         "pt": "Resumo"
       },
       "required": true,
-      "order": 3,
+      "order": 5,
       "headingAnchors": [
         "Summary",
         "Totals",
@@ -66,9 +100,8 @@
         "pt": "Aprovacao"
       },
       "required": false,
-      "order": 4,
+      "order": 6,
       "headingAnchors": [
-        "Approval",
         "Reviewed by",
         "Approved by",
         "Aprovado por"

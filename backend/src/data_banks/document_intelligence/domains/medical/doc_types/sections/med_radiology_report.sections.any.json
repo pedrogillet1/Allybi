@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -24,12 +24,10 @@
       "order": 1,
       "headingAnchors": [
         "Document Header",
-        "Cabecalho do Documento",
-        "document id",
-        "encounter",
-        "record number",
-        "Radiology Report Document Header",
-        "Laudo de Radiologia Cabecalho do Documento"
+        "Radiology Report Header",
+        "laudo radiologico",
+        "Cabecalho",
+        "Dados do Exame"
       ]
     },
     {
@@ -42,12 +40,11 @@
       "order": 2,
       "headingAnchors": [
         "Patient Identification",
-        "Identificacao do Paciente",
-        "patient name",
-        "mrn",
-        "dob",
-        "Radiology Report Patient Identification",
-        "Laudo de Radiologia Identificacao do Paciente"
+        "Paciente",
+        "Nome",
+        "MRN",
+        "Identificacao",
+        "Nome do Paciente"
       ]
     },
     {
@@ -60,120 +57,180 @@
       "order": 3,
       "headingAnchors": [
         "Encounter Context",
+        "Data do Atendimento",
+        "Motivo do Exame",
         "Contexto do Atendimento",
-        "admission",
-        "visit date",
-        "service line",
-        "Radiology Report Encounter Context",
-        "Laudo de Radiologia Contexto do Atendimento"
+        "Data/Hora"
       ]
     },
     {
-      "id": "chief_complaint_reason",
+      "id": "clinical_indication",
       "name": {
-        "en": "Chief Complaint / Reason",
-        "pt": "Queixa Principal / Motivo"
+        "en": "Clinical Indication",
+        "pt": "Indicacao Clinica"
       },
       "required": true,
       "order": 4,
       "headingAnchors": [
-        "Chief Complaint / Reason",
-        "Queixa Principal / Motivo",
-        "chief complaint",
-        "reason for visit",
-        "motivo",
-        "Radiology Report Chief Complaint / Reason",
-        "Laudo de Radiologia Queixa Principal / Motivo"
+        "Clinical Indication",
+        "Reason for Study",
+        "Indication",
+        "Indicacao Clinica",
+        "Motivo"
       ]
     },
     {
-      "id": "history_background",
+      "id": "study_information",
       "name": {
-        "en": "History and Background",
-        "pt": "Historia e Contexto"
-      },
-      "required": false,
-      "order": 5,
-      "headingAnchors": [
-        "History and Background",
-        "Historia e Contexto",
-        "history of present illness",
-        "past medical history",
-        "Radiology Report History and Background",
-        "Laudo de Radiologia Historia e Contexto"
-      ]
-    },
-    {
-      "id": "objective_findings",
-      "name": {
-        "en": "Objective Findings",
-        "pt": "Achados Objetivos"
+        "en": "Study Information",
+        "pt": "Informacao do Estudo"
       },
       "required": true,
-      "order": 6,
+      "order": 5,
       "headingAnchors": [
-        "Objective Findings",
-        "Achados Objetivos",
-        "exam",
-        "physical exam",
-        "objective",
-        "Radiology Report Objective Findings",
-        "Laudo de Radiologia Achados Objetivos"
+        "Study Information",
+        "Modality",
+        "Procedure",
+        "Body Part",
+        "Informacao do Estudo"
       ]
     },
     {
-      "id": "vitals_and_measurements",
+      "id": "comparison",
       "name": {
-        "en": "Vitals and Measurements",
-        "pt": "Sinais Vitais e Medidas"
+        "en": "Comparison",
+        "pt": "Comparacao"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "Comparison",
+        "Comparado com",
+        "Previous Study",
+        "Comparacao",
+        "Exames anteriores"
+      ]
+    },
+    {
+      "id": "technique",
+      "name": {
+        "en": "Technique",
+        "pt": "Tecnica"
       },
       "required": true,
       "order": 7,
       "headingAnchors": [
-        "Vitals and Measurements",
-        "Sinais Vitais e Medidas",
-        "bp",
-        "heart rate",
-        "temperature",
-        "spo2",
-        "Radiology Report Vitals and Measurements",
-        "Laudo de Radiologia Sinais Vitais e Medidas"
+        "Technique",
+        "Technique used",
+        "Acquisition",
+        "Tecnica"
       ]
     },
     {
-      "id": "labs_imaging",
+      "id": "findings",
       "name": {
-        "en": "Laboratory and Imaging",
-        "pt": "Laboratorio e Imagem"
+        "en": "Findings",
+        "pt": "Achados"
       },
-      "required": false,
+      "required": true,
       "order": 8,
       "headingAnchors": [
-        "Laboratory and Imaging",
-        "Laboratorio e Imagem",
-        "laboratory",
-        "impression",
-        "finding",
-        "Radiology Report Laboratory and Imaging",
-        "Laudo de Radiologia Laboratorio e Imagem"
+        "Findings",
+        "Observed Findings",
+        "Achados",
+        "Descricao",
+        "Resultados"
       ]
     },
     {
-      "id": "assessment_documented",
+      "id": "impression",
       "name": {
-        "en": "Documented Assessment",
-        "pt": "Avaliacao Documentada"
+        "en": "Impression",
+        "pt": "Conclusao"
       },
       "required": true,
       "order": 9,
       "headingAnchors": [
-        "Documented Assessment",
-        "Avaliacao Documentada",
-        "assessment",
-        "clinical impression",
-        "diagnosis documented",
-        "Radiology Report Documented Assessment",
-        "Laudo de Radiologia Avaliacao Documentada"
+        "Impression",
+        "Radiology Impression",
+        "Conclusao",
+        "Conclusoes"
+      ]
+    },
+    {
+      "id": "measurements",
+      "name": {
+        "en": "Measurements",
+        "pt": "Medicoes"
+      },
+      "required": false,
+      "order": 10,
+      "headingAnchors": [
+        "Measurements",
+        "Lesion Size",
+        "Dimensions",
+        "Medicoes",
+        "Medicao"
+      ]
+    },
+    {
+      "id": "limitations",
+      "name": {
+        "en": "Limitations",
+        "pt": "Limitacoes"
+      },
+      "required": false,
+      "order": 11,
+      "headingAnchors": [
+        "Limitations",
+        "Image Quality",
+        "Artifacts",
+        "Limitacoes",
+        "Qualidade da Imagem"
+      ]
+    },
+    {
+      "id": "differential",
+      "name": {
+        "en": "Differential",
+        "pt": "Diferencial"
+      },
+      "required": false,
+      "order": 12,
+      "headingAnchors": [
+        "Differential",
+        "Differential Diagnosis",
+        "Possiveis Diagnosticos",
+        "Differencial"
+      ]
+    },
+    {
+      "id": "recommendations",
+      "name": {
+        "en": "Recommendations",
+        "pt": "Recomendacoes"
+      },
+      "required": true,
+      "order": 13,
+      "headingAnchors": [
+        "Recommendations",
+        "Follow-up",
+        "Additional Workup",
+        "Recomendacoes"
+      ]
+    },
+    {
+      "id": "incidental_findings",
+      "name": {
+        "en": "Incidental Findings",
+        "pt": "Achados Incidentes"
+      },
+      "required": false,
+      "order": 14,
+      "headingAnchors": [
+        "Incidental Findings",
+        "Additional Findings",
+        "Achados Incidentes"
       ]
     },
     {
@@ -182,106 +239,27 @@
         "en": "Plan and Orders",
         "pt": "Plano e Condutas"
       },
-      "required": true,
-      "order": 10,
-      "headingAnchors": [
-        "Plan and Orders",
-        "Plano e Condutas",
-        "plan",
-        "orders",
-        "next steps",
-        "Radiology Report Plan and Orders",
-        "Laudo de Radiologia Plano e Condutas"
-      ]
-    },
-    {
-      "id": "medications_allergies",
-      "name": {
-        "en": "Medications and Allergies",
-        "pt": "Medicacoes e Alergias"
-      },
-      "required": true,
-      "order": 11,
-      "headingAnchors": [
-        "Medications and Allergies",
-        "Medicacoes e Alergias",
-        "medications",
-        "allergies",
-        "contraindication",
-        "Radiology Report Medications and Allergies",
-        "Laudo de Radiologia Medicacoes e Alergias"
-      ]
-    },
-    {
-      "id": "followup_and_disposition",
-      "name": {
-        "en": "Follow-up and Disposition",
-        "pt": "Acompanhamento e Desfecho"
-      },
-      "required": true,
-      "order": 12,
-      "headingAnchors": [
-        "Follow-up and Disposition",
-        "Acompanhamento e Desfecho",
-        "follow-up",
-        "discharge",
-        "referral",
-        "Radiology Report Follow-up and Disposition",
-        "Laudo de Radiologia Acompanhamento e Desfecho"
-      ]
-    },
-    {
-      "id": "patient_instructions",
-      "name": {
-        "en": "Patient Instructions",
-        "pt": "Instrucoes ao Paciente"
-      },
-      "required": false,
-      "order": 13,
-      "headingAnchors": [
-        "Patient Instructions",
-        "Instrucoes ao Paciente",
-        "instructions",
-        "warning signs",
-        "return precautions",
-        "Radiology Report Patient Instructions",
-        "Laudo de Radiologia Instrucoes ao Paciente"
-      ]
-    },
-    {
-      "id": "signoff_and_attestation",
-      "name": {
-        "en": "Signoff and Attestation",
-        "pt": "Assinatura e Atestacao"
-      },
-      "required": true,
-      "order": 14,
-      "headingAnchors": [
-        "Signoff and Attestation",
-        "Assinatura e Atestacao",
-        "signed by",
-        "clinician",
-        "timestamp",
-        "Radiology Report Signoff and Attestation",
-        "Laudo de Radiologia Assinatura e Atestacao"
-      ]
-    },
-    {
-      "id": "annexes_tables",
-      "name": {
-        "en": "Annexes and Tables",
-        "pt": "Anexos e Tabelas"
-      },
       "required": false,
       "order": 15,
       "headingAnchors": [
-        "Annexes and Tables",
-        "Anexos e Tabelas",
-        "table",
-        "appendix",
-        "annex",
-        "Radiology Report Annexes and Tables",
-        "Laudo de Radiologia Anexos e Tabelas"
+        "Plan",
+        "Order",
+        "Plano e Condutas"
+      ]
+    },
+    {
+      "id": "signature_block",
+      "name": {
+        "en": "Signature Block",
+        "pt": "Bloco de Assinatura"
+      },
+      "required": true,
+      "order": 16,
+      "headingAnchors": [
+        "Signed by",
+        "Radiologist",
+        "Assinatura",
+        "Medico Radiologista"
       ]
     }
   ]

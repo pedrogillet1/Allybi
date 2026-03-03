@@ -2,11 +2,11 @@
   "_meta": {
     "id": "medical_med_radiology_report_extraction_hints",
     "version": "2.0.0",
-    "description": "Extraction hints and pitfalls for Radiology Report.",
+    "description": "Extraction hints for med radiology report.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -16,753 +16,591 @@
   "hints": [
     {
       "id": "med_radiology_report_hint_001",
-      "entity": "patient_identifier_masked",
+      "entity": "patient_name_masked",
       "anchors": [
-        "patient identifier masked",
-        "radiology report patient identifier masked",
-        "see section",
-        "documented as"
+        "patient name masked",
+        "patient name masked radiology report",
+        "see section"
       ],
       "location": "document_header",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "patient identifier masked med_radiology_report",
-        "document_header patient identifier masked"
+        "patient_name_masked med_radiology_report",
+        "med_radiology_report patient name masked extracted from document_header"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_002",
-      "entity": "patient_age",
+      "entity": "mrn_masked",
       "anchors": [
-        "patient age",
-        "radiology report patient age",
-        "see section",
-        "documented as"
+        "mrn masked",
+        "mrn masked radiology report",
+        "see section"
       ],
       "location": "patient_identification",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "patient age med_radiology_report",
-        "patient_identification patient age"
+        "mrn_masked med_radiology_report",
+        "med_radiology_report mrn masked extracted from patient_identification"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_003",
-      "entity": "patient_sex_documented",
+      "entity": "study_accession",
       "anchors": [
-        "patient sex documented",
-        "radiology report patient sex documented",
-        "see section",
-        "documented as"
+        "study accession",
+        "study accession radiology report",
+        "see section"
       ],
-      "location": "encounter_context",
+      "location": "study_information",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "patient sex documented med_radiology_report",
-        "encounter_context patient sex documented"
+        "study_accession med_radiology_report",
+        "med_radiology_report study accession extracted from study_information"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_004",
-      "entity": "encounter_date",
+      "entity": "study_modality",
       "anchors": [
-        "encounter date",
-        "radiology report encounter date",
-        "see section",
-        "documented as"
+        "study modality",
+        "study modality radiology report",
+        "see section"
       ],
-      "location": "chief_complaint_reason",
+      "location": "clinical_indication",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "encounter date med_radiology_report",
-        "chief_complaint_reason encounter date"
+        "study_modality med_radiology_report",
+        "med_radiology_report study modality extracted from clinical_indication"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_005",
-      "entity": "encounter_time",
+      "entity": "body_part_examined",
       "anchors": [
-        "encounter time",
-        "radiology report encounter time",
-        "see section",
-        "documented as"
+        "body part examined",
+        "body part examined radiology report",
+        "see section"
       ],
-      "location": "history_background",
+      "location": "findings",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "encounter time med_radiology_report",
-        "history_background encounter time"
+        "body_part_examined med_radiology_report",
+        "med_radiology_report body part examined extracted from findings"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_006",
-      "entity": "chief_complaint_text",
+      "entity": "indication",
       "anchors": [
-        "chief complaint text",
-        "radiology report chief complaint text",
-        "see section",
-        "documented as"
+        "indication",
+        "indication radiology report",
+        "see section"
       ],
-      "location": "objective_findings",
+      "location": "impression",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "chief complaint text med_radiology_report",
-        "objective_findings chief complaint text"
+        "indication med_radiology_report",
+        "med_radiology_report indication extracted from impression"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_007",
-      "entity": "history_duration",
+      "entity": "study_date",
       "anchors": [
-        "history duration",
-        "radiology report history duration",
-        "see section",
-        "documented as"
+        "study date",
+        "study date radiology report",
+        "see section"
       ],
-      "location": "vitals_and_measurements",
+      "location": "recommendations",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "history duration med_radiology_report",
-        "vitals_and_measurements history duration"
+        "study_date med_radiology_report",
+        "med_radiology_report study date extracted from recommendations"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_008",
-      "entity": "blood_pressure_systolic",
+      "entity": "study_time",
       "anchors": [
-        "blood pressure systolic",
-        "radiology report blood pressure systolic",
-        "see section",
-        "documented as"
+        "study time",
+        "study time radiology report",
+        "see section"
       ],
-      "location": "labs_imaging",
+      "location": "signature_block",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "blood pressure systolic med_radiology_report",
-        "labs_imaging blood pressure systolic"
+        "study_time med_radiology_report",
+        "med_radiology_report study time extracted from signature_block"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_009",
-      "entity": "blood_pressure_diastolic",
+      "entity": "comparison_study",
       "anchors": [
-        "blood pressure diastolic",
-        "radiology report blood pressure diastolic",
-        "see section",
-        "documented as"
+        "comparison study",
+        "comparison study radiology report",
+        "see section"
       ],
-      "location": "assessment_documented",
+      "location": "document_header",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "blood pressure diastolic med_radiology_report",
-        "assessment_documented blood pressure diastolic"
+        "comparison_study med_radiology_report",
+        "med_radiology_report comparison study extracted from document_header"
       ],
-      "confidenceBias": "high"
+      "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_010",
-      "entity": "heart_rate",
+      "entity": "technique",
       "anchors": [
-        "heart rate",
-        "radiology report heart rate",
-        "see section",
-        "documented as"
+        "technique",
+        "technique radiology report",
+        "see section"
       ],
-      "location": "plan_and_orders",
+      "location": "patient_identification",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "heart rate med_radiology_report",
-        "plan_and_orders heart rate"
+        "technique med_radiology_report",
+        "med_radiology_report technique extracted from patient_identification"
       ],
       "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_011",
-      "entity": "respiratory_rate",
+      "entity": "contrast_used",
       "anchors": [
-        "respiratory rate",
-        "radiology report respiratory rate",
-        "see section",
-        "documented as"
+        "contrast used",
+        "contrast used radiology report",
+        "see section"
       ],
-      "location": "medications_allergies",
+      "location": "study_information",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "respiratory rate med_radiology_report",
-        "medications_allergies respiratory rate"
+        "contrast_used med_radiology_report",
+        "med_radiology_report contrast used extracted from study_information"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_012",
-      "entity": "temperature",
+      "entity": "findings_text",
       "anchors": [
-        "temperature",
-        "radiology report temperature",
-        "see section",
-        "documented as"
+        "findings text",
+        "findings text radiology report",
+        "see section"
       ],
-      "location": "followup_and_disposition",
+      "location": "clinical_indication",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "temperature med_radiology_report",
-        "followup_and_disposition temperature"
+        "findings_text med_radiology_report",
+        "med_radiology_report findings text extracted from clinical_indication"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_013",
-      "entity": "oxygen_saturation",
+      "entity": "measurement_rows",
       "anchors": [
-        "oxygen saturation",
-        "radiology report oxygen saturation",
-        "see section",
-        "documented as"
+        "measurement rows",
+        "measurement rows radiology report",
+        "see section"
       ],
-      "location": "patient_instructions",
+      "location": "findings",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "oxygen saturation med_radiology_report",
-        "patient_instructions oxygen saturation"
+        "measurement_rows med_radiology_report",
+        "med_radiology_report measurement rows extracted from findings"
       ],
-      "confidenceBias": "medium"
+      "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_014",
-      "entity": "weight",
+      "entity": "impression",
       "anchors": [
-        "weight",
-        "radiology report weight",
-        "see section",
-        "documented as"
+        "impression",
+        "impression radiology report",
+        "see section"
       ],
-      "location": "signoff_and_attestation",
+      "location": "impression",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "weight med_radiology_report",
-        "signoff_and_attestation weight"
+        "impression med_radiology_report",
+        "med_radiology_report impression extracted from impression"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_015",
-      "entity": "height",
+      "entity": "incidental_findings",
       "anchors": [
-        "height",
-        "radiology report height",
-        "see section",
-        "documented as"
+        "incidental findings",
+        "incidental findings radiology report",
+        "see section"
       ],
-      "location": "annexes_tables",
+      "location": "recommendations",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "height med_radiology_report",
-        "annexes_tables height"
+        "incidental_findings med_radiology_report",
+        "med_radiology_report incidental findings extracted from recommendations"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_016",
-      "entity": "body_mass_index",
+      "entity": "differential",
       "anchors": [
-        "body mass index",
-        "radiology report body mass index",
-        "see section",
-        "documented as"
+        "differential",
+        "differential radiology report",
+        "see section"
       ],
-      "location": "document_header",
+      "location": "signature_block",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "body mass index med_radiology_report",
-        "document_header body mass index"
+        "differential med_radiology_report",
+        "med_radiology_report differential extracted from signature_block"
       ],
-      "confidenceBias": "medium"
+      "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_017",
-      "entity": "pain_score",
+      "entity": "recommendation",
       "anchors": [
-        "pain score",
-        "radiology report pain score",
-        "see section",
-        "documented as"
+        "recommendation",
+        "recommendation radiology report",
+        "see section"
       ],
-      "location": "patient_identification",
+      "location": "document_header",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "pain score med_radiology_report",
-        "patient_identification pain score"
+        "recommendation med_radiology_report",
+        "med_radiology_report recommendation extracted from document_header"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_018",
-      "entity": "glucose_value",
+      "entity": "critical_findings",
       "anchors": [
-        "glucose value",
-        "radiology report glucose value",
-        "see section",
-        "documented as"
+        "critical findings",
+        "critical findings radiology report",
+        "see section"
       ],
-      "location": "encounter_context",
+      "location": "patient_identification",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "glucose value med_radiology_report",
-        "encounter_context glucose value"
+        "critical_findings med_radiology_report",
+        "med_radiology_report critical findings extracted from patient_identification"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_019",
-      "entity": "hemoglobin_value",
+      "entity": "limitations",
       "anchors": [
-        "hemoglobin value",
-        "radiology report hemoglobin value",
-        "see section",
-        "documented as"
+        "limitations",
+        "limitations radiology report",
+        "see section"
       ],
-      "location": "chief_complaint_reason",
+      "location": "study_information",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "hemoglobin value med_radiology_report",
-        "chief_complaint_reason hemoglobin value"
+        "limitations med_radiology_report",
+        "med_radiology_report limitations extracted from study_information"
       ],
-      "confidenceBias": "medium"
+      "confidenceBias": "high"
     },
     {
       "id": "med_radiology_report_hint_020",
-      "entity": "white_cell_count",
+      "entity": "radiologist_name",
       "anchors": [
-        "white cell count",
-        "radiology report white cell count",
-        "see section",
-        "documented as"
+        "radiologist name",
+        "radiologist name radiology report",
+        "see section"
       ],
-      "location": "history_background",
+      "location": "clinical_indication",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "white cell count med_radiology_report",
-        "history_background white cell count"
+        "radiologist_name med_radiology_report",
+        "med_radiology_report radiologist name extracted from clinical_indication"
       ],
       "confidenceBias": "medium"
     },
     {
       "id": "med_radiology_report_hint_021",
-      "entity": "creatinine_value",
+      "entity": "document_signature",
       "anchors": [
-        "creatinine value",
-        "radiology report creatinine value",
-        "see section",
-        "documented as"
+        "document signature",
+        "document signature radiology report",
+        "see section"
       ],
-      "location": "objective_findings",
+      "location": "findings",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
       ],
       "pitfalls": [
         "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
       ],
       "fallbackQueries": [
-        "creatinine value med_radiology_report",
-        "objective_findings creatinine value"
+        "document_signature med_radiology_report",
+        "med_radiology_report document signature extracted from findings"
       ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_022",
-      "entity": "sodium_value",
-      "anchors": [
-        "sodium value",
-        "radiology report sodium value",
-        "see section",
-        "documented as"
-      ],
-      "location": "vitals_and_measurements",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "sodium value med_radiology_report",
-        "vitals_and_measurements sodium value"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_023",
-      "entity": "potassium_value",
-      "anchors": [
-        "potassium value",
-        "radiology report potassium value",
-        "see section",
-        "documented as"
-      ],
-      "location": "labs_imaging",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "potassium value med_radiology_report",
-        "labs_imaging potassium value"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_024",
-      "entity": "radiology_modality",
-      "anchors": [
-        "radiology modality",
-        "radiology report radiology modality",
-        "see section",
-        "documented as"
-      ],
-      "location": "assessment_documented",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "radiology modality med_radiology_report",
-        "assessment_documented radiology modality"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_025",
-      "entity": "radiology_impression_text",
-      "anchors": [
-        "radiology impression text",
-        "radiology report radiology impression text",
-        "see section",
-        "documented as"
-      ],
-      "location": "plan_and_orders",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "radiology impression text med_radiology_report",
-        "plan_and_orders radiology impression text"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_026",
-      "entity": "pathology_specimen_type",
-      "anchors": [
-        "pathology specimen type",
-        "radiology report pathology specimen type",
-        "see section",
-        "documented as"
-      ],
-      "location": "medications_allergies",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "pathology specimen type med_radiology_report",
-        "medications_allergies pathology specimen type"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_027",
-      "entity": "ecg_rate",
-      "anchors": [
-        "ecg rate",
-        "radiology report ecg rate",
-        "see section",
-        "documented as"
-      ],
-      "location": "followup_and_disposition",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "ecg rate med_radiology_report",
-        "followup_and_disposition ecg rate"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_028",
-      "entity": "ecg_qtc",
-      "anchors": [
-        "ecg qtc",
-        "radiology report ecg qtc",
-        "see section",
-        "documented as"
-      ],
-      "location": "patient_instructions",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "ecg qtc med_radiology_report",
-        "patient_instructions ecg qtc"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_029",
-      "entity": "documented_assessment_text",
-      "anchors": [
-        "documented assessment text",
-        "radiology report documented assessment text",
-        "see section",
-        "documented as"
-      ],
-      "location": "signoff_and_attestation",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "documented assessment text med_radiology_report",
-        "signoff_and_attestation documented assessment text"
-      ],
-      "confidenceBias": "low"
-    },
-    {
-      "id": "med_radiology_report_hint_030",
-      "entity": "ordered_intervention_text",
-      "anchors": [
-        "ordered intervention text",
-        "radiology report ordered intervention text",
-        "see section",
-        "documented as"
-      ],
-      "location": "annexes_tables",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in table appendix",
-        "can appear in narrative paragraph"
-      ],
-      "pitfalls": [
-        "do not convert units silently",
-        "do not synthesize undocumented diagnosis or treatment advice"
-      ],
-      "fallbackQueries": [
-        "ordered intervention text med_radiology_report",
-        "annexes_tables ordered intervention text"
-      ],
-      "confidenceBias": "low"
+      "confidenceBias": "medium"
     }
   ]
 }

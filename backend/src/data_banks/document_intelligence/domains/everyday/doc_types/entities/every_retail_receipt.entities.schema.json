@@ -1,0 +1,225 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_retail_receipt",
+    "version": "1.0.0",
+    "description": "Entity schema for every_retail_receipt.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_retail_receipt"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    {
+      "id": "merchant_name",
+      "type": "string",
+      "required": true,
+      "description": "Merchant legal name.",
+      "section": "merchant_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["merchant", "store", "shop", "estabelecimento"],
+        "disallowInference": true,
+        "preferredSources": ["merchant_profile"]
+      }
+    },
+    {
+      "id": "merchant_tax_id",
+      "type": "string",
+      "required": false,
+      "description": "Merchant CPF/CNPJ.",
+      "section": "merchant_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["cnpj", "cpf", "merchant id"],
+        "disallowInference": true,
+        "preferredSources": ["merchant_profile"]
+      }
+    },
+    {
+      "id": "merchant_store_id",
+      "type": "string",
+      "required": false,
+      "description": "Store or terminal identifier.",
+      "section": "merchant_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["store id", "terminal", "loja"],
+        "disallowInference": true,
+        "preferredSources": ["merchant_profile"]
+      }
+    },
+    {
+      "id": "merchant_address",
+      "type": "string",
+      "required": false,
+      "description": "Merchant address and location.",
+      "section": "merchant_profile",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["address", "endereco", "location"],
+        "disallowInference": true,
+        "preferredSources": ["merchant_profile"]
+      }
+    },
+    {
+      "id": "receipt_number",
+      "type": "string",
+      "required": true,
+      "description": "Receipt identifier.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["receipt", "document id", "cupom", "fiscal number"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "transaction_datetime",
+      "type": "date",
+      "required": true,
+      "description": "Date/time of purchase.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["date", "hora", "datetime", "transacao"],
+        "disallowInference": true,
+        "preferredSources": ["document_header"]
+      }
+    },
+    {
+      "id": "currency",
+      "type": "string",
+      "required": true,
+      "description": "Receipt currency.",
+      "section": "document_header",
+      "evidence": {
+        "minCitations": 0,
+        "anchors": ["currency", "moeda", "currency code"],
+        "disallowInference": false,
+        "preferredSources": ["document_header", "totals_block"]
+      }
+    },
+    {
+      "id": "subtotal_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Subtotal before discounts and taxes.",
+      "section": "discounts_taxes",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["subtotal", "sub-total"],
+        "disallowInference": true,
+        "preferredSources": ["totals_block", "discounts_taxes"]
+      }
+    },
+    {
+      "id": "discount_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Discount total applied.",
+      "section": "discounts_taxes",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["discount", "desconto", "reduction"],
+        "disallowInference": true,
+        "preferredSources": ["discounts_taxes"]
+      }
+    },
+    {
+      "id": "tax_amount",
+      "type": "currency",
+      "required": false,
+      "description": "Tax amount included in total.",
+      "section": "discounts_taxes",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["tax", "imposto", "icms", "vat", "taxes"],
+        "disallowInference": true,
+        "preferredSources": ["discounts_taxes"]
+      }
+    },
+    {
+      "id": "total_amount",
+      "type": "currency",
+      "required": true,
+      "description": "Total payable amount.",
+      "section": "totals_block",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["total", "amount due", "valor total", "total a pagar"],
+        "disallowInference": true,
+        "preferredSources": ["totals_block"]
+      }
+    },
+    {
+      "id": "item_count",
+      "type": "number",
+      "required": false,
+      "description": "Number of transaction lines.",
+      "section": "transaction_lines",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["items", "qt", "quantity"],
+        "disallowInference": false,
+        "preferredSources": ["transaction_lines"]
+      }
+    },
+    {
+      "id": "payment_method",
+      "type": "string",
+      "required": false,
+      "description": "Payment method used for purchase.",
+      "section": "payment_info",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["payment", "card", "cash", "credit", "debit", "pix"],
+        "disallowInference": false,
+        "preferredSources": ["payment_info"]
+      }
+    },
+    {
+      "id": "cashback",
+      "type": "currency",
+      "required": false,
+      "description": "Cashback credited, if present.",
+      "section": "payment_info",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["cashback", "reembolso", "reward"],
+        "disallowInference": true,
+        "preferredSources": ["payment_info"]
+      }
+    },
+    {
+      "id": "card_last_four",
+      "type": "string",
+      "required": false,
+      "description": "Masked card number suffix used for payment.",
+      "section": "payment_info",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["card", "last", "xxxx", "final"],
+        "disallowInference": true,
+        "preferredSources": ["payment_info"]
+      }
+    },
+    {
+      "id": "invoice_qr_code",
+      "type": "string",
+      "required": false,
+      "description": "Receipt QR code payload.",
+      "section": "security_code",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": ["qr", "qrcode", "barcode", "codigo"],
+        "disallowInference": true,
+        "preferredSources": ["security_code"]
+      }
+    }
+  ]
+}

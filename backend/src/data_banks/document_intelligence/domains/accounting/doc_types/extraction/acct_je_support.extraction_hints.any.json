@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_accounting_extraction_acct_je_support",
+    "version": "1.1.0",
     "description": "Extraction hints for journal entry support.",
-    "version": "1.0.0",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -14,6 +14,64 @@
     "docType": "acct_je_support"
   },
   "hints": [
+    {
+      "id": "hint_period",
+      "entity": "period",
+      "anchors": [
+        "period",
+        "posting period",
+        "competencia",
+        "periodo"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_entity",
+      "entity": "entity",
+      "anchors": [
+        "entity",
+        "company",
+        "legal entity",
+        "empresa"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_currency",
+      "entity": "currency",
+      "anchors": [
+        "currency",
+        "moeda",
+        "curr",
+        "presentation currency"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
+      "id": "hint_basis",
+      "entity": "basis",
+      "anchors": [
+        "basis",
+        "accounting basis",
+        "base contabil"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
+    {
+      "id": "hint_source_system",
+      "entity": "sourceSystem",
+      "anchors": [
+        "source system",
+        "erp",
+        "sistema origem"
+      ],
+      "location": "header",
+      "extractionMethod": "metadata_or_heading"
+    },
     {
       "id": "hint_je_number",
       "entity": "je_number",
@@ -37,11 +95,23 @@
       "extractionMethod": "date_parse"
     },
     {
+      "id": "hint_posting_period",
+      "entity": "posting_period",
+      "anchors": [
+        "posting period",
+        "periodo do lancamento",
+        "month"
+      ],
+      "location": "header",
+      "extractionMethod": "heading_proximity"
+    },
+    {
       "id": "hint_total_debits",
       "entity": "total_debits",
       "anchors": [
         "total debits",
-        "debit total"
+        "debit total",
+        "sum debit"
       ],
       "location": "je_lines_table",
       "extractionMethod": "table_row_match"
@@ -51,7 +121,32 @@
       "entity": "total_credits",
       "anchors": [
         "total credits",
-        "credit total"
+        "credit total",
+        "sum credit"
+      ],
+      "location": "je_lines_table",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_total_debits_shifted",
+      "entity": "total_debits",
+      "anchors": [
+        "total",
+        "debits",
+        "shifted columns",
+        "column order"
+      ],
+      "location": "je_lines_table",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_total_credits_shifted",
+      "entity": "total_credits",
+      "anchors": [
+        "total",
+        "credits",
+        "column order",
+        "reordered"
       ],
       "location": "je_lines_table",
       "extractionMethod": "table_row_match"
@@ -61,10 +156,36 @@
       "entity": "prepared_by",
       "anchors": [
         "prepared by",
-        "prepared"
+        "preparado por"
       ],
       "location": "approval_workflow",
       "extractionMethod": "role_lookup"
+    },
+    {
+      "id": "hint_line_count_from_export",
+      "entity": "line_count",
+      "anchors": [
+        "line count",
+        "line count total",
+        "exported rows",
+        "row count",
+        "csv"
+      ],
+      "location": "je_lines_table",
+      "extractionMethod": "table_row_match"
+    },
+    {
+      "id": "hint_messy_export",
+      "entity": "line_count",
+      "anchors": [
+        "excel export",
+        "spreadsheet export",
+        "messy layout",
+        "merged cells",
+        "row split"
+      ],
+      "location": "entry_lines",
+      "extractionMethod": "table_row_match"
     }
   ]
 }

@@ -1,17 +1,53 @@
 {
   "_meta": {
     "id": "di_accounting_tables_acct_je_support",
+    "version": "1.1.0",
     "description": "Expected table patterns for journal entry support.",
-    "version": "1.0.0",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "accounting",
     "docType": "acct_je_support"
+  },
+  "tableHeaderSynonyms": {
+    "debit": [
+      "debit",
+      "debits",
+      "dr",
+      "dr.",
+      "debit amount",
+      "debito",
+      "valor debito"
+    ],
+    "credit": [
+      "credit",
+      "credits",
+      "cr",
+      "cr.",
+      "credit amount",
+      "credito",
+      "valor credito"
+    ],
+    "currency": [
+      "currency",
+      "currency code",
+      "moeda",
+      "ccy"
+    ],
+    "account": [
+      "account",
+      "account no",
+      "account number",
+      "account code",
+      "acct",
+      "gl account",
+      "ledger account",
+      "conta"
+    ]
   },
   "tables": [
     {
@@ -27,18 +63,154 @@
         "account_name",
         "debit",
         "credit",
+        "currency_code",
         "memo",
         "cost_center"
       ],
       "keyRows": [
         "total_debits",
         "total_credits"
+      ],
+      "headerSynonyms": {
+        "line_no": [
+          "line",
+          "line no",
+          "#"
+        ],
+        "account_code": [
+          "account",
+          "acct",
+          "gl account"
+        ],
+        "account_name": [
+          "account name",
+          "account description"
+        ]
+      },
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "line_no"
+          ],
+          "scale": 1
+        },
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "notes": "Some extracts swap debit and credit column positions by file type"
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "JPY",
+        "BRL",
+        "CAD",
+        "$",
+        "€",
+        "£",
+        "R$"
+      ],
+      "extractionNotes": [
+        "Accept CSV exports where totals appear before the line table",
+        "Accept line tables with extra leading/trailing empty columns"
+      ]
+    },
+    {
+      "id": "je_currency_table",
+      "name": {
+        "en": "Journal Entry Currency Break",
+        "pt": "Quebra por Moeda do Lancamento"
+      },
+      "section": "entry_lines",
+      "expectedColumns": [
+        "currency_code",
+        "debit",
+        "credit",
+        "difference"
+      ],
+      "keyRows": [
+        "grand_total"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "difference"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "debit",
+            "credit",
+            "difference"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "debitColumns": [
+          "debit"
+        ],
+        "creditColumns": [
+          "credit"
+        ],
+        "balanceColumns": [
+          "difference"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "GBP",
+        "BRL",
+        "JPY",
+        "$",
+        "€"
       ]
     },
     {
       "id": "je_support_calc_table",
       "name": {
-        "en": "Support Calculation",
+        "en": "Supporting Calculation",
         "pt": "Calculo de Suporte"
       },
       "section": "supporting_calculation",
@@ -50,6 +222,46 @@
       ],
       "keyRows": [
         "final_result"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "thousands",
+          "appliesToColumns": [
+            "value",
+            "result"
+          ],
+          "scale": 1000,
+          "aliases": [
+            "k"
+          ]
+        },
+        {
+          "unitId": "millions",
+          "appliesToColumns": [
+            "value",
+            "result"
+          ],
+          "scale": 1000000,
+          "aliases": [
+            "m"
+          ]
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "input"
+        ],
+        "valueColumns": [
+          "value",
+          "result"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL",
+        "$",
+        "R$"
       ]
     },
     {
@@ -69,117 +281,26 @@
         "prepared",
         "reviewed",
         "approved"
+      ],
+      "unitsRules": [
+        {
+          "unitId": "unitless",
+          "appliesToColumns": [
+            "role"
+          ],
+          "scale": 1
+        }
+      ],
+      "debitCreditConventions": {
+        "metricColumns": [
+          "status"
+        ]
+      },
+      "multiCurrencyPatterns": [
+        "USD",
+        "EUR",
+        "BRL"
       ]
     }
-  ],
-  "tableHeaderSynonyms": {
-    "debit": [
-      "debit",
-      "debits",
-      "dr",
-      "dr.",
-      "debit amount",
-      "debit amt",
-      "debit value",
-      "debit posting",
-      "debit column",
-      "debit entry",
-      "debit movement",
-      "debito",
-      "débito",
-      "valor debito",
-      "lancamento a debito",
-      "entrada debito"
-    ],
-    "credit": [
-      "credit",
-      "credits",
-      "cr",
-      "cr.",
-      "credit amount",
-      "credit amt",
-      "credit value",
-      "credit posting",
-      "credit column",
-      "credit entry",
-      "credit movement",
-      "credito",
-      "crédito",
-      "valor credito",
-      "lancamento a credito",
-      "saida credito"
-    ],
-    "balance": [
-      "balance",
-      "ending balance",
-      "closing balance",
-      "opening balance",
-      "running balance",
-      "net balance",
-      "book balance",
-      "statement balance",
-      "saldo",
-      "saldo final",
-      "saldo inicial",
-      "saldo liquido",
-      "saldo contabil",
-      "saldo bancario",
-      "valor liquido",
-      "balanco"
-    ],
-    "account": [
-      "account",
-      "account no",
-      "account number",
-      "account code",
-      "acct",
-      "acct no",
-      "gl account",
-      "ledger account",
-      "nominal account",
-      "conta",
-      "numero da conta",
-      "codigo da conta",
-      "conta contabil",
-      "conta razao",
-      "plano de contas item",
-      "classificacao contabil"
-    ],
-    "vendor": [
-      "vendor",
-      "supplier",
-      "payee",
-      "provider",
-      "seller",
-      "beneficiary",
-      "counterparty",
-      "fornecedor",
-      "prestador",
-      "favorecido",
-      "credor",
-      "terceiro",
-      "parceiro",
-      "nome do fornecedor",
-      "codigo do fornecedor",
-      "id fornecedor"
-    ],
-    "invoice": [
-      "invoice",
-      "invoice no",
-      "invoice number",
-      "invoice id",
-      "bill",
-      "bill number",
-      "voucher",
-      "nota fiscal",
-      "nf",
-      "nf-e",
-      "fatura",
-      "numero da fatura",
-      "documento fiscal",
-      "doc number",
-      "id invoice",
-      "chave da nota"
-    ]
-  }
+  ]
 }

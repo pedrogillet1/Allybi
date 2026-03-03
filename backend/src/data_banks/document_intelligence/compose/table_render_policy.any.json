@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "id": "table_render_policy",
+    "version": "1.0.0",
+    "description": "Table rendering policy to prevent truncation while preserving unit and header context.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "preserveHeaders": true,
+    "preserveUnits": true,
+    "preserveSectionContext": true,
+    "allowTruncation": false,
+    "allowPagination": true,
+    "maxColumnWidth": 220,
+    "maxRowsPerChunk": 140,
+    "fallbackMode": "streaming_with_continuation"
+  },
+  "rules": [
+    {
+      "id": "TRP_001_forbid_row_truncation",
+      "trigger": "A table output exceeds UI row budget",
+      "check": "table.rowCount > config.maxRowsPerChunk",
+      "failureAction": "RENDER_WITHOUT_TRUNCATION",
+      "action": "preserveAllRows",
+      "notes": "Do not truncate rows; use pagination or stream chunks and clear continuation labels."
+    },
+    {
+      "id": "TRP_002_preserve_unit_header_context",
+      "trigger": "Rendered table includes numeric columns with units",
+      "check": "table.unitColumns.count > 0",
+      "failureAction": "KEEP_UNIT_ROW_HEADERS",
+      "notes": "Keep units in column headers and footers."
+    },
+    {
+      "id": "TRP_003_anchor_units_on_merged_cells",
+      "trigger": "Table merge may obscure unit metadata",
+      "check": "table.hasMergedHeaderCells == true AND table.unitColumns.count > 0",
+      "failureAction": "RENDER_HEADER_REPEATER_FOR_MERGED_COLUMNS",
+      "notes": "Repeat compact unit annotation per repeated header lineage."
+    },
+    {
+      "id": "TRP_004_no_value_widening",
+      "trigger": "Renderer decides to shorten numeric precision",
+      "check": "table.valueFormatting.precisionReduced == true",
+      "failureAction": "PRESERVE_SOURCE_PRECISION",
+      "notes": "Do not auto-round numbers if numeric integrity risk applies."
+    }
+  ],
+  "templates": [
+    {
+      "id": "TABLE_RENDER_POLICY_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in table_render_policy.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

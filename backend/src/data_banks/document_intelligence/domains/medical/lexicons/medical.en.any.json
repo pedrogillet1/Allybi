@@ -1314,6 +1314,56 @@
         "care objective provision"
       ],
       "display": "Care Objective"
+    },
+    {
+      "id": "medical_lex_en_131",
+      "canonical": "lab result",
+      "synonyms": [
+        "lab result",
+        "laboratory result",
+        "lab report result"
+      ],
+      "display": "Lab Result"
+    },
+    {
+      "id": "medical_lex_en_132",
+      "canonical": "abnormal flag",
+      "synonyms": [
+        "abnormal flag",
+        "abnormal finding",
+        "flagged abnormal"
+      ],
+      "display": "Abnormal Flag"
+    },
+    {
+      "id": "medical_lex_en_133",
+      "canonical": "lab unit",
+      "synonyms": [
+        "lab unit",
+        "measurement unit",
+        "laboratory unit"
+      ],
+      "display": "Lab Unit"
+    },
+    {
+      "id": "medical_lex_en_134",
+      "canonical": "critical value",
+      "synonyms": [
+        "critical value",
+        "critical result",
+        "urgent value"
+      ],
+      "display": "Critical Value"
+    },
+    {
+      "id": "medical_lex_en_135",
+      "canonical": "discharge",
+      "synonyms": [
+        "discharge",
+        "medical discharge",
+        "hospital discharge"
+      ],
+      "display": "Discharge"
     }
   ]
 }

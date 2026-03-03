@@ -1,11 +1,1382 @@
 {
-  "_meta": { "id": "di_finance_sections_fin_variance", "version": "1.0.0", "description": "Section map for variance analysis reports.", "languages": ["any"], "lastUpdated": "2026-02-27" },
-  "config": { "enabled": true, "domain": "finance", "docType": "fin_variance" },
+  "_meta": {
+    "id": "di_finance_sections_fin_variance",
+    "version": "2.1.0",
+    "description": "Sections mapping for Variance Analysis.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "finance",
+    "docType": "fin_variance"
+  },
   "sections": [
-    { "id": "commentary", "name": { "en": "Management Commentary", "pt": "Comentário da Administração" }, "required": false, "order": 5, "headingAnchors": ["Commentary", "Explanation", "Key Drivers"] },
-    { "id": "executive_summary", "name": { "en": "Executive Summary", "pt": "Resumo Executivo" }, "required": false, "order": 1, "headingAnchors": ["Executive Summary", "Overview"] },
-    { "id": "expense_variance", "name": { "en": "Expense Variance", "pt": "Variação de Despesas" }, "required": true, "order": 3, "headingAnchors": ["Expense Variance", "Cost Variance"] },
-    { "id": "pnl_variance", "name": { "en": "P&L Variance Summary", "pt": "Resumo de Variação P&L" }, "required": true, "order": 4, "headingAnchors": ["P&L Variance", "Income Statement Variance", "Total Variance"] },
-    { "id": "revenue_variance", "name": { "en": "Revenue Variance", "pt": "Variação de Receita" }, "required": true, "order": 2, "headingAnchors": ["Revenue Variance", "Revenue Analysis"] }
+    {
+      "id": "plan_vs_actual_summary_1",
+      "name": {
+        "en": "Plan Vs Actual Summary Segment 1",
+        "pt": "Plan Vs Actual Summary segmento 1"
+      },
+      "mustHave": true,
+      "order": 1,
+      "headingAnchors": [
+        "Plan Vs Actual Summary 1",
+        "plan_vs_actual_summary 1",
+        "Plan Vs Actual Summary section",
+        "seção Plan Vs Actual Summary 1"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bplan_vs_actual_summary\b",
+        "\bplan_vs_actual_summary_1\b",
+        "\bplan_vs_actual_summary section\b"
+      ],
+      "description": "Canonical section plan_vs_actual_summary for Variance Analysis"
+    },
+    {
+      "id": "variance_by_category_2",
+      "name": {
+        "en": "Variance By Category Segment 2",
+        "pt": "Variacao By Category segmento 2"
+      },
+      "mustHave": true,
+      "order": 2,
+      "headingAnchors": [
+        "Variance By Category 2",
+        "variance_by_category 2",
+        "Variance By Category section",
+        "seção Variance By Category 2"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bvariance_by_category\b",
+        "\bvariance_by_category_2\b",
+        "\bvariance_by_category section\b"
+      ],
+      "description": "Canonical section variance_by_category for Variance Analysis"
+    },
+    {
+      "id": "materiality_rationale_3",
+      "name": {
+        "en": "Materiality Rationale Segment 3",
+        "pt": "Materiality Rationale segmento 3"
+      },
+      "mustHave": true,
+      "order": 3,
+      "headingAnchors": [
+        "Materiality Rationale 3",
+        "materiality_rationale 3",
+        "Materiality Rationale section",
+        "seção Materiality Rationale 3"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bmateriality_rationale\b",
+        "\bmateriality_rationale_3\b",
+        "\bmateriality_rationale section\b"
+      ],
+      "description": "Canonical section materiality_rationale for Variance Analysis"
+    },
+    {
+      "id": "root_cause_analysis_4",
+      "name": {
+        "en": "Root Cause Analysis Segment 4",
+        "pt": "Root Cause Analysis segmento 4"
+      },
+      "mustHave": true,
+      "order": 4,
+      "headingAnchors": [
+        "Root Cause Analysis 4",
+        "root_cause_analysis 4",
+        "Root Cause Analysis section",
+        "seção Root Cause Analysis 4"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\broot_cause_analysis\b",
+        "\broot_cause_analysis_4\b",
+        "\broot_cause_analysis section\b"
+      ],
+      "description": "Canonical section root_cause_analysis for Variance Analysis"
+    },
+    {
+      "id": "driver_drilldown_5",
+      "name": {
+        "en": "Driver Drilldown Segment 5",
+        "pt": "Driver Drilldown segmento 5"
+      },
+      "mustHave": true,
+      "order": 5,
+      "headingAnchors": [
+        "Driver Drilldown 5",
+        "driver_drilldown 5",
+        "Driver Drilldown section",
+        "seção Driver Drilldown 5"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bdriver_drilldown\b",
+        "\bdriver_drilldown_5\b",
+        "\bdriver_drilldown section\b"
+      ],
+      "description": "Canonical section driver_drilldown for Variance Analysis"
+    },
+    {
+      "id": "periodic_trends_6",
+      "name": {
+        "en": "Periodic Trends Segment 6",
+        "pt": "Periodic Trends segmento 6"
+      },
+      "mustHave": true,
+      "order": 6,
+      "headingAnchors": [
+        "Periodic Trends 6",
+        "periodic_trends 6",
+        "Periodic Trends section",
+        "seção Periodic Trends 6"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bperiodic_trends\b",
+        "\bperiodic_trends_6\b",
+        "\bperiodic_trends section\b"
+      ],
+      "description": "Canonical section periodic_trends for Variance Analysis"
+    },
+    {
+      "id": "forecast_impacts_7",
+      "name": {
+        "en": "Forecast Impacts Segment 7",
+        "pt": "Previsao Impacts segmento 7"
+      },
+      "mustHave": true,
+      "order": 7,
+      "headingAnchors": [
+        "Forecast Impacts 7",
+        "forecast_impacts 7",
+        "Forecast Impacts section",
+        "seção Forecast Impacts 7"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bforecast_impacts\b",
+        "\bforecast_impacts_7\b",
+        "\bforecast_impacts section\b"
+      ],
+      "description": "Canonical section forecast_impacts for Variance Analysis"
+    },
+    {
+      "id": "remediation_actions_8",
+      "name": {
+        "en": "Remediation Actions Segment 8",
+        "pt": "Remediation Actions segmento 8"
+      },
+      "mustHave": true,
+      "order": 8,
+      "headingAnchors": [
+        "Remediation Actions 8",
+        "remediation_actions 8",
+        "Remediation Actions section",
+        "seção Remediation Actions 8"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bremediation_actions\b",
+        "\bremediation_actions_8\b",
+        "\bremediation_actions section\b"
+      ],
+      "description": "Canonical section remediation_actions for Variance Analysis"
+    },
+    {
+      "id": "approval_notes_9",
+      "name": {
+        "en": "Approval Notes Segment 9",
+        "pt": "Approval Notes segmento 9"
+      },
+      "mustHave": true,
+      "order": 9,
+      "headingAnchors": [
+        "Approval Notes 9",
+        "approval_notes 9",
+        "Approval Notes section",
+        "seção Approval Notes 9"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bapproval_notes\b",
+        "\bapproval_notes_9\b",
+        "\bapproval_notes section\b"
+      ],
+      "description": "Canonical section approval_notes for Variance Analysis"
+    },
+    {
+      "id": "appendix_detail_10",
+      "name": {
+        "en": "Appendix Detail Segment 10",
+        "pt": "Appendix Detail segmento 10"
+      },
+      "mustHave": true,
+      "order": 10,
+      "headingAnchors": [
+        "Appendix Detail 10",
+        "appendix_detail 10",
+        "Appendix Detail section",
+        "seção Appendix Detail 10"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bappendix_detail\b",
+        "\bappendix_detail_10\b",
+        "\bappendix_detail section\b"
+      ],
+      "description": "Canonical section appendix_detail for Variance Analysis"
+    },
+    {
+      "id": "controls_11",
+      "name": {
+        "en": "Controls Segment 11",
+        "pt": "Controls segmento 11"
+      },
+      "mustHave": false,
+      "order": 11,
+      "headingAnchors": [
+        "Controls 11",
+        "controls 11",
+        "Controls section",
+        "seção Controls 11"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bcontrols\b",
+        "\bcontrols_11\b",
+        "\bcontrols section\b"
+      ],
+      "description": "Canonical section controls for Variance Analysis"
+    },
+    {
+      "id": "variance_objective_12",
+      "name": {
+        "en": "Variance Objective Segment 12",
+        "pt": "Variacao Objective segmento 12"
+      },
+      "mustHave": false,
+      "order": 12,
+      "headingAnchors": [
+        "Variance Objective 12",
+        "variance_objective 12",
+        "Variance Objective section",
+        "seção Variance Objective 12"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bvariance_objective\b",
+        "\bvariance_objective_12\b",
+        "\bvariance_objective section\b"
+      ],
+      "description": "Canonical section variance_objective for Variance Analysis"
+    },
+    {
+      "id": "plan_vs_actual_summary_13",
+      "name": {
+        "en": "Plan Vs Actual Summary Segment 13",
+        "pt": "Plan Vs Actual Summary segmento 13"
+      },
+      "mustHave": false,
+      "order": 13,
+      "headingAnchors": [
+        "Plan Vs Actual Summary 13",
+        "plan_vs_actual_summary 13",
+        "Plan Vs Actual Summary section",
+        "seção Plan Vs Actual Summary 13"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bplan_vs_actual_summary\b",
+        "\bplan_vs_actual_summary_13\b",
+        "\bplan_vs_actual_summary section\b"
+      ],
+      "description": "Canonical section plan_vs_actual_summary for Variance Analysis"
+    },
+    {
+      "id": "variance_by_category_14",
+      "name": {
+        "en": "Variance By Category Segment 14",
+        "pt": "Variacao By Category segmento 14"
+      },
+      "mustHave": false,
+      "order": 14,
+      "headingAnchors": [
+        "Variance By Category 14",
+        "variance_by_category 14",
+        "Variance By Category section",
+        "seção Variance By Category 14"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bvariance_by_category\b",
+        "\bvariance_by_category_14\b",
+        "\bvariance_by_category section\b"
+      ],
+      "description": "Canonical section variance_by_category for Variance Analysis"
+    },
+    {
+      "id": "materiality_rationale_15",
+      "name": {
+        "en": "Materiality Rationale Segment 15",
+        "pt": "Materiality Rationale segmento 15"
+      },
+      "mustHave": false,
+      "order": 15,
+      "headingAnchors": [
+        "Materiality Rationale 15",
+        "materiality_rationale 15",
+        "Materiality Rationale section",
+        "seção Materiality Rationale 15"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bmateriality_rationale\b",
+        "\bmateriality_rationale_15\b",
+        "\bmateriality_rationale section\b"
+      ],
+      "description": "Canonical section materiality_rationale for Variance Analysis"
+    },
+    {
+      "id": "root_cause_analysis_16",
+      "name": {
+        "en": "Root Cause Analysis Segment 16",
+        "pt": "Root Cause Analysis segmento 16"
+      },
+      "mustHave": false,
+      "order": 16,
+      "headingAnchors": [
+        "Root Cause Analysis 16",
+        "root_cause_analysis 16",
+        "Root Cause Analysis section",
+        "seção Root Cause Analysis 16"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\broot_cause_analysis\b",
+        "\broot_cause_analysis_16\b",
+        "\broot_cause_analysis section\b"
+      ],
+      "description": "Canonical section root_cause_analysis for Variance Analysis"
+    },
+    {
+      "id": "driver_drilldown_17",
+      "name": {
+        "en": "Driver Drilldown Segment 17",
+        "pt": "Driver Drilldown segmento 17"
+      },
+      "mustHave": false,
+      "order": 17,
+      "headingAnchors": [
+        "Driver Drilldown 17",
+        "driver_drilldown 17",
+        "Driver Drilldown section",
+        "seção Driver Drilldown 17"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bdriver_drilldown\b",
+        "\bdriver_drilldown_17\b",
+        "\bdriver_drilldown section\b"
+      ],
+      "description": "Canonical section driver_drilldown for Variance Analysis"
+    },
+    {
+      "id": "periodic_trends_18",
+      "name": {
+        "en": "Periodic Trends Segment 18",
+        "pt": "Periodic Trends segmento 18"
+      },
+      "mustHave": false,
+      "order": 18,
+      "headingAnchors": [
+        "Periodic Trends 18",
+        "periodic_trends 18",
+        "Periodic Trends section",
+        "seção Periodic Trends 18"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bperiodic_trends\b",
+        "\bperiodic_trends_18\b",
+        "\bperiodic_trends section\b"
+      ],
+      "description": "Canonical section periodic_trends for Variance Analysis"
+    },
+    {
+      "id": "forecast_impacts_19",
+      "name": {
+        "en": "Forecast Impacts Segment 19",
+        "pt": "Previsao Impacts segmento 19"
+      },
+      "mustHave": false,
+      "order": 19,
+      "headingAnchors": [
+        "Forecast Impacts 19",
+        "forecast_impacts 19",
+        "Forecast Impacts section",
+        "seção Forecast Impacts 19"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bforecast_impacts\b",
+        "\bforecast_impacts_19\b",
+        "\bforecast_impacts section\b"
+      ],
+      "description": "Canonical section forecast_impacts for Variance Analysis"
+    },
+    {
+      "id": "remediation_actions_20",
+      "name": {
+        "en": "Remediation Actions Segment 20",
+        "pt": "Remediation Actions segmento 20"
+      },
+      "mustHave": false,
+      "order": 20,
+      "headingAnchors": [
+        "Remediation Actions 20",
+        "remediation_actions 20",
+        "Remediation Actions section",
+        "seção Remediation Actions 20"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bremediation_actions\b",
+        "\bremediation_actions_20\b",
+        "\bremediation_actions section\b"
+      ],
+      "description": "Canonical section remediation_actions for Variance Analysis"
+    },
+    {
+      "id": "approval_notes_21",
+      "name": {
+        "en": "Approval Notes Segment 21",
+        "pt": "Approval Notes segmento 21"
+      },
+      "mustHave": false,
+      "order": 21,
+      "headingAnchors": [
+        "Approval Notes 21",
+        "approval_notes 21",
+        "Approval Notes section",
+        "seção Approval Notes 21"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bapproval_notes\b",
+        "\bapproval_notes_21\b",
+        "\bapproval_notes section\b"
+      ],
+      "description": "Canonical section approval_notes for Variance Analysis"
+    },
+    {
+      "id": "appendix_detail_22",
+      "name": {
+        "en": "Appendix Detail Segment 22",
+        "pt": "Appendix Detail segmento 22"
+      },
+      "mustHave": false,
+      "order": 22,
+      "headingAnchors": [
+        "Appendix Detail 22",
+        "appendix_detail 22",
+        "Appendix Detail section",
+        "seção Appendix Detail 22"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bappendix_detail\b",
+        "\bappendix_detail_22\b",
+        "\bappendix_detail section\b"
+      ],
+      "description": "Canonical section appendix_detail for Variance Analysis"
+    },
+    {
+      "id": "controls_23",
+      "name": {
+        "en": "Controls Segment 23",
+        "pt": "Controls segmento 23"
+      },
+      "mustHave": false,
+      "order": 23,
+      "headingAnchors": [
+        "Controls 23",
+        "controls 23",
+        "Controls section",
+        "seção Controls 23"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bcontrols\b",
+        "\bcontrols_23\b",
+        "\bcontrols section\b"
+      ],
+      "description": "Canonical section controls for Variance Analysis"
+    },
+    {
+      "id": "variance_objective_24",
+      "name": {
+        "en": "Variance Objective Segment 24",
+        "pt": "Variacao Objective segmento 24"
+      },
+      "mustHave": false,
+      "order": 24,
+      "headingAnchors": [
+        "Variance Objective 24",
+        "variance_objective 24",
+        "Variance Objective section",
+        "seção Variance Objective 24"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bvariance_objective\b",
+        "\bvariance_objective_24\b",
+        "\bvariance_objective section\b"
+      ],
+      "description": "Canonical section variance_objective for Variance Analysis"
+    },
+    {
+      "id": "plan_vs_actual_summary_25",
+      "name": {
+        "en": "Plan Vs Actual Summary Segment 25",
+        "pt": "Plan Vs Actual Summary segmento 25"
+      },
+      "mustHave": false,
+      "order": 25,
+      "headingAnchors": [
+        "Plan Vs Actual Summary 25",
+        "plan_vs_actual_summary 25",
+        "Plan Vs Actual Summary section",
+        "seção Plan Vs Actual Summary 25"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bplan_vs_actual_summary\b",
+        "\bplan_vs_actual_summary_25\b",
+        "\bplan_vs_actual_summary section\b"
+      ],
+      "description": "Canonical section plan_vs_actual_summary for Variance Analysis"
+    },
+    {
+      "id": "variance_by_category_26",
+      "name": {
+        "en": "Variance By Category Segment 26",
+        "pt": "Variacao By Category segmento 26"
+      },
+      "mustHave": false,
+      "order": 26,
+      "headingAnchors": [
+        "Variance By Category 26",
+        "variance_by_category 26",
+        "Variance By Category section",
+        "seção Variance By Category 26"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bvariance_by_category\b",
+        "\bvariance_by_category_26\b",
+        "\bvariance_by_category section\b"
+      ],
+      "description": "Canonical section variance_by_category for Variance Analysis"
+    },
+    {
+      "id": "materiality_rationale_27",
+      "name": {
+        "en": "Materiality Rationale Segment 27",
+        "pt": "Materiality Rationale segmento 27"
+      },
+      "mustHave": false,
+      "order": 27,
+      "headingAnchors": [
+        "Materiality Rationale 27",
+        "materiality_rationale 27",
+        "Materiality Rationale section",
+        "seção Materiality Rationale 27"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bmateriality_rationale\b",
+        "\bmateriality_rationale_27\b",
+        "\bmateriality_rationale section\b"
+      ],
+      "description": "Canonical section materiality_rationale for Variance Analysis"
+    },
+    {
+      "id": "root_cause_analysis_28",
+      "name": {
+        "en": "Root Cause Analysis Segment 28",
+        "pt": "Root Cause Analysis segmento 28"
+      },
+      "mustHave": false,
+      "order": 28,
+      "headingAnchors": [
+        "Root Cause Analysis 28",
+        "root_cause_analysis 28",
+        "Root Cause Analysis section",
+        "seção Root Cause Analysis 28"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\broot_cause_analysis\b",
+        "\broot_cause_analysis_28\b",
+        "\broot_cause_analysis section\b"
+      ],
+      "description": "Canonical section root_cause_analysis for Variance Analysis"
+    },
+    {
+      "id": "driver_drilldown_29",
+      "name": {
+        "en": "Driver Drilldown Segment 29",
+        "pt": "Driver Drilldown segmento 29"
+      },
+      "mustHave": false,
+      "order": 29,
+      "headingAnchors": [
+        "Driver Drilldown 29",
+        "driver_drilldown 29",
+        "Driver Drilldown section",
+        "seção Driver Drilldown 29"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bdriver_drilldown\b",
+        "\bdriver_drilldown_29\b",
+        "\bdriver_drilldown section\b"
+      ],
+      "description": "Canonical section driver_drilldown for Variance Analysis"
+    },
+    {
+      "id": "periodic_trends_30",
+      "name": {
+        "en": "Periodic Trends Segment 30",
+        "pt": "Periodic Trends segmento 30"
+      },
+      "mustHave": false,
+      "order": 30,
+      "headingAnchors": [
+        "Periodic Trends 30",
+        "periodic_trends 30",
+        "Periodic Trends section",
+        "seção Periodic Trends 30"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bperiodic_trends\b",
+        "\bperiodic_trends_30\b",
+        "\bperiodic_trends section\b"
+      ],
+      "description": "Canonical section periodic_trends for Variance Analysis"
+    },
+    {
+      "id": "forecast_impacts_31",
+      "name": {
+        "en": "Forecast Impacts Segment 31",
+        "pt": "Previsao Impacts segmento 31"
+      },
+      "mustHave": false,
+      "order": 31,
+      "headingAnchors": [
+        "Forecast Impacts 31",
+        "forecast_impacts 31",
+        "Forecast Impacts section",
+        "seção Forecast Impacts 31"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bforecast_impacts\b",
+        "\bforecast_impacts_31\b",
+        "\bforecast_impacts section\b"
+      ],
+      "description": "Canonical section forecast_impacts for Variance Analysis"
+    },
+    {
+      "id": "remediation_actions_32",
+      "name": {
+        "en": "Remediation Actions Segment 32",
+        "pt": "Remediation Actions segmento 32"
+      },
+      "mustHave": false,
+      "order": 32,
+      "headingAnchors": [
+        "Remediation Actions 32",
+        "remediation_actions 32",
+        "Remediation Actions section",
+        "seção Remediation Actions 32"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bremediation_actions\b",
+        "\bremediation_actions_32\b",
+        "\bremediation_actions section\b"
+      ],
+      "description": "Canonical section remediation_actions for Variance Analysis"
+    },
+    {
+      "id": "approval_notes_33",
+      "name": {
+        "en": "Approval Notes Segment 33",
+        "pt": "Approval Notes segmento 33"
+      },
+      "mustHave": false,
+      "order": 33,
+      "headingAnchors": [
+        "Approval Notes 33",
+        "approval_notes 33",
+        "Approval Notes section",
+        "seção Approval Notes 33"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bapproval_notes\b",
+        "\bapproval_notes_33\b",
+        "\bapproval_notes section\b"
+      ],
+      "description": "Canonical section approval_notes for Variance Analysis"
+    },
+    {
+      "id": "appendix_detail_34",
+      "name": {
+        "en": "Appendix Detail Segment 34",
+        "pt": "Appendix Detail segmento 34"
+      },
+      "mustHave": false,
+      "order": 34,
+      "headingAnchors": [
+        "Appendix Detail 34",
+        "appendix_detail 34",
+        "Appendix Detail section",
+        "seção Appendix Detail 34"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bappendix_detail\b",
+        "\bappendix_detail_34\b",
+        "\bappendix_detail section\b"
+      ],
+      "description": "Canonical section appendix_detail for Variance Analysis"
+    },
+    {
+      "id": "controls_35",
+      "name": {
+        "en": "Controls Segment 35",
+        "pt": "Controls segmento 35"
+      },
+      "mustHave": false,
+      "order": 35,
+      "headingAnchors": [
+        "Controls 35",
+        "controls 35",
+        "Controls section",
+        "seção Controls 35"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bcontrols\b",
+        "\bcontrols_35\b",
+        "\bcontrols section\b"
+      ],
+      "description": "Canonical section controls for Variance Analysis"
+    },
+    {
+      "id": "variance_objective_36",
+      "name": {
+        "en": "Variance Objective Segment 36",
+        "pt": "Variacao Objective segmento 36"
+      },
+      "mustHave": false,
+      "order": 36,
+      "headingAnchors": [
+        "Variance Objective 36",
+        "variance_objective 36",
+        "Variance Objective section",
+        "seção Variance Objective 36"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bvariance_objective\b",
+        "\bvariance_objective_36\b",
+        "\bvariance_objective section\b"
+      ],
+      "description": "Canonical section variance_objective for Variance Analysis"
+    },
+    {
+      "id": "plan_vs_actual_summary_37",
+      "name": {
+        "en": "Plan Vs Actual Summary Segment 37",
+        "pt": "Plan Vs Actual Summary segmento 37"
+      },
+      "mustHave": false,
+      "order": 37,
+      "headingAnchors": [
+        "Plan Vs Actual Summary 37",
+        "plan_vs_actual_summary 37",
+        "Plan Vs Actual Summary section",
+        "seção Plan Vs Actual Summary 37"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bplan_vs_actual_summary\b",
+        "\bplan_vs_actual_summary_37\b",
+        "\bplan_vs_actual_summary section\b"
+      ],
+      "description": "Canonical section plan_vs_actual_summary for Variance Analysis"
+    },
+    {
+      "id": "variance_by_category_38",
+      "name": {
+        "en": "Variance By Category Segment 38",
+        "pt": "Variacao By Category segmento 38"
+      },
+      "mustHave": false,
+      "order": 38,
+      "headingAnchors": [
+        "Variance By Category 38",
+        "variance_by_category 38",
+        "Variance By Category section",
+        "seção Variance By Category 38"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bvariance_by_category\b",
+        "\bvariance_by_category_38\b",
+        "\bvariance_by_category section\b"
+      ],
+      "description": "Canonical section variance_by_category for Variance Analysis"
+    },
+    {
+      "id": "materiality_rationale_39",
+      "name": {
+        "en": "Materiality Rationale Segment 39",
+        "pt": "Materiality Rationale segmento 39"
+      },
+      "mustHave": false,
+      "order": 39,
+      "headingAnchors": [
+        "Materiality Rationale 39",
+        "materiality_rationale 39",
+        "Materiality Rationale section",
+        "seção Materiality Rationale 39"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bmateriality_rationale\b",
+        "\bmateriality_rationale_39\b",
+        "\bmateriality_rationale section\b"
+      ],
+      "description": "Canonical section materiality_rationale for Variance Analysis"
+    },
+    {
+      "id": "root_cause_analysis_40",
+      "name": {
+        "en": "Root Cause Analysis Segment 40",
+        "pt": "Root Cause Analysis segmento 40"
+      },
+      "mustHave": false,
+      "order": 40,
+      "headingAnchors": [
+        "Root Cause Analysis 40",
+        "root_cause_analysis 40",
+        "Root Cause Analysis section",
+        "seção Root Cause Analysis 40"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\broot_cause_analysis\b",
+        "\broot_cause_analysis_40\b",
+        "\broot_cause_analysis section\b"
+      ],
+      "description": "Canonical section root_cause_analysis for Variance Analysis"
+    },
+    {
+      "id": "driver_drilldown_41",
+      "name": {
+        "en": "Driver Drilldown Segment 41",
+        "pt": "Driver Drilldown segmento 41"
+      },
+      "mustHave": false,
+      "order": 41,
+      "headingAnchors": [
+        "Driver Drilldown 41",
+        "driver_drilldown 41",
+        "Driver Drilldown section",
+        "seção Driver Drilldown 41"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bdriver_drilldown\b",
+        "\bdriver_drilldown_41\b",
+        "\bdriver_drilldown section\b"
+      ],
+      "description": "Canonical section driver_drilldown for Variance Analysis"
+    },
+    {
+      "id": "periodic_trends_42",
+      "name": {
+        "en": "Periodic Trends Segment 42",
+        "pt": "Periodic Trends segmento 42"
+      },
+      "mustHave": false,
+      "order": 42,
+      "headingAnchors": [
+        "Periodic Trends 42",
+        "periodic_trends 42",
+        "Periodic Trends section",
+        "seção Periodic Trends 42"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bperiodic_trends\b",
+        "\bperiodic_trends_42\b",
+        "\bperiodic_trends section\b"
+      ],
+      "description": "Canonical section periodic_trends for Variance Analysis"
+    },
+    {
+      "id": "forecast_impacts_43",
+      "name": {
+        "en": "Forecast Impacts Segment 43",
+        "pt": "Previsao Impacts segmento 43"
+      },
+      "mustHave": false,
+      "order": 43,
+      "headingAnchors": [
+        "Forecast Impacts 43",
+        "forecast_impacts 43",
+        "Forecast Impacts section",
+        "seção Forecast Impacts 43"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bforecast_impacts\b",
+        "\bforecast_impacts_43\b",
+        "\bforecast_impacts section\b"
+      ],
+      "description": "Canonical section forecast_impacts for Variance Analysis"
+    },
+    {
+      "id": "remediation_actions_44",
+      "name": {
+        "en": "Remediation Actions Segment 44",
+        "pt": "Remediation Actions segmento 44"
+      },
+      "mustHave": false,
+      "order": 44,
+      "headingAnchors": [
+        "Remediation Actions 44",
+        "remediation_actions 44",
+        "Remediation Actions section",
+        "seção Remediation Actions 44"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bremediation_actions\b",
+        "\bremediation_actions_44\b",
+        "\bremediation_actions section\b"
+      ],
+      "description": "Canonical section remediation_actions for Variance Analysis"
+    },
+    {
+      "id": "approval_notes_45",
+      "name": {
+        "en": "Approval Notes Segment 45",
+        "pt": "Approval Notes segmento 45"
+      },
+      "mustHave": false,
+      "order": 45,
+      "headingAnchors": [
+        "Approval Notes 45",
+        "approval_notes 45",
+        "Approval Notes section",
+        "seção Approval Notes 45"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bapproval_notes\b",
+        "\bapproval_notes_45\b",
+        "\bapproval_notes section\b"
+      ],
+      "description": "Canonical section approval_notes for Variance Analysis"
+    },
+    {
+      "id": "appendix_detail_46",
+      "name": {
+        "en": "Appendix Detail Segment 46",
+        "pt": "Appendix Detail segmento 46"
+      },
+      "mustHave": false,
+      "order": 46,
+      "headingAnchors": [
+        "Appendix Detail 46",
+        "appendix_detail 46",
+        "Appendix Detail section",
+        "seção Appendix Detail 46"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bappendix_detail\b",
+        "\bappendix_detail_46\b",
+        "\bappendix_detail section\b"
+      ],
+      "description": "Canonical section appendix_detail for Variance Analysis"
+    },
+    {
+      "id": "controls_47",
+      "name": {
+        "en": "Controls Segment 47",
+        "pt": "Controls segmento 47"
+      },
+      "mustHave": false,
+      "order": 47,
+      "headingAnchors": [
+        "Controls 47",
+        "controls 47",
+        "Controls section",
+        "seção Controls 47"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bcontrols\b",
+        "\bcontrols_47\b",
+        "\bcontrols section\b"
+      ],
+      "description": "Canonical section controls for Variance Analysis"
+    },
+    {
+      "id": "variance_objective_48",
+      "name": {
+        "en": "Variance Objective Segment 48",
+        "pt": "Variacao Objective segmento 48"
+      },
+      "mustHave": false,
+      "order": 48,
+      "headingAnchors": [
+        "Variance Objective 48",
+        "variance_objective 48",
+        "Variance Objective section",
+        "seção Variance Objective 48"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bvariance_objective\b",
+        "\bvariance_objective_48\b",
+        "\bvariance_objective section\b"
+      ],
+      "description": "Canonical section variance_objective for Variance Analysis"
+    },
+    {
+      "id": "plan_vs_actual_summary_49",
+      "name": {
+        "en": "Plan Vs Actual Summary Segment 49",
+        "pt": "Plan Vs Actual Summary segmento 49"
+      },
+      "mustHave": false,
+      "order": 49,
+      "headingAnchors": [
+        "Plan Vs Actual Summary 49",
+        "plan_vs_actual_summary 49",
+        "Plan Vs Actual Summary section",
+        "seção Plan Vs Actual Summary 49"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bplan_vs_actual_summary\b",
+        "\bplan_vs_actual_summary_49\b",
+        "\bplan_vs_actual_summary section\b"
+      ],
+      "description": "Canonical section plan_vs_actual_summary for Variance Analysis"
+    },
+    {
+      "id": "variance_by_category_50",
+      "name": {
+        "en": "Variance By Category Segment 50",
+        "pt": "Variacao By Category segmento 50"
+      },
+      "mustHave": false,
+      "order": 50,
+      "headingAnchors": [
+        "Variance By Category 50",
+        "variance_by_category 50",
+        "Variance By Category section",
+        "seção Variance By Category 50"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bvariance_by_category\b",
+        "\bvariance_by_category_50\b",
+        "\bvariance_by_category section\b"
+      ],
+      "description": "Canonical section variance_by_category for Variance Analysis"
+    },
+    {
+      "id": "materiality_rationale_51",
+      "name": {
+        "en": "Materiality Rationale Segment 51",
+        "pt": "Materiality Rationale segmento 51"
+      },
+      "mustHave": false,
+      "order": 51,
+      "headingAnchors": [
+        "Materiality Rationale 51",
+        "materiality_rationale 51",
+        "Materiality Rationale section",
+        "seção Materiality Rationale 51"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bmateriality_rationale\b",
+        "\bmateriality_rationale_51\b",
+        "\bmateriality_rationale section\b"
+      ],
+      "description": "Canonical section materiality_rationale for Variance Analysis"
+    },
+    {
+      "id": "root_cause_analysis_52",
+      "name": {
+        "en": "Root Cause Analysis Segment 52",
+        "pt": "Root Cause Analysis segmento 52"
+      },
+      "mustHave": false,
+      "order": 52,
+      "headingAnchors": [
+        "Root Cause Analysis 52",
+        "root_cause_analysis 52",
+        "Root Cause Analysis section",
+        "seção Root Cause Analysis 52"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\broot_cause_analysis\b",
+        "\broot_cause_analysis_52\b",
+        "\broot_cause_analysis section\b"
+      ],
+      "description": "Canonical section root_cause_analysis for Variance Analysis"
+    },
+    {
+      "id": "driver_drilldown_53",
+      "name": {
+        "en": "Driver Drilldown Segment 53",
+        "pt": "Driver Drilldown segmento 53"
+      },
+      "mustHave": false,
+      "order": 53,
+      "headingAnchors": [
+        "Driver Drilldown 53",
+        "driver_drilldown 53",
+        "Driver Drilldown section",
+        "seção Driver Drilldown 53"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bdriver_drilldown\b",
+        "\bdriver_drilldown_53\b",
+        "\bdriver_drilldown section\b"
+      ],
+      "description": "Canonical section driver_drilldown for Variance Analysis"
+    },
+    {
+      "id": "periodic_trends_54",
+      "name": {
+        "en": "Periodic Trends Segment 54",
+        "pt": "Periodic Trends segmento 54"
+      },
+      "mustHave": false,
+      "order": 54,
+      "headingAnchors": [
+        "Periodic Trends 54",
+        "periodic_trends 54",
+        "Periodic Trends section",
+        "seção Periodic Trends 54"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bperiodic_trends\b",
+        "\bperiodic_trends_54\b",
+        "\bperiodic_trends section\b"
+      ],
+      "description": "Canonical section periodic_trends for Variance Analysis"
+    },
+    {
+      "id": "forecast_impacts_55",
+      "name": {
+        "en": "Forecast Impacts Segment 55",
+        "pt": "Previsao Impacts segmento 55"
+      },
+      "mustHave": false,
+      "order": 55,
+      "headingAnchors": [
+        "Forecast Impacts 55",
+        "forecast_impacts 55",
+        "Forecast Impacts section",
+        "seção Forecast Impacts 55"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bforecast_impacts\b",
+        "\bforecast_impacts_55\b",
+        "\bforecast_impacts section\b"
+      ],
+      "description": "Canonical section forecast_impacts for Variance Analysis"
+    },
+    {
+      "id": "remediation_actions_56",
+      "name": {
+        "en": "Remediation Actions Segment 56",
+        "pt": "Remediation Actions segmento 56"
+      },
+      "mustHave": false,
+      "order": 56,
+      "headingAnchors": [
+        "Remediation Actions 56",
+        "remediation_actions 56",
+        "Remediation Actions section",
+        "seção Remediation Actions 56"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bremediation_actions\b",
+        "\bremediation_actions_56\b",
+        "\bremediation_actions section\b"
+      ],
+      "description": "Canonical section remediation_actions for Variance Analysis"
+    },
+    {
+      "id": "approval_notes_57",
+      "name": {
+        "en": "Approval Notes Segment 57",
+        "pt": "Approval Notes segmento 57"
+      },
+      "mustHave": false,
+      "order": 57,
+      "headingAnchors": [
+        "Approval Notes 57",
+        "approval_notes 57",
+        "Approval Notes section",
+        "seção Approval Notes 57"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bapproval_notes\b",
+        "\bapproval_notes_57\b",
+        "\bapproval_notes section\b"
+      ],
+      "description": "Canonical section approval_notes for Variance Analysis"
+    },
+    {
+      "id": "appendix_detail_58",
+      "name": {
+        "en": "Appendix Detail Segment 58",
+        "pt": "Appendix Detail segmento 58"
+      },
+      "mustHave": false,
+      "order": 58,
+      "headingAnchors": [
+        "Appendix Detail 58",
+        "appendix_detail 58",
+        "Appendix Detail section",
+        "seção Appendix Detail 58"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bappendix_detail\b",
+        "\bappendix_detail_58\b",
+        "\bappendix_detail section\b"
+      ],
+      "description": "Canonical section appendix_detail for Variance Analysis"
+    },
+    {
+      "id": "controls_59",
+      "name": {
+        "en": "Controls Segment 59",
+        "pt": "Controls segmento 59"
+      },
+      "mustHave": false,
+      "order": 59,
+      "headingAnchors": [
+        "Controls 59",
+        "controls 59",
+        "Controls section",
+        "seção Controls 59"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bcontrols\b",
+        "\bcontrols_59\b",
+        "\bcontrols section\b"
+      ],
+      "description": "Canonical section controls for Variance Analysis"
+    },
+    {
+      "id": "variance_objective_60",
+      "name": {
+        "en": "Variance Objective Segment 60",
+        "pt": "Variacao Objective segmento 60"
+      },
+      "mustHave": false,
+      "order": 60,
+      "headingAnchors": [
+        "Variance Objective 60",
+        "variance_objective 60",
+        "Variance Objective section",
+        "seção Variance Objective 60"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bvariance_objective\b",
+        "\bvariance_objective_60\b",
+        "\bvariance_objective section\b"
+      ],
+      "description": "Canonical section variance_objective for Variance Analysis"
+    },
+    {
+      "id": "plan_vs_actual_summary_61",
+      "name": {
+        "en": "Plan Vs Actual Summary Segment 61",
+        "pt": "Plan Vs Actual Summary segmento 61"
+      },
+      "mustHave": false,
+      "order": 61,
+      "headingAnchors": [
+        "Plan Vs Actual Summary 61",
+        "plan_vs_actual_summary 61",
+        "Plan Vs Actual Summary section",
+        "seção Plan Vs Actual Summary 61"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bplan_vs_actual_summary\b",
+        "\bplan_vs_actual_summary_61\b",
+        "\bplan_vs_actual_summary section\b"
+      ],
+      "description": "Canonical section plan_vs_actual_summary for Variance Analysis"
+    },
+    {
+      "id": "variance_by_category_62",
+      "name": {
+        "en": "Variance By Category Segment 62",
+        "pt": "Variacao By Category segmento 62"
+      },
+      "mustHave": false,
+      "order": 62,
+      "headingAnchors": [
+        "Variance By Category 62",
+        "variance_by_category 62",
+        "Variance By Category section",
+        "seção Variance By Category 62"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bvariance_by_category\b",
+        "\bvariance_by_category_62\b",
+        "\bvariance_by_category section\b"
+      ],
+      "description": "Canonical section variance_by_category for Variance Analysis"
+    }
   ]
 }

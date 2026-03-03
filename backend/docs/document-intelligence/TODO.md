@@ -11,6 +11,7 @@ Generated checklist to guarantee all document intelligence banks are created, po
 - [ ] Retrieval answers include grounded evidence without wrong-doc drift
 
 ## Domains
+- [ ] Domain coverage complete: accounting
 - [ ] Domain coverage complete: finance
 - [ ] Domain coverage complete: legal
 - [ ] Domain coverage complete: medical
@@ -35,6 +36,7 @@ Generated checklist to guarantee all document intelligence banks are created, po
 - [ ] doc_archetypes_legal
 - [ ] doc_archetypes_medical
 - [ ] doc_archetypes_ops
+- [ ] doc_archetypes_accounting
 
 ## Structure Banks
 - [ ] headings_map
@@ -126,6 +128,9 @@ Generated checklist to guarantee all document intelligence banks are created, po
 - [ ] ambiguity_questions
 
 ## Retrieval Banks
+- [ ] query_rewrites_accounting
+- [ ] boost_rules_accounting
+- [ ] section_priority_accounting
 - [ ] query_rewrites_finance
 - [ ] boost_rules_finance
 - [ ] section_priority_finance
@@ -160,6 +165,8 @@ Generated checklist to guarantee all document intelligence banks are created, po
 - [ ] doc_aliases_medical
 - [ ] doc_archetypes_ops
 - [ ] doc_aliases_ops
+- [ ] doc_archetypes_accounting
+- [ ] doc_aliases_accounting
 - [ ] headings_map
 - [ ] table_header_ontology_finance
 - [ ] table_header_ontology_legal
@@ -180,6 +187,8 @@ Generated checklist to guarantee all document intelligence banks are created, po
 - [ ] medical_report_ontology
 - [ ] medical_safety_boundaries
 - [ ] medical_explanation_templates
+- [ ] ops_kpi_ontology
+- [ ] ops_doc_logic
 - [ ] operator_playbook_navigate_finance
 - [ ] operator_playbook_navigate_legal
 - [ ] operator_playbook_navigate_medical
@@ -237,6 +246,9 @@ Generated checklist to guarantee all document intelligence banks are created, po
 - [ ] wrong_doc_lock
 - [ ] source_policy
 - [ ] ambiguity_questions
+- [ ] query_rewrites_accounting
+- [ ] boost_rules_accounting
+- [ ] section_priority_accounting
 - [ ] query_rewrites_finance
 - [ ] boost_rules_finance
 - [ ] section_priority_finance
@@ -252,12 +264,94 @@ Generated checklist to guarantee all document intelligence banks are created, po
 
 ## Optional Banks
 - [ ] keyword_taxonomy_finance
-- [ ] pain_points_finance
 - [ ] keyword_taxonomy_legal
-- [ ] pain_points_legal
 - [ ] keyword_taxonomy_medical
-- [ ] pain_points_medical
 - [ ] keyword_taxonomy_ops
+- [ ] legal_abbreviations_en
+- [ ] legal_abbreviations_pt
+- [ ] legal_answer_style_bank
+- [ ] legal_board_resolution_extraction_hints
+- [ ] legal_board_resolution_sections
+- [ ] legal_board_resolution_tables
+- [ ] legal_disclaimer_policy
+- [ ] legal_doc_type_catalog
+- [ ] legal_domain_detection_rules
+- [ ] legal_domain_profile
+- [ ] legal_dpa_extraction_hints
+- [ ] legal_dpa_sections
+- [ ] legal_dpa_tables
+- [ ] legal_employment_agreement_extraction_hints
+- [ ] legal_employment_agreement_sections
+- [ ] legal_employment_agreement_tables
+- [ ] legal_evidence_requirements
+- [ ] legal_lease_extraction_hints
+- [ ] legal_lease_sections
+- [ ] legal_lease_tables
+- [ ] legal_lexicon_en
+- [ ] legal_lexicon_pt
+- [ ] legal_litigation_memo_extraction_hints
+- [ ] legal_litigation_memo_sections
+- [ ] legal_litigation_memo_tables
+- [ ] legal_msa_extraction_hints
+- [ ] legal_msa_sections
+- [ ] legal_msa_tables
+- [ ] legal_nda_extraction_hints
+- [ ] legal_nda_sections
+- [ ] legal_nda_tables
+- [ ] legal_privacy_policy_extraction_hints
+- [ ] legal_privacy_policy_sections
+- [ ] legal_privacy_policy_tables
+- [ ] legal_reasoning_scaffolds
+- [ ] legal_redaction_and_safety_rules
+- [ ] legal_retrieval_strategies
+- [ ] legal_sow_extraction_hints
+- [ ] legal_sow_sections
+- [ ] legal_sow_tables
+- [ ] legal_terms_extraction_hints
+- [ ] legal_terms_sections
+- [ ] legal_terms_tables
+- [ ] legal_validation_policies
+- [ ] medical_abbreviations_en
+- [ ] medical_abbreviations_pt
+- [ ] medical_answer_style_bank
+- [ ] medical_care_plan_extraction_hints
+- [ ] medical_care_plan_sections
+- [ ] medical_care_plan_tables
+- [ ] medical_discharge_summary_extraction_hints
+- [ ] medical_discharge_summary_sections
+- [ ] medical_discharge_summary_tables
+- [ ] medical_disclaimer_policy
+- [ ] medical_doc_type_catalog
+- [ ] medical_domain_detection_rules
+- [ ] medical_domain_profile
+- [ ] medical_evidence_requirements
+- [ ] medical_lab_report_extraction_hints
+- [ ] medical_lab_report_sections
+- [ ] medical_lab_report_tables
+- [ ] medical_lexicon_en
+- [ ] medical_lexicon_pt
+- [ ] medical_med_list_extraction_hints
+- [ ] medical_med_list_sections
+- [ ] medical_med_list_tables
+- [ ] medical_progress_note_extraction_hints
+- [ ] medical_progress_note_sections
+- [ ] medical_progress_note_tables
+- [ ] medical_radiology_report_extraction_hints
+- [ ] medical_radiology_report_sections
+- [ ] medical_radiology_report_tables
+- [ ] medical_reasoning_scaffolds
+- [ ] medical_redaction_and_safety_rules
+- [ ] medical_referral_extraction_hints
+- [ ] medical_referral_sections
+- [ ] medical_referral_tables
+- [ ] medical_retrieval_strategies
+- [ ] medical_soap_note_extraction_hints
+- [ ] medical_soap_note_sections
+- [ ] medical_soap_note_tables
+- [ ] medical_validation_policies
+- [ ] pain_points_finance
+- [ ] pain_points_legal
+- [ ] pain_points_medical
 - [ ] pain_points_ops
 - [ ] pattern_library
 

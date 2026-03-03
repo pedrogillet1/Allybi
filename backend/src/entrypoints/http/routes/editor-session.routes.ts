@@ -28,6 +28,8 @@ import type {
   StreamTransport,
 } from "../../../services/llm/types/llmStreaming.types";
 import { logger } from "../../../utils/logger";
+import { ViewerLockedChatPolicyService } from "../../../services/core/policy/viewerLockedChatPolicy.service";
+import { GovernanceRuntimePolicyService } from "../../../services/core/policy/governanceRuntimePolicy.service";
 
 const router = Router();
 const controller = createEditorSessionController();
@@ -54,6 +56,8 @@ router.post("/cancel", authMiddleware, rateLimitMiddleware, (req, res) =>
 const editingFacade = new EditingFacadeService({
   revisionStore: new DocumentRevisionStoreService(),
 });
+const viewerLockedChatPolicyService = new ViewerLockedChatPolicyService();
+const governanceRuntimePolicyService = new GovernanceRuntimePolicyService();
 
 const DEFAULT_STREAMING_CONFIG: LLMStreamingConfig = {
   chunking: { maxCharsPerDelta: 64 },
@@ -568,13 +572,48 @@ router.post(
         body.meta && typeof body.meta === "object"
           ? (body.meta as Record<string, unknown>)
           : {};
+      const viewerPolicy = viewerLockedChatPolicyService.resolve();
       const viewerIntent = asString(rawMeta.viewerIntent).toLowerCase();
-      const forcedQaPath = viewerIntent === "qa_locked";
+      const forcedQaPath =
+        viewerPolicy.enabled &&
+        viewerIntent === viewerPolicy.defaultViewerIntent.toLowerCase();
       const qaPath = shouldUseQaPath({
         message,
         domain,
         rawOperator: body.operator,
       }) || forcedQaPath;
+      const requestedMode = asString(body.mode).toLowerCase();
+      const governanceAction = qaPath
+        ? "viewer_chat_query"
+        : requestedMode === "apply"
+          ? "viewer_edit_apply"
+          : "viewer_edit_preview";
+      const governance = governanceRuntimePolicyService.evaluate({
+        role: asString((req as any)?.user?.role),
+        action: governanceAction,
+        legalHold: rawMeta.legalHoldActive === true,
+        userErasureRequested: rawMeta.userErasureRequested === true,
+        overrideRequested: rawMeta.overridePolicy === true,
+        exceptionApproved: rawMeta.policyExceptionApproved === true,
+        exceptionExpired: rawMeta.policyExceptionExpired === true,
+        keyTier: asString(rawMeta.keyTier),
+        keyAgeDays: Number(rawMeta.keyAgeDays || 0),
+        incidentCategory: asString(rawMeta.incidentCategory),
+        incidentSeverity: asString(rawMeta.incidentSeverity),
+        severity1Failures: Number(rawMeta.severity1Failures || 0),
+        regressionPassRate: Number(rawMeta.regressionPassRate || 0),
+      });
+      if (!governance.allowed) {
+        sendSse(res, {
+          type: "error",
+          message: "Request blocked by governance policy.",
+          policy: "governance_runtime_policy",
+          reasons: governance.blocks,
+        });
+        sendSse(res, { type: "done" });
+        res.end();
+        return;
+      }
 
       if (qaPath) {
         const preferredLanguage = resolveChatPreferredLanguage(
@@ -597,21 +636,35 @@ router.post(
 
         const qaRequestMeta: Record<string, unknown> = {
           ...rawMeta,
-          ...(forcedQaPath ? { viewerIntent: "qa_locked" } : {}),
+          ...(forcedQaPath
+            ? { viewerIntent: viewerPolicy.defaultViewerIntent }
+            : {}),
           viewerMode: true,
           intentFamily: "documents",
           operator: "extract",
           operatorFamily: null,
-          answerMode: undefined,
+          answerMode: viewerPolicy.defaultAnswerMode,
         };
+        const scopeSignalSet = new Set(viewerPolicy.emitScopeSignals);
+        const lockSignals = viewerPolicy.lockToActiveDocument
+          ? {
+              ...(scopeSignalSet.has("explicitDocLock")
+                ? { explicitDocLock: true }
+                : {}),
+              ...(scopeSignalSet.has("singleDocIntent")
+                ? { singleDocIntent: true }
+                : {}),
+              ...(scopeSignalSet.has("hardScopeActive")
+                ? { hardScopeActive: true }
+                : {}),
+              activeDocId: documentId,
+            }
+          : {};
         const qaRequestContext: Record<string, unknown> = {
           ...rawContext,
           signals: {
             ...existingSignals,
-            explicitDocLock: true,
-            activeDocId: documentId,
-            singleDocIntent: true,
-            hardScopeActive: true,
+            ...lockSignals,
             ...(domain === "sheets"
               ? {
                   sheetHintPresent: Boolean(sheetSelection.sheetName),
@@ -625,7 +678,7 @@ router.post(
 
         sendSse(res, {
           type: "meta",
-          answerMode: "doc_grounded_single",
+          answerMode: viewerPolicy.defaultAnswerMode,
           answerClass: "DOCUMENT",
           navType: null,
           executionPath: "chat_runtime",

@@ -217,6 +217,8 @@ describe("RuntimeWiringIntegrityService – structural contract", () => {
     const expectedFields: Array<keyof typeof result> = [
       "ok",
       "missingBanks",
+      "missingRuntimePolicyConsumers",
+      "runtimePolicyEnvGaps",
       "missingOperatorContracts",
       "missingOperatorOutputShapes",
       "missingEditingCatalogOperators",

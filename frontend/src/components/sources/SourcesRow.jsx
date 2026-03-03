@@ -19,6 +19,24 @@ import { getFileIcon } from '../../utils/files/iconMapper';
 // Max visible pills before showing "See all"
 const MAX_VISIBLE_PILLS = 5;
 
+const buildButtonIdentity = (button) => {
+  const docId = String(button?.documentId || button?.id || '').trim();
+  const locationKey = String(button?.locationKey || '').trim().toLowerCase();
+  const location = button?.location && typeof button.location === 'object'
+    ? button.location
+    : null;
+  const locationType = String(location?.type || '').trim().toLowerCase();
+  const locationValue = String(location?.value || '').trim().toLowerCase();
+  const title = String(button?.title || button?.filename || '').trim().toLowerCase();
+  return [
+    docId || 'unknown-doc',
+    locationKey,
+    locationType,
+    locationValue,
+    title,
+  ].join('|');
+};
+
 /**
  * SourcesRow Component - Renders source pills after answer
  */
@@ -56,13 +74,13 @@ const SourcesRow = ({
   // Get seeAll data
   const seeAllData = sourceButtons?.seeAll || null;
 
-  // Dedupe by documentId (simple, no useMemo to avoid hot reload issues)
+  // Dedupe by document + location identity so multiple citations from same file can coexist.
   const seenIds = new Set();
   const uniqueButtons = [];
   for (const btn of rawButtons) {
-    const docId = btn.documentId || btn.id;
-    if (docId && !seenIds.has(docId)) {
-      seenIds.add(docId);
+    const identity = buildButtonIdentity(btn);
+    if (!seenIds.has(identity)) {
+      seenIds.add(identity);
       uniqueButtons.push(btn);
     }
   }
@@ -124,7 +142,7 @@ const SourcesRow = ({
         {!isNavPill && <span className="koda-sources-label" style={{ marginBottom: 0 }}>{l.sources}</span>}
         {visibleButtons.map((btn, idx) => (
           <button
-            key={btn.documentId || idx}
+            key={buildButtonIdentity(btn) || `source-${idx}`}
             className="koda-source-pill"
             onClick={() => handleSourceClick(btn)}
             title={btn.title}

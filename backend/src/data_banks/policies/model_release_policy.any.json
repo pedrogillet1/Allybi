@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "id": "model_release_policy",
+    "version": "1.0.0",
+    "description": "Release gating policy for model/provider changes.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03",
+    "owner": "platform-ml",
+    "reviewCadenceDays": 14,
+    "criticality": "high",
+    "changeLog": [
+      "Initial model release gate policy bank"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": false,
+    "defaultAction": "hold"
+  },
+  "gates": {
+    "minRegressionPassRate": 0.98,
+    "maxSeverity1Failures": 0,
+    "requireCanary": true,
+    "requireRollbackPlan": true
+  },
+  "rules": [
+    {
+      "id": "MRP_1000_block_on_sev1",
+      "priority": 1000,
+      "when": {
+        "path": "metrics.severity1Failures",
+        "op": "gt",
+        "value": 0
+      },
+      "then": {
+        "action": "block_release",
+        "reason": "severity1_failures_present"
+      },
+      "reasonCode": "model_release_blocked_sev1",
+      "terminal": true
+    },
+    {
+      "id": "MRP_900_block_on_low_regression_pass_rate",
+      "priority": 900,
+      "when": {
+        "path": "metrics.regressionPassRate",
+        "op": "lt",
+        "value": 0.98
+      },
+      "then": {
+        "action": "block_release",
+        "reason": "regression_threshold_not_met"
+      },
+      "reasonCode": "model_release_blocked_regression",
+      "terminal": true
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "MRP_T_001",
+        "runtime": {
+          "metrics": {
+            "severity1Failures": 1,
+            "regressionPassRate": 0.99
+          }
+        },
+        "expect": {
+          "action": "block_release"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "_meta": {
+    "id": "response_templates",
+    "version": "1.0.0",
+    "description": "Composable response templates for doc-grounded, comparison, and clarification outputs.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "strictPlaceholders": true,
+    "defaultLanguage": "en"
+  },
+  "templates": [
+    {
+      "id": "TML_DOC_SINGLE_SUMMARY",
+      "domain": "any",
+      "intent": "summary",
+      "language": "en",
+      "tone": "concise",
+      "template": "From {{document}}, I found {{evidenceCount}} evidence item(s). {{result}} {{confidence}}",
+      "requiredParts": [
+        "document",
+        "result",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_DOC_SINGLE_SUMMARY_PT",
+      "domain": "any",
+      "intent": "summary",
+      "language": "pt",
+      "tone": "conciso",
+      "template": "Em {{document}}, encontrei {{evidenceCount}} evidencias. {{result}} {{confidence}}",
+      "requiredParts": [
+        "document",
+        "result",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_COMPARE_RESULT",
+      "domain": "any",
+      "intent": "compare",
+      "language": "en",
+      "tone": "structured",
+      "template": "I compared {{leftDoc}} and {{rightDoc}} on {{topic}}. Key diff: {{differences}}. Evidence footprint: {{evidenceCount}}. {{confidence}}",
+      "requiredParts": [
+        "leftDoc",
+        "rightDoc",
+        "topic",
+        "differences",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_COMPARE_RESULT_PT",
+      "domain": "any",
+      "intent": "compare",
+      "language": "pt",
+      "tone": "estruturado",
+      "template": "Comparei {{leftDoc}} e {{rightDoc}} em {{topic}}. Diferenças-chave: {{differences}}. Evidencias: {{evidenceCount}}. {{confidence}}",
+      "requiredParts": [
+        "leftDoc",
+        "rightDoc",
+        "topic",
+        "differences",
+        "evidenceCount",
+        "confidence"
+      ]
+    },
+    {
+      "id": "TML_QUESTION_CLARIFY",
+      "domain": "any",
+      "intent": "clarify",
+      "language": "en",
+      "tone": "helpful",
+      "template": "I need one clarification to answer safely: {{question}}",
+      "requiredParts": [
+        "question"
+      ]
+    },
+    {
+      "id": "TML_QUESTION_CLARIFY_PT",
+      "domain": "any",
+      "intent": "clarify",
+      "language": "pt",
+      "tone": "ajudavel",
+      "template": "Preciso de uma clarificacao para responder com seguranca: {{question}}",
+      "requiredParts": [
+        "question"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "RT_001_required_parts_enforced",
+      "trigger": "template selected but required parts missing",
+      "check": "context.templateSelected == true AND output.missingRequiredParts == true",
+      "failureAction": "REJECT_TEMPLATE_RENDER"
+    },
+    {
+      "id": "RT_002_compare_template_requires_two_docs",
+      "trigger": "compare intent resolves to compare template without both docs",
+      "check": "context.intent == 'compare' AND context.templateId LIKE 'TML_COMPARE_RESULT' AND (context.leftDocId == null OR context.rightDocId == null)",
+      "failureAction": "ASK_FOR_COMPARISON_DOCS"
+    },
+    {
+      "id": "RT_003_language_template_alignment",
+      "trigger": "template language not aligned with user language",
+      "check": "context.userLanguage == 'pt' AND context.templateLanguage != 'pt'",
+      "failureAction": "SWITCH_TEMPLATE_LANGUAGE_PT"
+    },
+    {
+      "id": "RT_004_evidence_confidence_binding",
+      "trigger": "template output has low evidence count but no confidence tag",
+      "check": "output.evidenceCount <= 0 AND output.confidence == null",
+      "failureAction": "INJECT_LOW_CONFIDENCE_GUARD"
+    },
+    {
+      "id": "RT_005_summary_style_guard",
+      "trigger": "summary intent with long narrative length",
+      "check": "context.intent == 'summary' AND output.wordCount > 360",
+      "failureAction": "CONDENSE_TO_SUMMARY_TEMPLATE"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ]
+}

@@ -2,7 +2,7 @@
   "_meta": {
     "id": "di_accounting_entities_acct_ar_aging",
     "version": "1.1.0",
-    "description": "Entity extraction schema for ar aging documents.",
+    "description": "Entity extraction schema for AR aging documents.",
     "languages": [
       "any"
     ],
@@ -62,31 +62,49 @@
       "id": "totalArBalance",
       "type": "currency",
       "required": true,
-      "description": "Total AR balance"
+      "description": "Total accounts receivable balance"
     },
     {
       "id": "bucketCurrent",
       "type": "currency",
       "required": true,
-      "description": "Current bucket"
+      "description": "Current bucket total"
     },
     {
       "id": "bucket1_30",
       "type": "currency",
       "required": true,
-      "description": "1-30 days bucket"
+      "description": "1-30 day aging bucket"
+    },
+    {
+      "id": "bucket31_60",
+      "type": "currency",
+      "required": false,
+      "description": "31-60 day aging bucket"
+    },
+    {
+      "id": "bucket61_90",
+      "type": "currency",
+      "required": false,
+      "description": "61-90 day aging bucket"
     },
     {
       "id": "bucketOver90",
       "type": "currency",
       "required": true,
-      "description": "Over-90 bucket"
+      "description": "Over 90 day aging bucket"
     },
     {
       "id": "customerCount",
       "type": "number",
       "required": false,
-      "description": "Number of customers with open balances"
+      "description": "Number of customers with open AR balances"
+    },
+    {
+      "id": "maxDaysOutstanding",
+      "type": "number",
+      "required": false,
+      "description": "Maximum days outstanding across the aging"
     }
   ]
 }

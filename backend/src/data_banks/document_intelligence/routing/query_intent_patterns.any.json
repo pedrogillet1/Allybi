@@ -1,0 +1,253 @@
+{
+  "_meta": {
+    "id": "query_intent_patterns",
+    "version": "1.0.0",
+    "description": "Regex and lexical patterns for routing document-intelligence intents by operator family.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "normalizeWhitespace": true,
+    "stripDiacritics": true,
+    "useLowercase": true,
+    "caseSensitive": false,
+    "defaultOperator": "extract",
+    "defaultAnswerMode": "doc_grounded"
+  },
+  "operators": {
+    "locate_docs": {
+      "id": "op_locate_docs",
+      "priority": 96,
+      "operators": [
+        "locate_docs",
+        "discover"
+      ],
+      "patterns": {
+        "en": [
+          "\\bwhich (document|file|doc)s?\\b",
+          "\\bfind\\b.{0,30}\\b(document|file|doc)s?\\b",
+          "\\bsearch\\b.{0,30}\\b(my|all)\\b.{0,30}\\b(files?|documents?)\\b",
+          "\\bin which\\b.{0,30}\\bfile\\b"
+        ],
+        "pt": [
+          "\\bqual(e)?\\b.{0,24}\\b(arquivo|documento)s?\\b",
+          "\\bbuscar\\b.{0,30}\\b(meus|todos)\\b.{0,20}\\b(arquivos|documentos)\\b",
+          "\\bem qual\\b.{0,30}\\barquivo\\b",
+          "\\bonde\\b.{0,20}\\b(esta|está|encotro|encontro)\\b.{0,20}\\b(documento|arquivo)\\b"
+        ]
+      },
+      "negatives": {
+        "en": [
+          "\\bdelete\\b",
+          "\\brename\\b",
+          "\\bmove\\b",
+          "\\bopen folder\\b"
+        ],
+        "pt": [
+          "\\bdeletar\\b",
+          "\\brenomear\\b",
+          "\\bmover\\b",
+          "\\bpasta\\b"
+        ]
+      }
+    },
+    "set_active_doc": {
+      "id": "op_set_active_doc",
+      "priority": 97,
+      "operators": [
+        "set_active_doc",
+        "lock_doc"
+      ],
+      "patterns": {
+        "en": [
+          "\\b(lock|pin|keep)\\b.{0,30}\\b(this|current|that|above)\\b",
+          "\\b(stay with|stay on|keep active)\\b",
+          "\\bdo not switch doc(s)?\\b"
+        ],
+        "pt": [
+          "\\b(travar|fixar|manter)\\b.{0,30}\\b(atual|este|esse)\\b",
+          "\\bnao trocar\\b",
+          "\\bfica nesse documento\\b"
+        ]
+      },
+      "negatives": {
+        "en": [
+          "\\bwhich file\\b",
+          "\\blist all files\\b"
+        ],
+        "pt": [
+          "\\bqual arquivo\\b",
+          "\\blistar arquivos\\b"
+        ]
+      }
+    },
+    "extract": {
+      "id": "op_extract",
+      "priority": 74,
+      "operators": [
+        "extract",
+        "summarize",
+        "locate_content"
+      ],
+      "patterns": {
+        "en": [
+          "\\bextract\\b",
+          "\\bwhat\\b.{0,40}\\b(value|valor|total|amount|interest|balance|result|period)\\b",
+          "\\bsummariz(e|ed|ing)\\b",
+          "\\boverview\\b",
+          "\\bquote\\b"
+        ],
+        "pt": [
+          "\\bextrair\\b",
+          "\\bresum(ir|ido|ar)\\b",
+          "\\bsumar\\b",
+          "\\bobter\\b",
+          "\\bcitar\\b",
+          "\\bvalor\\b",
+          "\\bqual\\b.{0,40}\\bo valor\\b"
+        ]
+      }
+    },
+    "compare": {
+      "id": "op_compare",
+      "priority": 86,
+      "operators": [
+        "compare",
+        "evaluate"
+      ],
+      "patterns": {
+        "en": [
+          "\\bcompare\\b",
+          "\\bversus\\b",
+          "\\b(vs\\.|vs)\\b",
+          "\\bdifferences?\\b",
+          "\\bwhich is better\\b"
+        ],
+        "pt": [
+          "\\bcomparar\\b",
+          "\\bversus\\b",
+          "\\bdiferen\\u00e7a\\b",
+          "\\bcomparacao\\b",
+          "\\bcomparado\\b",
+          "\\bqual\\b.{0,20}\\bmais\\b"
+        ]
+      }
+    },
+    "compute": {
+      "id": "op_compute",
+      "priority": 76,
+      "operators": [
+        "calculate",
+        "compute",
+        "model"
+      ],
+      "patterns": {
+        "en": [
+          "\\bcalculate\\b",
+          "\\bcompute\\b",
+          "\\bwhat is\\b.{0,20}(\\+|\\-|\\bx\\b|/|%)\\b",
+          "\\baverage\\b",
+          "\\bpercentage\\b",
+          "\\bdelta\\b",
+          "\\bratio\\b"
+        ],
+        "pt": [
+          "\\bcalcular\\b",
+          "\\bsomar\\b",
+          "\\bmedia\\b",
+          "\\bpercentual\\b",
+          "\\bmedia\\b",
+          "\\bquanto\\b",
+          "\\be porcentagem\\b"
+        ]
+      }
+    },
+    "clarify": {
+      "id": "op_clarify",
+      "priority": 90,
+      "operators": [
+        "ask_clarification",
+        "resolve_scope"
+      ],
+      "patterns": {
+        "en": [
+          "\\bwhich\\b.{0,20}\\b(file|doc|document|period|version)\\b",
+          "\\bwhich one\\b",
+          "\\bclarify\\b",
+          "\\bnot sure\\b"
+        ],
+        "pt": [
+          "\\bqual\\b.{0,20}\\b(arquivo|arquivo|documento|periodo|vers[aã]o)\\b",
+          "\\bespecifique\\b",
+          "\\bclarificar\\b",
+          "\\bnao tenho certeza\\b"
+        ]
+      }
+    }
+  },
+  "fallback": {
+    "operator": "extract",
+    "answerMode": "doc_grounded",
+    "confidence": 0.68
+  },
+  "rules": [
+    {
+      "id": "QIP_001_operator_selection_guard",
+      "trigger": "No operator matched despite explicit extraction intent",
+      "check": "context.operator == null AND query.textMatches('(extract|summarize|locate|quote|show|what|qual|quale|quanto)')",
+      "failureAction": "ROUTE_TO_EXTRACT_OPERATOR",
+      "severity": "warning"
+    },
+    {
+      "id": "QIP_002_compare_requires_doc_resolution",
+      "trigger": "Compare operator is inferred but docs were not resolved",
+      "check": "context.operator == 'compare' AND context.queryDocs.resolvedCount < 2",
+      "failureAction": "ASK_FOR_COMPARISON_DOCS",
+      "severity": "error"
+    },
+    {
+      "id": "QIP_003_compute_guard",
+      "trigger": "Compute operator signal appears with no numeric context",
+      "check": "context.operator == 'compute' AND context.numericExpressionPresent == false",
+      "failureAction": "ASK_FOR_NUMERIC_CONTEXT",
+      "severity": "error"
+    },
+    {
+      "id": "QIP_004_locate_docs_guard",
+      "trigger": "Locate operator is chosen with a strong doc identifier",
+      "check": "context.operator == 'locate_docs' AND context.docAliasConfidence < 0.92",
+      "failureAction": "ASK_DOC_SCOPE_CLARIFICATION",
+      "severity": "warning"
+    },
+    {
+      "id": "QIP_005_clarify_operator_for_short_ambiguous_query",
+      "trigger": "Short ambiguous query maps to clarify operator",
+      "check": "context.operator == 'clarify' AND query.textLength < 12",
+      "failureAction": "ASK_SINGLE_CLOSING_QUESTION",
+      "severity": "low"
+    },
+    {
+      "id": "QIP_006_language_safe_mode",
+      "trigger": "Portuguese query is routed through English-only pattern hits",
+      "check": "context.language == 'pt' AND context.queryLangConfidence < 0.85",
+      "failureAction": "SET_QUERY_LANGUAGE_PT",
+      "severity": "warning"
+    }
+  ],
+  "templates": [
+    {
+      "id": "QUERY_INTENT_PATTERNS_GEN_TEMPLATE_001",
+      "text": "Use machine-actionable policy fallback when a specific template is missing in query_intent_patterns.",
+      "language": "any",
+      "failureAction": "APPLY_TEMPLATE_GUARD"
+    }
+  ],
+  "patterns": [
+    "\\bdocument( |-)?intelligence\\b"
+  ]
+}

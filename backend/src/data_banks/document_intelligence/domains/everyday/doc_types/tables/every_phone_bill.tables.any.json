@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_phone_bill",
+    "version": "1.0.0",
+    "description": "Tables expected in every_phone_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_phone_bill"
+  },
+  "tableHeaderSynonyms": {
+    "description": ["description", "descricao", "item"],
+    "minutes": ["minutes", "minutes used", "minutos"],
+    "amount": ["amount", "valor", "total"],
+    "quantity": ["quantity", "qtd", "count"]
+  },
+  "tables": [
+    { "id": "phone_usage_table", "canonicalName": { "en": "Usage Table", "pt": "Tabela de Uso" }, "section": "line_usage", "signaturePatterns": ["\\busage\\b", "\\busage table\\b"], "requiredHeaders": ["description", "minutes", "sms", "data", "amount", "unit"], "headerAliases": [["description", "descricao"], ["minutes", "minutos"], ["sms", "messages"], ["data", "gb"], ["amount", "valor"], ["unit", "moeda"]], "unitsAndScaling": {"preferredScales":["units"],"currencyField":"currency","requiresScaleEvidence":true,"mixedScaleHandling":"normalize_to_currency_base"}, "footnotes": ["phone_bill_fn_01"], "extractionNotes": "Line usage rows may continue across columns when table is wrapped." },
+    { "id": "phone_charges_table", "canonicalName": { "en": "Charges Table", "pt": "Tabela de Cobrancas" }, "section": "charges_and_fees", "signaturePatterns": ["\\bcharges\\b", "\\bfees\\b"], "requiredHeaders": ["description", "quantity", "rate", "amount", "unit"], "headerAliases": [["description","descricao"],["quantity","qtd"],["rate","taxa"],["amount","valor"],["unit","moeda"]], "unitsAndScaling": {"preferredScales":["units","thousands"],"currencyField":"currency","requiresScaleEvidence":true,"mixedScaleHandling":"normalize_to_currency_base"}, "footnotes": ["phone_bill_fn_02","phone_bill_fn_03"], "extractionNotes": "Use fee header and amount header to resolve charges." }
+  ]
+}

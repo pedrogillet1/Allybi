@@ -6,7 +6,7 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -24,12 +24,10 @@
       "order": 1,
       "headingAnchors": [
         "Document Header",
-        "Cabecalho do Documento",
-        "document id",
-        "encounter",
-        "record number",
-        "Lab Results Report Document Header",
-        "Laudo de Exames Laboratoriais Cabecalho do Documento"
+        "Laboratory Report Header",
+        "encounter id",
+        "resulting lab",
+        "Laudo Laboratorio Cabecalho"
       ]
     },
     {
@@ -42,12 +40,12 @@
       "order": 2,
       "headingAnchors": [
         "Patient Identification",
+        "Patient Name",
+        "MRN",
+        "DOB",
         "Identificacao do Paciente",
-        "patient name",
-        "mrn",
-        "dob",
-        "Lab Results Report Patient Identification",
-        "Laudo de Exames Laboratoriais Identificacao do Paciente"
+        "Nome do Paciente",
+        "Registro do Paciente"
       ]
     },
     {
@@ -60,138 +58,169 @@
       "order": 3,
       "headingAnchors": [
         "Encounter Context",
-        "Contexto do Atendimento",
+        "Visit Date",
+        "Admissao",
         "admission",
-        "visit date",
-        "service line",
-        "Lab Results Report Encounter Context",
-        "Laudo de Exames Laboratoriais Contexto do Atendimento"
+        "contexto",
+        "Data do Atendimento"
       ]
     },
     {
-      "id": "chief_complaint_reason",
+      "id": "hpi_and_ros",
       "name": {
-        "en": "Chief Complaint / Reason",
-        "pt": "Queixa Principal / Motivo"
-      },
-      "required": true,
-      "order": 4,
-      "headingAnchors": [
-        "Chief Complaint / Reason",
-        "Queixa Principal / Motivo",
-        "chief complaint",
-        "reason for visit",
-        "motivo",
-        "Lab Results Report Chief Complaint / Reason",
-        "Laudo de Exames Laboratoriais Queixa Principal / Motivo"
-      ]
-    },
-    {
-      "id": "history_background",
-      "name": {
-        "en": "History and Background",
-        "pt": "Historia e Contexto"
+        "en": "HPI / ROS",
+        "pt": "Historia da Doenca / ROS"
       },
       "required": false,
-      "order": 5,
+      "order": 4,
       "headingAnchors": [
-        "History and Background",
-        "Historia e Contexto",
-        "history of present illness",
-        "past medical history",
-        "Lab Results Report History and Background",
-        "Laudo de Exames Laboratoriais Historia e Contexto"
+        "HPI",
+        "History of present illness",
+        "ROS",
+        "Review of systems",
+        "Historia da Doenca",
+        "Sintomas Atuais"
       ]
     },
     {
-      "id": "objective_findings",
+      "id": "sample_collection",
       "name": {
-        "en": "Objective Findings",
-        "pt": "Achados Objetivos"
+        "en": "Specimen and Collection",
+        "pt": "Coleta e Especime"
+      },
+      "required": true,
+      "order": 5,
+      "headingAnchors": [
+        "Specimen and Collection",
+        "Sample Type",
+        "Collection Time",
+        "Coleta e Especime",
+        "Material Coletado"
+      ]
+    },
+    {
+      "id": "requested_panels",
+      "name": {
+        "en": "Requested Panels",
+        "pt": "Painel Solicitado"
       },
       "required": true,
       "order": 6,
       "headingAnchors": [
-        "Objective Findings",
-        "Achados Objetivos",
-        "exam",
-        "physical exam",
-        "objective",
-        "Lab Results Report Objective Findings",
-        "Laudo de Exames Laboratoriais Achados Objetivos"
+        "Requested Panels",
+        "Ordered Tests",
+        "Panels",
+        "Requested Panels",
+        "Painel Solicitado"
       ]
     },
     {
-      "id": "vitals_and_measurements",
+      "id": "results_table",
       "name": {
-        "en": "Vitals and Measurements",
-        "pt": "Sinais Vitais e Medidas"
+        "en": "Laboratory Results",
+        "pt": "Resultado Laboratorial"
       },
       "required": true,
       "order": 7,
       "headingAnchors": [
-        "Vitals and Measurements",
-        "Sinais Vitais e Medidas",
-        "bp",
-        "heart rate",
-        "temperature",
-        "spo2",
-        "Lab Results Report Vitals and Measurements",
-        "Laudo de Exames Laboratoriais Sinais Vitais e Medidas"
+        "Lab Results",
+        "Resultados Laboratoriais",
+        "Result Tables",
+        "Valores",
+        "Valores de Laboratorio"
       ]
     },
     {
-      "id": "labs_imaging",
+      "id": "chemistry_panel",
       "name": {
-        "en": "Laboratory and Imaging",
-        "pt": "Laboratorio e Imagem"
+        "en": "Chemistry Panel",
+        "pt": "Painel Bioquimico"
       },
       "required": false,
       "order": 8,
       "headingAnchors": [
-        "Laboratory and Imaging",
-        "Laboratorio e Imagem",
-        "laboratory",
-        "impression",
-        "finding",
-        "Lab Results Report Laboratory and Imaging",
-        "Laudo de Exames Laboratoriais Laboratorio e Imagem"
+        "Chemistry Panel",
+        "Chem Panel",
+        "Bioquimica",
+        "Painel Bioquimico"
+      ]
+    },
+    {
+      "id": "hematology_panel",
+      "name": {
+        "en": "Hematology Panel",
+        "pt": "Painel Hematologico"
+      },
+      "required": false,
+      "order": 9,
+      "headingAnchors": [
+        "Hematology Panel",
+        "CBC",
+        "Hemograma",
+        "Painel Hematologico"
+      ]
+    },
+    {
+      "id": "microbiology_panel",
+      "name": {
+        "en": "Microbiology",
+        "pt": "Microbiologia"
+      },
+      "required": false,
+      "order": 10,
+      "headingAnchors": [
+        "Microbiology",
+        "Culture",
+        "Gram stain",
+        "Culture",
+        "Microbiologia"
+      ]
+    },
+    {
+      "id": "critical_values",
+      "name": {
+        "en": "Critical and Abnormal Values",
+        "pt": "Valores Criticos e Anormais"
+      },
+      "required": false,
+      "order": 11,
+      "headingAnchors": [
+        "Critical Values",
+        "Abnormal",
+        "Critical Result",
+        "Valores Criticos",
+        "Valores Anormais"
       ]
     },
     {
       "id": "assessment_documented",
       "name": {
-        "en": "Documented Assessment",
+        "en": "Clinical Assessment",
         "pt": "Avaliacao Documentada"
       },
-      "required": true,
-      "order": 9,
+      "required": false,
+      "order": 12,
       "headingAnchors": [
-        "Documented Assessment",
-        "Avaliacao Documentada",
-        "assessment",
-        "clinical impression",
-        "diagnosis documented",
-        "Lab Results Report Documented Assessment",
-        "Laudo de Exames Laboratoriais Avaliacao Documentada"
+        "Assessment",
+        "Clinical Impression",
+        "Conclusion",
+        "Avaliacao Documentada"
       ]
     },
     {
       "id": "plan_and_orders",
       "name": {
-        "en": "Plan and Orders",
-        "pt": "Plano e Condutas"
+        "en": "Plan and Recommendations",
+        "pt": "Plano e Recomendacoes"
       },
       "required": true,
-      "order": 10,
+      "order": 13,
       "headingAnchors": [
-        "Plan and Orders",
-        "Plano e Condutas",
-        "plan",
-        "orders",
-        "next steps",
-        "Lab Results Report Plan and Orders",
-        "Laudo de Exames Laboratoriais Plano e Condutas"
+        "Plan",
+        "Recommendations",
+        "Follow-up Plan",
+        "Plano e Recomendacoes",
+        "Recomendacoes"
       ]
     },
     {
@@ -200,88 +229,43 @@
         "en": "Medications and Allergies",
         "pt": "Medicacoes e Alergias"
       },
-      "required": true,
-      "order": 11,
+      "required": false,
+      "order": 14,
       "headingAnchors": [
-        "Medications and Allergies",
-        "Medicacoes e Alergias",
-        "medications",
-        "allergies",
-        "contraindication",
-        "Lab Results Report Medications and Allergies",
-        "Laudo de Exames Laboratoriais Medicacoes e Alergias"
+        "Medications",
+        "Allergies",
+        "Medicacoes e Alergias"
       ]
     },
     {
       "id": "followup_and_disposition",
       "name": {
-        "en": "Follow-up and Disposition",
-        "pt": "Acompanhamento e Desfecho"
+        "en": "Disposition and Follow-up",
+        "pt": "Desfecho e Acompanhamento"
       },
       "required": true,
-      "order": 12,
-      "headingAnchors": [
-        "Follow-up and Disposition",
-        "Acompanhamento e Desfecho",
-        "follow-up",
-        "discharge",
-        "referral",
-        "Lab Results Report Follow-up and Disposition",
-        "Laudo de Exames Laboratoriais Acompanhamento e Desfecho"
-      ]
-    },
-    {
-      "id": "patient_instructions",
-      "name": {
-        "en": "Patient Instructions",
-        "pt": "Instrucoes ao Paciente"
-      },
-      "required": false,
-      "order": 13,
-      "headingAnchors": [
-        "Patient Instructions",
-        "Instrucoes ao Paciente",
-        "instructions",
-        "warning signs",
-        "return precautions",
-        "Lab Results Report Patient Instructions",
-        "Laudo de Exames Laboratoriais Instrucoes ao Paciente"
-      ]
-    },
-    {
-      "id": "signoff_and_attestation",
-      "name": {
-        "en": "Signoff and Attestation",
-        "pt": "Assinatura e Atestacao"
-      },
-      "required": true,
-      "order": 14,
-      "headingAnchors": [
-        "Signoff and Attestation",
-        "Assinatura e Atestacao",
-        "signed by",
-        "clinician",
-        "timestamp",
-        "Lab Results Report Signoff and Attestation",
-        "Laudo de Exames Laboratoriais Assinatura e Atestacao"
-      ]
-    },
-    {
-      "id": "annexes_tables",
-      "name": {
-        "en": "Annexes and Tables",
-        "pt": "Anexos e Tabelas"
-      },
-      "required": false,
       "order": 15,
       "headingAnchors": [
-        "Annexes and Tables",
-        "Anexos e Tabelas",
-        "table",
-        "appendix",
-        "annex",
-        "Lab Results Report Annexes and Tables",
-        "Laudo de Exames Laboratoriais Anexos e Tabelas"
+        "Follow-up",
+        "Disposition",
+        "Resultado Seguimento",
+        "Acompanhamento"
+      ]
+    },
+    {
+      "id": "signature_block",
+      "name": {
+        "en": "Signature Block",
+        "pt": "Bloco de Assinatura"
+      },
+      "required": false,
+      "order": 16,
+      "headingAnchors": [
+        "Signature",
+        "Signed by",
+        "Pathologist",
+        "Assinatura",
+        "Laboratorio"
       ]
     }
   ]

@@ -1,415 +1,3781 @@
 {
   "_meta": {
     "id": "di_finance_domain_detection_rules",
-    "version": "2.0.0",
-    "description": "Finance domain detection rules with explicit negative disambiguation against accounting patterns.",
+    "version": "2.1.0",
+    "description": "Finance domain detection rules with explicit doc-type signatures and disambiguation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "finance",
-    "minScore": 0.65,
-    "maxRulesPerDocument": 48
+    "minScore": 0.68,
+    "maxRulesPerDocument": 220
   },
   "domain": "finance",
   "rules": [
     {
-      "id": "fin_detect_neg_acct_aging_conflict",
-      "priority": 172,
-      "weight": -2.3,
-      "signal": "content",
-      "ruleType": "negative",
-      "patterns": [
-        "\\baccounts payable aging\\b",
-        "\\baccounts receivable aging\\b",
-        "\\baging de contas\\b"
-      ],
-      "description": "Negative disambiguation rule against finance false positives: acct_aging_conflict"
-    },
-    {
-      "id": "fin_detect_neg_acct_gl_conflict",
-      "priority": 174,
-      "weight": -2.6,
-      "signal": "heading_or_content",
-      "ruleType": "negative",
-      "patterns": [
-        "\\bgeneral ledger\\b",
-        "\\braz[aã]o geral\\b",
-        "\\blivro raz[aã]o\\b"
-      ],
-      "description": "Negative disambiguation rule against finance false positives: acct_gl_conflict"
-    },
-    {
-      "id": "fin_detect_neg_acct_je_conflict",
-      "priority": 173,
-      "weight": -2.5,
-      "signal": "content",
-      "ruleType": "negative",
-      "patterns": [
-        "\\bjournal entry\\b",
-        "\\blan[cç]amento cont[aá]bil\\b",
-        "\\bje support\\b"
-      ],
-      "description": "Negative disambiguation rule against finance false positives: acct_je_conflict"
-    },
-    {
-      "id": "fin_detect_neg_acct_reconciliation_conflict",
-      "priority": 171,
-      "weight": -2.2,
-      "signal": "content",
-      "ruleType": "negative",
-      "patterns": [
-        "\\bbank reconciliation\\b",
-        "\\bconcilia[cç][aã]o banc[aá]ria\\b"
-      ],
-      "description": "Negative disambiguation rule against finance false positives: acct_reconciliation_conflict"
-    },
-    {
-      "id": "fin_detect_neg_acct_trial_balance_conflict",
-      "priority": 175,
-      "weight": -2.8,
-      "signal": "heading_or_content",
-      "ruleType": "negative",
-      "patterns": [
-        "\\btrial balance\\b",
-        "\\bbalancete\\b"
-      ],
-      "description": "Negative disambiguation rule against finance false positives: acct_trial_balance_conflict"
-    },
-    {
-      "id": "fin_detect_neg_tax_compliance_conflict",
-      "priority": 170,
-      "weight": -1.8,
-      "signal": "content",
-      "ruleType": "negative",
-      "patterns": [
-        "\\btax filing\\b",
-        "\\bnota fiscal\\b",
-        "\\bsped\\b"
-      ],
-      "description": "Negative disambiguation rule against finance false positives: tax_compliance_conflict"
-    },
-    {
-      "id": "fin_detect_pos_board_reporting",
-      "priority": 195,
-      "weight": 2,
-      "signal": "heading_or_content",
+      "id": "fin_detect_fin_10k",
+      "priority": 240,
+      "weight": 3.8,
+      "signal": "doc_type_signature",
       "ruleType": "positive",
+      "docType": "fin_10k",
       "patterns": [
-        "\\bboard deck\\b",
-        "\\bconselho\\b",
-        "\\bdeck financeiro\\b"
+        "\\bfin_10k\\b",
+        "\\b10-k annual report\\b",
+        "\\brelatório anual 10-k\\b"
       ],
-      "description": "Positive finance detection rule: board_reporting"
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_10k using title and canonical aliases."
     },
     {
-      "id": "fin_detect_pos_context_01",
-      "priority": 193,
-      "weight": 1.1,
-      "signal": "table_header_cluster",
+      "id": "fin_detect_fin_10q",
+      "priority": 239,
+      "weight": 3.73,
+      "signal": "doc_type_signature",
       "ruleType": "positive",
+      "docType": "fin_10q",
       "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+        "\\bfin_10q\\b",
+        "\\b10-q quarterly report\\b",
+        "\\brelatório trimestral 10-q\\b"
       ],
-      "description": "Contextual finance signal requiring metric + period context."
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_10q using title and canonical aliases."
     },
     {
-      "id": "fin_detect_pos_context_02",
-      "priority": 192,
-      "weight": 1.3,
-      "signal": "content",
+      "id": "fin_detect_fin_8k",
+      "priority": 238,
+      "weight": 3.6599999999999997,
+      "signal": "doc_type_signature",
       "ruleType": "positive",
+      "docType": "fin_8k",
       "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+        "\\bfin_8k\\b",
+        "\\b8-k current report\\b",
+        "\\brelatório de evento relevante 8-k\\b"
       ],
-      "description": "Contextual finance signal requiring metric + period context."
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_8k using title and canonical aliases."
     },
     {
-      "id": "fin_detect_pos_context_03",
-      "priority": 191,
-      "weight": 1.5,
-      "signal": "table_header_cluster",
+      "id": "fin_detect_fin_annual_report",
+      "priority": 237,
+      "weight": 3.59,
+      "signal": "doc_type_signature",
       "ruleType": "positive",
+      "docType": "fin_annual_report",
       "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+        "\\bfin_annual_report\\b",
+        "\\bannual report\\b",
+        "\\brelatório anual\\b"
       ],
-      "description": "Contextual finance signal requiring metric + period context."
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_annual_report using title and canonical aliases."
     },
     {
-      "id": "fin_detect_pos_context_04",
-      "priority": 190,
-      "weight": 1.7000000000000002,
-      "signal": "content",
+      "id": "fin_detect_fin_annual_financials",
+      "priority": 236,
+      "weight": 3.5199999999999996,
+      "signal": "doc_type_signature",
       "ruleType": "positive",
+      "docType": "fin_annual_financials",
       "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
+        "\\bfin_annual_financials\\b",
+        "\\bannual financial statements\\b",
+        "\\bdemonstrações financeiras anuais\\b"
       ],
-      "description": "Contextual finance signal requiring metric + period context."
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_annual_financials using title and canonical aliases."
     },
     {
-      "id": "fin_detect_pos_context_05",
-      "priority": 189,
-      "weight": 1.1,
-      "signal": "table_header_cluster",
+      "id": "fin_detect_fin_income_statement",
+      "priority": 235,
+      "weight": 3.4499999999999997,
+      "signal": "doc_type_signature",
       "ruleType": "positive",
+      "docType": "fin_income_statement",
       "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_06",
-      "priority": 188,
-      "weight": 1.3,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_07",
-      "priority": 187,
-      "weight": 1.5,
-      "signal": "table_header_cluster",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_08",
-      "priority": 186,
-      "weight": 1.7000000000000002,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_09",
-      "priority": 185,
-      "weight": 1.1,
-      "signal": "table_header_cluster",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_10",
-      "priority": 184,
-      "weight": 1.3,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_11",
-      "priority": 183,
-      "weight": 1.5,
-      "signal": "table_header_cluster",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_12",
-      "priority": 182,
-      "weight": 1.7000000000000002,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_13",
-      "priority": 181,
-      "weight": 1.1,
-      "signal": "table_header_cluster",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_14",
-      "priority": 180,
-      "weight": 1.3,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_15",
-      "priority": 179,
-      "weight": 1.5,
-      "signal": "table_header_cluster",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_16",
-      "priority": 178,
-      "weight": 1.7000000000000002,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_17",
-      "priority": 177,
-      "weight": 1.1,
-      "signal": "table_header_cluster",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(revenue|ebitda|net income|cash)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_context_18",
-      "priority": 176,
-      "weight": 1.3,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b(guidance|runway|burn|liquidity)\\b",
-        "\\b(period|quarter|month|ano|trimestre|mes)\\b"
-      ],
-      "description": "Contextual finance signal requiring metric + period context."
-    },
-    {
-      "id": "fin_detect_pos_kpi_cluster",
-      "priority": 194,
-      "weight": 1.9,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\bEBITDA\\b",
-        "\\beps\\b",
-        "\\bgross margin\\b",
-        "\\bfree cash flow\\b"
-      ],
-      "description": "Positive finance detection rule: kpi_cluster"
-    },
-    {
-      "id": "fin_detect_pos_planning_cluster",
-      "priority": 198,
-      "weight": 2.4,
-      "signal": "heading_or_content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\bbudget\\b",
-        "\\bforecast\\b",
-        "\\bor[cç]amento\\b",
-        "\\bprevis[aã]o\\b",
-        "\\bor[cç]ado vs realizado\\b"
-      ],
-      "description": "Positive finance detection rule: planning_cluster"
-    },
-    {
-      "id": "fin_detect_pos_saas_finance_cluster",
-      "priority": 196,
-      "weight": 2.2,
-      "signal": "content",
-      "ruleType": "positive",
-      "patterns": [
-        "\\bARR\\b",
-        "\\bMRR\\b",
-        "\\bNRR\\b",
-        "\\bchurn\\b",
-        "\\bunit economics\\b",
-        "\\bcohort\\b"
-      ],
-      "description": "Positive finance detection rule: saas_finance_cluster"
-    },
-    {
-      "id": "fin_detect_pos_sec_filing",
-      "priority": 200,
-      "weight": 3,
-      "signal": "heading_or_metadata",
-      "ruleType": "positive",
-      "patterns": [
-        "\\b10-K\\b",
-        "\\b10-Q\\b",
-        "\\b8-K\\b",
-        "\\bSEC\\s+filing\\b"
-      ],
-      "description": "Positive finance detection rule: sec_filing"
-    },
-    {
-      "id": "fin_detect_pos_statements_cluster",
-      "priority": 199,
-      "weight": 2.8,
-      "signal": "heading",
-      "ruleType": "positive",
-      "patterns": [
+        "\\bfin_income_statement\\b",
         "\\bincome statement\\b",
-        "\\bbalance sheet\\b",
-        "\\bcash flow statement\\b",
-        "\\bdre\\b",
-        "\\bbalan[çc]o\\b",
-        "\\bfluxo de caixa\\b"
+        "\\bdemonstração do resultado\\b"
       ],
-      "description": "Positive finance detection rule: statements_cluster"
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_income_statement using title and canonical aliases."
     },
     {
-      "id": "fin_detect_pos_treasury_cluster",
+      "id": "fin_detect_fin_balance_sheet",
+      "priority": 234,
+      "weight": 3.38,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_balance_sheet",
+      "patterns": [
+        "\\bfin_balance_sheet\\b",
+        "\\bbalance sheet\\b",
+        "\\bbalanço patrimonial\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_balance_sheet using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_cash_flow",
+      "priority": 233,
+      "weight": 3.3099999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_cash_flow",
+      "patterns": [
+        "\\bfin_cash_flow\\b",
+        "\\bcash flow statement\\b",
+        "\\bdemonstração de fluxo de caixa\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_cash_flow using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_efs",
+      "priority": 232,
+      "weight": 3.2399999999999998,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_efs",
+      "patterns": [
+        "\\bfin_efs\\b",
+        "\\bequity flow statement\\b",
+        "\\bdemonstração de variação patrimonial\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_efs using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_cap_table",
+      "priority": 231,
+      "weight": 3.17,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_cap_table",
+      "patterns": [
+        "\\bfin_cap_table\\b",
+        "\\bcap table\\b",
+        "\\btabela de capitalização\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_cap_table using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_unit_economics_model",
+      "priority": 230,
+      "weight": 3.0999999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_unit_economics_model",
+      "patterns": [
+        "\\bfin_unit_economics_model\\b",
+        "\\bunit economics model\\b",
+        "\\bmodelo de economia unitária\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_unit_economics_model using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_arr_mrr_report",
+      "priority": 229,
+      "weight": 3.03,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_arr_mrr_report",
+      "patterns": [
+        "\\bfin_arr_mrr_report\\b",
+        "\\barr/mrr report\\b",
+        "\\brelatório arr/mrr\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_arr_mrr_report using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_cohort_analysis",
+      "priority": 228,
+      "weight": 2.96,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_cohort_analysis",
+      "patterns": [
+        "\\bfin_cohort_analysis\\b",
+        "\\bcohort analysis\\b",
+        "\\banálise de cohort\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_cohort_analysis using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_benchmarking_report",
+      "priority": 227,
+      "weight": 2.8899999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_benchmarking_report",
+      "patterns": [
+        "\\bfin_benchmarking_report\\b",
+        "\\bbenchmarking report\\b",
+        "\\brelatório de benchmarking\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_benchmarking_report using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_budget",
+      "priority": 226,
+      "weight": 2.82,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_budget",
+      "patterns": [
+        "\\bfin_budget\\b",
+        "\\bbudget pack\\b",
+        "\\borçamento\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_budget using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_forecast",
+      "priority": 225,
+      "weight": 2.75,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_forecast",
+      "patterns": [
+        "\\bfin_forecast\\b",
+        "\\bforecast\\b",
+        "\\bprevisão financeira\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_forecast using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_budget_vs_actual",
+      "priority": 224,
+      "weight": 2.6799999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_budget_vs_actual",
+      "patterns": [
+        "\\bfin_budget_vs_actual\\b",
+        "\\bbudget vs actual report\\b",
+        "\\brelatório orçado x realizado\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_budget_vs_actual using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_rolling_forecast",
+      "priority": 223,
+      "weight": 2.6099999999999994,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_rolling_forecast",
+      "patterns": [
+        "\\bfin_rolling_forecast\\b",
+        "\\brolling forecast\\b",
+        "\\bprevisão rolante\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_rolling_forecast using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_monthly_close_pack",
+      "priority": 222,
+      "weight": 2.5399999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_monthly_close_pack",
+      "patterns": [
+        "\\bfin_monthly_close_pack\\b",
+        "\\bmonthly close pack\\b",
+        "\\bfechamento mensal\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_monthly_close_pack using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_quarterly_close_pack",
+      "priority": 221,
+      "weight": 2.4699999999999998,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_quarterly_close_pack",
+      "patterns": [
+        "\\bfin_quarterly_close_pack\\b",
+        "\\bquarterly close pack\\b",
+        "\\bfechamento trimestral\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_quarterly_close_pack using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_board_deck_finance",
+      "priority": 220,
+      "weight": 3.8,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_board_deck_finance",
+      "patterns": [
+        "\\bfin_board_deck_finance\\b",
+        "\\bfinance board deck\\b",
+        "\\bdeck financeiro do conselho\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_board_deck_finance using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_investor_presentation",
+      "priority": 219,
+      "weight": 3.73,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_investor_presentation",
+      "patterns": [
+        "\\bfin_investor_presentation\\b",
+        "\\binvestor presentation\\b",
+        "\\bapresentação a investidores\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_investor_presentation using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_earnings_release",
+      "priority": 218,
+      "weight": 3.6599999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_earnings_release",
+      "patterns": [
+        "\\bfin_earnings_release\\b",
+        "\\bearnings release\\b",
+        "\\bcomunicado de resultados\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_earnings_release using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_covenant_compliance_certificate",
+      "priority": 217,
+      "weight": 3.59,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_covenant_compliance_certificate",
+      "patterns": [
+        "\\bfin_covenant_compliance_certificate\\b",
+        "\\bcovenant compliance certificate\\b",
+        "\\bcertificado de cumprimento de covenants\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_covenant_compliance_certificate using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_debt_schedule",
+      "priority": 216,
+      "weight": 3.5199999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_debt_schedule",
+      "patterns": [
+        "\\bfin_debt_schedule\\b",
+        "\\bdebt schedule\\b",
+        "\\bcronograma de dívida\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_debt_schedule using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_bank_statement",
+      "priority": 215,
+      "weight": 3.4499999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_bank_statement",
+      "patterns": [
+        "\\bfin_bank_statement\\b",
+        "\\bbank statement\\b",
+        "\\bextrato bancário\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_bank_statement using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_credit_facility",
+      "priority": 214,
+      "weight": 3.38,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_credit_facility",
+      "patterns": [
+        "\\bfin_credit_facility\\b",
+        "\\bcredit facility\\b",
+        "\\blinha de crédito\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_credit_facility using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_cash_management",
+      "priority": 213,
+      "weight": 3.3099999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_cash_management",
+      "patterns": [
+        "\\bfin_cash_management\\b",
+        "\\bcash management\\b",
+        "\\bgestão de caixa\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_cash_management using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_tax_return_summary",
+      "priority": 212,
+      "weight": 3.2399999999999998,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_tax_return_summary",
+      "patterns": [
+        "\\bfin_tax_return_summary\\b",
+        "\\btax return summary\\b",
+        "\\bresumo de declaração fiscal\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_tax_return_summary using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_audit_compliance_pack",
+      "priority": 211,
+      "weight": 3.17,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_audit_compliance_pack",
+      "patterns": [
+        "\\bfin_audit_compliance_pack\\b",
+        "\\baudit & compliance pack\\b",
+        "\\bpacote de compliance e auditoria\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_audit_compliance_pack using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_tax_deed_summary",
+      "priority": 210,
+      "weight": 3.0999999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_tax_deed_summary",
+      "patterns": [
+        "\\bfin_tax_deed_summary\\b",
+        "\\btax deed summary\\b",
+        "\\bresumo de encargo fiscal\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_tax_deed_summary using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_dividend_policy",
+      "priority": 209,
+      "weight": 3.03,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_dividend_policy",
+      "patterns": [
+        "\\bfin_dividend_policy\\b",
+        "\\bdividend policy note\\b",
+        "\\bnota de política de dividendos\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_dividend_policy using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_kpi_dashboard",
+      "priority": 208,
+      "weight": 2.96,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_kpi_dashboard",
+      "patterns": [
+        "\\bfin_kpi_dashboard\\b",
+        "\\bkpi dashboard\\b",
+        "\\bpainel de kpis\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_kpi_dashboard using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_cash_forecast",
+      "priority": 207,
+      "weight": 2.8899999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_cash_forecast",
+      "patterns": [
+        "\\bfin_cash_forecast\\b",
+        "\\bcash forecast\\b",
+        "\\bprevisão de caixa\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_cash_forecast using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_treasury_memo",
+      "priority": 206,
+      "weight": 2.82,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_treasury_memo",
+      "patterns": [
+        "\\bfin_treasury_memo\\b",
+        "\\btreasury memo\\b",
+        "\\bmemorando de tesouraria\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_treasury_memo using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_investor_termsheet",
+      "priority": 205,
+      "weight": 2.75,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_investor_termsheet",
+      "patterns": [
+        "\\bfin_investor_termsheet\\b",
+        "\\bterm sheet\\b",
+        "\\bterm sheet\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_investor_termsheet using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_financing_term_sheet",
+      "priority": 204,
+      "weight": 2.6799999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_financing_term_sheet",
+      "patterns": [
+        "\\bfin_financing_term_sheet\\b",
+        "\\bfinancing term sheet\\b",
+        "\\bterm sheet de financiamento\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_financing_term_sheet using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_board_minutes_finance",
+      "priority": 203,
+      "weight": 2.6099999999999994,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_board_minutes_finance",
+      "patterns": [
+        "\\bfin_board_minutes_finance\\b",
+        "\\bboard finance minutes\\b",
+        "\\bata financeira\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_board_minutes_finance using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_revenue_operational_review",
+      "priority": 202,
+      "weight": 2.5399999999999996,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_revenue_operational_review",
+      "patterns": [
+        "\\bfin_revenue_operational_review\\b",
+        "\\brevenue ops review\\b",
+        "\\brevisão operacional de receita\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_revenue_operational_review using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_incentive_plan",
+      "priority": 201,
+      "weight": 2.4699999999999998,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_incentive_plan",
+      "patterns": [
+        "\\bfin_incentive_plan\\b",
+        "\\bincentive plan summary\\b",
+        "\\bresumo de plano de incentivos\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_incentive_plan using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_esg_finance_linkage",
+      "priority": 200,
+      "weight": 3.8,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_esg_finance_linkage",
+      "patterns": [
+        "\\bfin_esg_finance_linkage\\b",
+        "\\besg finance linkage\\b",
+        "\\bligação esg financeira\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_esg_finance_linkage using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_fx_exposure_report",
+      "priority": 199,
+      "weight": 3.73,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_fx_exposure_report",
+      "patterns": [
+        "\\bfin_fx_exposure_report\\b",
+        "\\bfx exposure report\\b",
+        "\\brelatório de exposição cambial\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_fx_exposure_report using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_investment_portfolio",
+      "priority": 198,
+      "weight": 3.6599999999999997,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_investment_portfolio",
+      "patterns": [
+        "\\bfin_investment_portfolio\\b",
+        "\\binvestment portfolio\\b",
+        "\\bportfólio de investimentos\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_investment_portfolio using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_fin_fixed_income_portfolio",
       "priority": 197,
+      "weight": 3.59,
+      "signal": "doc_type_signature",
+      "ruleType": "positive",
+      "docType": "fin_fixed_income_portfolio",
+      "patterns": [
+        "\\bfin_fixed_income_portfolio\\b",
+        "\\bfixed income portfolio\\b",
+        "\\bportfólio de renda fixa\\b"
+      ],
+      "negativePatterns": [
+        "\\bsoap note\\b",
+        "\\bhemoglobin\\b",
+        "\\bradiology report\\b"
+      ],
+      "description": "Strong signature for doc type fin_fixed_income_portfolio using title and canonical aliases."
+    },
+    {
+      "id": "fin_detect_extra_001",
+      "priority": 179,
       "weight": 2.3,
       "signal": "content",
       "ruleType": "positive",
       "patterns": [
-        "\\bcash forecast\\b",
-        "\\bbank statement\\b",
-        "\\bdebt schedule\\b",
-        "\\bcovenant\\b",
-        "\\bextrato banc[aá]rio\\b"
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b1\\b"
       ],
-      "description": "Positive finance detection rule: treasury_cluster"
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 1 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_002",
+      "priority": 178,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b2\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 2 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_003",
+      "priority": 177,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b3\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 3 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_004",
+      "priority": 176,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b4\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 4 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_005",
+      "priority": 175,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b5\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 5 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_006",
+      "priority": 174,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b6\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 6 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_007",
+      "priority": 173,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b7\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 7 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_008",
+      "priority": 172,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b8\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 8 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_009",
+      "priority": 171,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b9\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 9 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_010",
+      "priority": 170,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b10\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 10 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_011",
+      "priority": 169,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b11\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 11 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_012",
+      "priority": 168,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b12\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 12 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_013",
+      "priority": 167,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b13\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 13 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_014",
+      "priority": 166,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b14\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 14 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_015",
+      "priority": 165,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b15\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 15 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_016",
+      "priority": 164,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b16\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 16 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_017",
+      "priority": 163,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b17\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 17 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_018",
+      "priority": 162,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b18\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 18 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_019",
+      "priority": 161,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b19\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 19 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_020",
+      "priority": 160,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b20\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 20 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_021",
+      "priority": 159,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b21\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 21 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_022",
+      "priority": 158,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b22\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 22 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_023",
+      "priority": 157,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b23\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 23 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_024",
+      "priority": 156,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b24\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 24 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_025",
+      "priority": 155,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b25\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 25 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_026",
+      "priority": 154,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b26\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 26 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_027",
+      "priority": 153,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b27\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 27 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_028",
+      "priority": 152,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b28\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 28 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_029",
+      "priority": 151,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b29\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 29 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_030",
+      "priority": 150,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b30\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 30 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_031",
+      "priority": 149,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b31\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 31 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_032",
+      "priority": 148,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b32\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 32 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_033",
+      "priority": 147,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b33\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 33 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_034",
+      "priority": 146,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b34\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 34 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_035",
+      "priority": 145,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b35\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 35 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_036",
+      "priority": 144,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b36\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 36 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_037",
+      "priority": 143,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b37\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 37 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_038",
+      "priority": 142,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b38\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 38 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_039",
+      "priority": 141,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b39\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 39 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_040",
+      "priority": 140,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b40\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 40 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_041",
+      "priority": 139,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b41\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 41 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_042",
+      "priority": 138,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b42\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 42 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_043",
+      "priority": 137,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b43\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 43 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_044",
+      "priority": 136,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b44\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 44 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_045",
+      "priority": 135,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b45\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 45 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_046",
+      "priority": 134,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b46\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 46 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_047",
+      "priority": 133,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b47\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 47 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_048",
+      "priority": 132,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b48\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 48 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_049",
+      "priority": 131,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b49\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 49 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_050",
+      "priority": 130,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b50\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 50 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_051",
+      "priority": 129,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b51\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 51 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_052",
+      "priority": 128,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b52\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 52 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_053",
+      "priority": 127,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b53\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 53 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_054",
+      "priority": 126,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b54\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 54 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_055",
+      "priority": 125,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b55\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 55 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_056",
+      "priority": 124,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b56\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 56 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_057",
+      "priority": 123,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b57\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 57 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_058",
+      "priority": 122,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b58\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 58 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_059",
+      "priority": 121,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b59\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 59 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_060",
+      "priority": 120,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b60\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 60 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_061",
+      "priority": 119,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b61\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 61 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_062",
+      "priority": 118,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b62\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 62 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_063",
+      "priority": 117,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b63\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 63 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_064",
+      "priority": 116,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b64\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 64 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_065",
+      "priority": 115,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b65\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 65 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_066",
+      "priority": 114,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b66\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 66 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_067",
+      "priority": 113,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b67\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 67 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_068",
+      "priority": 112,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b68\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 68 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_069",
+      "priority": 111,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b69\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 69 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_070",
+      "priority": 110,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b70\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 70 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_071",
+      "priority": 109,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b71\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 71 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_072",
+      "priority": 108,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b72\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 72 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_073",
+      "priority": 107,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b73\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 73 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_074",
+      "priority": 106,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b74\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 74 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_075",
+      "priority": 105,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b75\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 75 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_076",
+      "priority": 104,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b76\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 76 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_077",
+      "priority": 103,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b77\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 77 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_078",
+      "priority": 102,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b78\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 78 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_079",
+      "priority": 101,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b79\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 79 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_080",
+      "priority": 100,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b80\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 80 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_081",
+      "priority": 99,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b81\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 81 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_082",
+      "priority": 98,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b82\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 82 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_083",
+      "priority": 97,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b83\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 83 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_084",
+      "priority": 96,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b84\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 84 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_085",
+      "priority": 95,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b85\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 85 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_086",
+      "priority": 94,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b86\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 86 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_087",
+      "priority": 93,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b87\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 87 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_088",
+      "priority": 92,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b88\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 88 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_089",
+      "priority": 91,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b89\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 89 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_090",
+      "priority": 90,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b90\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 90 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_091",
+      "priority": 89,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b91\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 91 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_092",
+      "priority": 88,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b92\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 92 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_093",
+      "priority": 87,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b93\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 93 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_094",
+      "priority": 86,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b94\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 94 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_095",
+      "priority": 85,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b95\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 95 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_096",
+      "priority": 84,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b96\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 96 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_097",
+      "priority": 83,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b97\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 97 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_098",
+      "priority": 82,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b98\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 98 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_099",
+      "priority": 81,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b99\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 99 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_100",
+      "priority": 80,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b100\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 100 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_101",
+      "priority": 79,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b101\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 101 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_102",
+      "priority": 78,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b102\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 102 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_103",
+      "priority": 77,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b103\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 103 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_104",
+      "priority": 76,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b104\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 104 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_105",
+      "priority": 75,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b105\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 105 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_106",
+      "priority": 74,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b106\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 106 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_107",
+      "priority": 73,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b107\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 107 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_108",
+      "priority": 72,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b108\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 108 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_109",
+      "priority": 71,
+      "weight": 2.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b109\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 109 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_110",
+      "priority": 70,
+      "weight": 2.4,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b110\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 110 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_111",
+      "priority": 69,
+      "weight": 2.5,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b111\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 111 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_112",
+      "priority": 68,
+      "weight": 2.6,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b112\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 112 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_113",
+      "priority": 67,
+      "weight": 2.7,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b113\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 113 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_114",
+      "priority": 66,
+      "weight": 2.8,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b114\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 114 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_115",
+      "priority": 65,
+      "weight": 2.9,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b115\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 115 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_116",
+      "priority": 64,
+      "weight": 3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b116\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 116 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_117",
+      "priority": 63,
+      "weight": 3.1,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b117\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 117 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_118",
+      "priority": 62,
+      "weight": 3.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b118\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 118 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_119",
+      "priority": 61,
+      "weight": 3.3,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bfiscal year\\b",
+        "\\b119\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 119 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_extra_120",
+      "priority": 60,
+      "weight": 2.2,
+      "signal": "content",
+      "ruleType": "positive",
+      "patterns": [
+        "\\bfinance (metric|analysis|statement|report|covid|cash|budget|arr|mrr|covenant|tax)\\b",
+        "\\bquarterly\\b",
+        "\\b120\\b"
+      ],
+      "negativePatterns": [
+        "\\bpatient\\b",
+        "\\bhemoglobin\\b",
+        "\\bdiagnosis\\b"
+      ],
+      "description": "Numeric finance signal 120 to reinforce retrieval confidence."
+    },
+    {
+      "id": "fin_detect_negative_001",
+      "priority": 159,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 1 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_002",
+      "priority": 158,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 2 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_003",
+      "priority": 157,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 3 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_004",
+      "priority": 156,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 4 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_005",
+      "priority": 155,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 5 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_006",
+      "priority": 154,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 6 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_007",
+      "priority": 153,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 7 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_008",
+      "priority": 152,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 8 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_009",
+      "priority": 151,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 9 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_010",
+      "priority": 150,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 10 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_011",
+      "priority": 149,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 11 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_012",
+      "priority": 148,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 12 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_013",
+      "priority": 147,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 13 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_014",
+      "priority": 146,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 14 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_015",
+      "priority": 145,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 15 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_016",
+      "priority": 144,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 16 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_017",
+      "priority": 143,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 17 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_018",
+      "priority": 142,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 18 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_019",
+      "priority": 141,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 19 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_020",
+      "priority": 140,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 20 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_021",
+      "priority": 139,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 21 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_022",
+      "priority": 138,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 22 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_023",
+      "priority": 137,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 23 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_024",
+      "priority": 136,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 24 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_025",
+      "priority": 135,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 25 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_026",
+      "priority": 134,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 26 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_027",
+      "priority": 133,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 27 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_028",
+      "priority": 132,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 28 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_029",
+      "priority": 131,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 29 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_030",
+      "priority": 130,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 30 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_031",
+      "priority": 129,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 31 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_032",
+      "priority": 128,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 32 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_033",
+      "priority": 127,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 33 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_034",
+      "priority": 126,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 34 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_035",
+      "priority": 125,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 35 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_036",
+      "priority": 124,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 36 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_037",
+      "priority": 123,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 37 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_038",
+      "priority": 122,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 38 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_039",
+      "priority": 121,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 39 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_040",
+      "priority": 120,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 40 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_041",
+      "priority": 119,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 41 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_042",
+      "priority": 118,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 42 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_043",
+      "priority": 117,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 43 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_044",
+      "priority": 116,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 44 to reduce false positives."
+    },
+    {
+      "id": "fin_detect_negative_045",
+      "priority": 115,
+      "weight": -2,
+      "signal": "content",
+      "ruleType": "negative",
+      "patterns": [
+        "\\bsoap note\\b",
+        "\\bradiology\\b",
+        "\\bmedical\\b",
+        "\\bdiagnostic\\b"
+      ],
+      "negativePatterns": [
+        "\\brevenue\\b"
+      ],
+      "description": "Domain anti-pattern 45 to reduce false positives."
     }
   ]
 }

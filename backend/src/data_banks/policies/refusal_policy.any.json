@@ -3,8 +3,16 @@
     "id": "refusal_policy",
     "version": "1.0.0",
     "description": "ChatGPT-like refusal policy for Koda. Defines when to refuse, how to refuse (short, non-lecturing, actionable), and which fallback path to take. No user-facing templates live here; this policy routes to refusal_phrases + safe alternatives.",
-    "languages": ["any"],
-    "lastUpdated": "2026-01-26"
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-01-26",
+    "owner": "platform-safety",
+    "reviewCadenceDays": 30,
+    "criticality": "critical",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -49,8 +57,16 @@
       "priority": 1000,
       "when": {
         "any": [
-          { "path": "signals.policy.selfHarm", "op": "eq", "value": true },
-          { "path": "signals.policy.suicide", "op": "eq", "value": true }
+          {
+            "path": "signals.policy.selfHarm",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.policy.suicide",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -66,7 +82,11 @@
     {
       "id": "RP_990_sexual_minors",
       "priority": 990,
-      "when": { "path": "signals.policy.sexualMinors", "op": "eq", "value": true },
+      "when": {
+        "path": "signals.policy.sexualMinors",
+        "op": "eq",
+        "value": true
+      },
       "then": {
         "action": "refuse",
         "category": "sexual_minors",
@@ -81,8 +101,16 @@
       "priority": 970,
       "when": {
         "any": [
-          { "path": "signals.policy.malware", "op": "eq", "value": true },
-          { "path": "signals.policy.exploitation", "op": "eq", "value": true }
+          {
+            "path": "signals.policy.malware",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.policy.exploitation",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -90,7 +118,11 @@
         "category": "malware_or_exploitation",
         "responseBank": "refusal_phrases",
         "responseType": "malware_or_exploitation",
-        "safeAlternatives": ["defensive_security_best_practices", "how_to_secure_account", "how_to_remove_malware"]
+        "safeAlternatives": [
+          "defensive_security_best_practices",
+          "how_to_secure_account",
+          "how_to_remove_malware"
+        ]
       },
       "terminal": true
     },
@@ -99,8 +131,16 @@
       "priority": 960,
       "when": {
         "any": [
-          { "path": "signals.policy.credentialTheft", "op": "eq", "value": true },
-          { "path": "signals.policy.bypass", "op": "eq", "value": true }
+          {
+            "path": "signals.policy.credentialTheft",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.policy.bypass",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -108,14 +148,22 @@
         "category": "credential_theft_or_bypass",
         "responseBank": "refusal_phrases",
         "responseType": "credential_or_bypass",
-        "safeAlternatives": ["account_recovery_official_steps", "security_hardening", "password_manager_tips"]
+        "safeAlternatives": [
+          "account_recovery_official_steps",
+          "security_hardening",
+          "password_manager_tips"
+        ]
       },
       "terminal": true
     },
     {
       "id": "RP_940_weapons",
       "priority": 940,
-      "when": { "path": "signals.policy.weapons", "op": "eq", "value": true },
+      "when": {
+        "path": "signals.policy.weapons",
+        "op": "eq",
+        "value": true
+      },
       "then": {
         "action": "refuse",
         "category": "weapons_and_violence",
@@ -129,8 +177,16 @@
       "priority": 920,
       "when": {
         "any": [
-          { "path": "signals.policy.illicitInstructions", "op": "eq", "value": true },
-          { "path": "signals.policy.illegalActivity", "op": "eq", "value": true }
+          {
+            "path": "signals.policy.illicitInstructions",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.policy.illegalActivity",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -138,7 +194,11 @@
         "category": "instructions_for_wrongdoing",
         "responseBank": "refusal_phrases",
         "responseType": "wrongdoing_instructions",
-        "safeAlternatives": ["lawful_overview", "risk_awareness", "legal_compliance_general"]
+        "safeAlternatives": [
+          "lawful_overview",
+          "risk_awareness",
+          "legal_compliance_general"
+        ]
       },
       "terminal": true
     },
@@ -147,8 +207,16 @@
       "priority": 900,
       "when": {
         "any": [
-          { "path": "signals.policy.sensitivePersonalDataExtraction", "op": "eq", "value": true },
-          { "path": "signals.policy.doxxing", "op": "eq", "value": true }
+          {
+            "path": "signals.policy.sensitivePersonalDataExtraction",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.policy.doxxing",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -156,20 +224,32 @@
         "category": "privacy_sensitive_extraction",
         "responseBank": "refusal_phrases",
         "responseType": "privacy_sensitive",
-        "safeAlternatives": ["summarize_without_sensitive_fields", "redact_then_extract", "explain_where_to_find_in_doc"]
+        "safeAlternatives": [
+          "summarize_without_sensitive_fields",
+          "redact_then_extract",
+          "explain_where_to_find_in_doc"
+        ]
       },
       "terminal": true
     },
     {
       "id": "RP_880_copyright",
       "priority": 880,
-      "when": { "path": "signals.policy.copyright", "op": "eq", "value": true },
+      "when": {
+        "path": "signals.policy.copyright",
+        "op": "eq",
+        "value": true
+      },
       "then": {
         "action": "refuse_and_offer_safe_alternative",
         "category": "copyright_violation",
         "responseBank": "refusal_phrases",
         "responseType": "copyright",
-        "safeAlternatives": ["summary", "short_excerpt_with_context", "analysis_or_discussion"]
+        "safeAlternatives": [
+          "summary",
+          "short_excerpt_with_context",
+          "analysis_or_discussion"
+        ]
       },
       "terminal": true
     },
@@ -178,8 +258,16 @@
       "priority": 860,
       "when": {
         "any": [
-          { "path": "signals.policy.highStakesMedicalInstruction", "op": "eq", "value": true },
-          { "path": "signals.policy.highStakesLegalInstruction", "op": "eq", "value": true }
+          {
+            "path": "signals.policy.highStakesMedicalInstruction",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "path": "signals.policy.highStakesLegalInstruction",
+            "op": "eq",
+            "value": true
+          }
         ]
       },
       "then": {
@@ -188,14 +276,22 @@
         "responseBank": "refusal_phrases",
         "responseType": "high_stakes",
         "includeSafeAlternative": true,
-        "safeAlternatives": ["general_information_only", "suggest_professional", "ask_for_context_non_actionable"]
+        "safeAlternatives": [
+          "general_information_only",
+          "suggest_professional",
+          "ask_for_context_non_actionable"
+        ]
       },
       "terminal": true
     },
     {
       "id": "RP_200_fallback_other",
       "priority": 200,
-      "when": { "path": "signals.policyRefusalRequired", "op": "eq", "value": true },
+      "when": {
+        "path": "signals.policyRefusalRequired",
+        "op": "eq",
+        "value": true
+      },
       "then": {
         "action": "refuse",
         "category": "other",
@@ -225,18 +321,43 @@
     "cases": [
       {
         "id": "RPT_0001_self_harm_routes_refusal",
-        "input": { "signals": { "policy": { "selfHarm": true } } },
-        "expect": { "category": "self_harm", "action": "refuse_and_redirect" }
+        "input": {
+          "signals": {
+            "policy": {
+              "selfHarm": true
+            }
+          }
+        },
+        "expect": {
+          "category": "self_harm",
+          "action": "refuse_and_redirect"
+        }
       },
       {
         "id": "RPT_0002_privacy_sensitive_routes_refusal",
-        "input": { "signals": { "policy": { "sensitivePersonalDataExtraction": true } } },
-        "expect": { "category": "privacy_sensitive_extraction" }
+        "input": {
+          "signals": {
+            "policy": {
+              "sensitivePersonalDataExtraction": true
+            }
+          }
+        },
+        "expect": {
+          "category": "privacy_sensitive_extraction"
+        }
       },
       {
         "id": "RPT_0003_copyright_routes_refusal",
-        "input": { "signals": { "policy": { "copyright": true } } },
-        "expect": { "category": "copyright_violation" }
+        "input": {
+          "signals": {
+            "policy": {
+              "copyright": true
+            }
+          }
+        },
+        "expect": {
+          "category": "copyright_violation"
+        }
       }
     ]
   }

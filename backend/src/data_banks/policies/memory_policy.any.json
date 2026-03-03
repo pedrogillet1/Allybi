@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-19"
+    "lastUpdated": "2026-02-19",
+    "owner": "koda-runtime",
+    "reviewCadenceDays": 30,
+    "criticality": "high",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -253,7 +259,7 @@
             "es": "No encontre detalles especificos sobre esto en tus documentos. Puedes decirme que archivo debo revisar?"
           },
           "hedgePrefixWeak": {
-            "en": "Based on the limited information available, ",
+            "en": "From the retrieved document snippets, ",
             "pt": "Pelos trechos encontrados, ",
             "es": "Con base en la informacion limitada disponible, "
           },
@@ -264,7 +270,8 @@
           }
         }
       }
-    }
+    },
+    "configModeOnly": true
   },
   "principles": {
     "_comment": "These are the behavioral guarantees you want for ChatGPT-parity.",

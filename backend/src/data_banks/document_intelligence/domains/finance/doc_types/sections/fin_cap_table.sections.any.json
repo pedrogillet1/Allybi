@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "di_finance_sections_fin_cap_table",
-    "version": "2.0.0",
-    "description": "Section map for fin_cap_table.",
+    "version": "2.1.0",
+    "description": "Sections mapping for Cap Table.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,76 +15,1368 @@
   },
   "sections": [
     {
-      "id": "executive_summary",
+      "id": "share_classes_1",
       "name": {
-        "en": "Executive Summary",
-        "pt": "Resumo Executivo"
+        "en": "Share Classes Segment 1",
+        "pt": "Share Classes segmento 1"
       },
-      "required": true,
-      "order": 1
+      "mustHave": true,
+      "order": 1,
+      "headingAnchors": [
+        "Share Classes 1",
+        "share_classes 1",
+        "Share Classes section",
+        "seção Share Classes 1"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bshare_classes\b",
+        "\bshare_classes_1\b",
+        "\bshare_classes section\b"
+      ],
+      "description": "Canonical section share_classes for Cap Table"
     },
     {
-      "id": "period_scope",
+      "id": "rounds_and_investments_2",
       "name": {
-        "en": "Period and Scope",
-        "pt": "Periodo e Escopo"
+        "en": "Rounds And Investments Segment 2",
+        "pt": "Rounds And Investments segmento 2"
       },
-      "required": true,
-      "order": 2
+      "mustHave": true,
+      "order": 2,
+      "headingAnchors": [
+        "Rounds And Investments 2",
+        "rounds_and_investments 2",
+        "Rounds And Investments section",
+        "seção Rounds And Investments 2"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\brounds_and_investments\b",
+        "\brounds_and_investments_2\b",
+        "\brounds_and_investments section\b"
+      ],
+      "description": "Canonical section rounds_and_investments for Cap Table"
     },
     {
-      "id": "assumptions",
+      "id": "vesting_schedule_3",
       "name": {
-        "en": "Assumptions",
-        "pt": "Premissas"
+        "en": "Vesting Schedule Segment 3",
+        "pt": "Vesting Schedule segmento 3"
       },
-      "required": false,
-      "order": 3
+      "mustHave": true,
+      "order": 3,
+      "headingAnchors": [
+        "Vesting Schedule 3",
+        "vesting_schedule 3",
+        "Vesting Schedule section",
+        "seção Vesting Schedule 3"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bvesting_schedule\b",
+        "\bvesting_schedule_3\b",
+        "\bvesting_schedule section\b"
+      ],
+      "description": "Canonical section vesting_schedule for Cap Table"
     },
     {
-      "id": "ownership_table",
+      "id": "option_pool_4",
       "name": {
-        "en": "Ownership Table",
-        "pt": "Tabela de Participacao"
+        "en": "Option Pool Segment 4",
+        "pt": "Option Pool segmento 4"
       },
-      "required": true,
-      "order": 4
+      "mustHave": true,
+      "order": 4,
+      "headingAnchors": [
+        "Option Pool 4",
+        "option_pool 4",
+        "Option Pool section",
+        "seção Option Pool 4"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\boption_pool\b",
+        "\boption_pool_4\b",
+        "\boption_pool section\b"
+      ],
+      "description": "Canonical section option_pool for Cap Table"
     },
     {
-      "id": "dilution_waterfall",
+      "id": "conversion_terms_5",
       "name": {
-        "en": "Dilution Waterfall",
-        "pt": "Waterfall de Diluicao"
+        "en": "Conversion Terms Segment 5",
+        "pt": "Conversion Terms segmento 5"
       },
-      "required": true,
-      "order": 5
+      "mustHave": true,
+      "order": 5,
+      "headingAnchors": [
+        "Conversion Terms 5",
+        "conversion_terms 5",
+        "Conversion Terms section",
+        "seção Conversion Terms 5"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bconversion_terms\b",
+        "\bconversion_terms_5\b",
+        "\bconversion_terms section\b"
+      ],
+      "description": "Canonical section conversion_terms for Cap Table"
     },
     {
-      "id": "risks_and_constraints",
+      "id": "warrants_6",
       "name": {
-        "en": "Risks and Constraints",
-        "pt": "Riscos e Restricoes"
+        "en": "Warrants Segment 6",
+        "pt": "Warrants segmento 6"
       },
-      "required": false,
-      "order": 6
+      "mustHave": true,
+      "order": 6,
+      "headingAnchors": [
+        "Warrants 6",
+        "warrants 6",
+        "Warrants section",
+        "seção Warrants 6"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bwarrants\b",
+        "\bwarrants_6\b",
+        "\bwarrants section\b"
+      ],
+      "description": "Canonical section warrants for Cap Table"
     },
     {
-      "id": "definitions",
+      "id": "rights_restrictions_7",
       "name": {
-        "en": "Definitions",
-        "pt": "Definicoes"
+        "en": "Rights Restrictions Segment 7",
+        "pt": "Rights Restrictions segmento 7"
       },
-      "required": true,
-      "order": 7
+      "mustHave": true,
+      "order": 7,
+      "headingAnchors": [
+        "Rights Restrictions 7",
+        "rights_restrictions 7",
+        "Rights Restrictions section",
+        "seção Rights Restrictions 7"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\brights_restrictions\b",
+        "\brights_restrictions_7\b",
+        "\brights_restrictions section\b"
+      ],
+      "description": "Canonical section rights_restrictions for Cap Table"
     },
     {
-      "id": "appendix",
+      "id": "preferred_terms_8",
       "name": {
-        "en": "Appendix",
-        "pt": "Anexos"
+        "en": "Preferred Terms Segment 8",
+        "pt": "Preferred Terms segmento 8"
       },
-      "required": false,
-      "order": 8
+      "mustHave": true,
+      "order": 8,
+      "headingAnchors": [
+        "Preferred Terms 8",
+        "preferred_terms 8",
+        "Preferred Terms section",
+        "seção Preferred Terms 8"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bpreferred_terms\b",
+        "\bpreferred_terms_8\b",
+        "\bpreferred_terms section\b"
+      ],
+      "description": "Canonical section preferred_terms for Cap Table"
+    },
+    {
+      "id": "conversion_conversion_9",
+      "name": {
+        "en": "Conversion Conversion Segment 9",
+        "pt": "Conversion Conversion segmento 9"
+      },
+      "mustHave": true,
+      "order": 9,
+      "headingAnchors": [
+        "Conversion Conversion 9",
+        "conversion_conversion 9",
+        "Conversion Conversion section",
+        "seção Conversion Conversion 9"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bconversion_conversion\b",
+        "\bconversion_conversion_9\b",
+        "\bconversion_conversion section\b"
+      ],
+      "description": "Canonical section conversion_conversion for Cap Table"
+    },
+    {
+      "id": "dilution_impact_10",
+      "name": {
+        "en": "Dilution Impact Segment 10",
+        "pt": "Dilution Impact segmento 10"
+      },
+      "mustHave": true,
+      "order": 10,
+      "headingAnchors": [
+        "Dilution Impact 10",
+        "dilution_impact 10",
+        "Dilution Impact section",
+        "seção Dilution Impact 10"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bdilution_impact\b",
+        "\bdilution_impact_10\b",
+        "\bdilution_impact section\b"
+      ],
+      "description": "Canonical section dilution_impact for Cap Table"
+    },
+    {
+      "id": "scenario_analysis_11",
+      "name": {
+        "en": "Scenario Analysis Segment 11",
+        "pt": "Scenario Analysis segmento 11"
+      },
+      "mustHave": false,
+      "order": 11,
+      "headingAnchors": [
+        "Scenario Analysis 11",
+        "scenario_analysis 11",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 11"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_11\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Cap Table"
+    },
+    {
+      "id": "approval_signoff_12",
+      "name": {
+        "en": "Approval Signoff Segment 12",
+        "pt": "Approval Signoff segmento 12"
+      },
+      "mustHave": false,
+      "order": 12,
+      "headingAnchors": [
+        "Approval Signoff 12",
+        "approval_signoff 12",
+        "Approval Signoff section",
+        "seção Approval Signoff 12"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bapproval_signoff\b",
+        "\bapproval_signoff_12\b",
+        "\bapproval_signoff section\b"
+      ],
+      "description": "Canonical section approval_signoff for Cap Table"
+    },
+    {
+      "id": "cap_table_header_13",
+      "name": {
+        "en": "Cap Table Header Segment 13",
+        "pt": "Cap Table Header segmento 13"
+      },
+      "mustHave": false,
+      "order": 13,
+      "headingAnchors": [
+        "Cap Table Header 13",
+        "cap_table_header 13",
+        "Cap Table Header section",
+        "seção Cap Table Header 13"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bcap_table_header\b",
+        "\bcap_table_header_13\b",
+        "\bcap_table_header section\b"
+      ],
+      "description": "Canonical section cap_table_header for Cap Table"
+    },
+    {
+      "id": "share_classes_14",
+      "name": {
+        "en": "Share Classes Segment 14",
+        "pt": "Share Classes segmento 14"
+      },
+      "mustHave": false,
+      "order": 14,
+      "headingAnchors": [
+        "Share Classes 14",
+        "share_classes 14",
+        "Share Classes section",
+        "seção Share Classes 14"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bshare_classes\b",
+        "\bshare_classes_14\b",
+        "\bshare_classes section\b"
+      ],
+      "description": "Canonical section share_classes for Cap Table"
+    },
+    {
+      "id": "rounds_and_investments_15",
+      "name": {
+        "en": "Rounds And Investments Segment 15",
+        "pt": "Rounds And Investments segmento 15"
+      },
+      "mustHave": false,
+      "order": 15,
+      "headingAnchors": [
+        "Rounds And Investments 15",
+        "rounds_and_investments 15",
+        "Rounds And Investments section",
+        "seção Rounds And Investments 15"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\brounds_and_investments\b",
+        "\brounds_and_investments_15\b",
+        "\brounds_and_investments section\b"
+      ],
+      "description": "Canonical section rounds_and_investments for Cap Table"
+    },
+    {
+      "id": "vesting_schedule_16",
+      "name": {
+        "en": "Vesting Schedule Segment 16",
+        "pt": "Vesting Schedule segmento 16"
+      },
+      "mustHave": false,
+      "order": 16,
+      "headingAnchors": [
+        "Vesting Schedule 16",
+        "vesting_schedule 16",
+        "Vesting Schedule section",
+        "seção Vesting Schedule 16"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bvesting_schedule\b",
+        "\bvesting_schedule_16\b",
+        "\bvesting_schedule section\b"
+      ],
+      "description": "Canonical section vesting_schedule for Cap Table"
+    },
+    {
+      "id": "option_pool_17",
+      "name": {
+        "en": "Option Pool Segment 17",
+        "pt": "Option Pool segmento 17"
+      },
+      "mustHave": false,
+      "order": 17,
+      "headingAnchors": [
+        "Option Pool 17",
+        "option_pool 17",
+        "Option Pool section",
+        "seção Option Pool 17"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\boption_pool\b",
+        "\boption_pool_17\b",
+        "\boption_pool section\b"
+      ],
+      "description": "Canonical section option_pool for Cap Table"
+    },
+    {
+      "id": "conversion_terms_18",
+      "name": {
+        "en": "Conversion Terms Segment 18",
+        "pt": "Conversion Terms segmento 18"
+      },
+      "mustHave": false,
+      "order": 18,
+      "headingAnchors": [
+        "Conversion Terms 18",
+        "conversion_terms 18",
+        "Conversion Terms section",
+        "seção Conversion Terms 18"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bconversion_terms\b",
+        "\bconversion_terms_18\b",
+        "\bconversion_terms section\b"
+      ],
+      "description": "Canonical section conversion_terms for Cap Table"
+    },
+    {
+      "id": "warrants_19",
+      "name": {
+        "en": "Warrants Segment 19",
+        "pt": "Warrants segmento 19"
+      },
+      "mustHave": false,
+      "order": 19,
+      "headingAnchors": [
+        "Warrants 19",
+        "warrants 19",
+        "Warrants section",
+        "seção Warrants 19"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bwarrants\b",
+        "\bwarrants_19\b",
+        "\bwarrants section\b"
+      ],
+      "description": "Canonical section warrants for Cap Table"
+    },
+    {
+      "id": "rights_restrictions_20",
+      "name": {
+        "en": "Rights Restrictions Segment 20",
+        "pt": "Rights Restrictions segmento 20"
+      },
+      "mustHave": false,
+      "order": 20,
+      "headingAnchors": [
+        "Rights Restrictions 20",
+        "rights_restrictions 20",
+        "Rights Restrictions section",
+        "seção Rights Restrictions 20"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\brights_restrictions\b",
+        "\brights_restrictions_20\b",
+        "\brights_restrictions section\b"
+      ],
+      "description": "Canonical section rights_restrictions for Cap Table"
+    },
+    {
+      "id": "preferred_terms_21",
+      "name": {
+        "en": "Preferred Terms Segment 21",
+        "pt": "Preferred Terms segmento 21"
+      },
+      "mustHave": false,
+      "order": 21,
+      "headingAnchors": [
+        "Preferred Terms 21",
+        "preferred_terms 21",
+        "Preferred Terms section",
+        "seção Preferred Terms 21"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bpreferred_terms\b",
+        "\bpreferred_terms_21\b",
+        "\bpreferred_terms section\b"
+      ],
+      "description": "Canonical section preferred_terms for Cap Table"
+    },
+    {
+      "id": "conversion_conversion_22",
+      "name": {
+        "en": "Conversion Conversion Segment 22",
+        "pt": "Conversion Conversion segmento 22"
+      },
+      "mustHave": false,
+      "order": 22,
+      "headingAnchors": [
+        "Conversion Conversion 22",
+        "conversion_conversion 22",
+        "Conversion Conversion section",
+        "seção Conversion Conversion 22"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bconversion_conversion\b",
+        "\bconversion_conversion_22\b",
+        "\bconversion_conversion section\b"
+      ],
+      "description": "Canonical section conversion_conversion for Cap Table"
+    },
+    {
+      "id": "dilution_impact_23",
+      "name": {
+        "en": "Dilution Impact Segment 23",
+        "pt": "Dilution Impact segmento 23"
+      },
+      "mustHave": false,
+      "order": 23,
+      "headingAnchors": [
+        "Dilution Impact 23",
+        "dilution_impact 23",
+        "Dilution Impact section",
+        "seção Dilution Impact 23"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bdilution_impact\b",
+        "\bdilution_impact_23\b",
+        "\bdilution_impact section\b"
+      ],
+      "description": "Canonical section dilution_impact for Cap Table"
+    },
+    {
+      "id": "scenario_analysis_24",
+      "name": {
+        "en": "Scenario Analysis Segment 24",
+        "pt": "Scenario Analysis segmento 24"
+      },
+      "mustHave": false,
+      "order": 24,
+      "headingAnchors": [
+        "Scenario Analysis 24",
+        "scenario_analysis 24",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 24"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_24\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Cap Table"
+    },
+    {
+      "id": "approval_signoff_25",
+      "name": {
+        "en": "Approval Signoff Segment 25",
+        "pt": "Approval Signoff segmento 25"
+      },
+      "mustHave": false,
+      "order": 25,
+      "headingAnchors": [
+        "Approval Signoff 25",
+        "approval_signoff 25",
+        "Approval Signoff section",
+        "seção Approval Signoff 25"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bapproval_signoff\b",
+        "\bapproval_signoff_25\b",
+        "\bapproval_signoff section\b"
+      ],
+      "description": "Canonical section approval_signoff for Cap Table"
+    },
+    {
+      "id": "cap_table_header_26",
+      "name": {
+        "en": "Cap Table Header Segment 26",
+        "pt": "Cap Table Header segmento 26"
+      },
+      "mustHave": false,
+      "order": 26,
+      "headingAnchors": [
+        "Cap Table Header 26",
+        "cap_table_header 26",
+        "Cap Table Header section",
+        "seção Cap Table Header 26"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\bcap_table_header\b",
+        "\bcap_table_header_26\b",
+        "\bcap_table_header section\b"
+      ],
+      "description": "Canonical section cap_table_header for Cap Table"
+    },
+    {
+      "id": "share_classes_27",
+      "name": {
+        "en": "Share Classes Segment 27",
+        "pt": "Share Classes segmento 27"
+      },
+      "mustHave": false,
+      "order": 27,
+      "headingAnchors": [
+        "Share Classes 27",
+        "share_classes 27",
+        "Share Classes section",
+        "seção Share Classes 27"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bshare_classes\b",
+        "\bshare_classes_27\b",
+        "\bshare_classes section\b"
+      ],
+      "description": "Canonical section share_classes for Cap Table"
+    },
+    {
+      "id": "rounds_and_investments_28",
+      "name": {
+        "en": "Rounds And Investments Segment 28",
+        "pt": "Rounds And Investments segmento 28"
+      },
+      "mustHave": false,
+      "order": 28,
+      "headingAnchors": [
+        "Rounds And Investments 28",
+        "rounds_and_investments 28",
+        "Rounds And Investments section",
+        "seção Rounds And Investments 28"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\brounds_and_investments\b",
+        "\brounds_and_investments_28\b",
+        "\brounds_and_investments section\b"
+      ],
+      "description": "Canonical section rounds_and_investments for Cap Table"
+    },
+    {
+      "id": "vesting_schedule_29",
+      "name": {
+        "en": "Vesting Schedule Segment 29",
+        "pt": "Vesting Schedule segmento 29"
+      },
+      "mustHave": false,
+      "order": 29,
+      "headingAnchors": [
+        "Vesting Schedule 29",
+        "vesting_schedule 29",
+        "Vesting Schedule section",
+        "seção Vesting Schedule 29"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bvesting_schedule\b",
+        "\bvesting_schedule_29\b",
+        "\bvesting_schedule section\b"
+      ],
+      "description": "Canonical section vesting_schedule for Cap Table"
+    },
+    {
+      "id": "option_pool_30",
+      "name": {
+        "en": "Option Pool Segment 30",
+        "pt": "Option Pool segmento 30"
+      },
+      "mustHave": false,
+      "order": 30,
+      "headingAnchors": [
+        "Option Pool 30",
+        "option_pool 30",
+        "Option Pool section",
+        "seção Option Pool 30"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\boption_pool\b",
+        "\boption_pool_30\b",
+        "\boption_pool section\b"
+      ],
+      "description": "Canonical section option_pool for Cap Table"
+    },
+    {
+      "id": "conversion_terms_31",
+      "name": {
+        "en": "Conversion Terms Segment 31",
+        "pt": "Conversion Terms segmento 31"
+      },
+      "mustHave": false,
+      "order": 31,
+      "headingAnchors": [
+        "Conversion Terms 31",
+        "conversion_terms 31",
+        "Conversion Terms section",
+        "seção Conversion Terms 31"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bconversion_terms\b",
+        "\bconversion_terms_31\b",
+        "\bconversion_terms section\b"
+      ],
+      "description": "Canonical section conversion_terms for Cap Table"
+    },
+    {
+      "id": "warrants_32",
+      "name": {
+        "en": "Warrants Segment 32",
+        "pt": "Warrants segmento 32"
+      },
+      "mustHave": false,
+      "order": 32,
+      "headingAnchors": [
+        "Warrants 32",
+        "warrants 32",
+        "Warrants section",
+        "seção Warrants 32"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bwarrants\b",
+        "\bwarrants_32\b",
+        "\bwarrants section\b"
+      ],
+      "description": "Canonical section warrants for Cap Table"
+    },
+    {
+      "id": "rights_restrictions_33",
+      "name": {
+        "en": "Rights Restrictions Segment 33",
+        "pt": "Rights Restrictions segmento 33"
+      },
+      "mustHave": false,
+      "order": 33,
+      "headingAnchors": [
+        "Rights Restrictions 33",
+        "rights_restrictions 33",
+        "Rights Restrictions section",
+        "seção Rights Restrictions 33"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\brights_restrictions\b",
+        "\brights_restrictions_33\b",
+        "\brights_restrictions section\b"
+      ],
+      "description": "Canonical section rights_restrictions for Cap Table"
+    },
+    {
+      "id": "preferred_terms_34",
+      "name": {
+        "en": "Preferred Terms Segment 34",
+        "pt": "Preferred Terms segmento 34"
+      },
+      "mustHave": false,
+      "order": 34,
+      "headingAnchors": [
+        "Preferred Terms 34",
+        "preferred_terms 34",
+        "Preferred Terms section",
+        "seção Preferred Terms 34"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bpreferred_terms\b",
+        "\bpreferred_terms_34\b",
+        "\bpreferred_terms section\b"
+      ],
+      "description": "Canonical section preferred_terms for Cap Table"
+    },
+    {
+      "id": "conversion_conversion_35",
+      "name": {
+        "en": "Conversion Conversion Segment 35",
+        "pt": "Conversion Conversion segmento 35"
+      },
+      "mustHave": false,
+      "order": 35,
+      "headingAnchors": [
+        "Conversion Conversion 35",
+        "conversion_conversion 35",
+        "Conversion Conversion section",
+        "seção Conversion Conversion 35"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bconversion_conversion\b",
+        "\bconversion_conversion_35\b",
+        "\bconversion_conversion section\b"
+      ],
+      "description": "Canonical section conversion_conversion for Cap Table"
+    },
+    {
+      "id": "dilution_impact_36",
+      "name": {
+        "en": "Dilution Impact Segment 36",
+        "pt": "Dilution Impact segmento 36"
+      },
+      "mustHave": false,
+      "order": 36,
+      "headingAnchors": [
+        "Dilution Impact 36",
+        "dilution_impact 36",
+        "Dilution Impact section",
+        "seção Dilution Impact 36"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bdilution_impact\b",
+        "\bdilution_impact_36\b",
+        "\bdilution_impact section\b"
+      ],
+      "description": "Canonical section dilution_impact for Cap Table"
+    },
+    {
+      "id": "scenario_analysis_37",
+      "name": {
+        "en": "Scenario Analysis Segment 37",
+        "pt": "Scenario Analysis segmento 37"
+      },
+      "mustHave": false,
+      "order": 37,
+      "headingAnchors": [
+        "Scenario Analysis 37",
+        "scenario_analysis 37",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 37"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_37\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Cap Table"
+    },
+    {
+      "id": "approval_signoff_38",
+      "name": {
+        "en": "Approval Signoff Segment 38",
+        "pt": "Approval Signoff segmento 38"
+      },
+      "mustHave": false,
+      "order": 38,
+      "headingAnchors": [
+        "Approval Signoff 38",
+        "approval_signoff 38",
+        "Approval Signoff section",
+        "seção Approval Signoff 38"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bapproval_signoff\b",
+        "\bapproval_signoff_38\b",
+        "\bapproval_signoff section\b"
+      ],
+      "description": "Canonical section approval_signoff for Cap Table"
+    },
+    {
+      "id": "cap_table_header_39",
+      "name": {
+        "en": "Cap Table Header Segment 39",
+        "pt": "Cap Table Header segmento 39"
+      },
+      "mustHave": false,
+      "order": 39,
+      "headingAnchors": [
+        "Cap Table Header 39",
+        "cap_table_header 39",
+        "Cap Table Header section",
+        "seção Cap Table Header 39"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\bcap_table_header\b",
+        "\bcap_table_header_39\b",
+        "\bcap_table_header section\b"
+      ],
+      "description": "Canonical section cap_table_header for Cap Table"
+    },
+    {
+      "id": "share_classes_40",
+      "name": {
+        "en": "Share Classes Segment 40",
+        "pt": "Share Classes segmento 40"
+      },
+      "mustHave": false,
+      "order": 40,
+      "headingAnchors": [
+        "Share Classes 40",
+        "share_classes 40",
+        "Share Classes section",
+        "seção Share Classes 40"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bshare_classes\b",
+        "\bshare_classes_40\b",
+        "\bshare_classes section\b"
+      ],
+      "description": "Canonical section share_classes for Cap Table"
+    },
+    {
+      "id": "rounds_and_investments_41",
+      "name": {
+        "en": "Rounds And Investments Segment 41",
+        "pt": "Rounds And Investments segmento 41"
+      },
+      "mustHave": false,
+      "order": 41,
+      "headingAnchors": [
+        "Rounds And Investments 41",
+        "rounds_and_investments 41",
+        "Rounds And Investments section",
+        "seção Rounds And Investments 41"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\brounds_and_investments\b",
+        "\brounds_and_investments_41\b",
+        "\brounds_and_investments section\b"
+      ],
+      "description": "Canonical section rounds_and_investments for Cap Table"
+    },
+    {
+      "id": "vesting_schedule_42",
+      "name": {
+        "en": "Vesting Schedule Segment 42",
+        "pt": "Vesting Schedule segmento 42"
+      },
+      "mustHave": false,
+      "order": 42,
+      "headingAnchors": [
+        "Vesting Schedule 42",
+        "vesting_schedule 42",
+        "Vesting Schedule section",
+        "seção Vesting Schedule 42"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bvesting_schedule\b",
+        "\bvesting_schedule_42\b",
+        "\bvesting_schedule section\b"
+      ],
+      "description": "Canonical section vesting_schedule for Cap Table"
+    },
+    {
+      "id": "option_pool_43",
+      "name": {
+        "en": "Option Pool Segment 43",
+        "pt": "Option Pool segmento 43"
+      },
+      "mustHave": false,
+      "order": 43,
+      "headingAnchors": [
+        "Option Pool 43",
+        "option_pool 43",
+        "Option Pool section",
+        "seção Option Pool 43"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\boption_pool\b",
+        "\boption_pool_43\b",
+        "\boption_pool section\b"
+      ],
+      "description": "Canonical section option_pool for Cap Table"
+    },
+    {
+      "id": "conversion_terms_44",
+      "name": {
+        "en": "Conversion Terms Segment 44",
+        "pt": "Conversion Terms segmento 44"
+      },
+      "mustHave": false,
+      "order": 44,
+      "headingAnchors": [
+        "Conversion Terms 44",
+        "conversion_terms 44",
+        "Conversion Terms section",
+        "seção Conversion Terms 44"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\bconversion_terms\b",
+        "\bconversion_terms_44\b",
+        "\bconversion_terms section\b"
+      ],
+      "description": "Canonical section conversion_terms for Cap Table"
+    },
+    {
+      "id": "warrants_45",
+      "name": {
+        "en": "Warrants Segment 45",
+        "pt": "Warrants segmento 45"
+      },
+      "mustHave": false,
+      "order": 45,
+      "headingAnchors": [
+        "Warrants 45",
+        "warrants 45",
+        "Warrants section",
+        "seção Warrants 45"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bwarrants\b",
+        "\bwarrants_45\b",
+        "\bwarrants section\b"
+      ],
+      "description": "Canonical section warrants for Cap Table"
+    },
+    {
+      "id": "rights_restrictions_46",
+      "name": {
+        "en": "Rights Restrictions Segment 46",
+        "pt": "Rights Restrictions segmento 46"
+      },
+      "mustHave": false,
+      "order": 46,
+      "headingAnchors": [
+        "Rights Restrictions 46",
+        "rights_restrictions 46",
+        "Rights Restrictions section",
+        "seção Rights Restrictions 46"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\brights_restrictions\b",
+        "\brights_restrictions_46\b",
+        "\brights_restrictions section\b"
+      ],
+      "description": "Canonical section rights_restrictions for Cap Table"
+    },
+    {
+      "id": "preferred_terms_47",
+      "name": {
+        "en": "Preferred Terms Segment 47",
+        "pt": "Preferred Terms segmento 47"
+      },
+      "mustHave": false,
+      "order": 47,
+      "headingAnchors": [
+        "Preferred Terms 47",
+        "preferred_terms 47",
+        "Preferred Terms section",
+        "seção Preferred Terms 47"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bpreferred_terms\b",
+        "\bpreferred_terms_47\b",
+        "\bpreferred_terms section\b"
+      ],
+      "description": "Canonical section preferred_terms for Cap Table"
+    },
+    {
+      "id": "conversion_conversion_48",
+      "name": {
+        "en": "Conversion Conversion Segment 48",
+        "pt": "Conversion Conversion segmento 48"
+      },
+      "mustHave": false,
+      "order": 48,
+      "headingAnchors": [
+        "Conversion Conversion 48",
+        "conversion_conversion 48",
+        "Conversion Conversion section",
+        "seção Conversion Conversion 48"
+      ],
+      "confidence": 0.83,
+      "fallbackPatterns": [
+        "\bconversion_conversion\b",
+        "\bconversion_conversion_48\b",
+        "\bconversion_conversion section\b"
+      ],
+      "description": "Canonical section conversion_conversion for Cap Table"
+    },
+    {
+      "id": "dilution_impact_49",
+      "name": {
+        "en": "Dilution Impact Segment 49",
+        "pt": "Dilution Impact segmento 49"
+      },
+      "mustHave": false,
+      "order": 49,
+      "headingAnchors": [
+        "Dilution Impact 49",
+        "dilution_impact 49",
+        "Dilution Impact section",
+        "seção Dilution Impact 49"
+      ],
+      "confidence": 0.84,
+      "fallbackPatterns": [
+        "\bdilution_impact\b",
+        "\bdilution_impact_49\b",
+        "\bdilution_impact section\b"
+      ],
+      "description": "Canonical section dilution_impact for Cap Table"
+    },
+    {
+      "id": "scenario_analysis_50",
+      "name": {
+        "en": "Scenario Analysis Segment 50",
+        "pt": "Scenario Analysis segmento 50"
+      },
+      "mustHave": false,
+      "order": 50,
+      "headingAnchors": [
+        "Scenario Analysis 50",
+        "scenario_analysis 50",
+        "Scenario Analysis section",
+        "seção Scenario Analysis 50"
+      ],
+      "confidence": 0.85,
+      "fallbackPatterns": [
+        "\bscenario_analysis\b",
+        "\bscenario_analysis_50\b",
+        "\bscenario_analysis section\b"
+      ],
+      "description": "Canonical section scenario_analysis for Cap Table"
+    },
+    {
+      "id": "approval_signoff_51",
+      "name": {
+        "en": "Approval Signoff Segment 51",
+        "pt": "Approval Signoff segmento 51"
+      },
+      "mustHave": false,
+      "order": 51,
+      "headingAnchors": [
+        "Approval Signoff 51",
+        "approval_signoff 51",
+        "Approval Signoff section",
+        "seção Approval Signoff 51"
+      ],
+      "confidence": 0.86,
+      "fallbackPatterns": [
+        "\bapproval_signoff\b",
+        "\bapproval_signoff_51\b",
+        "\bapproval_signoff section\b"
+      ],
+      "description": "Canonical section approval_signoff for Cap Table"
+    },
+    {
+      "id": "cap_table_header_52",
+      "name": {
+        "en": "Cap Table Header Segment 52",
+        "pt": "Cap Table Header segmento 52"
+      },
+      "mustHave": false,
+      "order": 52,
+      "headingAnchors": [
+        "Cap Table Header 52",
+        "cap_table_header 52",
+        "Cap Table Header section",
+        "seção Cap Table Header 52"
+      ],
+      "confidence": 0.87,
+      "fallbackPatterns": [
+        "\bcap_table_header\b",
+        "\bcap_table_header_52\b",
+        "\bcap_table_header section\b"
+      ],
+      "description": "Canonical section cap_table_header for Cap Table"
+    },
+    {
+      "id": "share_classes_53",
+      "name": {
+        "en": "Share Classes Segment 53",
+        "pt": "Share Classes segmento 53"
+      },
+      "mustHave": false,
+      "order": 53,
+      "headingAnchors": [
+        "Share Classes 53",
+        "share_classes 53",
+        "Share Classes section",
+        "seção Share Classes 53"
+      ],
+      "confidence": 0.88,
+      "fallbackPatterns": [
+        "\bshare_classes\b",
+        "\bshare_classes_53\b",
+        "\bshare_classes section\b"
+      ],
+      "description": "Canonical section share_classes for Cap Table"
+    },
+    {
+      "id": "rounds_and_investments_54",
+      "name": {
+        "en": "Rounds And Investments Segment 54",
+        "pt": "Rounds And Investments segmento 54"
+      },
+      "mustHave": false,
+      "order": 54,
+      "headingAnchors": [
+        "Rounds And Investments 54",
+        "rounds_and_investments 54",
+        "Rounds And Investments section",
+        "seção Rounds And Investments 54"
+      ],
+      "confidence": 0.89,
+      "fallbackPatterns": [
+        "\brounds_and_investments\b",
+        "\brounds_and_investments_54\b",
+        "\brounds_and_investments section\b"
+      ],
+      "description": "Canonical section rounds_and_investments for Cap Table"
+    },
+    {
+      "id": "vesting_schedule_55",
+      "name": {
+        "en": "Vesting Schedule Segment 55",
+        "pt": "Vesting Schedule segmento 55"
+      },
+      "mustHave": false,
+      "order": 55,
+      "headingAnchors": [
+        "Vesting Schedule 55",
+        "vesting_schedule 55",
+        "Vesting Schedule section",
+        "seção Vesting Schedule 55"
+      ],
+      "confidence": 0.9,
+      "fallbackPatterns": [
+        "\bvesting_schedule\b",
+        "\bvesting_schedule_55\b",
+        "\bvesting_schedule section\b"
+      ],
+      "description": "Canonical section vesting_schedule for Cap Table"
+    },
+    {
+      "id": "option_pool_56",
+      "name": {
+        "en": "Option Pool Segment 56",
+        "pt": "Option Pool segmento 56"
+      },
+      "mustHave": false,
+      "order": 56,
+      "headingAnchors": [
+        "Option Pool 56",
+        "option_pool 56",
+        "Option Pool section",
+        "seção Option Pool 56"
+      ],
+      "confidence": 0.91,
+      "fallbackPatterns": [
+        "\boption_pool\b",
+        "\boption_pool_56\b",
+        "\boption_pool section\b"
+      ],
+      "description": "Canonical section option_pool for Cap Table"
+    },
+    {
+      "id": "conversion_terms_57",
+      "name": {
+        "en": "Conversion Terms Segment 57",
+        "pt": "Conversion Terms segmento 57"
+      },
+      "mustHave": false,
+      "order": 57,
+      "headingAnchors": [
+        "Conversion Terms 57",
+        "conversion_terms 57",
+        "Conversion Terms section",
+        "seção Conversion Terms 57"
+      ],
+      "confidence": 0.92,
+      "fallbackPatterns": [
+        "\bconversion_terms\b",
+        "\bconversion_terms_57\b",
+        "\bconversion_terms section\b"
+      ],
+      "description": "Canonical section conversion_terms for Cap Table"
+    },
+    {
+      "id": "warrants_58",
+      "name": {
+        "en": "Warrants Segment 58",
+        "pt": "Warrants segmento 58"
+      },
+      "mustHave": false,
+      "order": 58,
+      "headingAnchors": [
+        "Warrants 58",
+        "warrants 58",
+        "Warrants section",
+        "seção Warrants 58"
+      ],
+      "confidence": 0.93,
+      "fallbackPatterns": [
+        "\bwarrants\b",
+        "\bwarrants_58\b",
+        "\bwarrants section\b"
+      ],
+      "description": "Canonical section warrants for Cap Table"
+    },
+    {
+      "id": "rights_restrictions_59",
+      "name": {
+        "en": "Rights Restrictions Segment 59",
+        "pt": "Rights Restrictions segmento 59"
+      },
+      "mustHave": false,
+      "order": 59,
+      "headingAnchors": [
+        "Rights Restrictions 59",
+        "rights_restrictions 59",
+        "Rights Restrictions section",
+        "seção Rights Restrictions 59"
+      ],
+      "confidence": 0.94,
+      "fallbackPatterns": [
+        "\brights_restrictions\b",
+        "\brights_restrictions_59\b",
+        "\brights_restrictions section\b"
+      ],
+      "description": "Canonical section rights_restrictions for Cap Table"
+    },
+    {
+      "id": "preferred_terms_60",
+      "name": {
+        "en": "Preferred Terms Segment 60",
+        "pt": "Preferred Terms segmento 60"
+      },
+      "mustHave": false,
+      "order": 60,
+      "headingAnchors": [
+        "Preferred Terms 60",
+        "preferred_terms 60",
+        "Preferred Terms section",
+        "seção Preferred Terms 60"
+      ],
+      "confidence": 0.8,
+      "fallbackPatterns": [
+        "\bpreferred_terms\b",
+        "\bpreferred_terms_60\b",
+        "\bpreferred_terms section\b"
+      ],
+      "description": "Canonical section preferred_terms for Cap Table"
+    },
+    {
+      "id": "conversion_conversion_61",
+      "name": {
+        "en": "Conversion Conversion Segment 61",
+        "pt": "Conversion Conversion segmento 61"
+      },
+      "mustHave": false,
+      "order": 61,
+      "headingAnchors": [
+        "Conversion Conversion 61",
+        "conversion_conversion 61",
+        "Conversion Conversion section",
+        "seção Conversion Conversion 61"
+      ],
+      "confidence": 0.81,
+      "fallbackPatterns": [
+        "\bconversion_conversion\b",
+        "\bconversion_conversion_61\b",
+        "\bconversion_conversion section\b"
+      ],
+      "description": "Canonical section conversion_conversion for Cap Table"
+    },
+    {
+      "id": "dilution_impact_62",
+      "name": {
+        "en": "Dilution Impact Segment 62",
+        "pt": "Dilution Impact segmento 62"
+      },
+      "mustHave": false,
+      "order": 62,
+      "headingAnchors": [
+        "Dilution Impact 62",
+        "dilution_impact 62",
+        "Dilution Impact section",
+        "seção Dilution Impact 62"
+      ],
+      "confidence": 0.82,
+      "fallbackPatterns": [
+        "\bdilution_impact\b",
+        "\bdilution_impact_62\b",
+        "\bdilution_impact section\b"
+      ],
+      "description": "Canonical section dilution_impact for Cap Table"
     }
   ]
 }

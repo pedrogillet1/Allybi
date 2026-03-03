@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "id": "di_everyday_tables_every_internet_bill",
+    "version": "1.0.0",
+    "description": "Tables expected in every_internet_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_internet_bill"
+  },
+  "tables": [
+    {
+      "id": "internet_usage_table",
+      "canonicalName": {
+        "en": "Usage Table",
+        "pt": "Tabela de Uso"
+      },
+      "section": "traffic_summary",
+      "signaturePatterns": ["\\busage\\b", "\\binternet usage\\b", "\\btraffic\\b"],
+      "requiredHeaders": ["description", "quantity", "unit", "amount"],
+      "headerAliases": [["description", "descricao"], ["quantity", "quantidade"], ["unit", "unidade"], ["amount", "valor"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "gigabytes"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true
+      },
+      "footnotes": ["internet_bill_fn_01", "internet_bill_fn_02"],
+      "extractionNotes": "Traffic rows may use MB/GB variants."
+    },
+    {
+      "id": "internet_charge_table",
+      "canonicalName": {
+        "en": "Charges Table",
+        "pt": "Tabela de Cobrancas"
+      },
+      "section": "charges_and_taxes",
+      "signaturePatterns": ["\\bcharges\\b", "\\btaxes\\b", "\\bfees\\b"],
+      "requiredHeaders": ["description", "base", "rate", "amount", "unit"],
+      "headerAliases": [["description", "descricao"], ["base", "base"], ["rate", "rate"], ["amount", "valor"], ["unit", "moeda"]],
+      "unitsAndScaling": {
+        "preferredScales": ["units", "thousands", "millions"],
+        "currencyField": "currency",
+        "requiresScaleEvidence": true,
+        "mixedScaleHandling": "normalize_to_currency_base"
+      },
+      "footnotes": ["internet_bill_fn_03"],
+      "extractionNotes": "Use this for base and applied taxes/fees."
+    }
+  ]
+}

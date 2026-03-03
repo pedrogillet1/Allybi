@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "legal_validation_policies",
-    "version": "2.0.0",
-    "description": "Validation rules for legal bank outputs and extracted fields.",
+    "version": "2.1.0",
+    "description": "Legal validation policies focused on evidence-bound obligations and non-hallucinated interpretation.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,113 +15,149 @@
   "domain": "legal",
   "policies": [
     {
-      "id": "legal_validation_001",
+      "id": "legal_val_001_doc_type_gate",
       "severity": "error",
-      "description": "Reject outputs without a recognizable document type from legal catalog.",
+      "description": "Require legal subtype lock for downstream extraction plans.",
       "applies": [
         "extract",
+        "locate",
         "validate"
       ],
       "check": "doc_type_detected",
       "failureAction": "BLOCK_AND_FLAG"
     },
     {
-      "id": "legal_validation_002",
+      "id": "legal_val_002_clause_anchor_gate",
       "severity": "error",
-      "description": "Reject clause-level claims without citation location.",
+      "description": "Reject clause claims without section heading and source location.",
       "applies": [
         "extract",
         "compare",
         "validate"
       ],
-      "check": "citations_present",
+      "check": "clause_anchor_present",
+      "failureAction": "BLOCK_AND_FLAG",
+      "requires": {
+        "minClauseAnchors": 1,
+        "requireExactClauseText": true
+      }
+    },
+    {
+      "id": "legal_val_003_obligation_quote_gate",
+      "severity": "error",
+      "description": "Obligations and rights must be emitted with exact quotation and clause location.",
+      "applies": [
+        "extract",
+        "extract_entity",
+        "validate",
+        "compare"
+      ],
+      "check": "obligation_quote_required",
       "failureAction": "BLOCK_AND_FLAG"
     },
     {
-      "id": "legal_validation_003",
+      "id": "legal_val_004_definition_link_gate",
       "severity": "warning",
-      "description": "Warn when parties are incomplete or role assignment is missing.",
+      "description": "Warn when a definition/exception is referenced without resolved source.",
       "applies": [
         "extract",
-        "summarize"
-      ],
-      "check": "parties_complete",
-      "failureAction": "WARN_AND_EXPLAIN"
-    },
-    {
-      "id": "legal_validation_004",
-      "severity": "warning",
-      "description": "Warn when term dates conflict across sections and signature block.",
-      "applies": [
-        "extract",
+        "locate",
         "validate"
       ],
-      "check": "date_consistency",
+      "check": "definition_reference_resolution",
       "failureAction": "WARN_AND_EXPLAIN"
     },
     {
-      "id": "legal_validation_005",
+      "id": "legal_val_005_party_role_gate",
+      "severity": "warning",
+      "description": "Party names and role assignments require at least one clause-anchored evidence source.",
+      "applies": [
+        "extract",
+        "compare",
+        "validate"
+      ],
+      "check": "party_role_completeness",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "legal_val_006_term_gov_law_gate",
       "severity": "error",
-      "description": "Block legal advice wording that goes beyond source-grounded interpretation.",
+      "description": "Governing law and jurisdiction outputs require explicit source location and no inference.",
+      "applies": [
+        "extract",
+        "summarize",
+        "evaluate"
+      ],
+      "check": "governing_law_anchored",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "legal_val_007_liability_precision_gate",
+      "severity": "error",
+      "description": "Liability and indemnity caps must include exception scope and source line reference.",
+      "applies": [
+        "extract",
+        "validate",
+        "evaluate"
+      ],
+      "check": "liability_cap_structure",
+      "failureAction": "BLOCK_AND_FLAG"
+    },
+    {
+      "id": "legal_val_008_termination_gate",
+      "severity": "warning",
+      "description": "Terminate/duration outputs must include cure period and notice trigger source when present.",
+      "applies": [
+        "extract",
+        "evaluate",
+        "validate"
+      ],
+      "check": "termination_context_anchored",
+      "failureAction": "WARN_AND_EXPLAIN"
+    },
+    {
+      "id": "legal_val_009_advice_guard",
+      "severity": "error",
+      "description": "Block legal advice-style language when only document interpretation is supported.",
       "applies": [
         "advise",
         "evaluate"
       ],
-      "check": "no_unauthorized_legal_advice",
+      "check": "no_unlicensed_legal_advice",
       "failureAction": "BLOCK_AND_FLAG"
     },
     {
-      "id": "legal_validation_006",
+      "id": "legal_val_010_cross_reference_gate",
       "severity": "info",
-      "description": "Annotate unresolved cross-references for manual follow-up.",
+      "description": "Annotate unresolved references to sections or exhibits for operator follow-up.",
       "applies": [
         "extract",
         "compare",
         "validate"
       ],
-      "check": "cross_reference_resolution",
+      "check": "unresolved_reference_annotation",
       "failureAction": "ANNOTATE"
     },
     {
-      "id": "legal_validation_007",
+      "id": "legal_val_011_section_shift_detection",
       "severity": "warning",
-      "description": "Warn if financial terms are extracted without currency context.",
+      "description": "Detect inconsistent definitions across sections and annotate precedence basis.",
       "applies": [
-        "extract",
-        "compare"
-      ],
-      "check": "currency_context",
-      "failureAction": "WARN_AND_EXPLAIN"
-    },
-    {
-      "id": "legal_validation_008",
-      "severity": "error",
-      "description": "Require governing law or explicit absence marker.",
-      "applies": [
-        "extract",
+        "compare",
+        "evaluate",
         "validate"
       ],
-      "check": "governing_law_presence",
-      "failureAction": "BLOCK_AND_FLAG"
-    },
-    {
-      "id": "legal_validation_009",
-      "severity": "warning",
-      "description": "Warn when security/privacy obligations are mentioned but control owner is missing.",
-      "applies": [
-        "extract",
-        "evaluate"
-      ],
-      "check": "control_owner_presence",
+      "check": "section_conflict_resolution",
       "failureAction": "WARN_AND_EXPLAIN"
     },
     {
-      "id": "legal_validation_010",
+      "id": "legal_val_012_draft_status_visibility",
       "severity": "info",
-      "description": "Annotate if document appears draft/redline and not final.",
+      "description": "When source is draft/redline, annotate extraction confidence and treat as potentially non-final.",
       "applies": [
         "summarize",
-        "evaluate"
+        "locate",
+        "validate"
       ],
       "check": "draft_status_annotation",
       "failureAction": "ANNOTATE"

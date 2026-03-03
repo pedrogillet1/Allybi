@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "id": "di_everyday_abbreviations_pt",
+    "version": "1.0.0",
+    "description": "PT abbreviations for everyday domain.",
+    "languages": [
+      "pt"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "language": "pt"
+  },
+  "domain": "everyday",
+  "abbreviations": [
+    { "abbr": "CPF", "expansion": "cadastro de pessoa fisica" },
+    { "abbr": "CNPJ", "expansion": "cadastro nacional da pessoa juridica" },
+    { "abbr": "RG", "expansion": "registro geral" },
+    { "abbr": "CNH", "expansion": "carteira nacional de habilitacao" },
+    { "abbr": "IR", "expansion": "imposto de renda" },
+    { "abbr": "INSS", "expansion": "instituto nacional do seguro social" },
+    { "abbr": "FAT", "expansion": "fatura" },
+    { "abbr": "Venc", "expansion": "vencimento" },
+    { "abbr": "CC", "expansion": "conta corrente" },
+    { "abbr": "CP", "expansion": "comprovante de pagamento" },
+    { "abbr": "DDD", "expansion": "discagem direta a distancia" },
+    { "abbr": "MB", "expansion": "megabyte" },
+    { "abbr": "GB", "expansion": "gigabyte" },
+    { "abbr": "kWh", "expansion": "quilowatt-hora" },
+    { "abbr": "IPTU", "expansion": "imposto predial e territorial urbano" },
+    { "abbr": "ITR", "expansion": "imposto territorial rural" },
+    { "abbr": "NF-e", "expansion": "nota fiscal eletronica" },
+    { "abbr": "NFS-e", "expansion": "nota fiscal de servicos" },
+    { "abbr": "BO", "expansion": "boleto" },
+    { "abbr": "AR", "expansion": "atendimento e recurso" },
+    { "abbr": "RNP", "expansion": "rede nacional de comunicacao" },
+    { "abbr": "SLA", "expansion": "acordo de nivel de servico" },
+    { "abbr": "ANV", "expansion": "aviso de nao pagamento" },
+    { "abbr": "PG", "expansion": "pagamento" },
+    { "abbr": "CCB", "expansion": "cobertura de custo base" },
+    { "abbr": "AP", "expansion": "apolice" },
+    { "abbr": "SIN", "expansion": "sinistro" },
+    { "abbr": "LTS", "expansion": "lista de transacoes" },
+    { "abbr": "RGH", "expansion": "registro geral de homicidios" },
+    { "abbr": "HUB", "expansion": "hibrido da unidade bancaria" },
+    { "abbr": "FGTS", "expansion": "fundo de garantia do tempo de servico" },
+    { "abbr": "DOC", "expansion": "documento de origem de credito" },
+    { "abbr": "TED", "expansion": "transferencia eletronica disponivel" }
+  ]
+}

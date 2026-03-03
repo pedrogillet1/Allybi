@@ -6,7 +6,13 @@
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-02-28",
+    "owner": "koda-reasoning",
+    "reviewCadenceDays": 30,
+    "criticality": "medium",
+    "changeLog": [
+      "Metadata governance baseline upgrade (2026-03-03)"
+    ]
   },
   "config": {
     "enabled": true,
@@ -1513,5 +1519,47 @@
         "allowInferenceWhenLabeled": true
       }
     }
-  ]
+  ],
+  "rules": [
+    {
+      "id": "LEG_DEC_001_compare_docs_required",
+      "trigger": "legal compare intent with insufficient explicit docs",
+      "check": "context.domain=='legal' && context.intent=='compare' && context.explicitDocs.count < 2",
+      "failureAction": "ASK_FOR_SECOND_DOC"
+    },
+    {
+      "id": "LEG_DEC_002_jurisdiction_missing",
+      "trigger": "legal query references jurisdiction/venue but not explicit",
+      "check": "context.domain=='legal' && context.hasJurisdictionRef == true && context.jurisdictionRef == null",
+      "failureAction": "ASK_FOR_JURISDICTION"
+    },
+    {
+      "id": "LEG_DEC_003_clause_risk_summary",
+      "trigger": "legal advice-like query without risk block",
+      "check": "context.domain=='legal' && context.queryNeedsRiskAssessment == true && output.riskAssessmentProvided == false",
+      "failureAction": "REQUIRE_RISK_SECTION"
+    },
+    {
+      "id": "LEG_DEC_004_legal_unit_guard",
+      "trigger": "legal answer drops legal citation unit/context",
+      "check": "context.domain=='legal' && context.legalCitationExpected == true && output.citationContextPreserved == false",
+      "failureAction": "ENFORCE_CITATION_CONTEXT"
+    },
+    {
+      "id": "LEG_DEC_005_multi_party_mismatch",
+      "trigger": "legal query has more than one party without explicit scope",
+      "check": "context.domain=='legal' && context.partyCount > 1 && context.partyScopeClarified == false",
+      "failureAction": "ASK_PARTY_SCOPE"
+    }
+  ],
+  "patterns": [
+    "\\b(query|document|evidence)\\b"
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "LEG_DEC_SMOKE_001"
+      }
+    ]
+  }
 }

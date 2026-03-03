@@ -3,7 +3,12 @@
     "id": "clarification_policy",
     "version": "1.0.0",
     "description": "Policy contract for clarification and disambiguation in Koda. Enforces ChatGPT-like minimal clarifications: ask at most one question, show 2–4 concrete options, prefer autopick when confidence margin is high, and never ask for info already present in context. Delegates rendering to disambiguation_render_policy and phrasing constraints to clarification_phrases (no hardcoded copy).",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26",
     "owner": "koda-policies",
     "compat": ">=1.0.0",
@@ -11,7 +16,9 @@
       "Added deterministic thresholds for autopick vs disambiguate",
       "Enforced 2–4 options and single-question maximum globally",
       "Added guards against redundant clarifications and follow-up continuity breaks"
-    ]
+    ],
+    "reviewCadenceDays": 30,
+    "criticality": "medium"
   },
   "config": {
     "enabled": true,
@@ -75,14 +82,26 @@
         "severity": "warning",
         "when": {
           "all": [
-            { "path": "metrics.topScore", "op": "gte", "value": 0.85 },
-            { "path": "metrics.scoreGap", "op": "gte", "value": 0.25 }
+            {
+              "path": "metrics.topScore",
+              "op": "gte",
+              "value": 0.85
+            },
+            {
+              "path": "metrics.scoreGap",
+              "op": "gte",
+              "value": 0.25
+            }
           ]
         },
         "then": {
           "action": "allow",
           "transform": [
-            { "type": "autopick_candidate", "notifyUser": true, "allowCorrection": true }
+            {
+              "type": "autopick_candidate",
+              "notifyUser": true,
+              "allowCorrection": true
+            }
           ]
         },
         "reasonCode": "auto_pick_high_confidence"
@@ -92,15 +111,31 @@
         "severity": "error",
         "when": {
           "all": [
-            { "path": "signals.isBlocked", "op": "eq", "value": true },
-            { "path": "signals.isAmbiguous", "op": "eq", "value": true },
-            { "path": "metrics.candidateCount", "op": "gte", "value": 2 }
+            {
+              "path": "signals.isBlocked",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "signals.isAmbiguous",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "metrics.candidateCount",
+              "op": "gte",
+              "value": 2
+            }
           ]
         },
         "then": {
           "action": "route",
           "routeTo": "rank_disambiguate",
-          "constraints": { "maxQuestions": 1, "minOptions": 2, "maxOptions": 4 }
+          "constraints": {
+            "maxQuestions": 1,
+            "minOptions": 2,
+            "maxOptions": 4
+          }
         },
         "reasonCode": "needs_doc_choice"
       },
@@ -109,15 +144,31 @@
         "severity": "fatal",
         "when": {
           "any": [
-            { "path": "metrics.candidateCount", "op": "gt", "value": 4 },
-            { "path": "metrics.clarificationQuestionCount", "op": "gt", "value": 1 }
+            {
+              "path": "metrics.candidateCount",
+              "op": "gt",
+              "value": 4
+            },
+            {
+              "path": "metrics.clarificationQuestionCount",
+              "op": "gt",
+              "value": 1
+            }
           ]
         },
         "then": {
           "action": "transform",
           "transform": [
-            { "type": "limit_options", "max": 4, "min": 2, "trimStrategy": "keep_top_scores_then_diverse" },
-            { "type": "limit_questions", "max": 1 }
+            {
+              "type": "limit_options",
+              "max": 4,
+              "min": 2,
+              "trimStrategy": "keep_top_scores_then_diverse"
+            },
+            {
+              "type": "limit_questions",
+              "max": 1
+            }
           ]
         },
         "reasonCode": "needs_doc_choice"
@@ -127,15 +178,29 @@
         "severity": "error",
         "when": {
           "all": [
-            { "path": "signals.isBlocked", "op": "eq", "value": true },
-            { "path": "signals.hasConcreteOptions", "op": "eq", "value": true },
-            { "path": "signals.answerableWithoutClarify", "op": "eq", "value": true }
+            {
+              "path": "signals.isBlocked",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "signals.hasConcreteOptions",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "signals.answerableWithoutClarify",
+              "op": "eq",
+              "value": true
+            }
           ]
         },
         "then": {
           "action": "allow",
           "transform": [
-            { "type": "suppress_clarification" }
+            {
+              "type": "suppress_clarification"
+            }
           ]
         },
         "reasonCode": "grounding_fail_soft"
@@ -145,17 +210,41 @@
         "severity": "warning",
         "when": {
           "all": [
-            { "path": "signals.isFollowup", "op": "eq", "value": true },
-            { "path": "signals.followupStrength", "op": "eq", "value": "strong" },
-            { "path": "signals.isAmbiguous", "op": "eq", "value": true },
-            { "path": "metrics.topScore", "op": "gte", "value": 0.8 },
-            { "path": "metrics.scoreGap", "op": "gte", "value": 0.2 }
+            {
+              "path": "signals.isFollowup",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "signals.followupStrength",
+              "op": "eq",
+              "value": "strong"
+            },
+            {
+              "path": "signals.isAmbiguous",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "metrics.topScore",
+              "op": "gte",
+              "value": 0.8
+            },
+            {
+              "path": "metrics.scoreGap",
+              "op": "gte",
+              "value": 0.2
+            }
           ]
         },
         "then": {
           "action": "allow",
           "transform": [
-            { "type": "autopick_candidate", "notifyUser": true, "allowCorrection": true }
+            {
+              "type": "autopick_candidate",
+              "notifyUser": true,
+              "allowCorrection": true
+            }
           ]
         },
         "reasonCode": "auto_pick_high_confidence"
@@ -165,14 +254,24 @@
         "severity": "fatal",
         "when": {
           "all": [
-            { "path": "signals.explicitDocLock", "op": "eq", "value": true },
-            { "path": "signals.isAmbiguous", "op": "eq", "value": true }
+            {
+              "path": "signals.explicitDocLock",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "path": "signals.isAmbiguous",
+              "op": "eq",
+              "value": true
+            }
           ]
         },
         "then": {
           "action": "transform",
           "transform": [
-            { "type": "restrict_candidates_within_active_doc" }
+            {
+              "type": "restrict_candidates_within_active_doc"
+            }
           ]
         },
         "reasonCode": "explicit_doc_required"
@@ -196,12 +295,17 @@
       {
         "matchReasonCode": "auto_pick_high_confidence",
         "action": "allow",
-        "constraints": { "notifyUser": true, "allowCorrection": true }
+        "constraints": {
+          "notifyUser": true,
+          "allowCorrection": true
+        }
       },
       {
         "matchReasonCode": "explicit_doc_required",
         "action": "transform",
-        "constraints": { "restrictWithinActiveDoc": true }
+        "constraints": {
+          "restrictWithinActiveDoc": true
+        }
       }
     ]
   },
@@ -209,45 +313,141 @@
     "cases": [
       {
         "id": "CLPOL_0001_autopick_safe",
-        "input": { "text": "Open the analysis" },
-        "runtime": { "metrics": { "topScore": 0.9, "scoreGap": 0.3 }, "signals": { "isAmbiguous": true } },
-        "expect": { "action": "allow", "reasonCode": "auto_pick_high_confidence" }
+        "input": {
+          "text": "Open the analysis"
+        },
+        "runtime": {
+          "metrics": {
+            "topScore": 0.9,
+            "scoreGap": 0.3
+          },
+          "signals": {
+            "isAmbiguous": true
+          }
+        },
+        "expect": {
+          "action": "allow",
+          "reasonCode": "auto_pick_high_confidence"
+        }
       },
       {
         "id": "CLPOL_0002_disambiguate_when_blocked",
-        "input": { "text": "Open the report" },
-        "runtime": { "signals": { "isBlocked": true, "isAmbiguous": true }, "metrics": { "candidateCount": 3, "topScore": 0.7, "scoreGap": 0.1 } },
-        "expect": { "action": "route", "routeTo": "rank_disambiguate", "reasonCode": "needs_doc_choice" }
+        "input": {
+          "text": "Open the report"
+        },
+        "runtime": {
+          "signals": {
+            "isBlocked": true,
+            "isAmbiguous": true
+          },
+          "metrics": {
+            "candidateCount": 3,
+            "topScore": 0.7,
+            "scoreGap": 0.1
+          }
+        },
+        "expect": {
+          "action": "route",
+          "routeTo": "rank_disambiguate",
+          "reasonCode": "needs_doc_choice"
+        }
       },
       {
         "id": "CLPOL_0003_limit_options_and_questions",
-        "input": { "text": "Which one?" },
-        "runtime": { "metrics": { "candidateCount": 10, "clarificationQuestionCount": 2 }, "signals": { "isBlocked": true, "isAmbiguous": true } },
-        "expect": { "action": "transform", "reasonCode": "needs_doc_choice" }
+        "input": {
+          "text": "Which one?"
+        },
+        "runtime": {
+          "metrics": {
+            "candidateCount": 10,
+            "clarificationQuestionCount": 2
+          },
+          "signals": {
+            "isBlocked": true,
+            "isAmbiguous": true
+          }
+        },
+        "expect": {
+          "action": "route",
+          "routeTo": "rank_disambiguate",
+          "reasonCode": "needs_doc_choice"
+        }
       },
       {
         "id": "CLPOL_0004_never_ask_if_answer_in_context",
-        "input": { "text": "Which one?" },
-        "runtime": { "signals": { "isBlocked": true, "hasConcreteOptions": true, "answerableWithoutClarify": true } },
-        "expect": { "action": "allow", "reasonCode": "grounding_fail_soft" }
+        "input": {
+          "text": "Which one?"
+        },
+        "runtime": {
+          "signals": {
+            "isBlocked": true,
+            "hasConcreteOptions": true,
+            "answerableWithoutClarify": true
+          }
+        },
+        "expect": {
+          "action": "allow",
+          "reasonCode": "grounding_fail_soft"
+        }
       },
       {
         "id": "CLPOL_0005_followup_strong_autopick",
-        "input": { "text": "and also the margin" },
-        "runtime": { "signals": { "isFollowup": true, "followupStrength": "strong", "isAmbiguous": true }, "metrics": { "topScore": 0.82, "scoreGap": 0.22 } },
-        "expect": { "action": "allow", "reasonCode": "auto_pick_high_confidence" }
+        "input": {
+          "text": "and also the margin"
+        },
+        "runtime": {
+          "signals": {
+            "isFollowup": true,
+            "followupStrength": "strong",
+            "isAmbiguous": true
+          },
+          "metrics": {
+            "topScore": 0.82,
+            "scoreGap": 0.22
+          }
+        },
+        "expect": {
+          "action": "allow",
+          "reasonCode": "auto_pick_high_confidence"
+        }
       },
       {
         "id": "CLPOL_0006_explicit_doc_lock_restricts",
-        "input": { "text": "Open the report" },
-        "runtime": { "signals": { "explicitDocLock": true, "isAmbiguous": true } },
-        "expect": { "action": "transform", "reasonCode": "explicit_doc_required" }
+        "input": {
+          "text": "Open the report"
+        },
+        "runtime": {
+          "signals": {
+            "explicitDocLock": true,
+            "isAmbiguous": true
+          }
+        },
+        "expect": {
+          "action": "transform",
+          "reasonCode": "explicit_doc_required"
+        }
       },
       {
         "id": "CLPOL_0007_multilingual_pt_disambiguate",
-        "input": { "text": "Abrir o arquivo" },
-        "runtime": { "signals": { "isBlocked": true, "isAmbiguous": true }, "metrics": { "candidateCount": 2, "topScore": 0.65, "scoreGap": 0.05 } },
-        "expect": { "action": "route", "routeTo": "rank_disambiguate", "reasonCode": "needs_doc_choice" }
+        "input": {
+          "text": "Abrir o arquivo"
+        },
+        "runtime": {
+          "signals": {
+            "isBlocked": true,
+            "isAmbiguous": true
+          },
+          "metrics": {
+            "candidateCount": 2,
+            "topScore": 0.65,
+            "scoreGap": 0.05
+          }
+        },
+        "expect": {
+          "action": "route",
+          "routeTo": "rank_disambiguate",
+          "reasonCode": "needs_doc_choice"
+        }
       }
     ]
   }

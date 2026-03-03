@@ -2,39 +2,42 @@
   "_meta": {
     "id": "medical_med_lab_results_report_entities",
     "version": "2.0.0",
-    "description": "Entity extraction schema for Lab Results Report with explicit units/reference ranges.",
+    "description": "Entity extraction schema for Lab Results Report with unit, reference range and flag handling.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
     "domain": "medical",
     "docType": "med_lab_results_report"
   },
-  "schemaVersion": "2026-02-28",
+  "schemaVersion": "2026-03-03",
   "entities": [
     {
-      "id": "patient_identifier_masked",
+      "id": "patient_name_masked",
       "type": "string",
       "required": true,
-      "description": "Extract patient identifier masked from Lab Results Report.",
+      "description": "Extract masked patient name from Lab Results Report.",
       "section": "patient_identification",
       "unit": "unitless",
       "referenceRange": "not_applicable",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "patient identifier masked",
-          "patient identification",
-          "lab results report"
+          "patient name masked",
+          "patient_identification",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
@@ -43,1104 +46,640 @@
       "extractionPriority": 250
     },
     {
-      "id": "patient_age",
-      "type": "number",
+      "id": "medical_record_number_masked",
+      "type": "string",
       "required": true,
-      "description": "Extract patient age from Lab Results Report.",
+      "description": "Extract masked MRN / ID from Lab Results Report.",
       "section": "patient_identification",
-      "unit": "year",
-      "referenceRange": "0-120",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "patient age",
-          "patient identification",
-          "lab results report"
+          "mrn",
+          "medical record number",
+          "patient id",
+          "med record"
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 249
-    },
-    {
-      "id": "patient_sex_documented",
-      "type": "string",
-      "required": false,
-      "description": "Extract patient sex documented from Lab Results Report.",
-      "section": "patient_identification",
-      "unit": "unitless",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "patient sex documented",
-          "patient identification",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 248
+      "extractionPriority": 250
     },
     {
-      "id": "encounter_date",
+      "id": "date_of_birth_masked",
       "type": "date",
-      "required": true,
-      "description": "Extract encounter date from Lab Results Report.",
-      "section": "encounter_context",
-      "unit": "unitless",
+      "required": false,
+      "description": "Extract masked or explicit patient date of birth from Lab Results Report.",
+      "section": "patient_identification",
+      "unit": "date",
       "referenceRange": "valid_date",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "encounter date",
-          "encounter context",
-          "lab results report"
+          "date of birth masked",
+          "patient_identification",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present",
         "valid_date_format"
       ],
-      "extractionPriority": 247
+      "extractionPriority": 250
+    },
+    {
+      "id": "encounter_date",
+      "type": "date",
+      "required": true,
+      "description": "Extract encounter date for Lab Results Report.",
+      "section": "encounter_context",
+      "unit": "date",
+      "referenceRange": "valid_date",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "encounter date",
+          "encounter_context",
+          ""
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
     },
     {
       "id": "encounter_time",
       "type": "string",
       "required": false,
-      "description": "Extract encounter time from Lab Results Report.",
+      "description": "Extract encounter time for Lab Results Report.",
       "section": "encounter_context",
       "unit": "hour",
       "referenceRange": "00:00-23:59",
       "evidence": {
-        "minCitations": 0,
+        "minCitations": 1,
         "anchors": [
           "encounter time",
-          "encounter context",
-          "lab results report"
+          "encounter_context",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 246
+      "extractionPriority": 250
     },
     {
-      "id": "chief_complaint_text",
+      "id": "specimen_type",
       "type": "string",
       "required": true,
-      "description": "Extract chief complaint text from Lab Results Report.",
-      "section": "chief_complaint_reason",
+      "description": "Extract specimen/source type.",
+      "section": "sample_collection",
       "unit": "unitless",
       "referenceRange": "not_applicable",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "chief complaint text",
-          "chief complaint reason",
-          "lab results report"
+          "specimen type",
+          "sample_collection",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 245
+      "extractionPriority": 250
     },
     {
-      "id": "history_duration",
+      "id": "collection_datetime",
       "type": "string",
-      "required": false,
-      "description": "Extract history duration from Lab Results Report.",
-      "section": "history_background",
-      "unit": "day",
-      "referenceRange": "document_value_only",
+      "required": true,
+      "description": "Extract specimen collection datetime for labs.",
+      "section": "sample_collection",
+      "unit": "datetime",
+      "referenceRange": "valid_datetime",
       "evidence": {
-        "minCitations": 0,
+        "minCitations": 1,
         "anchors": [
-          "history duration",
-          "history background",
-          "lab results report"
+          "collection datetime",
+          "sample_collection",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 244
+      "extractionPriority": 250
     },
     {
-      "id": "blood_pressure_systolic",
-      "type": "number",
-      "required": true,
-      "description": "Extract blood pressure systolic from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "mmHg",
-      "referenceRange": "70-220",
-      "evidence": {
-        "minCitations": 1,
-        "anchors": [
-          "blood pressure systolic",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 243
-    },
-    {
-      "id": "blood_pressure_diastolic",
-      "type": "number",
-      "required": true,
-      "description": "Extract blood pressure diastolic from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "mmHg",
-      "referenceRange": "40-140",
-      "evidence": {
-        "minCitations": 1,
-        "anchors": [
-          "blood pressure diastolic",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 242
-    },
-    {
-      "id": "heart_rate",
-      "type": "number",
-      "required": true,
-      "description": "Extract heart rate from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "bpm",
-      "referenceRange": "30-220",
-      "evidence": {
-        "minCitations": 1,
-        "anchors": [
-          "heart rate",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 241
-    },
-    {
-      "id": "respiratory_rate",
-      "type": "number",
-      "required": true,
-      "description": "Extract respiratory rate from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "breaths_per_minute",
-      "referenceRange": "6-50",
-      "evidence": {
-        "minCitations": 1,
-        "anchors": [
-          "respiratory rate",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 240
-    },
-    {
-      "id": "temperature",
-      "type": "number",
-      "required": true,
-      "description": "Extract temperature from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "celsius",
-      "referenceRange": "34-42",
-      "evidence": {
-        "minCitations": 1,
-        "anchors": [
-          "temperature",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 239
-    },
-    {
-      "id": "oxygen_saturation",
-      "type": "number",
-      "required": true,
-      "description": "Extract oxygen saturation from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "percent",
-      "referenceRange": "50-100",
-      "evidence": {
-        "minCitations": 1,
-        "anchors": [
-          "oxygen saturation",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 238
-    },
-    {
-      "id": "weight",
-      "type": "number",
-      "required": false,
-      "description": "Extract weight from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "kg",
-      "referenceRange": "0-400",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "weight",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 237
-    },
-    {
-      "id": "height",
-      "type": "number",
-      "required": false,
-      "description": "Extract height from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "cm",
-      "referenceRange": "30-250",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "height",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 236
-    },
-    {
-      "id": "body_mass_index",
-      "type": "number",
-      "required": false,
-      "description": "Extract body mass index from Lab Results Report.",
-      "section": "vitals_and_measurements",
-      "unit": "kg_per_m2",
-      "referenceRange": "10-80",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "body mass index",
-          "vitals and measurements",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 235
-    },
-    {
-      "id": "pain_score",
-      "type": "number",
-      "required": false,
-      "description": "Extract pain score from Lab Results Report.",
-      "section": "objective_findings",
-      "unit": "point",
-      "referenceRange": "0-10",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "pain score",
-          "objective findings",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 234
-    },
-    {
-      "id": "glucose_value",
-      "type": "number",
-      "required": false,
-      "description": "Extract glucose value from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "mg/dL",
-      "referenceRange": "70-199",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "glucose value",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 233
-    },
-    {
-      "id": "hemoglobin_value",
-      "type": "number",
-      "required": false,
-      "description": "Extract hemoglobin value from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "g/dL",
-      "referenceRange": "6-20",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "hemoglobin value",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 232
-    },
-    {
-      "id": "white_cell_count",
-      "type": "number",
-      "required": false,
-      "description": "Extract white cell count from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "10^3/uL",
-      "referenceRange": "2-30",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "white cell count",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 231
-    },
-    {
-      "id": "creatinine_value",
-      "type": "number",
-      "required": false,
-      "description": "Extract creatinine value from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "mg/dL",
-      "referenceRange": "0.2-20",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "creatinine value",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 230
-    },
-    {
-      "id": "sodium_value",
-      "type": "number",
-      "required": false,
-      "description": "Extract sodium value from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "mmol/L",
-      "referenceRange": "110-170",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "sodium value",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 229
-    },
-    {
-      "id": "potassium_value",
-      "type": "number",
-      "required": false,
-      "description": "Extract potassium value from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "mmol/L",
-      "referenceRange": "2-8",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "potassium value",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 228
-    },
-    {
-      "id": "radiology_modality",
+      "id": "ordering_provider",
       "type": "string",
-      "required": false,
-      "description": "Extract radiology modality from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "unitless",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "radiology modality",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 227
-    },
-    {
-      "id": "radiology_impression_text",
-      "type": "string",
-      "required": false,
-      "description": "Extract radiology impression text from Lab Results Report.",
-      "section": "labs_imaging",
+      "required": true,
+      "description": "Extract ordering provider name.",
+      "section": "encounter_context",
       "unit": "unitless",
       "referenceRange": "not_applicable",
       "evidence": {
-        "minCitations": 0,
+        "minCitations": 1,
         "anchors": [
-          "radiology impression text",
-          "labs imaging",
-          "lab results report"
+          "ordering provider",
+          "provider",
+          "solicitante"
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 226
+      "extractionPriority": 250
     },
     {
-      "id": "pathology_specimen_type",
+      "id": "ordered_panel",
       "type": "string",
-      "required": false,
-      "description": "Extract pathology specimen type from Lab Results Report.",
-      "section": "labs_imaging",
+      "required": true,
+      "description": "Extract ordered test panel/grouping.",
+      "section": "requested_panels",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "ordered panel",
+          "requested_panels",
+          ""
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "result_panel_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract result panel name.",
+      "section": "results_table",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "result panel name",
+          "results_table",
+          ""
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "test_name",
+      "type": "string",
+      "required": true,
+      "description": "Extract individual lab test name.",
+      "section": "results_table",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "test name",
+          "results_table",
+          ""
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "result_value",
+      "type": "number",
+      "required": true,
+      "description": "Extract numeric result value.",
+      "section": "results_table",
       "unit": "unitless",
       "referenceRange": "document_value_only",
       "evidence": {
-        "minCitations": 0,
+        "minCitations": 1,
         "anchors": [
-          "pathology specimen type",
-          "labs imaging",
-          "lab results report"
+          "result value",
+          "results_table",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present",
+        "numeric_parseable"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "result_unit",
+      "type": "string",
+      "required": true,
+      "description": "Extract units for laboratory result.",
+      "section": "results_table",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "result unit",
+          "results_table",
+          ""
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 225
+      "extractionPriority": 250
     },
     {
-      "id": "ecg_rate",
-      "type": "number",
-      "required": false,
-      "description": "Extract ecg rate from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "bpm",
-      "referenceRange": "30-220",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "ecg rate",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 224
-    },
-    {
-      "id": "ecg_qtc",
-      "type": "number",
-      "required": false,
-      "description": "Extract ecg qtc from Lab Results Report.",
-      "section": "labs_imaging",
-      "unit": "ms",
-      "referenceRange": "300-550",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "ecg qtc",
-          "labs imaging",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present",
-        "numeric_parseable"
-      ],
-      "extractionPriority": 223
-    },
-    {
-      "id": "documented_assessment_text",
+      "id": "reference_range_text",
       "type": "string",
-      "required": true,
-      "description": "Extract documented assessment text from Lab Results Report.",
+      "required": false,
+      "description": "Extract textual reference range text from lab table.",
+      "section": "results_table",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "reference range",
+          "normal range"
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "abnormal_flag",
+      "type": "string",
+      "required": false,
+      "description": "Extract abnormality flag.",
+      "section": "results_table",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "flag",
+          "abnormal",
+          "high",
+          "low",
+          "critical",
+          "flag note"
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "critical_flag",
+      "type": "string",
+      "required": false,
+      "description": "Extract critical value flag.",
+      "section": "critical_values",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "critical",
+          "critical flag",
+          "critical value"
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "result_interpretation",
+      "type": "string",
+      "required": false,
+      "description": "Extract interpretation narrative tied to results.",
       "section": "assessment_documented",
       "unit": "unitless",
       "referenceRange": "not_applicable",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "documented assessment text",
-          "assessment documented",
-          "lab results report"
+          "result interpretation",
+          "assessment_documented",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 222
+      "extractionPriority": 250
     },
     {
-      "id": "ordered_intervention_text",
+      "id": "delta_reference",
+      "type": "string",
+      "required": false,
+      "description": "Capture trend or delta comparison statement.",
+      "section": "followup_and_disposition",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "delta",
+          "trend",
+          "previous result",
+          "comparison"
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
+    },
+    {
+      "id": "recommendation",
       "type": "string",
       "required": true,
-      "description": "Extract ordered intervention text from Lab Results Report.",
+      "description": "Extract follow-up recommendations related to labs.",
       "section": "plan_and_orders",
       "unit": "unitless",
       "referenceRange": "not_applicable",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "ordered intervention text",
-          "plan and orders",
-          "lab results report"
+          "recommendation",
+          "plan_and_orders",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 221
+      "extractionPriority": 250
     },
     {
-      "id": "medication_name",
+      "id": "disposition",
       "type": "string",
       "required": false,
-      "description": "Extract medication name from Lab Results Report.",
-      "section": "medications_allergies",
-      "unit": "unitless",
-      "referenceRange": "not_applicable",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "medication name",
-          "medications allergies",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 220
-    },
-    {
-      "id": "medication_dose",
-      "type": "string",
-      "required": false,
-      "description": "Extract medication dose from Lab Results Report.",
-      "section": "medications_allergies",
-      "unit": "mg",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "medication dose",
-          "medications allergies",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 219
-    },
-    {
-      "id": "medication_route",
-      "type": "string",
-      "required": false,
-      "description": "Extract medication route from Lab Results Report.",
-      "section": "medications_allergies",
-      "unit": "unitless",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "medication route",
-          "medications allergies",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 218
-    },
-    {
-      "id": "medication_frequency",
-      "type": "string",
-      "required": false,
-      "description": "Extract medication frequency from Lab Results Report.",
-      "section": "medications_allergies",
-      "unit": "per_day",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "medication frequency",
-          "medications allergies",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 217
-    },
-    {
-      "id": "allergy_substance",
-      "type": "string",
-      "required": false,
-      "description": "Extract allergy substance from Lab Results Report.",
-      "section": "medications_allergies",
-      "unit": "unitless",
-      "referenceRange": "not_applicable",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "allergy substance",
-          "medications allergies",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 216
-    },
-    {
-      "id": "allergy_reaction",
-      "type": "string",
-      "required": false,
-      "description": "Extract allergy reaction from Lab Results Report.",
-      "section": "medications_allergies",
-      "unit": "unitless",
-      "referenceRange": "not_applicable",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "allergy reaction",
-          "medications allergies",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 215
-    },
-    {
-      "id": "followup_window",
-      "type": "string",
-      "required": false,
-      "description": "Extract followup window from Lab Results Report.",
-      "section": "followup_and_disposition",
-      "unit": "day",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "followup window",
-          "followup and disposition",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 214
-    },
-    {
-      "id": "referral_target",
-      "type": "string",
-      "required": false,
-      "description": "Extract referral target from Lab Results Report.",
+      "description": "Extract disposition note from lab report.",
       "section": "followup_and_disposition",
       "unit": "unitless",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "referral target",
-          "followup and disposition",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 213
-    },
-    {
-      "id": "disposition_status",
-      "type": "string",
-      "required": false,
-      "description": "Extract disposition status from Lab Results Report.",
-      "section": "followup_and_disposition",
-      "unit": "unitless",
-      "referenceRange": "document_value_only",
-      "evidence": {
-        "minCitations": 0,
-        "anchors": [
-          "disposition status",
-          "followup and disposition",
-          "lab results report"
-        ],
-        "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
-          "labs_imaging",
-          "plan_and_orders"
-        ]
-      },
-      "qualityChecks": [
-        "non_empty_if_present"
-      ],
-      "extractionPriority": 212
-    },
-    {
-      "id": "author_clinician_role",
-      "type": "string",
-      "required": true,
-      "description": "Extract author clinician role from Lab Results Report.",
-      "section": "signoff_and_attestation",
-      "unit": "unitless",
-      "referenceRange": "document_value_only",
+      "referenceRange": "not_applicable",
       "evidence": {
         "minCitations": 1,
         "anchors": [
-          "author clinician role",
-          "signoff and attestation",
-          "lab results report"
+          "disposition",
+          "followup_and_disposition",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 211
+      "extractionPriority": 250
     },
     {
-      "id": "attestation_timestamp",
+      "id": "reporting_clinician",
       "type": "string",
-      "required": false,
-      "description": "Extract attestation timestamp from Lab Results Report.",
-      "section": "signoff_and_attestation",
-      "unit": "iso_datetime",
-      "referenceRange": "valid_datetime",
+      "required": true,
+      "description": "Extract clinician signature/reporter.",
+      "section": "signature_block",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
       "evidence": {
-        "minCitations": 0,
+        "minCitations": 1,
         "anchors": [
-          "attestation timestamp",
-          "signoff and attestation",
-          "lab results report"
+          "reporting clinician",
+          "signature_block",
+          ""
         ],
         "preferredSources": [
-          "objective_findings",
-          "vitals_and_measurements",
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
           "labs_imaging",
-          "plan_and_orders"
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
         ]
       },
       "qualityChecks": [
         "non_empty_if_present"
       ],
-      "extractionPriority": 210
+      "extractionPriority": 250
+    },
+    {
+      "id": "document_footer",
+      "type": "string",
+      "required": false,
+      "description": "Extract report footer or metadata from labs.",
+      "section": "signature_block",
+      "unit": "unitless",
+      "referenceRange": "not_applicable",
+      "evidence": {
+        "minCitations": 1,
+        "anchors": [
+          "document footer",
+          "signature_block",
+          ""
+        ],
+        "preferredSources": [
+          "patient_identification",
+          "encounter_context",
+          "hpi_and_ros",
+          "labs_imaging",
+          "assessment_documented",
+          "plan_and_orders",
+          "followup_and_disposition"
+        ]
+      },
+      "qualityChecks": [
+        "non_empty_if_present"
+      ],
+      "extractionPriority": 250
     }
   ]
 }

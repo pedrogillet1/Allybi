@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "id": "di_everyday_entities_every_electricity_bill",
+    "version": "1.0.0",
+    "description": "Entity schema for every_electricity_bill.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-03"
+  },
+  "config": {
+    "enabled": true,
+    "domain": "everyday",
+    "docType": "every_electricity_bill"
+  },
+  "schemaVersion": "2026-03-03",
+  "entities": [
+    { "id": "service_address", "type": "string", "required": true, "description": "Service address for the meter.", "section": "service_address", "evidence": {"minCitations": 1, "anchors": ["service address", "endereco", "instalacao"], "disallowInference": true, "preferredSources": ["service_address"]} },
+    { "id": "meter_number", "type": "string", "required": true, "description": "Utility meter identifier.", "section": "meter_readings", "evidence": {"minCitations": 1, "anchors": ["meter", "medidor", "numero"], "disallowInference": true, "preferredSources": ["meter_readings"]} },
+    { "id": "reading_previous", "type": "number", "required": false, "description": "Previous meter reading.", "section": "meter_readings", "evidence": {"minCitations": 1, "anchors": ["previous reading", "anterior"], "disallowInference": true, "preferredSources": ["meter_readings"]} },
+    { "id": "reading_current", "type": "number", "required": false, "description": "Current meter reading.", "section": "meter_readings", "evidence": {"minCitations": 1, "anchors": ["current reading", "atual"], "disallowInference": true, "preferredSources": ["meter_readings"]} },
+    { "id": "consumption_kwh", "type": "number", "required": true, "description": "Total kWh consumption.", "section": "consumption_summary", "evidence": {"minCitations": 1, "anchors": ["kwh", "consumo", "kwh total"], "disallowInference": true, "preferredSources": ["consumption_summary"]} },
+    { "id": "energy_charge", "type": "currency", "required": true, "description": "Energy energy component charge.", "section": "charges_by_component", "evidence": {"minCitations": 1, "anchors": ["energy charge", "energia", "charge"], "disallowInference": true, "preferredSources": ["charges_by_component"]} },
+    { "id": "public_lighting_charge", "type": "currency", "required": false, "description": "Lighting and service levy charges.", "section": "charges_by_component", "evidence": {"minCitations": 1, "anchors": ["lighting", "iluminacao", "charge"], "disallowInference": true, "preferredSources": ["charges_by_component"]} },
+    { "id": "tariff_rate", "type": "number", "required": false, "description": "Active tariff rate.", "section": "tariff_breakdown", "evidence": {"minCitations": 1, "anchors": ["tariff", "rate", "tarifa"], "disallowInference": false, "preferredSources": ["tariff_breakdown"]} },
+    { "id": "tax_amount", "type": "currency", "required": false, "description": "Total taxes included in bill.", "section": "charges_by_component", "evidence": {"minCitations": 1, "anchors": ["tax", "icms", "pis", "cofins"], "disallowInference": true, "preferredSources": ["charges_by_component"]} },
+    { "id": "total_amount", "type": "currency", "required": true, "description": "Total amount due for the bill.", "section": "totals_and_due", "evidence": {"minCitations": 1, "anchors": ["total", "valor total", "total due"], "disallowInference": true, "preferredSources": ["totals_and_due"]} },
+    { "id": "due_date", "type": "date", "required": true, "description": "Payment due date.", "section": "totals_and_due", "evidence": {"minCitations": 1, "anchors": ["due date", "vencimento"], "disallowInference": true, "preferredSources": ["totals_and_due"]} },
+    { "id": "billing_period_start", "type": "date", "required": true, "description": "Start of billing period.", "section": "billing_period", "evidence": {"minCitations": 1, "anchors": ["from", "periodo", "inicio"], "disallowInference": true, "preferredSources": ["billing_period"]} },
+    { "id": "billing_period_end", "type": "date", "required": true, "description": "End of billing period.", "section": "billing_period", "evidence": {"minCitations": 1, "anchors": ["to", "periodo", "fim"], "disallowInference": true, "preferredSources": ["billing_period"]} }
+  ]
+}

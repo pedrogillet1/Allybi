@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "medical_med_referral_note_extraction_hints",
-    "version": "1.0.0",
-    "description": "Extraction hints for Referral Note.",
+    "version": "2.0.0",
+    "description": "Extraction hints for med referral note.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,548 +15,620 @@
   },
   "hints": [
     {
-      "id": "med_referral_note_hint_01",
-      "entity": "address",
+      "id": "med_referral_note_hint_001",
+      "entity": "patient_name_masked",
       "anchors": [
-        "address",
-        "referral note address",
-        "see clause",
-        "refer to section"
+        "patient name masked",
+        "patient name masked referral note",
+        "see section"
       ],
-      "location": "abstract",
+      "location": "document_header",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
         "often in appendix",
-        "can be buried in annex ii"
-      ]
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "patient_name_masked med_referral_note",
+        "med_referral_note patient name masked extracted from document_header"
+      ],
+      "confidenceBias": "high"
     },
     {
-      "id": "med_referral_note_hint_02",
-      "entity": "case_number",
+      "id": "med_referral_note_hint_002",
+      "entity": "patient_dob_masked",
       "anchors": [
-        "case number",
-        "referral note case number",
-        "see clause",
-        "refer to section"
+        "patient dob masked",
+        "patient dob masked referral note",
+        "see section"
       ],
-      "location": "appendix",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in appendix a",
-        "can be buried in exhibit"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_03",
-      "entity": "city",
-      "anchors": [
-        "city",
-        "referral note city",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "approvals",
+      "location": "patient_identification",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in appendix b",
-        "can be buried in exhibit a"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "patient_dob_masked med_referral_note",
+        "med_referral_note patient dob masked extracted from patient_identification"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_04",
-      "entity": "country",
+      "id": "med_referral_note_hint_003",
+      "entity": "patient_id_masked",
       "anchors": [
-        "country",
-        "referral note country",
-        "see clause",
-        "refer to section"
+        "patient id masked",
+        "patient id masked referral note",
+        "see section"
       ],
-      "location": "assessment_plan",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in annex",
-        "can be buried in exhibit b"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_05",
-      "entity": "diagnosis_code",
-      "anchors": [
-        "diagnosis code",
-        "referral note diagnosis code",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "attachments",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in annex i",
-        "can be buried in footnote"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_06",
-      "entity": "document_number",
-      "anchors": [
-        "document number",
-        "referral note document number",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "authorization",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in annex ii",
-        "can be buried in endnote"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_07",
-      "entity": "dosage",
-      "anchors": [
-        "dosage",
-        "referral note dosage",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "certifications",
+      "location": "referring_provider",
       "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in exhibit",
-        "can be buried in schedule"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "patient_id_masked med_referral_note",
+        "med_referral_note patient id masked extracted from referring_provider"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_08",
-      "entity": "effective_date",
+      "id": "med_referral_note_hint_004",
+      "entity": "insurance_id_masked",
       "anchors": [
-        "effective date",
-        "referral note effective date",
-        "see clause",
-        "refer to section"
+        "insurance id masked",
+        "insurance id masked referral note",
+        "see section"
       ],
-      "location": "compliance_section",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in exhibit a",
-        "can be buried in attachment"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_09",
-      "entity": "expiration_date",
-      "anchors": [
-        "expiration date",
-        "referral note expiration date",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "criteria",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in exhibit b",
-        "can be buried in addendum"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_10",
-      "entity": "lab_value",
-      "anchors": [
-        "lab value",
-        "referral note lab value",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "data_tables",
+      "location": "receiving_provider",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in footnote",
-        "can be buried in rider"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "insurance_id_masked med_referral_note",
+        "med_referral_note insurance id masked extracted from receiving_provider"
+      ],
+      "confidenceBias": "high"
     },
     {
-      "id": "med_referral_note_hint_11",
-      "entity": "medication_name",
+      "id": "med_referral_note_hint_005",
+      "entity": "referring_provider_name",
       "anchors": [
-        "medication name",
-        "referral note medication name",
-        "see clause",
-        "refer to section"
+        "referring provider name",
+        "referring provider name referral note",
+        "see section"
       ],
-      "location": "detailed_analysis",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in endnote",
-        "can be buried in supplement"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_12",
-      "entity": "period_reference",
-      "anchors": [
-        "period reference",
-        "referral note period reference",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "disclaimers",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in schedule",
-        "can be buried in definitions section"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_13",
-      "entity": "person_name",
-      "anchors": [
-        "person name",
-        "referral note person name",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "discussion",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in attachment",
-        "can be buried in signature block"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_14",
-      "entity": "person_role",
-      "anchors": [
-        "person role",
-        "referral note person role",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "document_metadata",
+      "location": "reason_for_referral",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in addendum",
-        "can be buried in metadata header"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "referring_provider_name med_referral_note",
+        "med_referral_note referring provider name extracted from reason_for_referral"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_15",
-      "entity": "person_title",
+      "id": "med_referral_note_hint_006",
+      "entity": "referring_provider_contact",
       "anchors": [
-        "person title",
-        "referral note person title",
-        "see clause",
-        "refer to section"
+        "referring provider contact",
+        "referring provider contact referral note",
+        "see section"
       ],
-      "location": "executive_summary",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in rider",
-        "can be buried in revision history"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_16",
-      "entity": "procedure_code",
-      "anchors": [
-        "procedure code",
-        "referral note procedure code",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "findings",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in supplement",
-        "can be buried in appendix"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_17",
-      "entity": "registration_number",
-      "anchors": [
-        "registration number",
-        "referral note registration number",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "glossary",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in definitions section",
-        "can be buried in appendix a"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_18",
-      "entity": "regulatory_body",
-      "anchors": [
-        "regulatory body",
-        "referral note regulatory body",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "header",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in signature block",
-        "can be buried in appendix b"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_19",
-      "entity": "report_date",
-      "anchors": [
-        "report date",
-        "referral note report date",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "history_present_illness",
-      "extractionMethod": "metadata_or_heading",
-      "whereItHides": [
-        "often in metadata header",
-        "can be buried in annex"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_20",
-      "entity": "state_province",
-      "anchors": [
-        "state province",
-        "referral note state province",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "introduction",
-      "extractionMethod": "cross_section_link",
-      "whereItHides": [
-        "often in revision history",
-        "can be buried in annex i"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_21",
-      "entity": "address",
-      "anchors": [
-        "address",
-        "referral note address",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "limitations",
+      "location": "clinical_summary",
       "extractionMethod": "heading_proximity",
       "whereItHides": [
         "often in appendix",
-        "can be buried in annex ii"
-      ]
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "referring_provider_contact med_referral_note",
+        "med_referral_note referring provider contact extracted from clinical_summary"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_22",
-      "entity": "case_number",
+      "id": "med_referral_note_hint_007",
+      "entity": "receiving_provider_name",
       "anchors": [
-        "case number",
-        "referral note case number",
-        "see clause",
-        "refer to section"
+        "receiving provider name",
+        "receiving provider name referral note",
+        "see section"
       ],
-      "location": "medications",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in appendix a",
-        "can be buried in exhibit"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_23",
-      "entity": "city",
-      "anchors": [
-        "city",
-        "referral note city",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "methodology",
+      "location": "requested_service",
       "extractionMethod": "regex_capture",
       "whereItHides": [
-        "often in appendix b",
-        "can be buried in exhibit a"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "receiving_provider_name med_referral_note",
+        "med_referral_note receiving provider name extracted from requested_service"
+      ],
+      "confidenceBias": "high"
     },
     {
-      "id": "med_referral_note_hint_24",
-      "entity": "country",
+      "id": "med_referral_note_hint_008",
+      "entity": "receiving_service",
       "anchors": [
-        "country",
-        "referral note country",
-        "see clause",
-        "refer to section"
+        "receiving service",
+        "receiving service referral note",
+        "see section"
       ],
-      "location": "orders",
-      "extractionMethod": "metadata_or_heading",
+      "location": "follow_up_and_plan",
+      "extractionMethod": "table_row_match",
       "whereItHides": [
-        "often in annex",
-        "can be buried in exhibit b"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "receiving_service med_referral_note",
+        "med_referral_note receiving service extracted from follow_up_and_plan"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_25",
-      "entity": "diagnosis_code",
+      "id": "med_referral_note_hint_009",
+      "entity": "reason_for_referral",
       "anchors": [
-        "diagnosis code",
-        "referral note diagnosis code",
-        "see clause",
-        "refer to section"
+        "reason for referral",
+        "reason for referral referral note",
+        "see section"
       ],
-      "location": "patient_demographics",
+      "location": "signature_block",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in annex i",
-        "can be buried in footnote"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "reason_for_referral med_referral_note",
+        "med_referral_note reason for referral extracted from signature_block"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_26",
-      "entity": "document_number",
+      "id": "med_referral_note_hint_010",
+      "entity": "clinical_question",
       "anchors": [
-        "document number",
-        "referral note document number",
-        "see clause",
-        "refer to section"
+        "clinical question",
+        "clinical question referral note",
+        "see section"
       ],
-      "location": "physical_examination",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in annex ii",
-        "can be buried in endnote"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_27",
-      "entity": "dosage",
-      "anchors": [
-        "dosage",
-        "referral note dosage",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "procedures",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in exhibit",
-        "can be buried in schedule"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_28",
-      "entity": "effective_date",
-      "anchors": [
-        "effective date",
-        "referral note effective date",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "protocols",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in exhibit a",
-        "can be buried in attachment"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_29",
-      "entity": "expiration_date",
-      "anchors": [
-        "expiration date",
-        "referral note expiration date",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "recommendations",
+      "location": "document_header",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in exhibit b",
-        "can be buried in addendum"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "clinical_question med_referral_note",
+        "med_referral_note clinical question extracted from document_header"
+      ],
+      "confidenceBias": "high"
     },
     {
-      "id": "med_referral_note_hint_30",
-      "entity": "lab_value",
+      "id": "med_referral_note_hint_011",
+      "entity": "hpi_summary",
       "anchors": [
-        "lab value",
-        "referral note lab value",
-        "see clause",
-        "refer to section"
+        "hpi summary",
+        "hpi summary referral note",
+        "see section"
       ],
-      "location": "red_flags",
+      "location": "patient_identification",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "hpi_summary med_referral_note",
+        "med_referral_note hpi summary extracted from patient_identification"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_012",
+      "entity": "ros_flags",
+      "anchors": [
+        "ros flags",
+        "ros flags referral note",
+        "see section"
+      ],
+      "location": "referring_provider",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "ros_flags med_referral_note",
+        "med_referral_note ros flags extracted from referring_provider"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_013",
+      "entity": "relevant_diagnosis",
+      "anchors": [
+        "relevant diagnosis",
+        "relevant diagnosis referral note",
+        "see section"
+      ],
+      "location": "receiving_provider",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "relevant_diagnosis med_referral_note",
+        "med_referral_note relevant diagnosis extracted from receiving_provider"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "med_referral_note_hint_014",
+      "entity": "requested_service",
+      "anchors": [
+        "requested service",
+        "requested service referral note",
+        "see section"
+      ],
+      "location": "reason_for_referral",
       "extractionMethod": "cross_section_link",
       "whereItHides": [
-        "often in footnote",
-        "can be buried in rider"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "requested_service med_referral_note",
+        "med_referral_note requested service extracted from reason_for_referral"
+      ],
+      "confidenceBias": "medium"
     },
     {
-      "id": "med_referral_note_hint_31",
-      "entity": "medication_name",
+      "id": "med_referral_note_hint_015",
+      "entity": "requested_studies",
       "anchors": [
-        "medication name",
-        "referral note medication name",
-        "see clause",
-        "refer to section"
+        "requested studies",
+        "requested studies referral note",
+        "see section"
       ],
-      "location": "regulatory_references",
-      "extractionMethod": "heading_proximity",
-      "whereItHides": [
-        "often in endnote",
-        "can be buried in supplement"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_32",
-      "entity": "period_reference",
-      "anchors": [
-        "period reference",
-        "referral note period reference",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "results",
-      "extractionMethod": "table_row_match",
-      "whereItHides": [
-        "often in schedule",
-        "can be buried in definitions section"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_33",
-      "entity": "person_name",
-      "anchors": [
-        "person name",
-        "referral note person name",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "review_notes",
-      "extractionMethod": "regex_capture",
-      "whereItHides": [
-        "often in attachment",
-        "can be buried in signature block"
-      ]
-    },
-    {
-      "id": "med_referral_note_hint_34",
-      "entity": "person_role",
-      "anchors": [
-        "person role",
-        "referral note person role",
-        "see clause",
-        "refer to section"
-      ],
-      "location": "revision_history",
+      "location": "clinical_summary",
       "extractionMethod": "metadata_or_heading",
       "whereItHides": [
-        "often in addendum",
-        "can be buried in metadata header"
-      ]
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "requested_studies med_referral_note",
+        "med_referral_note requested studies extracted from clinical_summary"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_016",
+      "entity": "urgency_level",
+      "anchors": [
+        "urgency level",
+        "urgency level referral note",
+        "see section"
+      ],
+      "location": "requested_service",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "urgency_level med_referral_note",
+        "med_referral_note urgency level extracted from requested_service"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "med_referral_note_hint_017",
+      "entity": "risk_summary",
+      "anchors": [
+        "risk summary",
+        "risk summary referral note",
+        "see section"
+      ],
+      "location": "follow_up_and_plan",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "risk_summary med_referral_note",
+        "med_referral_note risk summary extracted from follow_up_and_plan"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_018",
+      "entity": "supporting_document_summary",
+      "anchors": [
+        "supporting document summary",
+        "supporting document summary referral note",
+        "see section"
+      ],
+      "location": "signature_block",
+      "extractionMethod": "table_row_match",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "supporting_document_summary med_referral_note",
+        "med_referral_note supporting document summary extracted from signature_block"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_019",
+      "entity": "insurance_authorization",
+      "anchors": [
+        "insurance authorization",
+        "insurance authorization referral note",
+        "see section"
+      ],
+      "location": "document_header",
+      "extractionMethod": "cross_section_link",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "insurance_authorization med_referral_note",
+        "med_referral_note insurance authorization extracted from document_header"
+      ],
+      "confidenceBias": "high"
+    },
+    {
+      "id": "med_referral_note_hint_020",
+      "entity": "follow_up_plan",
+      "anchors": [
+        "follow up plan",
+        "follow up plan referral note",
+        "see section"
+      ],
+      "location": "patient_identification",
+      "extractionMethod": "metadata_or_heading",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "follow_up_plan med_referral_note",
+        "med_referral_note follow up plan extracted from patient_identification"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_021",
+      "entity": "referring_clinician_signature",
+      "anchors": [
+        "referring clinician signature",
+        "referring clinician signature referral note",
+        "see section"
+      ],
+      "location": "referring_provider",
+      "extractionMethod": "heading_proximity",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "referring_clinician_signature med_referral_note",
+        "med_referral_note referring clinician signature extracted from referring_provider"
+      ],
+      "confidenceBias": "medium"
+    },
+    {
+      "id": "med_referral_note_hint_022",
+      "entity": "acknowledgment_required",
+      "anchors": [
+        "acknowledgment required",
+        "acknowledgment required referral note",
+        "see section"
+      ],
+      "location": "receiving_provider",
+      "extractionMethod": "regex_capture",
+      "whereItHides": [
+        "often in appendix",
+        "can appear in table continuation",
+        "sometimes after page breaks",
+        "may be in footer",
+        "may be in cover page"
+      ],
+      "pitfalls": [
+        "do not convert units silently",
+        "avoid combining separate result rows",
+        "do not infer diagnosis beyond explicit text"
+      ],
+      "fallbackQueries": [
+        "acknowledgment_required med_referral_note",
+        "med_referral_note acknowledgment required extracted from receiving_provider"
+      ],
+      "confidenceBias": "high"
     }
   ]
 }

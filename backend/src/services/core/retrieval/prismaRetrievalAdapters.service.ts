@@ -226,6 +226,24 @@ function toLocationKey(
   return `d:${documentId}|p:${page ?? -1}|c:${chunkIndex}`;
 }
 
+function sectionKeyFromLocation(
+  locationKey: string,
+  chunkIndex: number,
+): string | null {
+  const normalizedLocationKey = String(locationKey || "").trim();
+  const fromLocation = normalizedLocationKey.match(/\|c:(-?\d+)/i);
+  const fromLocationChunk = fromLocation
+    ? Number(fromLocation[1] || Number.NaN)
+    : Number.NaN;
+  if (Number.isFinite(fromLocationChunk) && fromLocationChunk >= 0) {
+    return `chunk_${fromLocationChunk}`;
+  }
+  if (Number.isFinite(chunkIndex) && chunkIndex >= 0) {
+    return `chunk_${chunkIndex}`;
+  }
+  return null;
+}
+
 function toSnippet(text: string | null): string {
   const clean = String(text ?? "")
     .replace(/\s+/g, " ")
@@ -837,7 +855,9 @@ class PrismaRetrievalUserAdapter
                   ? String(md.sheetName)
                   : null,
             sectionKey:
-              typeof md.sectionKey === "string" ? String(md.sectionKey) : null,
+              typeof md.sectionKey === "string"
+                ? String(md.sectionKey)
+                : sectionKeyFromLocation(locationKey, chunkIndex),
           } as ChunkLocation,
           snippet,
           score: clamp01(Number(hit.similarity || 0)),

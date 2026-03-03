@@ -1,12 +1,12 @@
 {
   "_meta": {
     "id": "legal_disclaimer_policy",
-    "version": "2.0.0",
-    "description": "Legal-domain disclaimers and trigger policy.",
+    "version": "2.1.0",
+    "description": "Legal disclaimer policy ensuring bounded recommendations and transparent uncertainty.",
     "languages": [
       "any"
     ],
-    "lastUpdated": "2026-02-28"
+    "lastUpdated": "2026-03-03"
   },
   "config": {
     "enabled": true,
@@ -15,43 +15,53 @@
   "domain": "legal",
   "disclaimers": [
     {
-      "id": "legal_disclaimer_001",
+      "id": "legal_disc_001_source_fidelity",
       "trigger": "always",
       "severity": "warning",
       "position": "footer",
       "text": {
-        "en": "This output is source-grounded document analysis and is not legal advice. Consult qualified counsel for legal decisions.",
-        "pt": "Esta saida e analise documental baseada em fonte e nao constitui aconselhamento juridico. Consulte assessoria juridica qualificada para decisoes legais."
+        "en": "This is source-grounded legal document analysis, not legal advice. Verify critical interpretations with qualified counsel.",
+        "pt": "Esta eh analise documental de texto juridico, nao aconselhamento juridico. Valide interpretacoes criticas com advogado qualificado."
       }
     },
     {
-      "id": "legal_disclaimer_002",
-      "trigger": "ambiguity_detected",
+      "id": "legal_disc_002_obligation_uncertainty",
+      "trigger": "clause_uncertainty",
       "severity": "warning",
       "position": "inline",
       "text": {
-        "en": "Ambiguity detected in parties, dates, or governing law. Confirm source clauses before relying on this interpretation.",
-        "pt": "Ambiguidade detectada em partes, datas ou lei aplicavel. Confirme as clausulas-fonte antes de usar esta interpretacao."
+        "en": "Obligation interpretation is uncertain because source language is ambiguous or incomplete; exact clause locations are shown and gaps are pending verification.",
+        "pt": "A interpretacao da obrigacao esta incerta porque a linguagem da fonte e ambigua ou incompleta; locais de clausulas foram indicados e as lacunas aguardam verificacao."
       }
     },
     {
-      "id": "legal_disclaimer_003",
-      "trigger": "policy_or_compliance_request",
+      "id": "legal_disc_003_conflicts",
+      "trigger": "conflicting_clauses_detected",
+      "severity": "info",
+      "position": "inline",
+      "text": {
+        "en": "Conflicting clauses were detected. Outputs prioritize higher-level clauses and include the conflict list for review.",
+        "pt": "Foram detectadas clausulas conflitantes. Saidas priorizam clausulas de nivel superior e incluem lista de conflito para revisao."
+      }
+    },
+    {
+      "id": "legal_disc_004_draft_limitations",
+      "trigger": "draft_or_redline_source",
+      "severity": "warning",
+      "position": "inline",
+      "text": {
+        "en": "Source appears to be draft/redline text; final legal effect may differ after countersignature or amendment.",
+        "pt": "A fonte parece ser rascunho/redline; o efeito juridico pode mudar apos contra-assinatura ou aditamento."
+      }
+    },
+    {
+      "id": "legal_disc_005_timelines",
+      "trigger": "timeline_output",
       "severity": "info",
       "position": "footer",
       "text": {
-        "en": "Compliance mapping indicates potential gaps, not definitive legal conclusions.",
-        "pt": "O mapeamento de conformidade indica lacunas potenciais, nao conclusoes juridicas definitivas."
-      }
-    },
-    {
-      "id": "legal_disclaimer_004",
-      "trigger": "litigation_context",
-      "severity": "warning",
-      "position": "inline",
-      "text": {
-        "en": "Litigation timelines and risk statements are informational; validate with docket/court counsel workflows.",
-        "pt": "Prazos e riscos de litigio sao informativos; valide com fluxos do processo e equipe juridica."
+        "en": "Deadline and termination guidance is informational and should be cross-checked against the original clause headings and date context.",
+        "pt": "Orientacao sobre prazo e rescisao tem fins informativos e deve ser checada com os cabecalhos originais de clausulas e contexto de datas."
       }
     }
   ]
