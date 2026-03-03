@@ -46,6 +46,7 @@ import {
   type DocumentIntelligenceDomain,
 } from "../banks/documentIntelligenceBanks.service";
 import type { RetrievalPlan } from "./retrievalPlanParser.service";
+import { RerankingService } from "../../retrieval/reranking.service";
 import { BankRuntimeCache } from "../cache/bankRuntimeCache.service";
 import {
   clamp01,
@@ -234,6 +235,7 @@ export interface CandidateChunk {
     recencyBoost?: number;
     documentIntelligenceBoost?: number;
     routingPriorityBoost?: number;
+    rerankScore?: number;
     penalties?: number;
     final?: number;
   };
@@ -519,6 +521,7 @@ export class RetrievalEngineService {
       | "getQueryRewriteRules"
       | "getSectionPriorityRules"
     > = getDocumentIntelligenceBanksInstance(),
+    private readonly reranker?: RerankingService,
   ) {}
 
   /**
@@ -978,6 +981,11 @@ export class RetrievalEngineService {
     ) as CandidateChunk[];
     candidates = this.applyRetrievalPlanHints(candidates, req.retrievalPlan);
     phaseCounts.afterBoosts = candidates.length;
+
+    // 8b) Rerank top candidates via cross-encoder if enabled
+    if (this.reranker) {
+      candidates = await this.reranker.rerank(queryNormalized, candidates);
+    }
 
     // 9) Rank candidates using ranker config (weights + normalization + tie-breakers)
     candidates = this.rankCandidates(
@@ -2986,6 +2994,7 @@ export class RetrievalEngineService {
       c.scores.routingPriorityBoost = routingPriorityBoost;
       const typeBoost = clamp01(c.scores.typeBoost ?? 0);
       const recencyBoost = clamp01(c.scores.recencyBoost ?? 0);
+      const rerankBoost = clamp01(c.scores.rerankScore ?? 0);
 
       const penalties = clamp01(c.scores.penalties ?? 0);
 
@@ -2997,6 +3006,7 @@ export class RetrievalEngineService {
         safeNumber(weights.documentIntelligenceBoost, 0.08) *
           documentIntelligenceBoost +
         safeNumber(weights.routingPriorityBoost, 0.04) * routingPriorityBoost +
+        safeNumber(weights.rerankScore, 0) * rerankBoost +
         weights.typeBoost * typeBoost +
         weights.recencyBoost * recencyBoost -
         penalties;

@@ -55,9 +55,10 @@
       }
     },
     "weights": {
-      "semantic": 0.46,
-      "lexical": 0.20,
-      "structural": 0.12,
+      "semantic": 0.36,
+      "lexical": 0.14,
+      "structural": 0.08,
+      "rerankScore": 0.20,
       "titleBoost": 0.06,
       "documentIntelligenceBoost": 0.08,
       "routingPriorityBoost": 0.04,

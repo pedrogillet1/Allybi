@@ -37,6 +37,7 @@ import {
   type MemoryPolicyRuntimeConfig,
 } from "../../../services/memory/memoryPolicyEngine.service";
 import { MemoryRedactionService } from "../../../services/memory/memoryRedaction.service";
+import { RerankingService } from "../../../services/retrieval/reranking.service";
 import { getBankLoaderInstance, getOptionalBank } from "../../domain/infra";
 import {
   RetrievalEngineService,
@@ -5376,6 +5377,9 @@ export class CentralizedChatRuntimeDelegate {
       dependencies.semanticIndex,
       dependencies.lexicalIndex,
       dependencies.structuralIndex,
+      undefined, // queryNormalizer
+      undefined, // documentIntelligenceBanks (use default)
+      new RerankingService(),
     );
     const semanticSignals = this.collectSemanticSignals(
       req.message,
