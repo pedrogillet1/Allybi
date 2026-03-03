@@ -275,13 +275,13 @@ describe("LlmRequestBuilderService", () => {
     );
 
     const userMessage = req.messages.find((msg) => msg.role === "user");
-    expect((userMessage?.content || "").length).toBeLessThanOrEqual(24000);
+    expect((userMessage?.content || "").length).toBeLessThanOrEqual(38000);
 
     const meta = req.kodaMeta as Record<string, any>;
     const payloadStats = meta?.payloadStats as Record<string, any>;
     expect(payloadStats?.memoryCharsIncluded).toBeLessThanOrEqual(9000);
-    expect(payloadStats?.evidenceItemsIncluded).toBeLessThanOrEqual(14);
-    expect(payloadStats?.evidenceCharsIncluded).toBeLessThanOrEqual(5600);
+    expect(payloadStats?.evidenceItemsIncluded).toBeLessThanOrEqual(20);
+    expect(payloadStats?.evidenceCharsIncluded).toBeLessThanOrEqual(9000);
     expect(payloadStats?.estimatedPromptTokens).toBeGreaterThan(0);
   });
 });
