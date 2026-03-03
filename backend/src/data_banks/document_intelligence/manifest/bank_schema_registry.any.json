@@ -190,6 +190,10 @@
       "schemaId": "document_intelligence_manifest_schema"
     },
     {
+      "bankId": "document_intelligence_implementation_report",
+      "schemaId": "document_intelligence_manifest_schema"
+    },
+    {
       "bankId": "document_intelligence_manifest_schema",
       "schemaId": "bank_schema"
     },

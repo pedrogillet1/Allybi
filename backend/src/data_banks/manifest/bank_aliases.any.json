@@ -1015,13 +1015,6 @@
     {
       "alias": "doc_aliases_accounting",
       "canonicalId": "doc_aliases_accounting",
-      "reason": "Canonical doc intelligence bank id (self-alias).",
-      "addedAt": "2026-02-28",
-      "expiresInDays": null
-    },
-    {
-      "alias": "doc_aliases_accounting",
-      "canonicalId": "doc_aliases_accounting",
       "reason": "Canonical document intelligence bank id (self-alias).",
       "addedAt": "2026-02-28",
       "expiresInDays": null
@@ -1052,13 +1045,6 @@
       "canonicalId": "doc_aliases_ops",
       "reason": "Canonical doc intelligence bank id (self-alias).",
       "addedAt": "2026-02-27",
-      "expiresInDays": null
-    },
-    {
-      "alias": "doc_archetypes_accounting",
-      "canonicalId": "doc_archetypes_accounting",
-      "reason": "Canonical doc intelligence bank id (self-alias).",
-      "addedAt": "2026-02-28",
       "expiresInDays": null
     },
     {
@@ -1106,13 +1092,6 @@
     {
       "alias": "doc.aliases.accounting",
       "canonicalId": "doc_aliases_accounting",
-      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
-      "addedAt": "2026-02-28",
-      "expiresInDays": null
-    },
-    {
-      "alias": "doc.aliases.accounting",
-      "canonicalId": "doc_aliases_accounting",
       "reason": "Dot-notation compatibility alias for document intelligence bank ids.",
       "addedAt": "2026-02-28",
       "expiresInDays": null
@@ -1143,13 +1122,6 @@
       "canonicalId": "doc_aliases_ops",
       "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
       "addedAt": "2026-02-27",
-      "expiresInDays": null
-    },
-    {
-      "alias": "doc.archetypes.accounting",
-      "canonicalId": "doc_archetypes_accounting",
-      "reason": "Dot-notation compatibility alias for doc intelligence bank ids.",
-      "addedAt": "2026-02-28",
       "expiresInDays": null
     },
     {

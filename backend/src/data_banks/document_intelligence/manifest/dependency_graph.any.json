@@ -168,6 +168,13 @@
       ]
     },
     {
+      "id": "document_intelligence_implementation_report",
+      "dependsOn": [
+        "document_intelligence_bank_map",
+        "document_intelligence_usage_manifest"
+      ]
+    },
+    {
       "id": "document_intelligence_orphan_allowlist",
       "dependsOn": [
         "document_intelligence_bank_map",
