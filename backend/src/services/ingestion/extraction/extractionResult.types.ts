@@ -68,6 +68,8 @@ export interface XlsxExtractionResult extends BaseExtractionResult {
     displayValue: string;
     period?: { year?: number; month?: number; quarter?: number };
     valueType?: "number" | "string" | "date" | "formula";
+    scaleFactor?: string;       // e.g. "thousands", "millions", "billions"
+    footnotes?: string[];       // e.g. ["(1) Restated", "(2) Unaudited"]
   }>;
   isFinancial?: boolean;
   allHeaders?: string[];
