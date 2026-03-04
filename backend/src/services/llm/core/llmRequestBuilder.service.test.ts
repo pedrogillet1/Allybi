@@ -573,4 +573,38 @@ describe("LlmRequestBuilderService", () => {
     expect(userContent).toContain("Region 1");
     expect(userContent).toContain("Region 6");
   });
+
+  test("annotates low-quality table scores in evidence", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              title: "Financial Report",
+              locationKey: "sheet:Revenue",
+              snippet: "table data",
+              evidenceType: "table" as const,
+              table: {
+                header: ["Metric", "Value"],
+                rows: [["Revenue", 1000]],
+                structureScore: 0.65,
+                numericIntegrityScore: 0.75,
+              },
+              score: { finalScore: 0.80 },
+              location: { sheet: "Revenue" },
+            },
+          ],
+        },
+      }),
+    );
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    expect(userContent).toContain("structureQuality: 65%");
+    expect(userContent).toContain("numericIntegrity: 75%");
+  });
 });

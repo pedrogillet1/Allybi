@@ -94,6 +94,8 @@ export interface EvidencePackLike {
       header?: string[];
       rows?: Array<Array<string | number | null>>;
       warnings?: string[];
+      structureScore?: number;
+      numericIntegrityScore?: number;
     } | null;
     score?: { finalScore?: number };
     evidenceType?: "text" | "table" | "image";
@@ -1091,6 +1093,12 @@ export class LlmRequestBuilderService {
             : tableText;
         if (e.table.warnings?.length) {
           clipped += ` [warnings: ${e.table.warnings.join(", ")}]`;
+        }
+        if (e.table.structureScore != null && e.table.structureScore < 0.8) {
+          clipped += ` [structureQuality: ${(e.table.structureScore * 100).toFixed(0)}%]`;
+        }
+        if (e.table.numericIntegrityScore != null && e.table.numericIntegrityScore < 0.9) {
+          clipped += ` [numericIntegrity: ${(e.table.numericIntegrityScore * 100).toFixed(0)}%]`;
         }
       } else {
         const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
