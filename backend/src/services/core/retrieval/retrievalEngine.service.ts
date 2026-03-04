@@ -3555,10 +3555,13 @@ export class RetrievalEngineService {
       }
     }
 
+    // Record post-extension truncPoint so sentence boundary never regresses past it
+    const extensionFloor = truncPoint;
+
     const sentenceBoundary = snippet.lastIndexOf(". ", truncPoint);
     const newlineBoundary = snippet.lastIndexOf("\n", truncPoint);
     const boundary = Math.max(sentenceBoundary, newlineBoundary);
-    if (boundary > effectiveMax * 0.5) {
+    if (boundary > effectiveMax * 0.5 && boundary >= extensionFloor) {
       truncPoint = boundary + 1;
     }
 
