@@ -607,4 +607,38 @@ describe("LlmRequestBuilderService", () => {
     expect(userContent).toContain("structureQuality: 65%");
     expect(userContent).toContain("numericIntegrity: 75%");
   });
+
+  test("emits evidence rendering telemetry in kodaMeta", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              title: "Report",
+              locationKey: "sheet:A",
+              snippet: "test evidence",
+              evidenceType: "table" as const,
+              table: { header: ["A"], rows: [["B"]] },
+              score: { finalScore: 0.80 },
+              location: { sheet: "A" },
+            },
+          ],
+          conflicts: [
+            { metric: "rev", docA: "d1", valueA: 100, docB: "d2", valueB: 200 },
+          ],
+        },
+      }),
+    );
+    const meta = req.kodaMeta as Record<string, any>;
+    expect(meta.evidenceRendering).toBeDefined();
+    expect(meta.evidenceRendering.tableItemsRendered).toBe(1);
+    expect(meta.evidenceRendering.conflictsInjected).toBe(1);
+    expect(meta.evidenceRendering.totalEvidenceItems).toBe(1);
+  });
 });

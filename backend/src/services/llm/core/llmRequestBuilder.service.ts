@@ -209,6 +209,8 @@ type EvidenceRenderResult = {
   text: string;
   charsIncluded: number;
   itemsIncluded: number;
+  tableItemsRendered: number;
+  tableQualityAnnotations: number;
 };
 
 type BuilderEvidenceCaps = {
@@ -655,6 +657,7 @@ export class LlmRequestBuilderService {
         },
         provenanceSchemaVersion: "v1",
         evidenceMap: this.buildEvidenceMapMetadata(input.evidencePack),
+        evidenceRendering: userPayload.evidenceRendering,
       },
     };
   }
@@ -886,8 +889,14 @@ export class LlmRequestBuilderService {
     input: BuildRequestInput,
     disambiguationSignal: DisambiguationPayload | null,
     policy: BuilderRuntimePolicy,
-  ): { content: string; stats: BuilderPayloadStats } {
+  ): { content: string; stats: BuilderPayloadStats; evidenceRendering?: Record<string, number> } {
     const parts: string[] = [];
+    const evidenceRenderingTelemetry: Record<string, number> = {
+      tableItemsRendered: 0,
+      tableQualityAnnotations: 0,
+      conflictsInjected: 0,
+      totalEvidenceItems: 0,
+    };
     const stats: BuilderPayloadStats = {
       memoryCharsIncluded: 0,
       evidenceCharsIncluded: 0,
@@ -934,6 +943,9 @@ export class LlmRequestBuilderService {
         stats.evidenceCharsIncluded = evidenceBlock.charsIncluded;
         stats.evidenceItemsIncluded = evidenceBlock.itemsIncluded;
       }
+      evidenceRenderingTelemetry.tableItemsRendered = evidenceBlock.tableItemsRendered;
+      evidenceRenderingTelemetry.tableQualityAnnotations = evidenceBlock.tableQualityAnnotations;
+      evidenceRenderingTelemetry.totalEvidenceItems = input.evidencePack.evidence.length;
     }
 
     // Cross-doc conflict warnings (from retrieval engine detection)
@@ -941,6 +953,7 @@ export class LlmRequestBuilderService {
       input.evidencePack?.conflicts?.length
     ) {
       const conflicts = input.evidencePack.conflicts.slice(0, 5);
+      evidenceRenderingTelemetry.conflictsInjected = conflicts.length;
       const conflictBlock = [
         "### Data Conflicts Detected",
         "The following metrics differ across documents. Flag uncertainty explicitly in your answer:",
@@ -1019,7 +1032,7 @@ export class LlmRequestBuilderService {
       .slice(0, policy.payloadCaps.totalUserPayloadCharsMax);
     stats.totalUserPayloadChars = content.length;
     stats.estimatedUserPayloadTokens = estimateTokensFromChars(content.length);
-    return { content, stats };
+    return { content, stats, evidenceRendering: evidenceRenderingTelemetry };
   }
 
   private renderEvidenceForPrompt(
@@ -1059,6 +1072,8 @@ export class LlmRequestBuilderService {
     lines.push(header);
     let sectionChars = header.length;
     let itemsIncluded = 0;
+    let tableItemsRendered = 0;
+    let tableQualityAnnotations = 0;
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const locParts: string[] = [];
@@ -1091,14 +1106,17 @@ export class LlmRequestBuilderService {
           tableText.length > maxSnippetChars
             ? tableText.slice(0, maxSnippetChars - 1) + "…"
             : tableText;
+        tableItemsRendered++;
         if (e.table.warnings?.length) {
           clipped += ` [warnings: ${e.table.warnings.join(", ")}]`;
         }
         if (e.table.structureScore != null && e.table.structureScore < 0.8) {
           clipped += ` [structureQuality: ${(e.table.structureScore * 100).toFixed(0)}%]`;
+          tableQualityAnnotations++;
         }
         if (e.table.numericIntegrityScore != null && e.table.numericIntegrityScore < 0.9) {
           clipped += ` [numericIntegrity: ${(e.table.numericIntegrityScore * 100).toFixed(0)}%]`;
+          tableQualityAnnotations++;
         }
       } else {
         const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
@@ -1135,6 +1153,8 @@ export class LlmRequestBuilderService {
       text,
       charsIncluded: text.length,
       itemsIncluded,
+      tableItemsRendered,
+      tableQualityAnnotations,
     };
   }
 

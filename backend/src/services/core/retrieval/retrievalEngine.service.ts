@@ -3997,12 +3997,14 @@ export class RetrievalEngineService {
         docLevelScores: Object.fromEntries(docScores),
       },
       evidence,
-      conflicts: this.detectEvidenceConflicts(evidence),
+      conflicts: [],
       debug: {
         phases: [],
         reasonCodes: [],
       },
     };
+
+    pack.conflicts = this.detectEvidenceConflicts(evidence);
 
     return pack;
   }
