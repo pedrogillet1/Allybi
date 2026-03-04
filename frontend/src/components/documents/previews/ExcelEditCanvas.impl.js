@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import api from '../../../services/api';
 import { applyEdit, extractVerifiedApply, isNoopResult, undoEdit } from '../../../services/editingService';
 import cleanDocumentName from '../../../utils/cleanDocumentName';
@@ -160,6 +161,448 @@ function worksheetColToPreviewColIdx(columnIndexZeroBased) {
   if (!Number.isFinite(n)) return 1;
   // Preview grid colIdx 0 is row header; worksheet col A(0) maps to colIdx 1.
   return Math.max(1, Math.trunc(n) + 1);
+}
+
+const COL_WIDTH = 100;
+const ROW_HEIGHT = 24;
+const ROW_HEADER_WIDTH = 48;
+const HEADER_HEIGHT = 24;
+
+function VirtualizedGrid({
+  current,
+  scale,
+  tableContainerRef,
+  selected,
+  selectedRange,
+  lockedCells,
+  dragRect,
+  pendingState,
+  flashRect,
+  appliedHighlightRects,
+  cellA1At,
+  currentSheetName,
+  draftFormatOverrides,
+  draftCellOverrides,
+  tableRangesForActiveSheet,
+  tablePaletteByStyle,
+  normalizeHex,
+  formatNumericLike,
+  setUserHasSelected,
+  setLockedCells,
+  setSelected,
+  setSelectedRange,
+  isDraggingRef,
+  setDragAnchor,
+  setDragEnd,
+  t,
+}) {
+  const scrollRef = React.useRef(null);
+
+  if (!current || !current.rows?.length) {
+    return (
+      <div className="excel-preview-grid-wrapper">
+        <div className="excel-preview-empty-sheet">
+          {t('excelPreview.emptySheet')}
+        </div>
+      </div>
+    );
+  }
+
+  const totalRows = Math.max(current.rows.length - 1, 100);
+  const totalCols = Math.max(current.colCount || current.rows[0]?.length || 1, 26) - 1; // exclude row-header col
+
+  return (
+    <VirtualizedGridInner
+      scrollRef={scrollRef}
+      tableContainerRef={tableContainerRef}
+      current={current}
+      scale={scale}
+      totalRows={totalRows}
+      totalCols={totalCols}
+      selected={selected}
+      selectedRange={selectedRange}
+      lockedCells={lockedCells}
+      dragRect={dragRect}
+      pendingState={pendingState}
+      flashRect={flashRect}
+      appliedHighlightRects={appliedHighlightRects}
+      cellA1At={cellA1At}
+      currentSheetName={currentSheetName}
+      draftFormatOverrides={draftFormatOverrides}
+      draftCellOverrides={draftCellOverrides}
+      tableRangesForActiveSheet={tableRangesForActiveSheet}
+      tablePaletteByStyle={tablePaletteByStyle}
+      normalizeHex={normalizeHex}
+      formatNumericLike={formatNumericLike}
+      setUserHasSelected={setUserHasSelected}
+      setLockedCells={setLockedCells}
+      setSelected={setSelected}
+      setSelectedRange={setSelectedRange}
+      isDraggingRef={isDraggingRef}
+      setDragAnchor={setDragAnchor}
+      setDragEnd={setDragEnd}
+    />
+  );
+}
+
+function VirtualizedGridInner({
+  scrollRef,
+  tableContainerRef,
+  current,
+  scale,
+  totalRows,
+  totalCols,
+  selected,
+  selectedRange,
+  lockedCells,
+  dragRect,
+  pendingState,
+  flashRect,
+  appliedHighlightRects,
+  cellA1At,
+  currentSheetName,
+  draftFormatOverrides,
+  draftCellOverrides,
+  tableRangesForActiveSheet,
+  tablePaletteByStyle,
+  normalizeHex,
+  formatNumericLike,
+  setUserHasSelected,
+  setLockedCells,
+  setSelected,
+  setSelectedRange,
+  isDraggingRef,
+  setDragAnchor,
+  setDragEnd,
+}) {
+  const rowVirtualizer = useVirtualizer({
+    count: totalRows,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 10,
+  });
+
+  // No column virtualization — render all columns (typically 14-30, trivial).
+  // This avoids measurement issues with the scroll element.
+  const allCols = React.useMemo(() => {
+    const cols = [];
+    for (let i = 0; i < totalCols; i++) {
+      cols.push({ index: i, start: i * COL_WIDTH, size: COL_WIDTH });
+    }
+    return cols;
+  }, [totalCols]);
+
+  const virtualRows = rowVirtualizer.getVirtualItems();
+
+  const totalWidth = totalCols * COL_WIDTH + ROW_HEADER_WIDTH;
+  const totalHeight = rowVirtualizer.getTotalSize() + HEADER_HEIGHT;
+
+  return (
+    <div
+      ref={scrollRef}
+      className="excel-preview-grid-wrapper"
+      role="grid"
+      aria-label="Spreadsheet grid"
+      tabIndex={0}
+      style={{
+        flex: 1,
+        minHeight: 0,
+        overflow: 'auto',
+      }}
+    >
+      <div
+        ref={tableContainerRef}
+        style={{
+          height: totalHeight * scale,
+          width: totalWidth * scale,
+          position: 'relative',
+          transform: scale !== 1 ? `scale(${scale})` : undefined,
+          transformOrigin: 'top left',
+        }}
+      >
+        {/* Corner cell */}
+        <div
+          role="columnheader"
+          style={{
+            position: 'sticky',
+            top: 0,
+            left: 0,
+            zIndex: 30,
+            width: ROW_HEADER_WIDTH,
+            height: HEADER_HEIGHT,
+            background: '#E0E0E0',
+            borderBottom: '1px solid #A0A0A0',
+            borderRight: '1px solid #A0A0A0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 12,
+            fontWeight: 600,
+            color: '#555',
+            boxSizing: 'border-box',
+          }}
+        />
+
+        {/* Column headers (A, B, C...) — all rendered */}
+        {allCols.map((col) => {
+          const colIdx = col.index + 1;
+          const headerCell = current.rows?.[0]?.[colIdx];
+          const label = headerCell?.value || indexToColLetter(col.index);
+          return (
+            <div
+              key={`ch-${col.index}`}
+              role="columnheader"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: col.start + ROW_HEADER_WIDTH,
+                width: col.size,
+                height: HEADER_HEIGHT,
+                background: '#F8F9FA',
+                borderBottom: '1px solid #A0A0A0',
+                borderRight: '1px solid #C0C0C0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#222',
+                zIndex: 20,
+                boxSizing: 'border-box',
+                userSelect: 'none',
+              }}
+            >
+              {label}
+            </div>
+          );
+        })}
+
+        {/* Row headers + Data cells (rows virtualized, columns all rendered) */}
+        {virtualRows.map((vr) => {
+          const rowIdx = vr.index + 1;
+          const rowData = current.rows?.[rowIdx] || [];
+          const rowHeaderCell = rowData?.[0];
+          const rowLabel = rowHeaderCell?.value ?? (vr.index + 1);
+
+          return (
+            <React.Fragment key={`r-${vr.index}`}>
+              {/* Row header */}
+              <div
+                role="rowheader"
+                style={{
+                  position: 'absolute',
+                  top: vr.start + HEADER_HEIGHT,
+                  left: 0,
+                  width: ROW_HEADER_WIDTH,
+                  height: vr.size,
+                  background: '#F8F9FA',
+                  borderRight: '1px solid #A0A0A0',
+                  borderBottom: '1px solid #C8C8C8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#333',
+                  zIndex: 10,
+                  boxSizing: 'border-box',
+                  userSelect: 'none',
+                }}
+              >
+                {rowLabel}
+              </div>
+
+              {/* Data cells for this row — all columns */}
+              {allCols.map((col) => {
+                const colIdx = col.index + 1;
+                const cell = rowData?.[colIdx] || { value: '', className: '' };
+                const isSelected = selected?.rowIdx === rowIdx && selected?.colIdx === colIdx;
+                const cellLockKey = `${rowIdx}:${colIdx}`;
+                const isLocked = lockedCells.has(cellLockKey);
+                const inDrag = Boolean(dragRect) && rowIdx >= dragRect.r1 && rowIdx <= dragRect.r2 && colIdx >= dragRect.c1 && colIdx <= dragRect.c2;
+                const inPendingRange = Boolean(pendingState?.rect) &&
+                  rowIdx >= pendingState.rect.r1 && rowIdx <= pendingState.rect.r2 &&
+                  colIdx >= pendingState.rect.c1 && colIdx <= pendingState.rect.c2;
+                const pendingEdges = pendingState?.rect ? {
+                  top: inPendingRange && rowIdx === pendingState.rect.r1,
+                  bottom: inPendingRange && rowIdx === pendingState.rect.r2,
+                  left: inPendingRange && colIdx === pendingState.rect.c1,
+                  right: inPendingRange && colIdx === pendingState.rect.c2,
+                } : { top: false, bottom: false, left: false, right: false };
+                const isFlashing = Boolean(flashRect) &&
+                  rowIdx >= flashRect.r1 && rowIdx <= flashRect.r2 &&
+                  colIdx >= flashRect.c1 && colIdx <= flashRect.c2;
+                const isAppliedHighlighted = Array.isArray(appliedHighlightRects) && appliedHighlightRects.some((rect) =>
+                  rect &&
+                  rowIdx >= Number(rect.r1) &&
+                  rowIdx <= Number(rect.r2) &&
+                  colIdx >= Number(rect.c1) &&
+                  colIdx <= Number(rect.c2)
+                );
+
+                const a1Here = cellA1At(rowIdx, colIdx);
+                const keyHere = a1Here ? `${currentSheetName}!${a1Here}` : '';
+                const hasPendingOverride = Boolean(keyHere && pendingState?.overrides?.[keyHere]);
+                const fmtOvr = keyHere ? draftFormatOverrides?.[keyHere] : null;
+                const showPendingCorner = pendingState?.rect
+                  ? (inPendingRange && rowIdx === pendingState.rect.r1 && colIdx === pendingState.rect.c1)
+                  : hasPendingOverride;
+                const parsedCol = colLetterToIndex(String(a1Here || '').replace(/[0-9]/g, ''));
+                const parsedRow = Number(String(a1Here || '').replace(/[^0-9]/g, ''));
+                const tableMatch = tableRangesForActiveSheet.find((tt) => {
+                  if (parsedCol == null || !Number.isFinite(parsedRow)) return false;
+                  return parsedCol >= tt.c1 && parsedCol <= tt.c2 && parsedRow >= tt.r1 && parsedRow <= tt.r2;
+                }) || null;
+                const inAnyTableRange = Boolean(tableMatch);
+                const isTableHeaderCell = Boolean(
+                  tableMatch && tableMatch.hasHeader !== false && Number.isFinite(parsedRow) && parsedRow === tableMatch.r1,
+                );
+                const isTableTotalsCell = Boolean(
+                  tableMatch && Number.isFinite(parsedRow) && parsedRow === tableMatch.r2,
+                );
+                const tablePalette = tablePaletteByStyle[String(tableMatch?.style || 'light_gray')] || tablePaletteByStyle.light_gray;
+                const tableHeaderBg = normalizeHex(tableMatch?.colors?.header) || tablePalette.header;
+                const tableStripeBg = normalizeHex(tableMatch?.colors?.stripe) || tablePalette.stripe;
+                const tableTotalsBg = normalizeHex(tableMatch?.colors?.totals) || null;
+                const tableBodyBg = tablePalette.base;
+                const tableCellBg = (() => {
+                  if (!tableMatch) return null;
+                  if (isTableHeaderCell) return tableHeaderBg;
+                  if (isTableTotalsCell && tableTotalsBg) return tableTotalsBg;
+                  if (Number.isFinite(parsedRow) && parsedRow % 2 === 0) return tableStripeBg;
+                  return tableBodyBg;
+                })();
+
+                const cellBoxShadow = (() => {
+                  const shadows = [];
+                  if (isSelected) shadows.push('inset 0 0 0 2px #2563EB');
+                  if (isAppliedHighlighted) shadows.push('inset 0 0 0 2px rgba(217, 119, 6, 0.85)');
+                  if (pendingEdges.top) shadows.push('inset 0 2px 0 0 #16A34A');
+                  if (pendingEdges.bottom) shadows.push('inset 0 -2px 0 0 #16A34A');
+                  if (pendingEdges.left) shadows.push('inset 2px 0 0 0 #16A34A');
+                  if (pendingEdges.right) shadows.push('inset -2px 0 0 0 #16A34A');
+                  if (isTableHeaderCell) shadows.push('inset 0 -1px 0 0 rgba(17,24,39,0.25)');
+                  return shadows.length ? shadows.join(',') : undefined;
+                })();
+
+                const inRange = Boolean(selectedRange) && (() => {
+                  const s = selectedRange?.start;
+                  const e = selectedRange?.end;
+                  if (!s || !e) return false;
+                  const r1 = Math.min(s.rowIdx, e.rowIdx);
+                  const r2 = Math.max(s.rowIdx, e.rowIdx);
+                  const c1 = Math.min(s.colIdx, e.colIdx);
+                  const c2 = Math.max(s.colIdx, e.colIdx);
+                  return rowIdx >= r1 && rowIdx <= r2 && colIdx >= c1 && colIdx <= c2;
+                })();
+
+                const bgColor = isFlashing
+                  ? 'rgba(245, 158, 11, 0.34)'
+                  : isAppliedHighlighted
+                    ? 'rgba(254, 243, 199, 0.82)'
+                  : isLocked
+                    ? '#E5E7EB'
+                  : inDrag
+                    ? 'rgba(17, 24, 39, 0.10)'
+                    : isTableHeaderCell
+                      ? tableCellBg
+                      : inAnyTableRange
+                        ? tableCellBg
+                    : (inPendingRange || hasPendingOverride)
+                      ? 'rgba(253, 230, 138, 0.35)'
+                      : isSelected
+                        ? 'rgba(37, 99, 235, 0.08)'
+                        : inRange
+                          ? 'rgba(37, 99, 235, 0.06)'
+                          : 'white';
+
+                return (
+                  <div
+                    key={`c-${vr.index}-${col.index}`}
+                    role="gridcell"
+                    aria-selected={isSelected || undefined}
+                    aria-label={isSelected && a1Here ? `Cell ${a1Here}` : undefined}
+                    data-row-idx={rowIdx}
+                    data-col-idx={colIdx}
+                    className={`${showPendingCorner ? 'excel-cell-pending' : ''}${isFlashing ? ' excel-cell-applied-flash' : ''}`}
+                    onMouseDown={(e) => {
+                      if (e.button !== 0) return;
+                      e.preventDefault();
+                      setUserHasSelected(true);
+                      setLockedCells(new Set());
+                      setSelected({ rowIdx, colIdx });
+                      setSelectedRange(null);
+                      isDraggingRef.current = true;
+                      setDragAnchor({ rowIdx, colIdx });
+                      setDragEnd({ rowIdx, colIdx });
+                    }}
+                    onMouseEnter={() => {
+                      if (isDraggingRef.current) {
+                        setDragEnd({ rowIdx, colIdx });
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: vr.start + HEADER_HEIGHT,
+                      left: col.start + ROW_HEADER_WIDTH,
+                      width: col.size,
+                      height: vr.size,
+                      boxSizing: 'border-box',
+                      padding: '4px 8px',
+                      borderRight: '1px solid #C8C8C8',
+                      borderBottom: '1px solid #C8C8C8',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      fontSize: Number.isFinite(Number(fmtOvr?.fontSizePt)) ? `${Number(fmtOvr.fontSizePt)}pt` : 13,
+                      lineHeight: `${vr.size - 8}px`,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      background: bgColor,
+                      boxShadow: cellBoxShadow,
+                      fontWeight: typeof fmtOvr?.bold === 'boolean' ? (fmtOvr.bold ? 700 : 400) : undefined,
+                      fontStyle: typeof fmtOvr?.italic === 'boolean' ? (fmtOvr.italic ? 'italic' : 'normal') : undefined,
+                      textDecoration: typeof fmtOvr?.underline === 'boolean' ? (fmtOvr.underline ? 'underline' : 'none') : undefined,
+                      color: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(fmtOvr?.color || '').trim()) ? String(fmtOvr.color).trim() : '#1a1a1a',
+                      fontFamily: /^[A-Za-z0-9 ,\-]{2,60}$/.test(String(fmtOvr?.fontFamily || '').trim())
+                        ? String(fmtOvr.fontFamily).trim()
+                        : undefined,
+                    }}
+                    title={isLocked ? 'Locked' : undefined}
+                  >
+                    {(() => {
+                      const pending = keyHere ? pendingState?.overrides?.[keyHere] : null;
+                      const ovr = keyHere ? draftCellOverrides?.[keyHere] : null;
+                      if (pending) return formatNumericLike(String(pending.value ?? ''), colIdx);
+                      if (!ovr) return formatNumericLike(cell.value, colIdx);
+                      const isFormula = String(ovr.kind || '') === 'formula';
+                      const display = isFormula ? String(ovr.value || '') : formatNumericLike(String(ovr.value || ''), colIdx);
+                      return (
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontWeight: 800,
+                            color: isFormula ? '#1D4ED8' : '#111827',
+                          }}
+                          title={display}
+                        >
+                          {display}
+                        </span>
+                      );
+                    })()}
+                  </div>
+                );
+              })}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
@@ -1382,10 +1825,51 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
 
   useEffect(() => {
     const onKeyDown = (e) => {
-      if (e.key !== 'Escape') return;
       const tag = String(e.target?.tagName || '').toLowerCase();
-      if (tag === 'input' || tag === 'textarea') return;
-      clearSelection();
+      const inInput = tag === 'input' || tag === 'textarea';
+
+      if (e.key === 'Escape') {
+        if (inInput) return;
+        clearSelection();
+        return;
+      }
+
+      // Arrow key, Tab, Enter, F2 navigation — only when not in an input
+      if (inInput) return;
+      const sel = selectedRef.current;
+      if (!sel) return;
+      const cur = currentRef.current;
+      if (!cur) return;
+      const maxRow = (cur.rows?.length || 1) - 1;
+      const maxCol = (cur.rows?.[0]?.length || 1) - 1;
+
+      const move = (dr, dc) => {
+        const nextRow = Math.max(1, Math.min(maxRow, sel.rowIdx + dr));
+        const nextCol = Math.max(1, Math.min(maxCol, sel.colIdx + dc));
+        if (nextRow === sel.rowIdx && nextCol === sel.colIdx) return;
+        e.preventDefault();
+        setSelected({ rowIdx: nextRow, colIdx: nextCol });
+        setSelectedRange(null);
+        setUserHasSelected(true);
+        setLockedCells(new Set());
+      };
+
+      switch (e.key) {
+        case 'ArrowUp': move(-1, 0); break;
+        case 'ArrowDown': move(1, 0); break;
+        case 'ArrowLeft': move(0, -1); break;
+        case 'ArrowRight': move(0, 1); break;
+        case 'Tab':
+          if (e.shiftKey) move(0, -1);
+          else move(0, 1);
+          break;
+        case 'Enter':
+          if (e.shiftKey) move(-1, 0);
+          else move(1, 0);
+          break;
+        default:
+          break;
+      }
     };
     window.addEventListener('keydown', onKeyDown, true);
     return () => window.removeEventListener('keydown', onKeyDown, true);
@@ -2894,304 +3378,35 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         />
       ) : null}
 
-      {/* Spreadsheet Grid */}
-      <div className="excel-preview-grid-wrapper">
-        <div
-          className="excel-preview-grid-scaler"
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
-            width: scale !== 1 ? `${100 / scale}%` : '100%',
-          }}
-        >
-          {current && current.rows?.length > 0 ? (
-            <div
-              className="excel-preview-table-container"
-              ref={tableContainerRef}
-              style={{ position: 'relative' }}
-            >
-              {/* Charts are rendered in chat cards (expandable), not over the sheet grid. */}
-              <table className="excel-preview-table">
-                <thead>
-                  <tr>
-                    {current.rows[0].map((cell, colIdx) => (
-                      <th
-                        key={colIdx}
-                        className={`excel-cell excel-header-cell ${colIdx === 0 ? 'excel-corner-cell' : ''}`}
-                        onMouseDown={(e) => {
-                          if (colIdx === 0) return;
-                          if (e.button !== 0) return;
-                          e.preventDefault();
-                          isDraggingRef.current = false;
-                          applySelectionRect(
-                            { rowIdx: 1, colIdx },
-                            { rowIdx: gridBounds.maxRowIdx, colIdx },
-                            { inlineEdit: false },
-                          );
-                        }}
-                        title={colIdx === 0 ? '' : 'Select column'}
-                      >
-                        {cell.value}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {current.rows.slice(1).map((row, rowIdx0) => {
-                    const rowIdx = rowIdx0 + 1; // align with parsed grid indices
-                    return (
-                      <tr key={rowIdx0}>
-                        {row.map((cell, colIdx) => {
-                          if (colIdx === 0) {
-                            return (
-                              <th
-                                key={colIdx}
-                                className="excel-cell excel-row-header"
-                                onMouseDown={(e) => {
-                                  if (e.button !== 0) return;
-                                  e.preventDefault();
-                                  isDraggingRef.current = false;
-                                  applySelectionRect(
-                                    { rowIdx, colIdx: 1 },
-                                    { rowIdx, colIdx: gridBounds.maxColIdx },
-                                    { inlineEdit: false },
-                                  );
-                                }}
-                                title="Select row"
-                              >
-                                {cell.value}
-                              </th>
-                            );
-                          }
-                          const isSelected = selected?.rowIdx === rowIdx && selected?.colIdx === colIdx;
-                          const cellLockKey = `${rowIdx}:${colIdx}`;
-                          const isLocked = lockedCells.has(cellLockKey);
-                          const inDrag = Boolean(dragRect) && rowIdx >= dragRect.r1 && rowIdx <= dragRect.r2 && colIdx >= dragRect.c1 && colIdx <= dragRect.c2;
-                          const inPendingRange = Boolean(pendingState?.rect) &&
-                            rowIdx >= pendingState.rect.r1 && rowIdx <= pendingState.rect.r2 &&
-                            colIdx >= pendingState.rect.c1 && colIdx <= pendingState.rect.c2;
-                          const pendingEdges = pendingState?.rect ? {
-                            top: inPendingRange && rowIdx === pendingState.rect.r1,
-                            bottom: inPendingRange && rowIdx === pendingState.rect.r2,
-                            left: inPendingRange && colIdx === pendingState.rect.c1,
-                            right: inPendingRange && colIdx === pendingState.rect.c2,
-                          } : { top: false, bottom: false, left: false, right: false };
-                          const isFlashing = Boolean(flashRect) &&
-                            rowIdx >= flashRect.r1 && rowIdx <= flashRect.r2 &&
-                            colIdx >= flashRect.c1 && colIdx <= flashRect.c2;
-                          const isAppliedHighlighted = Array.isArray(appliedHighlightRects) && appliedHighlightRects.some((rect) =>
-                            rect &&
-                            rowIdx >= Number(rect.r1) &&
-                            rowIdx <= Number(rect.r2) &&
-                            colIdx >= Number(rect.c1) &&
-                            colIdx <= Number(rect.c2)
-                          );
-
-                          const a1Here = cellA1At(rowIdx, colIdx);
-                          const keyHere = a1Here ? `${currentSheetName}!${a1Here}` : '';
-                          const hasPendingOverride = Boolean(keyHere && pendingState?.overrides?.[keyHere]);
-                          const fmtOvr = keyHere ? draftFormatOverrides?.[keyHere] : null;
-                          const showPendingCorner = pendingState?.rect
-                            ? (inPendingRange && rowIdx === pendingState.rect.r1 && colIdx === pendingState.rect.c1)
-                            : hasPendingOverride;
-                          const parsedCol = colLetterToIndex(String(a1Here || '').replace(/[0-9]/g, ''));
-                          const parsedRow = Number(String(a1Here || '').replace(/[^0-9]/g, ''));
-                          const tableMatch = tableRangesForActiveSheet.find((t) => {
-                            if (parsedCol == null || !Number.isFinite(parsedRow)) return false;
-                            return parsedCol >= t.c1 && parsedCol <= t.c2 && parsedRow >= t.r1 && parsedRow <= t.r2;
-                          }) || null;
-                          const inAnyTableRange = Boolean(tableMatch);
-                          const isTableHeaderCell = Boolean(
-                            tableMatch &&
-                            tableMatch.hasHeader !== false &&
-                            Number.isFinite(parsedRow) &&
-                            parsedRow === tableMatch.r1,
-                          );
-                          const isTableTotalsCell = Boolean(
-                            tableMatch &&
-                            Number.isFinite(parsedRow) &&
-                            parsedRow === tableMatch.r2,
-                          );
-                          const tablePalette = tablePaletteByStyle[String(tableMatch?.style || 'light_gray')] || tablePaletteByStyle.light_gray;
-                          const tableHeaderBg = normalizeHex(tableMatch?.colors?.header) || tablePalette.header;
-                          const tableStripeBg = normalizeHex(tableMatch?.colors?.stripe) || tablePalette.stripe;
-                          const tableTotalsBg = normalizeHex(tableMatch?.colors?.totals) || null;
-                          const tableBodyBg = tablePalette.base;
-                          const tableCellBg = (() => {
-                            if (!tableMatch) return null;
-                            if (isTableHeaderCell) return tableHeaderBg;
-                            if (isTableTotalsCell && tableTotalsBg) return tableTotalsBg;
-                            if (Number.isFinite(parsedRow) && parsedRow % 2 === 0) return tableStripeBg;
-                            return tableBodyBg;
-                          })();
-
-                          const cellBoxShadow = (() => {
-                            const shadows = [];
-                            if (isAppliedHighlighted) shadows.push('inset 0 0 0 2px rgba(217, 119, 6, 0.85)');
-                            if (pendingEdges.top) shadows.push('inset 0 2px 0 0 #16A34A');
-                            if (pendingEdges.bottom) shadows.push('inset 0 -2px 0 0 #16A34A');
-                            if (pendingEdges.left) shadows.push('inset 2px 0 0 0 #16A34A');
-                            if (pendingEdges.right) shadows.push('inset -2px 0 0 0 #16A34A');
-                            if (isTableHeaderCell) shadows.push('inset 0 -1px 0 0 rgba(17,24,39,0.25)');
-                            return shadows.length ? shadows.join(',') : undefined;
-                          })();
-                          const inRange = Boolean(selectedRange) && (() => {
-                            const s = selectedRange?.start;
-                            const e = selectedRange?.end;
-                            if (!s || !e) return false;
-                            const r1 = Math.min(s.rowIdx, e.rowIdx);
-                            const r2 = Math.max(s.rowIdx, e.rowIdx);
-                            const c1 = Math.min(s.colIdx, e.colIdx);
-                            const c2 = Math.max(s.colIdx, e.colIdx);
-                            return rowIdx >= r1 && rowIdx <= r2 && colIdx >= c1 && colIdx <= c2;
-                          })();
-                          return (
-                            <td
-                              key={colIdx}
-                              className={`excel-cell ${cell.className || ''}${isLocked ? ' excel-cell-locked' : ''}${inDrag ? ' excel-cell-drag-preview' : ''}${showPendingCorner ? ' excel-cell-pending' : ''}${isAppliedHighlighted ? ' excel-cell-applied-range' : ''}${isFlashing ? ' excel-cell-applied-flash' : ''}${inAnyTableRange ? ' excel-cell-table' : ''}${isTableHeaderCell ? ' excel-cell-table-header' : ''}`}
-                              data-row-idx={rowIdx}
-                              data-col-idx={colIdx}
-                              onMouseDown={(e) => {
-                                if (e.button !== 0) return; // left-click only
-                                e.preventDefault(); // prevent text selection during drag
-                                if (e.shiftKey && selectedRef.current) {
-                                  isDraggingRef.current = false;
-                                  applySelectionRect(
-                                    selectedRef.current,
-                                    { rowIdx, colIdx },
-                                    { inlineEdit: false },
-                                  );
-                                  return;
-                                }
-                                setIsInlineEditing(false);
-                                setUserHasSelected(true);
-                                setLockedCells(new Set([`${rowIdx}:${colIdx}`]));
-                                setSelected({ rowIdx, colIdx });
-                                setSelectedRange(null);
-                                isDraggingRef.current = true;
-                                setDragAnchor({ rowIdx, colIdx });
-                                setDragEnd({ rowIdx, colIdx });
-                              }}
-                              onDoubleClick={(e) => {
-                                if (e.button !== 0) return;
-                                e.preventDefault();
-                                setIsInlineEditing(true);
-                              }}
-                              onMouseEnter={() => {
-                                if (isDraggingRef.current) {
-                                  setDragEnd({ rowIdx, colIdx });
-                                }
-                              }}
-                              style={{
-                                cursor: 'pointer',
-                                userSelect: 'none',
-                                boxShadow: cellBoxShadow,
-                                fontWeight: typeof fmtOvr?.bold === 'boolean' ? (fmtOvr.bold ? 700 : 400) : undefined,
-                                fontStyle: typeof fmtOvr?.italic === 'boolean' ? (fmtOvr.italic ? 'italic' : 'normal') : undefined,
-                                textDecoration: typeof fmtOvr?.underline === 'boolean' ? (fmtOvr.underline ? 'underline' : 'none') : undefined,
-                                color: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(fmtOvr?.color || '').trim()) ? String(fmtOvr.color).trim() : undefined,
-                                fontSize: Number.isFinite(Number(fmtOvr?.fontSizePt)) ? `${Number(fmtOvr.fontSizePt)}pt` : undefined,
-                                fontFamily: /^[A-Za-z0-9 ,\-]{2,60}$/.test(String(fmtOvr?.fontFamily || '').trim())
-                                  ? String(fmtOvr.fontFamily).trim()
-                                  : undefined,
-                                background: isFlashing
-                                  ? 'rgba(245, 158, 11, 0.34)'
-                                  : isAppliedHighlighted
-                                    ? 'rgba(254, 243, 199, 0.82)'
-                                  : isLocked
-                                    ? '#E5E7EB'
-                                  : inDrag
-                                    ? 'rgba(17, 24, 39, 0.10)'
-                                    : isTableHeaderCell
-                                      ? tableCellBg
-                                      : inAnyTableRange
-                                        ? tableCellBg
-                                    : (inPendingRange || hasPendingOverride)
-                                      ? 'rgba(253, 230, 138, 0.35)'
-                                      : isSelected
-                                        ? 'rgba(17, 24, 39, 0.06)'
-                                        : inRange
-                                          ? 'rgba(17, 24, 39, 0.035)'
-                                          : undefined,
-                              }}
-                              title={isLocked ? 'Locked' : 'Click to edit. Drag to select.'}
-                            >
-                              {(() => {
-                                const pending = keyHere ? pendingState?.overrides?.[keyHere] : null;
-                                const ovr = keyHere ? draftCellOverrides?.[keyHere] : null;
-                                if (isSelected && isInlineEditing && !isApplying) {
-                                  return (
-                                    <input
-                                      ref={inlineEditorRef}
-                                      className="excel-inline-editor"
-                                      value={effectiveDraftValue}
-                                      onMouseDown={(evt) => evt.stopPropagation()}
-                                      onChange={(evt) => {
-                                        const nextValue = evt.target.value;
-                                        if (controlledDraftValue != null) onDraftValueChange?.(nextValue);
-                                        else setDraftValue(nextValue);
-                                      }}
-                                      onBlur={() => setIsInlineEditing(false)}
-                                      onKeyDown={(evt) => {
-                                        if (evt.key === 'Escape') {
-                                          evt.preventDefault();
-                                          setIsInlineEditing(false);
-                                          revert();
-                                          return;
-                                        }
-                                        if (evt.key !== 'Enter' && evt.key !== 'Tab') return;
-                                        evt.preventDefault();
-                                        if (isApplying) return;
-                                        const deltaRow = evt.key === 'Enter' ? (evt.shiftKey ? -1 : 1) : 0;
-                                        const deltaCol = evt.key === 'Tab' ? (evt.shiftKey ? -1 : 1) : 0;
-                                        setIsInlineEditing(false);
-                                        void (async () => {
-                                          const ok = await commitDraftIfDirty();
-                                          if (!ok) return;
-                                          moveSelectionBy(deltaRow, deltaCol, { extendRange: false });
-                                        })();
-                                      }}
-                                      aria-label={`Edit cell ${a1Here || ''}`}
-                                    />
-                                  );
-                                }
-                                if (pending) return formatNumericLike(String(pending.value ?? ''), colIdx);
-                                if (!ovr) return formatNumericLike(cell.value, colIdx);
-                                const isFormula = String(ovr.kind || '') === 'formula';
-                                const display = isFormula ? String(ovr.value || '') : formatNumericLike(String(ovr.value || ''), colIdx);
-                                return (
-                                  <span
-                                    style={{
-                                      display: 'inline-block',
-                                      maxWidth: '100%',
-                                      overflow: 'hidden',
-                                      textOverflow: 'ellipsis',
-                                      whiteSpace: 'nowrap',
-                                      fontWeight: 800,
-                                      color: isFormula ? '#1D4ED8' : '#111827',
-                                    }}
-                                    title={display}
-                                  >
-                                    {display}
-                                  </span>
-                                );
-                              })()}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="excel-preview-empty-sheet">
-              {t('excelPreview.emptySheet')}
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Spreadsheet Grid — Virtualized */}
+      <VirtualizedGrid
+        current={current}
+        scale={scale}
+        tableContainerRef={tableContainerRef}
+        selected={selected}
+        selectedRange={selectedRange}
+        lockedCells={lockedCells}
+        dragRect={dragRect}
+        pendingState={pendingState}
+        flashRect={flashRect}
+        appliedHighlightRects={appliedHighlightRects}
+        cellA1At={cellA1At}
+        currentSheetName={currentSheetName}
+        draftFormatOverrides={draftFormatOverrides}
+        draftCellOverrides={draftCellOverrides}
+        tableRangesForActiveSheet={tableRangesForActiveSheet}
+        tablePaletteByStyle={tablePaletteByStyle}
+        normalizeHex={normalizeHex}
+        formatNumericLike={formatNumericLike}
+        setUserHasSelected={setUserHasSelected}
+        setLockedCells={setLockedCells}
+        setSelected={setSelected}
+        setSelectedRange={setSelectedRange}
+        isDraggingRef={isDraggingRef}
+        setDragAnchor={setDragAnchor}
+        setDragEnd={setDragEnd}
+        t={t}
+      />
 
       {/* Sheet Tabs */}
       {sheetCount > 1 && !hideSheetTabs && (

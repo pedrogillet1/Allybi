@@ -10,11 +10,11 @@
    ============================================ */
 
 .excel-preview-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
   background: white;
   border-radius: 0;
   display: flex;
@@ -117,6 +117,7 @@
 .excel-preview-grid-wrapper {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow-x: scroll;
   overflow-y: auto;
   scrollbar-gutter: stable both-edges;
@@ -254,11 +255,13 @@
 }
 
 /* Pending (not-yet-applied) edit indicator: Excel-like corner marker */
-.excel-cell.excel-cell-pending {
+.excel-cell.excel-cell-pending,
+.excel-cell-pending {
   position: relative;
 }
 
-.excel-cell.excel-cell-pending::after {
+.excel-cell.excel-cell-pending::after,
+.excel-cell-pending::after {
   content: '';
   position: absolute;
   top: 0;
@@ -293,11 +296,13 @@
 }
 
 /* Post-apply confirmation highlight */
-.excel-cell.excel-cell-applied-flash {
+.excel-cell.excel-cell-applied-flash,
+.excel-cell-applied-flash {
   position: relative;
 }
 
-.excel-cell.excel-cell-applied-flash::before {
+.excel-cell.excel-cell-applied-flash::before,
+.excel-cell-applied-flash::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -572,4 +577,18 @@
 /* Corner scrollbar intersection */
 .excel-preview-grid-wrapper::-webkit-scrollbar-corner {
   background: white;
+}
+
+/* ============================================
+   FOCUS VISIBLE (ACCESSIBILITY)
+   ============================================ */
+
+.excel-preview-grid-wrapper:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: -2px;
+}
+
+.excel-preview-sheet-tab:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: -1px;
 }

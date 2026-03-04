@@ -1424,15 +1424,15 @@ const Documents = () => {
           if (!selectedCategoryId) return;
           const destId = selectedCategoryId;
           const srcId = movingFromCategoryId;
-          const docsInSrc = contextDocuments.filter(d => d.folderId === srcId);
           setShowCategoryModal(false);
           setSelectedCategoryId(null);
           setMovingFromCategoryId(null);
           try {
-            await Promise.all(docsInSrc.map(d => moveToFolder(d.id, destId)));
-            showSuccess(t('toasts.filesMovedSuccessfully', { count: docsInSrc.length }));
+            await api.patch(`/api/folders/${srcId}`, { parentId: destId });
+            showSuccess(t('toasts.folderMovedSuccessfully'));
+            refreshAll();
           } catch (error) {
-            showError(t('toasts.failedToAddDocumentsToCategory'));
+            showError(t('toasts.failedToMoveFolder'));
           }
         } : handleCategorySelection}
       />

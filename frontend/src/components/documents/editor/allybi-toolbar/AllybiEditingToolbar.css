@@ -560,7 +560,8 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Excel toolbar (sheet nav + name box + value bar)                            */
+/* Excel toolbar — now handled by SpreadsheetPageLayout                       */
+/* Legacy rules kept (dead code) to avoid conflicts if any stale references.  */
 /* -------------------------------------------------------------------------- */
 
 .allybi-excel-row {

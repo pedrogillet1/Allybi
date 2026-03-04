@@ -86,7 +86,8 @@
       "invalidVerificationCode": "Código de verificación inválido",
       "failedToChangePassword": "Error al cambiar la contraseña. Por favor, inténtalo de nuevo.",
       "failedToSaveNotificationPreferences": "Error al guardar las preferencias de notificación. Por favor, inténtalo de nuevo.",
-      "failedToClearCache": "Error al borrar el caché"
+      "failedToClearCache": "Error al borrar el caché",
+      "failedToSendVerification": "Error al enviar la verificación. Por favor, inténtalo de nuevo."
     },
     "logoutDescription": "Cerrar sesión de tu cuenta",
     "replay": "Repetir",
@@ -102,7 +103,9 @@
       "verifyButton": "Verificar",
       "notVerified": "No verificado",
       "notAdded": "No agregado",
-      "verified": "Verificado"
+      "verified": "Verificado",
+      "emailSent": "Enlace de verificación enviado a tu correo",
+      "phoneSent": "Código de verificación enviado a tu teléfono"
     }
   },
   "common": {

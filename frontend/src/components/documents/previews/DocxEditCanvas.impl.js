@@ -220,6 +220,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     autoSaveOnBlur = true,
     onStatusMsg,
     onDirtyChange,
+    paperMode = false,
   },
   ref
 ) {
@@ -1935,7 +1936,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
   if (loading) {
     return (
-      <div style={{ padding: 40, background: 'white', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+      <div style={{ padding: 40, background: paperMode ? 'transparent' : 'white', borderRadius: paperMode ? 0 : 12, boxShadow: paperMode ? 'none' : '0 4px 12px rgba(0,0,0,0.1)' }}>
         Loading editor…
       </div>
     );
@@ -1943,7 +1944,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
   if (error) {
     return (
-      <div style={{ padding: 40, background: 'white', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+      <div style={{ padding: 40, background: paperMode ? 'transparent' : 'white', borderRadius: paperMode ? 0 : 12, boxShadow: paperMode ? 'none' : '0 4px 12px rgba(0,0,0,0.1)' }}>
         <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 16, color: '#111827', marginBottom: 8 }}>
           DOCX editor not available
         </div>
@@ -1953,7 +1954,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: 1100, position: 'relative' }}>
+    <div style={{ width: '100%', maxWidth: paperMode ? 'none' : 1100, position: 'relative' }}>
       <style>{`
         [data-docx-edit-host="1"] ::selection {
           background: rgba(107, 114, 128, 0.28);
@@ -2121,13 +2122,13 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
             })();
           }}
           style={{
-            width: 'min(860px, 100%)',
-            margin: '0 auto',
-            background: 'white',
-            borderRadius: 10,
-            border: '1px solid #E5E7EB',
-            boxShadow: '0 10px 28px rgba(17, 24, 39, 0.10)',
-            padding: '48px 56px',
+            width: paperMode ? '100%' : 'min(860px, 100%)',
+            margin: paperMode ? 0 : '0 auto',
+            background: paperMode ? 'transparent' : 'white',
+            borderRadius: paperMode ? 0 : 10,
+            border: paperMode ? 'none' : '1px solid #E5E7EB',
+            boxShadow: paperMode ? 'none' : '0 10px 28px rgba(17, 24, 39, 0.10)',
+            padding: paperMode ? 0 : '48px 56px',
             lineHeight: 1.6,
             fontFamily: 'Calibri, Arial, sans-serif',
             fontSize: 16,

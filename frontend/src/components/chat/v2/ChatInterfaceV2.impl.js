@@ -127,37 +127,67 @@ const CONNECTOR_OPTIONS = [
 
 const VIEWER_STARTER_PROMPTS = {
   docx: [
-    "Rewrite the intro to be more concise and professional.",
-    "Fix grammar and tighten the bullet points.",
-    "Change the tone to match an executive summary.",
-    "Turn this section into clear bullet points with action verbs.",
-    "Shorten this text by 30% without removing key facts.",
-    "Rewrite this in a formal and professional tone.",
-    "Convert passive voice to active voice in this selection.",
-    "Standardize terminology and capitalization in this section.",
-    "Extract key commitments and deadlines into bullet points.",
-    "Improve readability to make this easier for non-experts.",
-    "Rewrite this as an executive summary in 5 bullets.",
-    "Improve transitions between these paragraphs for better flow.",
+    "Find all dates, deadlines, and time-sensitive commitments.",
+    "Find the main arguments and list them as bullet points.",
+    "Find any action items or next steps mentioned in this document.",
+    "Find key terms and provide a quick definition for each.",
+    "Find all names, roles, and responsibilities mentioned here.",
+    "Find sections that reference budgets, costs, or financial figures.",
+    "Find any risks, warnings, or caveats mentioned in this text.",
+    "Find the conclusion and summarize it in one sentence.",
+    "Find all references to external documents or sources.",
+    "Find recurring themes and patterns across sections.",
+    "Find any legal or compliance language in this document.",
+    "Find open questions or unresolved items that need follow-up.",
   ],
   xlsx: [
-    "Analyze this sheet and summarize the key trends in plain language.",
-    "Convert this selection into a clean table with clear headers.",
-    "Create formulas for totals, growth %, and variance across rows.",
-    "Highlight outliers and explain what might be driving them.",
-    "Format currency, percentages, and dates consistently in this sheet.",
-    "Build a KPI summary with total, average, min, and max.",
-    "Write formulas for month-over-month and year-over-year change.",
-    "Create conditional formatting for top and bottom performers.",
-    "Find duplicate rows and flag them for review.",
-    "Detect missing values and suggest how to handle them.",
-    "Suggest the best chart types for the key metrics here.",
-    "Create a quick forecast for the next 3 periods.",
+    "Find the top and bottom performers in this data.",
+    "Find any outliers or anomalies and explain what stands out.",
+    "Find all rows with missing or incomplete values.",
+    "Find duplicate entries and flag them for review.",
+    "Find the key trends and summarize them in plain language.",
+    "Find totals, averages, and key stats for each column.",
+    "Find month-over-month changes and highlight the biggest shifts.",
+    "Find the most and least common values in this dataset.",
+    "Find correlations between columns and explain them simply.",
+    "Find all entries above or below a specific threshold.",
+    "Find the date range covered and summarize activity over time.",
+    "Find any formatting inconsistencies in this sheet.",
   ],
   pptx: [
-    "Rewrite this slide to be clearer and more executive-friendly.",
-    "Turn this content into 3 concise bullet points.",
-    "Improve this slide title and subtitle for clarity.",
+    "Find the key takeaway from each slide and list them.",
+    "Find all data points and statistics mentioned across slides.",
+    "Find the main call-to-action or recommendation in this deck.",
+  ],
+  pdf: [
+    "Find all key dates, deadlines, and milestones in this PDF.",
+    "Find the main topics covered and summarize each briefly.",
+    "Find any clauses, terms, or conditions that need attention.",
+    "Find all figures, tables, and data referenced in this document.",
+    "Find the conclusion or final recommendations.",
+    "Find contact information, signatures, or parties mentioned.",
+    "Find any footnotes, disclaimers, or fine print worth noting.",
+    "Find all section headings and give me a quick outline.",
+    "Find specific numbers, amounts, or percentages mentioned.",
+    "Find any references to external documents or appendices.",
+  ],
+  image: [
+    "Find and describe all the text visible in this image.",
+    "Find the key objects, people, or elements in this image.",
+    "Find any logos, brands, or labels shown here.",
+    "Find all the colors used and describe the overall palette.",
+    "Find any data, charts, or numbers displayed in this image.",
+    "Find details that might be easy to miss at first glance.",
+    "Find and list all the text content for easy copy-paste.",
+    "Find the main subject and describe what's happening.",
+  ],
+  generic: [
+    "Find the main topics covered in this file and summarize them.",
+    "Find any key dates, names, or important details.",
+    "Find action items or next steps mentioned in this content.",
+    "Find the most important information and highlight it.",
+    "Find any data points, figures, or statistics referenced.",
+    "Find open questions or items that need follow-up.",
   ],
 };
 const VIEWER_STARTER_PROMPT_COUNT = 3;
@@ -179,7 +209,16 @@ function getViewerPromptBucket(fileType) {
   if (ft === "powerpoint" || ft === "ppt" || ft === "pptx" || ft === "slides") {
     return "pptx";
   }
-  return "docx";
+  if (ft === "pdf") {
+    return "pdf";
+  }
+  if (ft === "image" || ft === "jpg" || ft === "jpeg" || ft === "png" || ft === "gif" || ft === "svg" || ft === "webp") {
+    return "image";
+  }
+  if (ft === "word" || ft === "doc" || ft === "docx") {
+    return "docx";
+  }
+  return "generic";
 }
 
 function uniquePrompts(pool) {
@@ -1597,12 +1636,12 @@ export default function ChatInterface({
   const viewerFileType = String(viewerContext?.fileType || "").trim().toLowerCase();
   const viewerPromptBucket = useMemo(() => getViewerPromptBucket(viewerFileType), [viewerFileType]);
   const [viewerStarterPrompts, setViewerStarterPrompts] = useState(() =>
-    uniquePrompts(VIEWER_STARTER_PROMPTS.docx).slice(0, VIEWER_STARTER_PROMPT_COUNT),
+    uniquePrompts(VIEWER_STARTER_PROMPTS.generic).slice(0, VIEWER_STARTER_PROMPT_COUNT),
   );
   const lastViewerSelectionRef = useRef({ selection: null, at: 0 });
 
   useEffect(() => {
-    const pool = VIEWER_STARTER_PROMPTS[viewerPromptBucket] || VIEWER_STARTER_PROMPTS.docx;
+    const pool = VIEWER_STARTER_PROMPTS[viewerPromptBucket] || VIEWER_STARTER_PROMPTS.generic;
     const documentId = String(viewerContext?.activeDocumentId || "").trim() || "none";
     const contextKey = [
       "viewer",
@@ -5183,7 +5222,7 @@ export default function ChatInterface({
 	                  </div>
 
                   <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 14, color: '#111827' }}>
-                    Edit with Allybi
+                    Find with Allybi
                   </div>
 
                   <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>

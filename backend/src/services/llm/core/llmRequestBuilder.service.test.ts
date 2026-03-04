@@ -412,4 +412,233 @@ describe("LlmRequestBuilderService", () => {
     );
     expect(maxTokens).toBe(8192);
   });
+
+  test("renders table evidence with headers and rows into prompt", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_table",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc-1",
+              title: "Q1 Report",
+              locationKey: "sheet:Revenue",
+              snippet: undefined,
+              evidenceType: "table",
+              table: {
+                header: ["Region", "Revenue (R$)", "Growth (%)"],
+                rows: [
+                  ["North", 1500000, 12.5],
+                  ["South", 2300000, -3.2],
+                ],
+              },
+              score: { finalScore: 0.78 },
+              location: { sheet: "Revenue" },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    expect(userContent).toContain("Region");
+    expect(userContent).toContain("Revenue (R$)");
+    expect(userContent).toContain("Growth (%)");
+    expect(userContent).toContain("1500000");
+    expect(userContent).toContain("-3.2");
+    expect(userContent).not.toContain("snippet=\n");
+  });
+
+  test("surfaces cross-doc conflicts as warning section in prompt", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_multi",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc-A",
+              title: "Q1 Report",
+              locationKey: "p:1",
+              snippet: "Revenue was R$ 1,500,000",
+              evidenceType: "text",
+              score: { finalScore: 0.82 },
+            },
+            {
+              docId: "doc-B",
+              title: "Q1 Draft",
+              locationKey: "p:1",
+              snippet: "Revenue was R$ 2,100,000",
+              evidenceType: "text",
+              score: { finalScore: 0.79 },
+            },
+          ],
+          conflicts: [
+            {
+              metric: "revenue",
+              docA: "doc-A",
+              valueA: 1500000,
+              docB: "doc-B",
+              valueB: 2100000,
+            },
+          ],
+        },
+      }),
+    );
+
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    expect(userContent).toContain("Data Conflicts");
+    expect(userContent).toContain("revenue");
+    expect(userContent).toContain("1500000");
+    expect(userContent).toContain("2100000");
+  });
+
+  test("secondary truncation preserves numeric units at snippet boundary", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    // Create a snippet that is >220 chars where a numeric unit straddles the cut point
+    const padding = "A".repeat(200);
+    const snippet = `${padding} The value is R$ 1,500,000 in total.`;
+    // At maxSnippetChars=220 the naive cut would be mid "R$ 1,500,"
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single", // maxSnippetChars=220
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc-1",
+              title: "Report",
+              locationKey: "p:1",
+              snippet,
+              evidenceType: "text",
+              score: { finalScore: 0.8 },
+              location: { page: 1 },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    // Should NOT cut mid-unit: must contain the full "R$ 1,500,000" or truncate before it
+    if (userContent.includes("R$")) {
+      expect(userContent).toMatch(/R\$\s*1,500,000/);
+    }
+  });
+
+  test("table mode allows wider snippet and section caps for rendered tables", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    // Build a table with 6 rows — needs ~400+ chars
+    const rows = Array.from({ length: 6 }, (_, i) => [
+      `Region ${i + 1}`,
+      (i + 1) * 500000,
+      (i + 1) * 2.5,
+    ]);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_table",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc-1",
+              title: "Revenue Breakdown",
+              locationKey: "sheet:Summary",
+              evidenceType: "table",
+              table: {
+                header: ["Region", "Revenue (R$)", "Growth (%)"],
+                rows,
+              },
+              score: { finalScore: 0.85 },
+              location: { sheet: "Summary" },
+            },
+          ],
+        },
+      }),
+    );
+
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    // All 6 rows should be present with wider caps
+    expect(userContent).toContain("Region 1");
+    expect(userContent).toContain("Region 6");
+  });
+
+  test("annotates low-quality table scores in evidence", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              title: "Financial Report",
+              locationKey: "sheet:Revenue",
+              snippet: "table data",
+              evidenceType: "table" as const,
+              table: {
+                header: ["Metric", "Value"],
+                rows: [["Revenue", 1000]],
+                structureScore: 0.65,
+                numericIntegrityScore: 0.75,
+              },
+              score: { finalScore: 0.80 },
+              location: { sheet: "Revenue" },
+            },
+          ],
+        },
+      }),
+    );
+    const userContent = req.messages.find((m) => m.role === "user")?.content ?? "";
+    expect(userContent).toContain("structureQuality: 65%");
+    expect(userContent).toContain("numericIntegrity: 75%");
+  });
+
+  test("emits evidence rendering telemetry in kodaMeta", () => {
+    const builder = new LlmRequestBuilderService(prompts);
+    const req = builder.build(
+      createInput({
+        signals: {
+          ...createInput().signals,
+          answerMode: "doc_grounded_single",
+        },
+        evidencePack: {
+          evidence: [
+            {
+              docId: "doc_1",
+              title: "Report",
+              locationKey: "sheet:A",
+              snippet: "test evidence",
+              evidenceType: "table" as const,
+              table: { header: ["A"], rows: [["B"]] },
+              score: { finalScore: 0.80 },
+              location: { sheet: "A" },
+            },
+          ],
+          conflicts: [
+            { metric: "rev", docA: "d1", valueA: 100, docB: "d2", valueB: 200 },
+          ],
+        },
+      }),
+    );
+    const meta = req.kodaMeta as Record<string, any>;
+    expect(meta.evidenceRendering).toBeDefined();
+    expect(meta.evidenceRendering.tableItemsRendered).toBe(1);
+    expect(meta.evidenceRendering.conflictsInjected).toBe(1);
+    expect(meta.evidenceRendering.totalEvidenceItems).toBe(1);
+  });
 });

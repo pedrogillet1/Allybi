@@ -86,7 +86,8 @@
       "invalidVerificationCode": "Invalid verification code",
       "failedToChangePassword": "Failed to change password. Please try again.",
       "failedToSaveNotificationPreferences": "Failed to save notification preferences. Please try again.",
-      "failedToClearCache": "Failed to clear cache"
+      "failedToClearCache": "Failed to clear cache",
+      "failedToSendVerification": "Failed to send verification. Please try again."
     },
     "logoutDescription": "Sign out of your account",
     "replay": "Replay",
@@ -102,7 +103,9 @@
       "verifyButton": "Verify",
       "notVerified": "Not verified",
       "notAdded": "Not added",
-      "verified": "Verified"
+      "verified": "Verified",
+      "emailSent": "Verification link sent to your email",
+      "phoneSent": "Verification code sent to your phone"
     }
   },
   "common": {

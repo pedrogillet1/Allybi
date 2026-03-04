@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { pdfjs } from 'react-pdf';
 import api from '../../services/api';
 import { applyEdit, undoEdit, extractVerifiedApply } from '../../services/editingService';
 import { trackAllybiEvent, trackAllybiVisit } from '../../services/allybiTelemetryService';
@@ -53,14 +53,16 @@ import {
   getImageRenderingCSS,
   logBrowserInfo
 } from '../../utils/browser/browserUtils';
-import {
-  getOptimalPDFWidth
-} from '../../utils/rendering/pdfRenderingUtils';
 import { getSupportedExports, hasExportOptions } from '../../utils/files/exportUtils';
 import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 import InlineNavPill from '../attachments/pills/InlineNavPill';
 import ChatInterface from '../chat/ChatInterface';
 import AllybiEditingToolbar from './editor/allybi-toolbar/AllybiEditingToolbar';
+import DocPageLayout from './editor/DocPageLayout';
+import ImageViewerCanvas from './ImageViewerCanvas';
+import PdfViewerShell from './pdf/PdfViewerShell';
+import PptxViewerShell from './pptx/PptxViewerShell';
+import VideoViewerShell from './video/VideoViewerShell';
 // EditRightPanel removed in viewer: assistant panel is chat-only.
 import TargetsTab from './editor/TargetsTab';
 import ChangesTab from './editor/ChangesTab';
@@ -357,6 +359,7 @@ const DocxEditCanvas = lazy(() => import('./previews/DocxEditCanvas'));
 // ⚡ PERFORMANCE: Code-split Excel/PPTX/PDF edit canvases (only used in edit mode)
 const ExcelEditCanvas = lazy(() => import('./previews/ExcelEditCanvas'));
 const PptxEditCanvas = lazy(() => import('./previews/PptxEditCanvas'));
+const SpreadsheetPageLayout = lazy(() => import('../spreadsheet/SpreadsheetPageLayout'));
 
 // Set up the worker for pdf.js - react-pdf comes with its own pdfjs version
 // Use jsdelivr CDN as fallback with the bundled version
@@ -491,7 +494,7 @@ const DocumentViewer = () => {
     return getFileType(document?.filename, document?.mimeType);
   }, [document?.filename, document?.mimeType]);
   const supportsAssistantInViewer = currentFileType !== 'unknown';
-  const supportsViewerEditing = currentFileType === 'word' || currentFileType === 'excel';
+  const supportsViewerEditing = true;
 
   // ---------------------------------------------------------------------------
   // Embedded editing panel (Ask Allybi -> assistant panel)
@@ -700,6 +703,7 @@ const DocumentViewer = () => {
   const [docxHasPendingEdits, setDocxHasPendingEdits] = useState(false);
   const [docxSaveNotice, setDocxSaveNotice] = useState(''); // 'Saved!' / 'Discarded' / ''
   const docxSaveInFlightRef = useRef(false);
+  const [docxSaveStatus, setDocxSaveStatus] = useState('idle'); // 'idle' | 'saving' | 'saved' | 'failed'
   const excelSaveInFlightRef = useRef(false);
 
   // XLSX toolbar state
@@ -2095,16 +2099,7 @@ const DocumentViewer = () => {
     };
   }, [isMobile]);
 
-  // Calculate responsive PDF page width - constrained to container
-  // Uses cross-platform utility to handle Mac vs Windows scrollbar differences
-  const getPdfPageWidth = useCallback(() => {
-    if (isMobile) {
-      return window.innerWidth - 16;
-    }
-    // Use cross-platform utility for better Mac/Windows compatibility
-    const effectiveContainerWidth = containerWidth || (window.innerWidth - 250); // 250px for sidebar
-    return getOptimalPDFWidth(effectiveContainerWidth, zoom, isMobile);
-  }, [zoom, isMobile, containerWidth]);
+
 
   // Canonical preview count computation for PDF/Word documents
   const previewCount = useMemo(() => {
@@ -2867,6 +2862,80 @@ const DocumentViewer = () => {
       if (raf) window.cancelAnimationFrame(raf);
     };
   }, [currentFileType, docxBlocks.length, previewVersion, syncDocxToolbarStateFromSelection]);
+
+  // ---------------------------------------------------------------------------
+  // DOCX command / save / discard handlers (used by DocPageLayout + toolbar)
+  // ---------------------------------------------------------------------------
+  const onDocxCommand = useCallback((cmd) => {
+    if (!cmd) return;
+    try {
+      const restored = Boolean(docxCanvasRef.current?.restoreSelection?.());
+      if (!restored) {
+        docxCanvasRef.current?.focus?.();
+        docxCanvasRef.current?.restoreSelection?.();
+      }
+    } catch {}
+    if (typeof cmd === 'object' && cmd?.type === 'applyStyle') {
+      docxCanvasRef.current?.wrapSelectionStyle?.(cmd.style || {});
+      setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+      setTimeout(() => syncDocxToolbarStateFromSelection(), 90);
+      return;
+    }
+    if (cmd === 'applyStyle') {
+      docxCanvasRef.current?.wrapSelectionStyle?.({ color: docxColorHex, 'font-size': docxFontSizePx, 'font-family': docxFontFamily });
+      setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+      setTimeout(() => syncDocxToolbarStateFromSelection(), 90);
+      return;
+    }
+    docxCanvasRef.current?.exec?.(cmd);
+    setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+    setTimeout(() => syncDocxToolbarStateFromSelection(), 90);
+  }, [syncDocxToolbarStateFromSelection, docxColorHex, docxFontSizePx, docxFontFamily]);
+
+  const handleDocxSave = useCallback(async () => {
+    if (docxSaveInFlightRef.current) return;
+    docxSaveInFlightRef.current = true;
+    setDocxSaveStatus('saving');
+    const hadPendingBeforeSave = Boolean(docxCanvasRef.current?.hasPendingEdits?.() ?? docxHasPendingEdits);
+    try {
+      const results = await docxCanvasRef.current?.saveAllManualEdits?.();
+      const saved = (results || []).filter(r => r.ok && r.revisionId);
+      const failed = (results || []).filter(r => !r.ok);
+      const stillPending = Boolean(docxCanvasRef.current?.hasPendingEdits?.());
+      if (saved.length > 0) {
+        setDocxHasPendingEdits(stillPending);
+        setDocxSaveStatus('saved');
+        setDocxSaveNotice('Saved!');
+        setTimeout(() => { setDocxSaveStatus('idle'); setDocxSaveNotice(''); }, 2000);
+      } else if (failed.length > 0 || (hadPendingBeforeSave && stillPending)) {
+        setDocxHasPendingEdits(true);
+        setDocxSaveStatus('failed');
+        setDocxSaveNotice('Save failed');
+        setTimeout(() => { setDocxSaveStatus('idle'); setDocxSaveNotice(''); }, 3000);
+      } else {
+        setDocxHasPendingEdits(false);
+        setDocxSaveStatus('saved');
+        setDocxSaveNotice('All changes already saved');
+        setTimeout(() => { setDocxSaveStatus('idle'); setDocxSaveNotice(''); }, 2000);
+      }
+    } catch (e) {
+      console.error('[DocxSave] save failed', e);
+      setDocxHasPendingEdits(true);
+      setDocxSaveStatus('failed');
+      setDocxSaveNotice('Save failed');
+      setTimeout(() => { setDocxSaveStatus('idle'); setDocxSaveNotice(''); }, 3000);
+    } finally {
+      docxSaveInFlightRef.current = false;
+    }
+  }, [docxHasPendingEdits]);
+
+  const handleDocxDiscard = useCallback(async () => {
+    await docxCanvasRef.current?.reload?.();
+    setDocxHasPendingEdits(false);
+    setDocxSaveStatus('idle');
+    setDocxSaveNotice('Discarded');
+    setTimeout(() => setDocxSaveNotice(''), 2000);
+  }, []);
 
   // Deep-link to a specific edit target (used by "Go to location" from receipts/cards).
   useEffect(() => {
@@ -4691,7 +4760,7 @@ const DocumentViewer = () => {
         background: currentFileType === 'excel' ? 'white' : '#F5F5F5',
         WebkitOverflowScrolling: 'touch',
         boxShadow: 'none',
-        borderTop: '1px solid #E6E6EC',
+        borderTop: currentFileType === 'excel' ? 'none' : '1px solid #E6E6EC',
         scrollbarGutter: currentFileType === 'excel' ? undefined : 'stable'
       }}
     >
@@ -4726,75 +4795,13 @@ const DocumentViewer = () => {
         }
 
         switch (fileType) {
-          case 'word': { // DOCX - show as PDF (converted during upload)
-            // Preview mode: DOCX files are converted to PDF on the backend and displayed as PDF.
-            // Edit mode: show a paragraph-level HTML canvas editor.
-            // Zoom: apply a visual scale so the toolbar zoom control actually works for the HTML editor.
-            // (We avoid CSS `zoom` for cross-browser consistency.)
-            const docxScale = Math.max(0.5, Math.min(2, Number(zoom || 100) / 100));
-            return (
-              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-                <Suspense fallback={null}>
-                  <div
-                    style={{
-                      width: `${100 / docxScale}%`,
-                      transform: `scale(${docxScale})`,
-                      transformOrigin: 'top center',
-                      display: 'flex',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <DocxEditCanvas
-                      document={document}
-                      selectedId={docxSelectedId}
-                      onSelectedIdChange={setDocxSelectedId}
-                      onBlocksLoaded={setDocxBlocks}
-                      hideToolbar
-                      readOnly={false}
-                      autoSaveOnBlur
-                      ref={docxCanvasRef}
-                      onStatusMsg={setEditorStatusMsg}
-                      onDirtyChange={setDocxHasPendingEdits}
-                      onApplied={({ revisionId } = {}) => {
-                        setPreviewVersion(v => v + 1);
-                        // Silently update the URL to the new revision so navigating
-                        // away and back shows the saved content (not the old version).
-                        if (revisionId && revisionId !== document?.id) {
-                          try { window.history.replaceState(null, '', buildRoute.document(revisionId)); } catch {}
-                        }
-                      }}
-                    />
-                  </div>
-                </Suspense>
-                {docxSaveNotice ? (
-                  <div style={{
-                    position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)',
-                    background: docxSaveNotice === 'Save failed' ? '#dc2626' : '#111827',
-                    color: '#fff', padding: '10px 24px', borderRadius: 8,
-                    fontSize: 14, fontWeight: 600, zIndex: 9999,
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
-                  }}>
-                    {docxSaveNotice}
-                  </div>
-                ) : null}
-              </div>
-            );
-          }
+          case 'word':
+            // DOCX rendering is handled entirely by DocPageLayout above.
+            return null;
 
                 case 'excel': // XLSX - always editable; Ask Allybi only toggles the assistant panel
                   return (
-                    <div
-                      style={{
-                        width: '100%',
-                        flex: '1 1 auto',
-                        minWidth: 0,
-                        minHeight: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'stretch',
-                        position: 'relative',
-                      }}
-                    >
+                    <div style={{ width: '100%', flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                       <Suspense fallback={null}>
 		                        <ExcelEditCanvas
 	                          ref={excelCanvasRef}
@@ -4823,224 +4830,21 @@ const DocumentViewer = () => {
                     </div>
                   );
 
-                case 'powerpoint': // PPTX - show with PPTXPreview component
-                  return (
-                    <Suspense fallback={null}>
-                      <PPTXPreview
-                        document={document}
-                        zoom={zoom}
-                        version={previewVersion}
-                        onCountUpdate={setChildPreviewCount}
-                        jumpRequest={pptxJumpRequest}
-                      />
-                    </Suspense>
-                  );
+                case 'powerpoint':
+                  // PPTX rendering handled by PptxViewerShell at the layout level.
+                  return null;
 
-                case 'pdf': {
-                  // Always render the real PDF normally (react-pdf).
-                  // "Edit text" creates a DOCX working copy (PDF->DOCX) and opens it for editing.
-                  const pageWidth = getPdfPageWidth();
-                  const hasNumPages = Number.isFinite(numPages) && Number(numPages) > 0;
-                  return (
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                      {fileConfig ? (
-                        <Document
-                          // Changing the URL should fully reset internal pdf.js state.
-                          key={String(actualDocumentUrl || documentUrl || document?.id || 'pdf')}
-                          file={fileConfig}
-                          onLoadSuccess={(info) => {
-                            pageRefs.current = {};
-                            onDocumentLoadSuccess(info);
-                          }}
-                          options={pdfOptions}
-                          loading={
-                            <div style={{ padding: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 700, color: '#6B7280' }}>
-                              Loading PDF…
-                            </div>
-                          }
-                          error={
-                            <div style={{ padding: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 700, color: '#991B1B' }}>
-                              Failed to load PDF preview.
-                            </div>
-                          }
-                          onLoadError={() => {
-                            // Keep viewer resilient; PDF failures are handled by the empty-state UI.
-                          }}
-                        >
-                          {/* Important: don't render any <Page> until numPages is known.
-                              Rendering a fake page then expanding to N pages can trigger pdf.js DOM errors
-                              like "Node cannot be found in the current page." */}
-                          {hasNumPages ? (
-                            Array.from(new Array(numPages), (el, index) => {
-                              const isSpotlit = Number(pdfSpotlightPage) === index + 1;
-                              return (
-                              <div
-                                key={`page_${index + 1}`}
-                                data-page-number={index + 1}
-                                ref={(ref) => {
-                                  pageRefs.current[index + 1] = ref;
-                                }}
-                                style={{
-                                  marginBottom: 20,
-                                  boxShadow: isSpotlit ? '0 0 0 4px rgba(17,24,39,0.16), 0 10px 24px rgba(17,24,39,0.18)' : '0 4px 12px rgba(0,0,0,0.1)',
-                                  borderRadius: 8,
-                                  overflow: 'hidden',
-                                  background: 'white',
-                                  transition: 'box-shadow 280ms ease'
-                                }}
-                              >
-                                <Page
-                                  pageNumber={index + 1}
-                                  width={pageWidth}
-                                  renderTextLayer
-                                  renderAnnotationLayer
-                                  loading={
-                                    <div style={{ padding: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 700, color: '#6B7280' }}>
-                                      Rendering…
-                                    </div>
-                                  }
-                                />
-                              </div>
-                              );
-                            })
-                          ) : null}
-                        </Document>
-                      ) : null}
-                    </div>
-                  );
-                }
+                case 'pdf':
+                  // PDF rendering handled by PdfViewerShell at the layout level.
+                  return null;
 
                 case 'image':
-                  return (
-                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {imageLoading && !imageError && (
-                  <div style={{ minHeight: 200 }} />
-                )}
-                {imageError ? (
-                  <div style={{
-                    padding: 40,
-                    background: 'white',
-                    borderRadius: 12,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    textAlign: 'center'
-                  }}>
-                    <div style={{ fontSize: 64, marginBottom: 20 }}>🖼️</div>
-                    <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
-                      Failed to load image
-                    </div>
-                    <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                      {cleanDocumentName(document.filename)}
-                    </div>
-                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-                      <button
-                        onClick={() => {
-                          setImageLoading(true);
-                          setImageError(false);
-                          setImageRetryNonce((n) => n + 1);
-                        }}
-                        style={{
-                          display: 'inline-block',
-                          padding: '12px 18px',
-                          background: 'white',
-                          color: '#181818',
-                          borderRadius: 14,
-                          fontSize: 14,
-                          fontWeight: '600',
-                          fontFamily: 'Plus Jakarta Sans',
-                          border: '1px solid #E6E6EC',
-                          cursor: 'pointer'
-                        }}>
-                        Retry
-                      </button>
-                      <button
-                        onClick={async () => {
-                          try {
-                            const response = await api.get(`/api/documents/${document.id}/download`);
-                            const downloadUrl = response.data.url;
-                            safariDownloadFile(downloadUrl, document.filename);
-                          } catch (error) {
-                            showError(t('alerts.failedToDownload'));
-                          }
-                        }}
-                        style={{
-                          display: 'inline-block',
-                          padding: '12px 18px',
-                          background: 'rgba(24, 24, 24, 0.90)',
-                          color: 'white',
-                          borderRadius: 14,
-                          textDecoration: 'none',
-                          fontSize: 14,
-                          fontWeight: '600',
-                          fontFamily: 'Plus Jakarta Sans',
-                          border: 'none',
-                          cursor: 'pointer'
-                        }}>
-                        {isSafari() || isIOS() ? t('documentViewer.openImage') : t('documentViewer.downloadImage')}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <img
-                    key={`img-${imageRetryNonce}`}
-                    src={actualDocumentUrl}
-                    alt={cleanDocumentName(document.filename)}
-                    onLoad={(e) => {
-                      setImageLoading(false);
-                    }}
-                    onError={(e) => {
-                      setImageLoading(false);
-                      setImageError(true);
-                    }}
-                    style={{
-                      width: 'auto',
-                      height: 'auto',
-                      maxWidth: '100%',
-                      maxHeight: '80vh',
-                      transform: `scale(${zoom / 100})`,
-                      transformOrigin: 'top left',
-                      objectFit: 'contain',
-                      borderRadius: 8,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      background: 'white',
-                      transition: 'transform 0.2s ease',
-                      display: imageLoading ? 'none' : 'block'
-                    }}
-                  />
-                )}
-              </div>
-            );
+                  // Image rendering handled by ImageViewerCanvas at the layout level.
+                  return null;
 
           case 'video':
-            return (
-              <div style={{
-                display: 'inline-block',
-                maxWidth: '100%',
-                maxHeight: '80vh'
-              }}>
-                <video
-                  src={documentUrl}
-                  controls
-                  preload="metadata"
-                  playsInline
-                  onLoadedMetadata={(e) => {
-                  }}
-                  onError={(e) => {
-                  }}
-                  style={{
-                    width: 'auto',
-                    height: 'auto',
-                    maxWidth: '100%',
-                    maxHeight: '80vh',
-                    borderRadius: 8,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    background: 'black'
-                  }}
-                >
-                  <source src={documentUrl} type={document.mimeType || 'video/mp4'} />
-                  Your browser does not support video playback.
-                </video>
-              </div>
-            );
+                  // Video rendering handled by VideoViewerShell at the layout level.
+                  return null;
 
           case 'audio':
             return (
@@ -5808,6 +5612,261 @@ const DocumentViewer = () => {
             React tree position regardless of editingOpen. Moving it between
             different parent branches causes React to unmount/remount it, which
             destroys manual DOM edits (contentEditable changes). */}
+        {currentFileType === 'excel' ? (
+          <Suspense fallback={null}>
+            <SpreadsheetPageLayout
+              document={document}
+              onBack={() => navigate(-1)}
+              onDownload={() => setShowShareModal(true)}
+              onShare={() => setShowShareModal(true)}
+              aiOpen={editingOpen}
+              onToggleAI={() => toggleEditingPanel({ source: 'spreadsheet_header' })}
+              assistantPanel={assistantRightPanel}
+              excelCanvasRef={excelCanvasRef}
+              draftValue={excelDraftValue}
+              onDraftValueChange={setExcelDraftValue}
+              selectedInfo={excelSelectedInfo}
+              sheetMeta={excelSheetMeta}
+              historyState={excelHistoryState}
+              statusMsg={editorStatusMsg}
+              fontFamily={excelFontFamily}
+              fontSizePt={excelFontSizePt}
+              colorHex={excelColorHex}
+              bold={excelBold}
+              italic={excelItalic}
+              underline={excelUnderline}
+              onFormatChange={(fmt) => {
+                if (fmt?.fontFamily) setExcelFontFamily(fmt.fontFamily);
+                if (fmt?.fontSizePt != null) setExcelFontSizePt(fmt.fontSizePt);
+                if (fmt?.color) setExcelColorHex(fmt.color);
+                if (typeof fmt?.bold === 'boolean') setExcelBold(fmt.bold);
+                if (typeof fmt?.italic === 'boolean') setExcelItalic(fmt.italic);
+                if (typeof fmt?.underline === 'boolean') setExcelUnderline(fmt.underline);
+                excelCanvasRef.current?.applyFormat?.(fmt);
+              }}
+              onUndo={() => {
+                if (excelCanvasRef.current?.canUndo?.()) {
+                  excelCanvasRef.current?.undo?.();
+                  return;
+                }
+                if (excelCanvasRef.current?.canUndoSelection?.()) {
+                  excelCanvasRef.current?.undoSelection?.();
+                }
+              }}
+              onRedo={() => {
+                if (excelCanvasRef.current?.canRedo?.()) {
+                  excelCanvasRef.current?.redo?.();
+                  return;
+                }
+                if (excelCanvasRef.current?.canRedoSelection?.()) {
+                  excelCanvasRef.current?.redoSelection?.();
+                }
+              }}
+              zoom={zoom}
+              onZoomChange={setZoom}
+              hasPendingEdits={Boolean(excelCanvasRef.current?.hasPendingEdits?.())}
+            >
+              {previewCanvas}
+            </SpreadsheetPageLayout>
+          </Suspense>
+        ) : currentFileType === 'word' ? (
+        <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
+          <DocPageLayout
+            ref={documentContainerRef}
+            fontFamily={docxFontFamily}
+            onFontFamilyChange={setDocxFontFamily}
+            fontSize={docxFontSizePx}
+            onFontSizeChange={setDocxFontSizePx}
+            colorHex={docxColorHex}
+            onColorHexChange={setDocxColorHex}
+            activeFormats={docxActiveFormats}
+            listType={docxListType}
+            alignment={docxAlignment}
+            onCommand={onDocxCommand}
+            hasPendingEdits={docxHasPendingEdits}
+            saveStatus={docxSaveStatus}
+            onSave={handleDocxSave}
+            onDiscard={handleDocxDiscard}
+            zoom={zoom}
+            onZoomChange={setZoom}
+            onBackgroundClick={clearFrozenSelection}
+            onScroll={onContainerScroll}
+            selectionOverlay={
+              selectionOverlay?.frozen && Array.isArray(selectionOverlay?.rects) && selectionOverlay.rects.length ? (
+                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10 }}>
+                  {selectionOverlay.rects.map((r, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        position: 'absolute',
+                        top: r.top, left: r.left, width: r.width, height: r.height,
+                        background: 'rgba(107, 114, 128, 0.18)',
+                        borderRadius: 3,
+                        boxShadow: 'inset 0 0 0 1.5px rgba(107, 114, 128, 0.35)',
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : null
+            }
+            saveNotice={docxSaveNotice}
+          >
+            <Suspense fallback={null}>
+              <DocxEditCanvas
+                document={document}
+                selectedId={docxSelectedId}
+                onSelectedIdChange={setDocxSelectedId}
+                onBlocksLoaded={setDocxBlocks}
+                hideToolbar
+                readOnly={false}
+                autoSaveOnBlur
+                ref={docxCanvasRef}
+                onStatusMsg={setEditorStatusMsg}
+                onDirtyChange={setDocxHasPendingEdits}
+                paperMode
+                onApplied={({ revisionId } = {}) => {
+                  setPreviewVersion(v => v + 1);
+                  if (revisionId && revisionId !== document?.id) {
+                    try { window.history.replaceState(null, '', buildRoute.document(revisionId)); } catch {}
+                  }
+                }}
+              />
+            </Suspense>
+          </DocPageLayout>
+          {/* Right: Allybi panel (desktop) */}
+          {editingOpen && !isMobile ? (
+            <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+          {/* Mobile: Allybi overlay */}
+          {editingOpen && isMobile ? (
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'white', zIndex: 2000,
+              display: 'flex', flexDirection: 'column'
+            }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+        </div>
+        ) : currentFileType === 'image' ? (
+        <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
+          <ImageViewerCanvas
+            key={`imgv-${imageRetryNonce}`}
+            src={actualDocumentUrl}
+            alt={cleanDocumentName(document?.filename)}
+            loading={imageLoading}
+            error={imageError}
+            onLoad={() => setImageLoading(false)}
+            onError={() => { setImageLoading(false); setImageError(true); }}
+            isPng={/\.png$/i.test(document?.filename || '') || document?.mimeType === 'image/png'}
+            retryNode={
+              <div style={{ padding: 40, background: 'white', borderRadius: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>🖼️</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 8 }}>
+                  Failed to load image
+                </div>
+                <div style={{ fontSize: 13, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 20 }}>
+                  {cleanDocumentName(document?.filename)}
+                </div>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                  <button
+                    onClick={() => { setImageLoading(true); setImageError(false); setImageRetryNonce((n) => n + 1); }}
+                    style={{ padding: '8px 16px', background: 'white', color: '#181818', borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: 'Plus Jakarta Sans', border: '1px solid #E6E6EC', cursor: 'pointer' }}
+                  >
+                    Retry
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await api.get(`/api/documents/${document.id}/download`);
+                        safariDownloadFile(response.data.url, document.filename);
+                      } catch (err) { showError(t('alerts.failedToDownload')); }
+                    }}
+                    style={{ padding: '8px 16px', background: '#111827', color: 'white', borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: 'Plus Jakarta Sans', border: 'none', cursor: 'pointer' }}
+                  >
+                    {isSafari() || isIOS() ? t('documentViewer.openImage') : t('documentViewer.downloadImage')}
+                  </button>
+                </div>
+              </div>
+            }
+          />
+          {/* Right: Allybi panel (desktop) */}
+          {editingOpen && !isMobile ? (
+            <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+          {editingOpen && isMobile ? (
+            <div style={{ position: 'absolute', inset: 0, background: 'white', zIndex: 2000, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>{assistantRightPanel}</div>
+            </div>
+          ) : null}
+        </div>
+        ) : currentFileType === 'pdf' ? (
+        <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
+          <PdfViewerShell
+            fileConfig={fileConfig}
+            pdfOptions={pdfOptions}
+            onDocumentLoadSuccess={onDocumentLoadSuccess}
+            initialPage={pendingInitialPage}
+          />
+          {/* Right: Allybi panel (desktop) */}
+          {editingOpen && !isMobile ? (
+            <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+          {editingOpen && isMobile ? (
+            <div style={{ position: 'absolute', inset: 0, background: 'white', zIndex: 2000, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>{assistantRightPanel}</div>
+            </div>
+          ) : null}
+        </div>
+        ) : currentFileType === 'powerpoint' ? (
+        <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
+          <PptxViewerShell document={document} version={previewVersion} />
+          {/* Right: Allybi panel (desktop) */}
+          {editingOpen && !isMobile ? (
+            <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+          {editingOpen && isMobile ? (
+            <div style={{ position: 'absolute', inset: 0, background: 'white', zIndex: 2000, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>{assistantRightPanel}</div>
+            </div>
+          ) : null}
+        </div>
+        ) : currentFileType === 'video' ? (
+        <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
+          <VideoViewerShell src={documentUrl} document={document} />
+          {/* Right: Allybi panel (desktop) */}
+          {editingOpen && !isMobile ? (
+            <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
+                {assistantRightPanel}
+              </div>
+            </div>
+          ) : null}
+          {editingOpen && isMobile ? (
+            <div style={{ position: 'absolute', inset: 0, background: 'white', zIndex: 2000, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flex: 1, minHeight: 0 }}>{assistantRightPanel}</div>
+            </div>
+          ) : null}
+        </div>
+        ) : (
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             {/* Toolbar */}
@@ -5858,6 +5917,7 @@ const DocumentViewer = () => {
             </div>
           ) : null}
         </div>
+        )}
       </div>
 
 	      {/* Selection bubble (desktop): highlight text -> Ask Allybi */}
