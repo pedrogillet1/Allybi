@@ -1,12 +1,13 @@
 {
   "_meta": {
     "id": "doc_taxonomy",
-    "version": "1.3.0",
-    "description": "Master taxonomy of document types across finance, legal, medical, accounting, and operations (canonical domain id: ops) with strict canonical domain validation.",
+    "version": "3.0.0",
+    "description": "Single source of truth document-type taxonomy covering all 16 domains.",
     "languages": [
-      "any"
+      "en",
+      "pt"
     ],
-    "lastUpdated": "2026-03-01",
+    "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
     "usedBy": [
       "services/core/banks/dataBankLoader.service.ts"
@@ -23,10 +24,20 @@
     },
     "canonicalDomains": [
       "accounting",
+      "banking",
+      "billing",
+      "education",
+      "everyday",
       "finance",
+      "housing",
+      "hr_payroll",
+      "identity",
+      "insurance",
       "legal",
       "medical",
-      "ops"
+      "ops",
+      "tax",
+      "travel"
     ],
     "domainValidation": {
       "required": true,
@@ -36,6 +47,91 @@
     }
   },
   "clusters": {
+    "accounting": [
+      "accounts_payable_subledger",
+      "accounts_receivable_subledger",
+      "acct_accrual_schedule",
+      "acct_ap_aging",
+      "acct_ar_aging",
+      "acct_audit_workpaper",
+      "acct_bank_rec",
+      "acct_cash_reconciliation",
+      "acct_close_checklist",
+      "acct_controls_narrative",
+      "acct_cost_center_report",
+      "acct_depreciation_schedule",
+      "acct_fixed_asset_register",
+      "acct_gl_export",
+      "acct_intercompany_reconciliation",
+      "acct_inventory_valuation",
+      "acct_invoice_register",
+      "acct_je_support",
+      "acct_payment_run",
+      "acct_prepaid_schedule",
+      "acct_revenue_recognition_schedule",
+      "acct_subledger_reconciliation",
+      "acct_tax_reconciliation",
+      "acct_trial_balance",
+      "audit_report",
+      "bank_fee_schedule",
+      "bank_reconciliation",
+      "budget_vs_actual",
+      "chart_of_accounts",
+      "consolidated_financial_statement",
+      "cost_allocation_report",
+      "depreciation_schedule",
+      "expense_report",
+      "financial_audit_workpaper",
+      "fixed_asset_register",
+      "fund_accounting_report",
+      "general_ledger",
+      "intercompany_invoice",
+      "journal_entry",
+      "management_letter",
+      "payroll_register",
+      "tax_provision",
+      "tax_return",
+      "tax_withholding_certificate",
+      "transfer_pricing_report",
+      "trial_balance",
+      "variance_analysis"
+    ],
+    "banking": [
+      "banking_bank_statement",
+      "banking_credit_card_statement",
+      "banking_loan_statement",
+      "banking_payment_receipt"
+    ],
+    "billing": [
+      "billing_electricity_bill",
+      "billing_internet_bill",
+      "billing_invoice_business",
+      "billing_phone_bill_mobile",
+      "billing_retail_receipt",
+      "billing_water_sewer_bill"
+    ],
+    "education": [
+      "edu_course_syllabus",
+      "edu_diploma_certificate",
+      "edu_enrollment_letter",
+      "edu_student_financial_aid_award",
+      "edu_student_schedule",
+      "edu_transcript"
+    ],
+    "everyday": [
+      "every_bank_statement",
+      "every_electricity_bill",
+      "every_identity_document",
+      "every_insurance_claim",
+      "every_insurance_policy",
+      "every_internet_bill",
+      "every_invoice",
+      "every_phone_bill",
+      "every_rent_receipt",
+      "every_retail_receipt",
+      "every_tax_notice",
+      "every_tax_return"
+    ],
     "finance": [
       "accounts_payable_aging",
       "accounts_receivable_aging",
@@ -124,6 +220,33 @@
       "tax_return",
       "treasury_position",
       "working_capital_report"
+    ],
+    "housing": [
+      "housing_hoa_statement",
+      "housing_home_inspection_report",
+      "housing_lease_summary",
+      "housing_mortgage_statement",
+      "housing_property_tax_bill",
+      "housing_rent_receipt"
+    ],
+    "hr_payroll": [
+      "hr_benefits_enrollment_summary",
+      "hr_employment_verification_letter",
+      "hr_expense_report",
+      "hr_pay_stub",
+      "hr_timesheet"
+    ],
+    "identity": [
+      "id_business_registration_certificate",
+      "id_driver_license",
+      "id_passport",
+      "id_proof_of_address"
+    ],
+    "insurance": [
+      "ins_claim_submission",
+      "ins_explanation_of_benefits",
+      "ins_policy_document",
+      "ins_premium_invoice"
     ],
     "legal": [
       "affidavit",
@@ -363,54 +486,19 @@
       "training_manual",
       "vendor_performance_review"
     ],
-    "accounting": [
-      "accounts_payable_subledger",
-      "accounts_receivable_subledger",
-      "acct_accrual_schedule",
-      "acct_ap_aging",
-      "acct_ar_aging",
-      "acct_audit_workpaper",
-      "acct_bank_rec",
-      "acct_cash_reconciliation",
-      "acct_close_checklist",
-      "acct_controls_narrative",
-      "acct_cost_center_report",
-      "acct_depreciation_schedule",
-      "acct_fixed_asset_register",
-      "acct_gl_export",
-      "acct_intercompany_reconciliation",
-      "acct_inventory_valuation",
-      "acct_invoice_register",
-      "acct_je_support",
-      "acct_payment_run",
-      "acct_prepaid_schedule",
-      "acct_revenue_recognition_schedule",
-      "acct_subledger_reconciliation",
-      "acct_tax_reconciliation",
-      "acct_trial_balance",
-      "audit_report",
-      "bank_fee_schedule",
-      "bank_reconciliation",
-      "budget_vs_actual",
-      "chart_of_accounts",
-      "consolidated_financial_statement",
-      "cost_allocation_report",
-      "depreciation_schedule",
-      "expense_report",
-      "financial_audit_workpaper",
-      "fixed_asset_register",
-      "fund_accounting_report",
-      "general_ledger",
-      "intercompany_invoice",
-      "journal_entry",
-      "management_letter",
-      "payroll_register",
-      "tax_provision",
-      "tax_return",
-      "tax_withholding_certificate",
-      "transfer_pricing_report",
-      "trial_balance",
-      "variance_analysis"
+    "tax": [
+      "tax_assessment_notice",
+      "tax_individual_income_return",
+      "tax_payment_slip",
+      "tax_property_tax_bill"
+    ],
+    "travel": [
+      "travel_boarding_pass",
+      "travel_car_rental_agreement",
+      "travel_hotel_booking_confirmation",
+      "travel_itinerary",
+      "travel_travel_insurance_policy",
+      "travel_visa_application_receipt"
     ]
   },
   "typeDefinitions": [
@@ -13305,6 +13393,18 @@
       {
         "input": "finance",
         "expected": "finance"
+      },
+      {
+        "input": "everyday",
+        "expected": "everyday"
+      },
+      {
+        "input": "banking",
+        "expected": "banking"
+      },
+      {
+        "input": "hr_payroll",
+        "expected": "hr_payroll"
       }
     ]
   }

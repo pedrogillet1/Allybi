@@ -20176,7 +20176,7 @@
       "category": "semantics",
       "path": "semantics/taxonomy/doc_taxonomy.any.json",
       "filename": "doc_taxonomy.any.json",
-      "version": "1.2.0",
+      "version": "3.0.0",
       "contentType": "semantics",
       "schemaId": "doc_identity_schema",
       "enabledByEnv": {
@@ -20194,30 +20194,6 @@
       "checksumSha256": "2198e06352fe1cdcd040e8f7c155382623915d44f362c278ac3061559cc15aaa",
       "lastUpdated": "2026-03-01",
       "dependsOn": []
-    },
-    {
-      "id": "doc_taxonomy_vd13afef0",
-      "category": "normalizers",
-      "filename": "doc_taxonomy.any.json",
-      "path": "normalizers/doc_taxonomy.any.json",
-      "version": "2.1.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "c9c5c5b740be0e9b9c52bfaab6ead4427943c07f059898cdbf9ca7de7237a682",
-      "lastUpdated": "2026-03-03"
     },
     {
       "id": "doc_title_boost_rules",
