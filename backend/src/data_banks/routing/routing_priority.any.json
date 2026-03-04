@@ -19,13 +19,15 @@
     "enabled": true
   },
   "intentFamilyBasePriority": {
-    "file_actions": 100,
     "editing": 95,
-    "documents": 90,
-    "connectors": 85,
-    "help": 60,
-    "conversation": 40,
-    "general": 10
+    "email": 94,
+    "connectors": 93,
+    "help": 92,
+    "file_actions": 90,
+    "doc_stats": 85,
+    "documents": 80,
+    "conversation": 50,
+    "error": 10
   },
   "tiebreakStages": [
     {
