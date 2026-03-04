@@ -336,6 +336,63 @@ describe("DOCX table extraction (w:tbl support)", () => {
   });
 
   // -------------------------------------------------------------------------
+  // Merged cells (gridSpan)
+  // -------------------------------------------------------------------------
+
+  it("handles gridSpan — cell spanning 2 columns", async () => {
+    // Row 1: a cell spanning 2 columns + a normal cell = 3 logical columns
+    // Row 2: 3 normal cells
+    const body = `
+      <w:tbl>
+        <w:tr>
+          <w:tc>
+            <w:tcPr><w:gridSpan w:val="2"/></w:tcPr>
+            <w:p><w:r><w:t>Merged Header</w:t></w:r></w:p>
+          </w:tc>
+          <w:tc><w:p><w:r><w:t>Col 3</w:t></w:r></w:p></w:tc>
+        </w:tr>
+        <w:tr>
+          <w:tc><w:p><w:r><w:t>A1</w:t></w:r></w:p></w:tc>
+          <w:tc><w:p><w:r><w:t>B1</w:t></w:r></w:p></w:tc>
+          <w:tc><w:p><w:r><w:t>C1</w:t></w:r></w:p></w:tc>
+        </w:tr>
+      </w:tbl>
+    `;
+
+    const buf = buildDocx(body);
+    const result = await extractDocxWithAnchors(buf);
+
+    // All content should be present
+    expect(result.text).toContain("Merged Header");
+    expect(result.text).toContain("Col 3");
+    expect(result.text).toContain("A1");
+    expect(result.text).toContain("B1");
+    expect(result.text).toContain("C1");
+
+    // Without gridSpan: row 1 = ["Merged Header", "Col 3"] → padded to ["Merged Header", "Col 3", ""]
+    // With gridSpan:    row 1 = ["Merged Header", "", "Col 3"]
+    // The key difference: "Col 3" must be in the THIRD column, aligned with "C1"
+    const lines = result.text.split("\n");
+    const headerLine = lines.find((l) => l.includes("Merged Header"));
+    const dataLine = lines.find((l) => l.includes("A1"));
+    expect(headerLine).toBeTruthy();
+    expect(dataLine).toBeTruthy();
+
+    // Split both lines by | to check column alignment
+    const headerCols = headerLine!.split("|").map((c) => c.trim()).filter((_, i, a) => i > 0 && i < a.length - 1);
+    const dataCols = dataLine!.split("|").map((c) => c.trim()).filter((_, i, a) => i > 0 && i < a.length - 1);
+
+    // Both rows should have 3 columns
+    expect(headerCols.length).toBe(3);
+    expect(dataCols.length).toBe(3);
+
+    // "Col 3" should be in the SAME column index as "C1" (column 3)
+    const col3Idx = headerCols.findIndex((c) => c === "Col 3");
+    const c1Idx = dataCols.findIndex((c) => c === "C1");
+    expect(col3Idx).toBe(c1Idx);
+  });
+
+  // -------------------------------------------------------------------------
   // paragraphCount includes table pseudo-paragraphs
   // -------------------------------------------------------------------------
 

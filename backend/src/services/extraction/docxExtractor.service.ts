@@ -163,10 +163,19 @@ function extractTableText(tblNode: any): string {
         continue;
       }
 
+      // Check for gridSpan (horizontal merged cells)
+      const tcPr = tc["w:tcPr"];
+      const tcPrNode = Array.isArray(tcPr) ? tcPr[0] : tcPr;
+      const gridSpanNode = tcPrNode?.["w:gridSpan"];
+      const gridSpanVal = Array.isArray(gridSpanNode) ? gridSpanNode[0] : gridSpanNode;
+      const gridSpan = parseInt(gridSpanVal?.$?.["w:val"] || "1", 10);
+
       // Each cell can contain multiple w:p paragraphs
       const pNodes = tc["w:p"];
       if (!pNodes) {
         cells.push("");
+        // Pad for spanned columns
+        for (let s = 1; s < gridSpan; s++) cells.push("");
         continue;
       }
 
@@ -183,6 +192,9 @@ function extractTableText(tblNode: any): string {
 
       // Join multi-paragraph cell content with a space (markdown table cells are single-line)
       cells.push(cellTextParts.join(" ").trim());
+
+      // Pad empty cells for spanned columns
+      for (let s = 1; s < gridSpan; s++) cells.push("");
     }
 
     rows.push(cells);
