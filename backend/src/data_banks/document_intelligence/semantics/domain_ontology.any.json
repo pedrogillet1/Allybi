@@ -15,7 +15,9 @@
     ],
     "tests": [
       "tests/patternWiringProof.test.ts"
-    ]
+    ],
+    "dependsOn": ["domain_ontology"],
+    "ssotRole": "di_enumeration"
   },
   "config": {
     "enabled": true,
@@ -34,10 +36,7 @@
       "education",
       "everyday",
       "housing",
-      "travel",
-      "education_research",
-      "procurement",
-      "compliance"
+      "travel"
     ],
     "domainAliases": {
       "fin": "finance",
@@ -69,13 +68,7 @@
       "housing": "housing",
       "residência": "housing",
       "travel": "travel",
-      "viagem": "travel",
-      "research": "education_research",
-      "pesquisa": "education_research",
-      "procurement": "procurement",
-      "suprimentos": "procurement",
-      "compliance": "compliance",
-      "conformidade": "compliance"
+      "viagem": "travel"
     }
   },
   "domains": [
@@ -272,45 +265,6 @@
         "billing",
         "legal",
         "finance"
-      ]
-    },
-    {
-      "id": "education_research",
-      "label": "Research",
-      "labelPt": "Pesquisa",
-      "description": "Research project plans, study cohorts, and methodology sections.",
-      "descriptionPt": "Planos de pesquisa, coortes de estudo e seções metodológicas.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "education",
-        "medical",
-        "legal"
-      ]
-    },
-    {
-      "id": "procurement",
-      "label": "Procurement",
-      "labelPt": "Aquisições",
-      "description": "Requests, quotations, vendor contracts, and spend analysis.",
-      "descriptionPt": "Solicitações, cotações, contratos de fornecedores e análise de gastos.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "finance",
-        "ops",
-        "legal"
-      ]
-    },
-    {
-      "id": "compliance",
-      "label": "Compliance",
-      "labelPt": "Conformidade",
-      "description": "Policy evidence, control matrices, and audit remediation evidence.",
-      "descriptionPt": "Evidências de política, matrizes de controle e evidências de remediação.",
-      "subdomains": [],
-      "crossDomainLinks": [
-        "legal",
-        "finance",
-        "ops"
       ]
     }
   ]
