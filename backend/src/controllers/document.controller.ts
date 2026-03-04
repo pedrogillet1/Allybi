@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import fileValidator from "../services/ingestion/fileValidator.service";
 
 /**
  * Clean, DI-friendly Document Controller.
@@ -270,6 +271,20 @@ export class DocumentController {
       const folderId = asString((req.body as any)?.folderId) ?? null;
 
       if (file?.buffer && file?.originalname) {
+        // Validate file header (magic bytes, empty check)
+        const headerCheck = fileValidator.validateFileHeader(
+          file.buffer,
+          file.mimetype || "application/octet-stream",
+        );
+        if (!headerCheck.isValid) {
+          return err(
+            res,
+            headerCheck.errorCode || "FILE_INVALID",
+            headerCheck.error || "File validation failed",
+            400,
+          );
+        }
+
         const created = await this.docs.upload({
           userId,
           data: {
