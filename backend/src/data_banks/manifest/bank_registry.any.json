@@ -36193,30 +36193,6 @@
       "lastUpdated": "2026-03-01"
     },
     {
-      "id": "table_header_ontology_accounting_v440f0106",
-      "category": "semantics",
-      "filename": "table_header_ontology.accounting.any.json",
-      "path": "document_intelligence/semantics/structure/table_header_ontology.accounting.any.json",
-      "version": "1.3.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "1bd53ebf801de85b845796b4cf397ab6f47253b51663335694be4d778d926aab",
-      "lastUpdated": "2026-03-03"
-    },
-    {
       "id": "table_header_ontology_banking",
       "category": "semantics",
       "path": "semantics/structure/table_header_ontology.banking.any.json",
@@ -36289,30 +36265,6 @@
       "lastUpdated": "2026-02-27"
     },
     {
-      "id": "table_header_ontology_everyday_v37e0344c",
-      "category": "semantics",
-      "filename": "table_header_ontology.everyday.any.json",
-      "path": "document_intelligence/semantics/structure/table_header_ontology.everyday.any.json",
-      "version": "1.3.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "f6155e8fe1839bdc0f59e23ca9be1e766adb462a904d471337b944f82052151a",
-      "lastUpdated": "2026-03-03"
-    },
-    {
       "id": "table_header_ontology_finance",
       "category": "semantics",
       "path": "semantics/structure/table_header_ontology.finance.any.json",
@@ -36337,30 +36289,6 @@
       },
       "checksumSha256": "2af74026c54a87f741c2251a109513d2543ab9dce7bf8cfa174c6de632ec86f8",
       "lastUpdated": "2026-03-01"
-    },
-    {
-      "id": "table_header_ontology_finance_v5baba7af",
-      "category": "semantics",
-      "filename": "table_header_ontology.finance.any.json",
-      "path": "document_intelligence/semantics/structure/table_header_ontology.finance.any.json",
-      "version": "1.3.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "80a50aebbbf6749ff2a5af677ea27abf023a579e38edf3251dc77e04f8e60cf4",
-      "lastUpdated": "2026-03-03"
     },
     {
       "id": "table_header_ontology_insurance",
@@ -36413,30 +36341,6 @@
       "lastUpdated": "2026-03-01"
     },
     {
-      "id": "table_header_ontology_legal_v439d4f7c",
-      "category": "semantics",
-      "filename": "table_header_ontology.legal.any.json",
-      "path": "document_intelligence/semantics/structure/table_header_ontology.legal.any.json",
-      "version": "1.3.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "c407ee32e910f132ca52aaa8c32d06a9289081a43573a76e830e23431c2694b7",
-      "lastUpdated": "2026-03-03"
-    },
-    {
       "id": "table_header_ontology_medical",
       "category": "semantics",
       "path": "semantics/structure/table_header_ontology.medical.any.json",
@@ -36461,30 +36365,6 @@
       },
       "checksumSha256": "ebe241e77a96764bca85b8b4d636936307ed3dfe4aa2943a15568d4c22ab5219",
       "lastUpdated": "2026-03-01"
-    },
-    {
-      "id": "table_header_ontology_medical_ved51f076",
-      "category": "semantics",
-      "filename": "table_header_ontology.medical.any.json",
-      "path": "document_intelligence/semantics/structure/table_header_ontology.medical.any.json",
-      "version": "1.3.0",
-      "schemaId": "bank_schema",
-      "contentType": "json",
-      "dependsOn": [],
-      "enabledByEnv": {
-        "production": true,
-        "staging": true,
-        "dev": true,
-        "local": true
-      },
-      "requiredByEnv": {
-        "production": false,
-        "staging": false,
-        "dev": false,
-        "local": false
-      },
-      "checksumSha256": "1339998e2e3e9e08f23cb27df38a1da96dcb1cd8488f819b44ff3b19b8103c16",
-      "lastUpdated": "2026-03-03"
     },
     {
       "id": "table_header_ontology_ops",

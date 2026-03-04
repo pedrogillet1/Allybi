@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 
 function resolveDataBanksRoot(): string {
   const candidates = [
@@ -106,5 +106,34 @@ describe("doc_taxonomy SSOT", () => {
     }
 
     expect(emptyDomains).toEqual([]);
+  });
+});
+
+describe("table_header_ontology SSOT", () => {
+  const CANONICAL_DIR = path.join(DATA_BANKS_ROOT, "semantics/structure");
+  const STALE_DIR = path.join(DATA_BANKS_ROOT, "document_intelligence/semantics/structure");
+
+  it("no table_header_ontology files exist in document_intelligence/semantics/structure", () => {
+    if (!fs.existsSync(STALE_DIR)) return;
+    const staleFiles = fs.readdirSync(STALE_DIR).filter(
+      (f) => f.startsWith("table_header_ontology.") && f.endsWith(".any.json"),
+    );
+    expect(staleFiles).toEqual([]);
+  });
+
+  it("all table_header_ontology IDs in bank_registry use canonical path", () => {
+    const registry = JSON.parse(
+      fs.readFileSync(path.join(DATA_BANKS_ROOT, "manifest/bank_registry.any.json"), "utf-8"),
+    );
+    const entries = (registry.banks || []).filter(
+      (b: Record<string, unknown>) =>
+        typeof b.id === "string" &&
+        (b.id as string).startsWith("table_header_ontology_"),
+    );
+    for (const entry of entries) {
+      expect(entry.path).toContain("semantics/structure/");
+      expect(entry.path).not.toContain("document_intelligence/semantics/structure/");
+      expect(entry.id).not.toMatch(/_v[0-9a-f]+$/);
+    }
   });
 });
