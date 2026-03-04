@@ -3,11 +3,17 @@
     "id": "cross_domain_tiebreak_policy",
     "version": "1.0.0",
     "description": "Deterministic tiebreak rules when a document matches detection rules in two or more domains simultaneously. The winner domain takes priority for doc-type assignment.",
-    "languages": ["any"],
+    "languages": [
+      "any"
+    ],
     "lastUpdated": "2026-03-04",
     "owner": "data-bank-governance",
-    "usedBy": ["services/core/banks/bankSelectionPlanner.service.ts"],
-    "tests": ["tests/document-intelligence/cross-domain-tiebreak.test.ts"]
+    "usedBy": [
+      "services/core/banks/bankSelectionPlanner.service.ts"
+    ],
+    "tests": [
+      "tests/document-intelligence/cross-domain-tiebreak.test.ts"
+    ]
   },
   "config": {
     "enabled": true,
@@ -158,6 +164,702 @@
       "winner": "finance",
       "confidenceBoost": 0.2,
       "reason": "Financial statements require numeric integrity rules. Must never be treated as everyday."
+    },
+    {
+      "id": "TBK_019",
+      "domainA": "accounting",
+      "domainB": "banking",
+      "winner": "accounting",
+      "confidenceBoost": 0.05,
+      "reason": "Accounting ledger rules take precedence; banking handles consumer statements."
+    },
+    {
+      "id": "TBK_020",
+      "domainA": "accounting",
+      "domainB": "billing",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting ledger rules handle structured financial data; billing handles simple invoices."
+    },
+    {
+      "id": "TBK_021",
+      "domainA": "accounting",
+      "domainB": "education",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting structured data rules take precedence over academic record parsing."
+    },
+    {
+      "id": "TBK_022",
+      "domainA": "accounting",
+      "domainB": "everyday",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting requires structured ledger extraction. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_023",
+      "domainA": "accounting",
+      "domainB": "housing",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting reconciliation rules take precedence; housing handles property statements."
+    },
+    {
+      "id": "TBK_024",
+      "domainA": "accounting",
+      "domainB": "hr_payroll",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting ledger and reconciliation rules take precedence over HR pay stub extraction."
+    },
+    {
+      "id": "TBK_025",
+      "domainA": "accounting",
+      "domainB": "identity",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting structured data rules take precedence over identity document verification."
+    },
+    {
+      "id": "TBK_026",
+      "domainA": "accounting",
+      "domainB": "insurance",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting structured data rules override insurance claim extraction."
+    },
+    {
+      "id": "TBK_027",
+      "domainA": "accounting",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.05,
+      "reason": "Legal instruments require clause-level extraction; accounting handles ledgers and reconciliations."
+    },
+    {
+      "id": "TBK_028",
+      "domainA": "accounting",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.1,
+      "reason": "Medical safety boundaries take precedence over accounting ledger rules."
+    },
+    {
+      "id": "TBK_029",
+      "domainA": "accounting",
+      "domainB": "ops",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting structured data rules take precedence over operational document handling."
+    },
+    {
+      "id": "TBK_030",
+      "domainA": "accounting",
+      "domainB": "travel",
+      "winner": "accounting",
+      "confidenceBoost": 0.1,
+      "reason": "Accounting structured data rules take precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_031",
+      "domainA": "banking",
+      "domainB": "billing",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Banking statement extraction takes precedence over generic billing invoices."
+    },
+    {
+      "id": "TBK_032",
+      "domainA": "banking",
+      "domainB": "education",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Banking institutional rules take precedence; education handles academic records."
+    },
+    {
+      "id": "TBK_033",
+      "domainA": "banking",
+      "domainB": "housing",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Banking institutional rules take precedence; housing handles property docs."
+    },
+    {
+      "id": "TBK_034",
+      "domainA": "banking",
+      "domainB": "hr_payroll",
+      "winner": "banking",
+      "confidenceBoost": 0.05,
+      "reason": "Banking institutional rules take precedence; HR/payroll handles employment docs."
+    },
+    {
+      "id": "TBK_035",
+      "domainA": "banking",
+      "domainB": "identity",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Banking statement extraction takes precedence over identity document verification."
+    },
+    {
+      "id": "TBK_036",
+      "domainA": "banking",
+      "domainB": "insurance",
+      "winner": "banking",
+      "confidenceBoost": 0.05,
+      "reason": "Banking statement extraction takes precedence; insurance handles policy docs."
+    },
+    {
+      "id": "TBK_037",
+      "domainA": "banking",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.1,
+      "reason": "Legal instruments require clause-level extraction over banking statement parsing."
+    },
+    {
+      "id": "TBK_038",
+      "domainA": "banking",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.1,
+      "reason": "Medical safety constraints override banking statement extraction."
+    },
+    {
+      "id": "TBK_039",
+      "domainA": "banking",
+      "domainB": "ops",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Banking institutional rules take precedence over operational document handling."
+    },
+    {
+      "id": "TBK_040",
+      "domainA": "banking",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.05,
+      "reason": "Tax regulatory rules take precedence over banking statement extraction."
+    },
+    {
+      "id": "TBK_041",
+      "domainA": "banking",
+      "domainB": "travel",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Banking statement extraction takes precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_042",
+      "domainA": "billing",
+      "domainB": "education",
+      "winner": "billing",
+      "confidenceBoost": 0.05,
+      "reason": "Billing extraction rules take precedence; education handles academic records."
+    },
+    {
+      "id": "TBK_043",
+      "domainA": "billing",
+      "domainB": "finance",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial statements require numeric integrity rules; billing handles utility invoices."
+    },
+    {
+      "id": "TBK_044",
+      "domainA": "billing",
+      "domainB": "hr_payroll",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.1,
+      "reason": "HR/payroll employment data rules take precedence; billing handles utility invoices."
+    },
+    {
+      "id": "TBK_045",
+      "domainA": "billing",
+      "domainB": "identity",
+      "winner": "identity",
+      "confidenceBoost": 0.05,
+      "reason": "Identity document verification rules take precedence; billing handles utility invoices."
+    },
+    {
+      "id": "TBK_046",
+      "domainA": "billing",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.15,
+      "reason": "Legal domain takes priority over billing for specialized extraction."
+    },
+    {
+      "id": "TBK_047",
+      "domainA": "billing",
+      "domainB": "ops",
+      "winner": "billing",
+      "confidenceBoost": 0.05,
+      "reason": "Billing extraction rules take precedence over operational document handling."
+    },
+    {
+      "id": "TBK_048",
+      "domainA": "billing",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax regulatory rules take precedence over generic billing extraction."
+    },
+    {
+      "id": "TBK_049",
+      "domainA": "billing",
+      "domainB": "travel",
+      "winner": "billing",
+      "confidenceBoost": 0.1,
+      "reason": "Billing extraction rules take precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_050",
+      "domainA": "education",
+      "domainB": "finance",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial reports require numeric integrity; education handles academic records."
+    },
+    {
+      "id": "TBK_051",
+      "domainA": "education",
+      "domainB": "housing",
+      "winner": "housing",
+      "confidenceBoost": 0.05,
+      "reason": "Housing property documents take precedence; education handles academic records."
+    },
+    {
+      "id": "TBK_052",
+      "domainA": "education",
+      "domainB": "hr_payroll",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.1,
+      "reason": "HR/payroll employment data rules take precedence; education handles academic records."
+    },
+    {
+      "id": "TBK_053",
+      "domainA": "education",
+      "domainB": "identity",
+      "winner": "identity",
+      "confidenceBoost": 0.1,
+      "reason": "Identity document verification takes precedence; education handles academic records."
+    },
+    {
+      "id": "TBK_054",
+      "domainA": "education",
+      "domainB": "insurance",
+      "winner": "insurance",
+      "confidenceBoost": 0.1,
+      "reason": "Insurance specialized extraction takes precedence; education handles academic records."
+    },
+    {
+      "id": "TBK_055",
+      "domainA": "education",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.15,
+      "reason": "Legal instruments require clause-level extraction over academic record parsing."
+    },
+    {
+      "id": "TBK_056",
+      "domainA": "education",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.15,
+      "reason": "Medical records require safety-critical extraction; education rules are insufficient."
+    },
+    {
+      "id": "TBK_057",
+      "domainA": "education",
+      "domainB": "ops",
+      "winner": "education",
+      "confidenceBoost": 0.05,
+      "reason": "Education academic records take precedence over operational document handling."
+    },
+    {
+      "id": "TBK_058",
+      "domainA": "education",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax regulatory rules take precedence over academic record parsing."
+    },
+    {
+      "id": "TBK_059",
+      "domainA": "education",
+      "domainB": "travel",
+      "winner": "education",
+      "confidenceBoost": 0.05,
+      "reason": "Education academic records take precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_060",
+      "domainA": "everyday",
+      "domainB": "housing",
+      "winner": "housing",
+      "confidenceBoost": 0.1,
+      "reason": "Housing property documents require specialized extraction. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_061",
+      "domainA": "everyday",
+      "domainB": "insurance",
+      "winner": "insurance",
+      "confidenceBoost": 0.1,
+      "reason": "Insurance policies require specialized extraction. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_062",
+      "domainA": "everyday",
+      "domainB": "ops",
+      "winner": "ops",
+      "confidenceBoost": 0.05,
+      "reason": "Operational documents require specific handling. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_063",
+      "domainA": "finance",
+      "domainB": "housing",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial reports take precedence for numeric integrity over housing statements."
+    },
+    {
+      "id": "TBK_064",
+      "domainA": "finance",
+      "domainB": "hr_payroll",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial statements require numeric integrity; HR/payroll handles pay stubs."
+    },
+    {
+      "id": "TBK_065",
+      "domainA": "finance",
+      "domainB": "identity",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial reports require numeric integrity rules; identity handles document verification."
+    },
+    {
+      "id": "TBK_066",
+      "domainA": "finance",
+      "domainB": "insurance",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial reports require numeric integrity rules over insurance claim extraction."
+    },
+    {
+      "id": "TBK_067",
+      "domainA": "finance",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.05,
+      "reason": "Legal contracts require clause-level precision that financial analysis rules cannot guarantee."
+    },
+    {
+      "id": "TBK_068",
+      "domainA": "finance",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.05,
+      "reason": "Medical documents are safety-critical and require clinical extraction rules over financial analysis."
+    },
+    {
+      "id": "TBK_069",
+      "domainA": "finance",
+      "domainB": "ops",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial statements require numeric integrity rules over operational doc handling."
+    },
+    {
+      "id": "TBK_070",
+      "domainA": "finance",
+      "domainB": "tax",
+      "winner": "finance",
+      "confidenceBoost": 0.05,
+      "reason": "Financial statements require numeric integrity rules that override tax form extraction."
+    },
+    {
+      "id": "TBK_071",
+      "domainA": "finance",
+      "domainB": "travel",
+      "winner": "finance",
+      "confidenceBoost": 0.1,
+      "reason": "Financial reports require numeric integrity; travel handles itineraries and passes."
+    },
+    {
+      "id": "TBK_072",
+      "domainA": "housing",
+      "domainB": "hr_payroll",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.05,
+      "reason": "HR/payroll employment data rules take precedence; housing handles property docs."
+    },
+    {
+      "id": "TBK_073",
+      "domainA": "housing",
+      "domainB": "identity",
+      "winner": "identity",
+      "confidenceBoost": 0.05,
+      "reason": "Identity document verification rules take precedence; housing handles property docs."
+    },
+    {
+      "id": "TBK_074",
+      "domainA": "housing",
+      "domainB": "insurance",
+      "winner": "insurance",
+      "confidenceBoost": 0.1,
+      "reason": "Insurance specialized extraction takes precedence; housing handles property docs."
+    },
+    {
+      "id": "TBK_075",
+      "domainA": "housing",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.15,
+      "reason": "Legal agreements take precedence; housing handles property-specific statements."
+    },
+    {
+      "id": "TBK_076",
+      "domainA": "housing",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.15,
+      "reason": "Medical content is safety-critical and takes precedence over housing documents."
+    },
+    {
+      "id": "TBK_077",
+      "domainA": "housing",
+      "domainB": "ops",
+      "winner": "housing",
+      "confidenceBoost": 0.1,
+      "reason": "Housing property documents take precedence over operational doc handling."
+    },
+    {
+      "id": "TBK_078",
+      "domainA": "housing",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax forms and notices take precedence; housing handles non-tax property docs."
+    },
+    {
+      "id": "TBK_079",
+      "domainA": "housing",
+      "domainB": "travel",
+      "winner": "housing",
+      "confidenceBoost": 0.1,
+      "reason": "Housing property documents take precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_080",
+      "domainA": "hr_payroll",
+      "domainB": "identity",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.05,
+      "reason": "HR/payroll employment data rules take precedence; identity handles basic verification."
+    },
+    {
+      "id": "TBK_081",
+      "domainA": "hr_payroll",
+      "domainB": "insurance",
+      "winner": "insurance",
+      "confidenceBoost": 0.05,
+      "reason": "Insurance specialized extraction takes precedence; HR/payroll handles employment docs."
+    },
+    {
+      "id": "TBK_082",
+      "domainA": "hr_payroll",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.1,
+      "reason": "Medical records require clinical safeguards that HR/payroll extraction cannot provide."
+    },
+    {
+      "id": "TBK_083",
+      "domainA": "hr_payroll",
+      "domainB": "ops",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.1,
+      "reason": "HR/payroll employment data rules take precedence over operational doc handling."
+    },
+    {
+      "id": "TBK_084",
+      "domainA": "hr_payroll",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax regulatory rules take precedence; HR/payroll handles non-tax employment docs."
+    },
+    {
+      "id": "TBK_085",
+      "domainA": "hr_payroll",
+      "domainB": "travel",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.1,
+      "reason": "HR/payroll employment data rules take precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_086",
+      "domainA": "identity",
+      "domainB": "insurance",
+      "winner": "insurance",
+      "confidenceBoost": 0.05,
+      "reason": "Insurance policy extraction takes precedence over identity document verification."
+    },
+    {
+      "id": "TBK_087",
+      "domainA": "identity",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.15,
+      "reason": "Legal instruments require clause-level extraction; identity handles document verification."
+    },
+    {
+      "id": "TBK_088",
+      "domainA": "identity",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.15,
+      "reason": "Medical documents need clinical safety rules; identity extraction is secondary."
+    },
+    {
+      "id": "TBK_089",
+      "domainA": "identity",
+      "domainB": "ops",
+      "winner": "identity",
+      "confidenceBoost": 0.1,
+      "reason": "Identity document verification rules take precedence over operational doc handling."
+    },
+    {
+      "id": "TBK_090",
+      "domainA": "identity",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax regulatory rules take precedence; identity handles document verification."
+    },
+    {
+      "id": "TBK_091",
+      "domainA": "identity",
+      "domainB": "travel",
+      "winner": "identity",
+      "confidenceBoost": 0.1,
+      "reason": "Identity document verification takes precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_092",
+      "domainA": "insurance",
+      "domainB": "legal",
+      "winner": "legal",
+      "confidenceBoost": 0.1,
+      "reason": "Legal contracts take precedence; insurance handles policy summaries and claims."
+    },
+    {
+      "id": "TBK_093",
+      "domainA": "insurance",
+      "domainB": "ops",
+      "winner": "insurance",
+      "confidenceBoost": 0.1,
+      "reason": "Insurance specialized extraction takes precedence over operational doc handling."
+    },
+    {
+      "id": "TBK_094",
+      "domainA": "insurance",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.05,
+      "reason": "Tax regulatory rules take precedence over insurance policy extraction."
+    },
+    {
+      "id": "TBK_095",
+      "domainA": "insurance",
+      "domainB": "travel",
+      "winner": "insurance",
+      "confidenceBoost": 0.1,
+      "reason": "Insurance policy extraction takes precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_096",
+      "domainA": "legal",
+      "domainB": "medical",
+      "winner": "medical",
+      "confidenceBoost": 0.05,
+      "reason": "Medical safety constraints override legal extraction; clinical content requires domain-specific safeguards."
+    },
+    {
+      "id": "TBK_097",
+      "domainA": "legal",
+      "domainB": "ops",
+      "winner": "legal",
+      "confidenceBoost": 0.15,
+      "reason": "Legal instruments require clause-level extraction; operations handles work orders."
+    },
+    {
+      "id": "TBK_098",
+      "domainA": "legal",
+      "domainB": "tax",
+      "winner": "legal",
+      "confidenceBoost": 0.1,
+      "reason": "Legal contracts require clause-level extraction; tax handles returns and notices."
+    },
+    {
+      "id": "TBK_099",
+      "domainA": "legal",
+      "domainB": "travel",
+      "winner": "legal",
+      "confidenceBoost": 0.15,
+      "reason": "Legal instruments require clause-level precision; travel handles itineraries."
+    },
+    {
+      "id": "TBK_100",
+      "domainA": "medical",
+      "domainB": "ops",
+      "winner": "medical",
+      "confidenceBoost": 0.15,
+      "reason": "Medical safety constraints override operational document handling."
+    },
+    {
+      "id": "TBK_101",
+      "domainA": "medical",
+      "domainB": "tax",
+      "winner": "medical",
+      "confidenceBoost": 0.1,
+      "reason": "Medical documents are safety-critical; tax rules do not apply to clinical content."
+    },
+    {
+      "id": "TBK_102",
+      "domainA": "medical",
+      "domainB": "travel",
+      "winner": "medical",
+      "confidenceBoost": 0.15,
+      "reason": "Medical documents are safety-critical; travel extraction rules do not apply."
+    },
+    {
+      "id": "TBK_103",
+      "domainA": "ops",
+      "domainB": "tax",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax regulatory rules take precedence over operational document handling."
+    },
+    {
+      "id": "TBK_104",
+      "domainA": "ops",
+      "domainB": "travel",
+      "winner": "ops",
+      "confidenceBoost": 0.05,
+      "reason": "Operations document handling takes precedence; travel handles itineraries."
+    },
+    {
+      "id": "TBK_105",
+      "domainA": "tax",
+      "domainB": "travel",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax regulatory rules take precedence; travel handles itineraries and passes."
     }
   ]
 }

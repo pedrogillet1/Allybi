@@ -4,6 +4,36 @@ import path from "node:path";
 
 const BANKS_ROOT = path.resolve(__dirname, "../../data_banks");
 
+/** The 15 canonical domains in priority order (highest first). */
+const CANONICAL_DOMAINS = [
+  "accounting",
+  "banking",
+  "billing",
+  "education",
+  "everyday",
+  "finance",
+  "housing",
+  "hr_payroll",
+  "identity",
+  "insurance",
+  "legal",
+  "medical",
+  "ops",
+  "tax",
+  "travel",
+] as const;
+
+/** Generate all C(15,2) = 105 unique unordered domain pairs. */
+function allDomainPairs(): [string, string][] {
+  const pairs: [string, string][] = [];
+  for (let i = 0; i < CANONICAL_DOMAINS.length; i++) {
+    for (let j = i + 1; j < CANONICAL_DOMAINS.length; j++) {
+      pairs.push([CANONICAL_DOMAINS[i], CANONICAL_DOMAINS[j]]);
+    }
+  }
+  return pairs;
+}
+
 describe("cross_domain_tiebreak_policy", () => {
   const BANK_PATH = path.join(
     BANKS_ROOT,
@@ -20,20 +50,12 @@ describe("cross_domain_tiebreak_policy", () => {
     expect(raw._meta.version).toBeTruthy();
   });
 
-  it("defines priority ordering for all overlapping domain pairs", () => {
+  it("defines priority ordering for ALL 105 domain pairs", () => {
     const raw = JSON.parse(fs.readFileSync(BANK_PATH, "utf-8"));
     const rules = raw.rules || [];
 
-    const requiredPairs = [
-      ["billing", "everyday"],
-      ["medical", "billing"],
-      ["medical", "insurance"],
-      ["legal", "hr_payroll"],
-      ["finance", "accounting"],
-      ["housing", "billing"],
-      ["tax", "accounting"],
-      ["identity", "everyday"],
-    ];
+    const requiredPairs = allDomainPairs();
+    expect(requiredPairs).toHaveLength(105);
 
     for (const [domainA, domainB] of requiredPairs) {
       const match = rules.find(
@@ -43,6 +65,24 @@ describe("cross_domain_tiebreak_policy", () => {
       );
       expect(match, `missing tiebreak for ${domainA} vs ${domainB}`).toBeTruthy();
     }
+  });
+
+  it("no duplicate domain pairs", () => {
+    const raw = JSON.parse(fs.readFileSync(BANK_PATH, "utf-8"));
+    const rules = raw.rules || [];
+
+    const seen = new Set<string>();
+    const duplicates: string[] = [];
+
+    for (const rule of rules) {
+      const key = [rule.domainA, rule.domainB].sort().join("|");
+      if (seen.has(key)) {
+        duplicates.push(`${rule.id}: ${rule.domainA} vs ${rule.domainB}`);
+      }
+      seen.add(key);
+    }
+
+    expect(duplicates, `duplicate pairs found: ${duplicates.join(", ")}`).toHaveLength(0);
   });
 
   it("each rule has a winner, reason, and confidenceBoost", () => {
