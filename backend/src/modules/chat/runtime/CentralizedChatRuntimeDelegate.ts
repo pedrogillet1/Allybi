@@ -710,11 +710,13 @@ function toEngineEvidencePack(pack: EvidencePack | null) {
       },
       locationKey: item.locationKey,
       snippet: item.snippet,
+      table: item.table ?? null,
       score: {
         finalScore: item.score.finalScore,
       },
       evidenceType: item.evidenceType,
     })),
+    conflicts: pack.conflicts,
   };
 }
 

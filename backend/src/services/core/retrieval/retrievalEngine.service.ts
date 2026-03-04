@@ -319,9 +319,18 @@ export interface EvidencePack {
     uniqueDocsInEvidence: number;
     topScore: number | null;
     scoreGap: number | null;
+    docLevelScores?: Record<string, number>;
   };
 
   evidence: EvidenceItem[];
+
+  conflicts?: Array<{
+    metric: string;
+    docA: string;
+    valueA: number;
+    docB: string;
+    valueB: number;
+  }>;
 
   // Debug is *engine-side only*. Never print to user.
   debug?: {
@@ -3430,6 +3439,22 @@ export class RetrievalEngineService {
   // Conflict Detection
   // -----------------------------
 
+  /**
+   * Parse a number string respecting both US (1,500.00) and BR (1.500,00) formats.
+   * Heuristic: if last separator is comma with 1-2 decimal digits after → BR format.
+   */
+  private parseLocaleNumber(raw: string): number {
+    const cleaned = raw.trim();
+    // Check for BR format: dots as thousands separators, comma as decimal
+    const brMatch = cleaned.match(/^([+-]?\d[\d.]*),(\d{1,2})$/);
+    if (brMatch) {
+      const intPart = brMatch[1].replace(/\./g, "");
+      return parseFloat(`${intPart}.${brMatch[2]}`);
+    }
+    // Default US: commas are thousands separators
+    return parseFloat(cleaned.replace(/,/g, ""));
+  }
+
   private detectEvidenceConflicts(
     evidence: EvidenceItem[],
   ): Array<{ metric: string; docA: string; valueA: number; docB: string; valueB: number }> {
@@ -3450,8 +3475,7 @@ export class RetrievalEngineService {
       let match: RegExpExecArray | null;
       while ((match = numPattern.exec(text)) !== null) {
         const fullMatch = match[0].trim();
-        const numStr = match[1].replace(/,/g, "");
-        const value = parseFloat(numStr);
+        const value = this.parseLocaleNumber(match[1]);
         if (!Number.isFinite(value)) continue;
         const words = fullMatch.replace(/[-+]?\d[\d.,]*/g, "").trim().toLowerCase();
         const metricKey = words.split(/\s+/).slice(-10).join(" ").trim();
@@ -3542,10 +3566,26 @@ export class RetrievalEngineService {
       }
     }
 
+    // SCP: Extend truncation to preserve negation context
+    const negPattern =
+      /\b(not|never|no|excluding|without|except|none|nem|não|nunca|exceto|sem)\b\s+\S{3,}/gi;
+    let negMatch: RegExpExecArray | null;
+    while ((negMatch = negPattern.exec(snippet)) !== null) {
+      const nStart = negMatch.index;
+      const nEnd = nStart + negMatch[0].length;
+      if (nStart < truncPoint && nEnd > truncPoint) {
+        truncPoint = nEnd;
+        break;
+      }
+    }
+
+    // Record post-extension truncPoint so sentence boundary never regresses past it
+    const extensionFloor = truncPoint;
+
     const sentenceBoundary = snippet.lastIndexOf(". ", truncPoint);
     const newlineBoundary = snippet.lastIndexOf("\n", truncPoint);
     const boundary = Math.max(sentenceBoundary, newlineBoundary);
-    if (boundary > effectiveMax * 0.5) {
+    if (boundary > effectiveMax * 0.5 && boundary >= extensionFloor) {
       truncPoint = boundary + 1;
     }
 
@@ -3556,6 +3596,32 @@ export class RetrievalEngineService {
   // -----------------------------
   // Packaging
   // -----------------------------
+
+  /**
+   * Compute aggregate doc-level score from all chunks belonging to a document.
+   * Formula: max(chunk scores) * 0.7 + mean(top-3 chunk scores) * 0.3
+   * This rewards documents with multiple strong chunks over single-chunk docs.
+   */
+  private computeDocLevelScores(
+    candidates: CandidateChunk[],
+  ): Map<string, number> {
+    const byDoc = new Map<string, number[]>();
+    for (const c of candidates) {
+      const scores = byDoc.get(c.docId) ?? [];
+      scores.push(c.scores.final ?? 0);
+      byDoc.set(c.docId, scores);
+    }
+
+    const result = new Map<string, number>();
+    for (const [docId, scores] of byDoc) {
+      scores.sort((a, b) => b - a);
+      const maxScore = scores[0] ?? 0;
+      const top3 = scores.slice(0, 3);
+      const meanTop3 = top3.reduce((a, b) => a + b, 0) / top3.length;
+      result.set(docId, maxScore * 0.7 + meanTop3 * 0.3);
+    }
+    return result;
+  }
 
   private packageEvidence(
     candidates: CandidateChunk[],
@@ -3692,6 +3758,15 @@ export class RetrievalEngineService {
     // document text. Any evidence from attached docs is better than none.
     const scopedMinScore = ctx.scope.hardScopeActive ? 0 : minFinalScore;
 
+    // Doc-level aggregation: blend 5% doc score into chunk scores
+    const docScores = this.computeDocLevelScores(candidates);
+    for (const c of candidates) {
+      const docScore = docScores.get(c.docId) ?? 0;
+      const chunkScore = c.scores.final ?? 0;
+      c.scores.final = chunkScore * 0.95 + docScore * 0.05;
+    }
+    candidates.sort((a, b) => (b.scores.final ?? 0) - (a.scores.final ?? 0));
+
     const evidence: EvidenceItem[] = [];
     const perDoc = new Map<string, number>();
     const selectedDocs = new Set<string>();
@@ -3771,7 +3846,7 @@ export class RetrievalEngineService {
         filename: c.filename ?? null,
         location: c.location,
         locationKey: c.locationKey,
-        snippet: c.type === "text"
+        snippet: c.snippet
           ? this.compressSnippet(c.snippet, {
               maxChars: maxSnippetChars,
               preserveNumericUnits,
@@ -3919,14 +3994,17 @@ export class RetrievalEngineService {
         uniqueDocsInEvidence: uniqueDocs.size,
         topScore,
         scoreGap,
+        docLevelScores: Object.fromEntries(docScores),
       },
       evidence,
+      conflicts: [],
       debug: {
         phases: [],
         reasonCodes: [],
-        conflicts: this.detectEvidenceConflicts(evidence),
       },
     };
+
+    pack.conflicts = this.detectEvidenceConflicts(evidence);
 
     return pack;
   }

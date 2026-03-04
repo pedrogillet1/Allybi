@@ -90,8 +90,22 @@ export interface EvidencePackLike {
     };
     locationKey?: string;
     snippet?: string;
+    table?: {
+      header?: string[];
+      rows?: Array<Array<string | number | null>>;
+      warnings?: string[];
+      structureScore?: number;
+      numericIntegrityScore?: number;
+    } | null;
     score?: { finalScore?: number };
     evidenceType?: "text" | "table" | "image";
+  }>;
+  conflicts?: Array<{
+    metric: string;
+    docA: string;
+    valueA: number;
+    docB: string;
+    valueB: number;
   }>;
 }
 
@@ -195,6 +209,8 @@ type EvidenceRenderResult = {
   text: string;
   charsIncluded: number;
   itemsIncluded: number;
+  tableItemsRendered: number;
+  tableQualityAnnotations: number;
 };
 
 type BuilderEvidenceCaps = {
@@ -251,8 +267,8 @@ const DEFAULT_BUILDER_POLICY: BuilderRuntimePolicy = {
     },
     doc_grounded_table: {
       maxItems: 8,
-      maxSnippetChars: 260,
-      maxSectionChars: 3200,
+      maxSnippetChars: 480,
+      maxSectionChars: 4800,
     },
   },
 };
@@ -641,6 +657,7 @@ export class LlmRequestBuilderService {
         },
         provenanceSchemaVersion: "v1",
         evidenceMap: this.buildEvidenceMapMetadata(input.evidencePack),
+        evidenceRendering: userPayload.evidenceRendering,
       },
     };
   }
@@ -872,8 +889,14 @@ export class LlmRequestBuilderService {
     input: BuildRequestInput,
     disambiguationSignal: DisambiguationPayload | null,
     policy: BuilderRuntimePolicy,
-  ): { content: string; stats: BuilderPayloadStats } {
+  ): { content: string; stats: BuilderPayloadStats; evidenceRendering?: Record<string, number> } {
     const parts: string[] = [];
+    const evidenceRenderingTelemetry: Record<string, number> = {
+      tableItemsRendered: 0,
+      tableQualityAnnotations: 0,
+      conflictsInjected: 0,
+      totalEvidenceItems: 0,
+    };
     const stats: BuilderPayloadStats = {
       memoryCharsIncluded: 0,
       evidenceCharsIncluded: 0,
@@ -920,6 +943,25 @@ export class LlmRequestBuilderService {
         stats.evidenceCharsIncluded = evidenceBlock.charsIncluded;
         stats.evidenceItemsIncluded = evidenceBlock.itemsIncluded;
       }
+      evidenceRenderingTelemetry.tableItemsRendered = evidenceBlock.tableItemsRendered;
+      evidenceRenderingTelemetry.tableQualityAnnotations = evidenceBlock.tableQualityAnnotations;
+      evidenceRenderingTelemetry.totalEvidenceItems = input.evidencePack.evidence.length;
+    }
+
+    // Cross-doc conflict warnings (from retrieval engine detection)
+    if (
+      input.evidencePack?.conflicts?.length
+    ) {
+      const conflicts = input.evidencePack.conflicts.slice(0, 5);
+      evidenceRenderingTelemetry.conflictsInjected = conflicts.length;
+      const conflictBlock = [
+        "### Data Conflicts Detected",
+        "The following metrics differ across documents. Flag uncertainty explicitly in your answer:",
+        ...conflicts.map(
+          (c) => `- "${c.metric}": ${c.docA}=${c.valueA} vs ${c.docB}=${c.valueB}`,
+        ),
+      ].join("\n");
+      parts.push(conflictBlock);
     }
 
     // Disambiguation options (if active) — keep minimal; prompt handles rendering policy
@@ -990,7 +1032,7 @@ export class LlmRequestBuilderService {
       .slice(0, policy.payloadCaps.totalUserPayloadCharsMax);
     stats.totalUserPayloadChars = content.length;
     stats.estimatedUserPayloadTokens = estimateTokensFromChars(content.length);
-    return { content, stats };
+    return { content, stats, evidenceRendering: evidenceRenderingTelemetry };
   }
 
   private renderEvidenceForPrompt(
@@ -1030,6 +1072,8 @@ export class LlmRequestBuilderService {
     lines.push(header);
     let sectionChars = header.length;
     let itemsIncluded = 0;
+    let tableItemsRendered = 0;
+    let tableQualityAnnotations = 0;
     for (const e of top) {
       const title = e.title || e.filename || e.docId;
       const locParts: string[] = [];
@@ -1045,11 +1089,55 @@ export class LlmRequestBuilderService {
       ).trim();
       const evidenceId = `${e.docId}:${locationKey}`;
 
-      const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
-      const clipped =
-        snippet.length > maxSnippetChars
-          ? snippet.slice(0, maxSnippetChars - 1) + "…"
-          : snippet;
+      let clipped: string;
+      if (
+        e.evidenceType === "table" &&
+        e.table &&
+        Array.isArray(e.table.header) &&
+        e.table.header.length > 0
+      ) {
+        const hdr = e.table.header.map((h) => String(h ?? "")).join(" | ");
+        const rows = (e.table.rows || [])
+          .slice(0, 8)
+          .map((r) => (r || []).map((c) => String(c ?? "")).join(" | "));
+        const sep = e.table.header.map(() => "---").join(" | ");
+        const tableText = [hdr, sep, ...rows].join("\n");
+        clipped =
+          tableText.length > maxSnippetChars
+            ? tableText.slice(0, maxSnippetChars - 1) + "…"
+            : tableText;
+        tableItemsRendered++;
+        if (e.table.warnings?.length) {
+          clipped += ` [warnings: ${e.table.warnings.join(", ")}]`;
+        }
+        if (e.table.structureScore != null && e.table.structureScore < 0.8) {
+          clipped += ` [structureQuality: ${(e.table.structureScore * 100).toFixed(0)}%]`;
+          tableQualityAnnotations++;
+        }
+        if (e.table.numericIntegrityScore != null && e.table.numericIntegrityScore < 0.9) {
+          clipped += ` [numericIntegrity: ${(e.table.numericIntegrityScore * 100).toFixed(0)}%]`;
+          tableQualityAnnotations++;
+        }
+      } else {
+        const snippet = (e.snippet || "").trim().replace(/\s+/g, " ");
+        if (snippet.length <= maxSnippetChars) {
+          clipped = snippet;
+        } else {
+          let truncAt = maxSnippetChars - 1;
+          // Match numeric+unit patterns that may straddle the cut point.
+          // Two flavours: prefix currencies (R$ 1,500,000, $200) and suffix units (12.5%, 1500 kg)
+          const unitPatterns =
+            /(?:R\$|\$|EUR)\s*[\d.,]+|\d[\d.,]*\s*(?:%|kg|months?|years?|days?|hours?|mil|milhões?|bilhões?)/gi;
+          let um: RegExpExecArray | null;
+          while ((um = unitPatterns.exec(snippet)) !== null) {
+            if (um.index < truncAt && um.index + um[0].length > truncAt) {
+              truncAt = um.index + um[0].length;
+              break;
+            }
+          }
+          clipped = snippet.slice(0, truncAt) + "…";
+        }
+      }
 
       const line = `- evidenceId=${evidenceId} | documentId=${e.docId} | locationKey=${locationKey} | title=${title}${loc ? ` | location=${loc}` : ""} | snippet=${clipped}`;
       if (sectionChars + line.length + 1 > maxSectionChars) {
@@ -1065,6 +1153,8 @@ export class LlmRequestBuilderService {
       text,
       charsIncluded: text.length,
       itemsIncluded,
+      tableItemsRendered,
+      tableQualityAnnotations,
     };
   }
 
