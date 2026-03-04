@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "id": "effective_date_resolution",
+    "version": "1.0.0",
+    "description": "Rules for resolving which document version governs based on effective dates, execution status, and version hierarchy.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/documents/revision.service.ts"],
+    "tests": ["tests/document-intelligence/effective-date-resolution.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "EDR_001",
+      "trigger": "Two versions exist: one with a later effective date and status=effective",
+      "resolution": "later_effective_date_governs",
+      "priority": 100,
+      "description": "When both documents are effective, the one with the later effective date governs.",
+      "labels": { "en": "Later effective date wins", "pt": "Data de vigência mais recente prevalece" }
+    },
+    {
+      "id": "EDR_002",
+      "trigger": "One document is signed/executed, the other is unsigned/draft",
+      "resolution": "signed_beats_unsigned",
+      "priority": 200,
+      "description": "A signed/executed document always takes precedence over an unsigned/draft version, regardless of date.",
+      "labels": { "en": "Signed beats unsigned", "pt": "Assinado prevalece sobre não assinado" }
+    },
+    {
+      "id": "EDR_003",
+      "trigger": "User asks for 'latest' version",
+      "resolution": "latest_means_effective_date_not_upload_date",
+      "priority": 150,
+      "description": "'Latest' always refers to the most recent effective date, never the most recent upload/ingestion date.",
+      "labels": { "en": "Latest = effective date", "pt": "Mais recente = data de vigência" }
+    },
+    {
+      "id": "EDR_004",
+      "trigger": "Draft version and executed version both exist",
+      "resolution": "draft_never_governs_over_executed",
+      "priority": 250,
+      "description": "A draft version never governs over an executed version. Drafts are informational only.",
+      "labels": { "en": "Draft never governs", "pt": "Rascunho nunca prevalece" }
+    },
+    {
+      "id": "EDR_005",
+      "trigger": "A restated version exists alongside prior amendments",
+      "resolution": "restated_supersedes_all_prior_amendments",
+      "priority": 300,
+      "description": "An 'Amended and Restated' document supersedes the original and all prior amendments. Only the restated version governs.",
+      "labels": { "en": "Restated supersedes all", "pt": "Consolidado substitui todos os anteriores" }
+    },
+    {
+      "id": "EDR_006",
+      "trigger": "Extension document exists for an expired agreement",
+      "resolution": "extension_revives_with_new_dates",
+      "priority": 180,
+      "description": "An extension document revives an expired agreement with new effective/expiry dates. The extended version governs.",
+      "labels": { "en": "Extension revives agreement", "pt": "Prorrogação revigora o contrato" }
+    },
+    {
+      "id": "EDR_007",
+      "trigger": "Termination document exists for an otherwise effective agreement",
+      "resolution": "termination_overrides_all",
+      "priority": 350,
+      "description": "A termination notice or agreement terminates the parent document regardless of its effective date.",
+      "labels": { "en": "Termination overrides", "pt": "Rescisão prevalece sobre todos" }
+    }
+  ]
+}
