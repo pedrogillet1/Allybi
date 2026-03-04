@@ -70,8 +70,13 @@ export class TelemetryService {
     }
   }
 
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.flushTimer) clearInterval(this.flushTimer);
+
+    // Drain the entire buffer (flush() processes 250 at a time)
+    while (this.buffer.length > 0) {
+      await this.flush();
+    }
   }
 
   /* ----------------------------- Public API ----------------------------- */

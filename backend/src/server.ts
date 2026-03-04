@@ -392,8 +392,17 @@ async function startServer() {
       console.log(`[Server] ${signal} received — shutting down gracefully...`);
       httpServer.close(() => {
         console.log("[Server] HTTP server closed.");
-        prisma
-          .$disconnect()
+
+        // Flush telemetry buffer before disconnecting Prisma (flush writes to DB)
+        (async () => {
+          try {
+            await telemetryService.shutdown();
+            console.log("[Server] Telemetry buffer flushed.");
+          } catch (err: unknown) {
+            console.warn("[Server] Telemetry flush failed:", (err as Error)?.message ?? String(err));
+          }
+        })()
+          .then(() => prisma.$disconnect())
           .then(() => {
             console.log("[Server] Database disconnected.");
             process.exit(0);
