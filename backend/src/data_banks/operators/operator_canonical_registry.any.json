@@ -1,0 +1,365 @@
+{
+  "_meta": {
+    "id": "operator_canonical_registry",
+    "version": "1.0.0",
+    "description": "Single source of truth for operator identity. Maps all alias conventions (intent_config, allybi_intents, editing_routing, collision_matrix) to canonical IDs.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/core/banks/dataBankLoader.service.ts"],
+    "tests": ["tests/certification/operator-registry-alignment.cert.test.ts"]
+  },
+  "config": { "enabled": true },
+  "operators": [
+    {
+      "canonicalId": "EDIT_PARAGRAPH",
+      "family": "editing",
+      "aliases": ["DOCX_REWRITE_PARAGRAPH", "DOCX_REWRITE_SECTION", "replace_text", "insert_paragraph"]
+    },
+    {
+      "canonicalId": "EDIT_SPAN",
+      "family": "editing",
+      "aliases": ["DOCX_REPLACE_SPAN", "DOCX_SET_RUN_STYLE"]
+    },
+    {
+      "canonicalId": "ADD_PARAGRAPH",
+      "family": "editing",
+      "aliases": ["DOCX_INSERT_AFTER", "DOCX_INSERT_BEFORE", "DOCX_DELETE_PARAGRAPH"]
+    },
+    {
+      "canonicalId": "EDIT_DOCX_BUNDLE",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EDIT_CELL",
+      "family": "editing",
+      "aliases": ["XLSX_SET_CELL_VALUE", "set_cell"]
+    },
+    {
+      "canonicalId": "EDIT_RANGE",
+      "family": "editing",
+      "aliases": ["XLSX_SET_RANGE_VALUES", "XLSX_SET_CELL_FORMULA", "XLSX_FORMAT_RANGE"]
+    },
+    {
+      "canonicalId": "ADD_SHEET",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "RENAME_SHEET",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "DELETE_SHEET",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "CREATE_CHART",
+      "family": "editing",
+      "aliases": ["XLSX_CHART_CREATE", "insert_chart", "create_chart"]
+    },
+    {
+      "canonicalId": "COMPUTE",
+      "family": "editing",
+      "aliases": ["python_calc", "excel_formula", "PY_COMPUTE"]
+    },
+    {
+      "canonicalId": "COMPUTE_BUNDLE",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "PY_CHART",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "PY_WRITEBACK",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "ADD_SLIDE",
+      "family": "editing",
+      "aliases": ["slide_insert"]
+    },
+    {
+      "canonicalId": "REWRITE_SLIDE_TEXT",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "REPLACE_SLIDE_IMAGE",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "insert_row",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "delete_row",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "add_column",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "delete_column",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "merge_cells",
+      "family": "editing",
+      "aliases": ["XLSX_MERGE_CELLS"]
+    },
+    {
+      "canonicalId": "slide_delete",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "slide_duplicate",
+      "family": "editing",
+      "aliases": []
+    },
+    {
+      "canonicalId": "chart_update",
+      "family": "editing",
+      "aliases": ["XLSX_CHART_SET_SERIES", "XLSX_CHART_SET_TITLES"]
+    },
+    {
+      "canonicalId": "open",
+      "family": "file_actions",
+      "aliases": ["file_open"]
+    },
+    {
+      "canonicalId": "list",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "filter",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "sort",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "group",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "locate_file",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "count_files",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "file_move",
+      "family": "file_actions",
+      "aliases": ["file_bulk_move", "file_multi_move"]
+    },
+    {
+      "canonicalId": "file_delete",
+      "family": "file_actions",
+      "aliases": ["file_bulk_delete"]
+    },
+    {
+      "canonicalId": "file_copy",
+      "family": "file_actions",
+      "aliases": ["file_bulk_copy"]
+    },
+    {
+      "canonicalId": "file_rename",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "folder_create",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "folder_move",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "folder_delete",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "folder_rename",
+      "family": "file_actions",
+      "aliases": []
+    },
+    {
+      "canonicalId": "summarize",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "extract",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "quote",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "compare",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "compute",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "locate_content",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "locate_docs",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "set_active_doc",
+      "family": "documents",
+      "aliases": []
+    },
+    {
+      "canonicalId": "CONNECT_START",
+      "family": "connectors",
+      "aliases": []
+    },
+    {
+      "canonicalId": "CONNECTOR_SYNC",
+      "family": "connectors",
+      "aliases": []
+    },
+    {
+      "canonicalId": "CONNECTOR_SEARCH",
+      "family": "connectors",
+      "aliases": []
+    },
+    {
+      "canonicalId": "CONNECTOR_STATUS",
+      "family": "connectors",
+      "aliases": []
+    },
+    {
+      "canonicalId": "CONNECTOR_DISCONNECT",
+      "family": "connectors",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EMAIL_LATEST",
+      "family": "email",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EMAIL_EXPLAIN_LATEST",
+      "family": "email",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EMAIL_SUMMARIZE_PREVIOUS",
+      "family": "email",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EMAIL_DRAFT",
+      "family": "email",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EMAIL_SEND",
+      "family": "email",
+      "aliases": []
+    },
+    {
+      "canonicalId": "EMAIL_DOC_FUSION",
+      "family": "email",
+      "aliases": []
+    },
+    {
+      "canonicalId": "count_pages",
+      "family": "doc_stats",
+      "aliases": []
+    },
+    {
+      "canonicalId": "count_slides",
+      "family": "doc_stats",
+      "aliases": []
+    },
+    {
+      "canonicalId": "count_sheets",
+      "family": "doc_stats",
+      "aliases": []
+    },
+    {
+      "canonicalId": "capabilities",
+      "family": "help",
+      "aliases": []
+    },
+    {
+      "canonicalId": "how_to",
+      "family": "help",
+      "aliases": []
+    },
+    {
+      "canonicalId": "greeting",
+      "family": "conversation",
+      "aliases": []
+    },
+    {
+      "canonicalId": "thanks",
+      "family": "conversation",
+      "aliases": []
+    },
+    {
+      "canonicalId": "goodbye",
+      "family": "conversation",
+      "aliases": []
+    },
+    {
+      "canonicalId": "ack",
+      "family": "conversation",
+      "aliases": []
+    },
+    {
+      "canonicalId": "error",
+      "family": "error",
+      "aliases": []
+    },
+    {
+      "canonicalId": "delete_paragraph",
+      "family": "editing",
+      "aliases": ["DOCX_DELETE_PARAGRAPH"]
+    }
+  ]
+}
