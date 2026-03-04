@@ -275,7 +275,7 @@ export function extractTablesFromText(text: string): TableExtractionResult {
     const originalText = tableLines.join("\n");
 
     // Add a marker before and after for clarity
-    const markdownBlock = `\n[TABLE START]\n${table.markdown}[TABLE END]\n`;
+    const markdownBlock = `\n${table.markdown}`;
     resultText = resultText.replace(originalText, markdownBlock);
   }
 

@@ -76,6 +76,29 @@ describe("pdfTableExtractor", () => {
     });
   });
 
+  describe("table marker cleanup", () => {
+    it("does not inject TABLE START/END markers into output", () => {
+      const text = [
+        "Revenue     2024   2023",
+        "Growth      15%    12%",
+        "Margin      22%    19%",
+      ].join("\n");
+      const result = extractTablesFromText(text);
+      expect(result.text).not.toContain("[TABLE START]");
+      expect(result.text).not.toContain("[TABLE END]");
+    });
+
+    it("output contains pipe-delimited markdown table", () => {
+      const text = [
+        "Revenue     2024   2023",
+        "Growth      15%    12%",
+      ].join("\n");
+      const result = extractTablesFromText(text);
+      expect(result.text).toContain("|");
+      expect(result.text).toContain("---");
+    });
+  });
+
   describe("column position detection", () => {
     it("correctly splits rows by detected column positions", () => {
       const text = [
