@@ -47,21 +47,36 @@ const KNOWN_WATERMARK_PATTERNS: RegExp[] = [
 // ============================================================================
 
 /**
- * Clean up extracted text (same logic as textExtraction.service.ts)
+ * Clean up extracted text while preserving layout structure needed for
+ * downstream table detection.
+ *
+ * Key invariants:
+ * - Newlines are preserved (not collapsed to spaces)
+ * - Multi-space gaps (3+ spaces) are preserved for table column detection
+ * - Runs of 2 spaces are collapsed to 1 (general cleanup)
+ * - 3+ consecutive blank lines are collapsed to 2
+ * - Punctuation spacing is normalised
  */
-function postProcessText(text: string): string {
+export function postProcessText(text: string): string {
   if (!text || text.trim().length === 0) {
     return text;
   }
 
   let cleaned = text;
 
-  // Fix spacing issues
-  cleaned = cleaned.replace(/\s+/g, " ");
+  // Collapse runs of spaces/tabs on the SAME LINE but preserve multi-space
+  // gaps (3+ chars) that the table extractor relies on (\s{3,}).
+  // [^\S\n]+ matches horizontal whitespace only (excludes newlines).
+  cleaned = cleaned.replace(/[^\S\n]+/g, (match) => {
+    if (match.length >= 3) return match; // preserve table column gaps
+    return " ";
+  });
+
+  // Collapse 3+ consecutive blank lines to 2
   cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
 
   // Fix punctuation spacing
-  cleaned = cleaned.replace(/\s+([.,!?;:])/g, "$1");
+  cleaned = cleaned.replace(/ +([.,!?;:])/g, "$1");
   cleaned = cleaned.replace(/([.,!?;:])(\S)/g, "$1 $2");
 
   return cleaned.trim();
