@@ -1282,9 +1282,7 @@ export class RetrievalEngineService {
     // Note: semantic_search_config may cap candidate docs; keep all here, cap later.
     return {
       candidateDocIds: allDocIdsCapped,
-      hardScopeActive: Boolean(
-        activeDocId || explicitDocId || signals.hardScopeActive,
-      ),
+      hardScopeActive: Boolean(signals.hardScopeActive),
       sheetName: signals.resolvedSheetName ?? null,
       rangeA1: signals.resolvedRangeA1 ?? null,
     };
