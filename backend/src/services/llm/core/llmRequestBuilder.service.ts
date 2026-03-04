@@ -98,15 +98,13 @@ export interface EvidencePackLike {
     score?: { finalScore?: number };
     evidenceType?: "text" | "table" | "image";
   }>;
-  debug?: {
-    conflicts?: Array<{
-      metric: string;
-      docA: string;
-      valueA: number;
-      docB: string;
-      valueB: number;
-    }>;
-  };
+  conflicts?: Array<{
+    metric: string;
+    docA: string;
+    valueA: number;
+    docB: string;
+    valueB: number;
+  }>;
 }
 
 /**
@@ -938,9 +936,9 @@ export class LlmRequestBuilderService {
 
     // Cross-doc conflict warnings (from retrieval engine detection)
     if (
-      input.evidencePack?.debug?.conflicts?.length
+      input.evidencePack?.conflicts?.length
     ) {
-      const conflicts = input.evidencePack.debug.conflicts.slice(0, 5);
+      const conflicts = input.evidencePack.conflicts.slice(0, 5);
       const conflictBlock = [
         "### Data Conflicts Detected",
         "The following metrics differ across documents. Flag uncertainty explicitly in your answer:",

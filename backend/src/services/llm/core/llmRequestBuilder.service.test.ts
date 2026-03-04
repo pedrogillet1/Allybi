@@ -480,17 +480,15 @@ describe("LlmRequestBuilderService", () => {
               score: { finalScore: 0.79 },
             },
           ],
-          debug: {
-            conflicts: [
-              {
-                metric: "revenue",
-                docA: "doc-A",
-                valueA: 1500000,
-                docB: "doc-B",
-                valueB: 2100000,
-              },
-            ],
-          },
+          conflicts: [
+            {
+              metric: "revenue",
+              docA: "doc-A",
+              valueA: 1500000,
+              docB: "doc-B",
+              valueB: 2100000,
+            },
+          ],
         },
       }),
     );

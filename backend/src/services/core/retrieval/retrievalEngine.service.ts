@@ -323,6 +323,14 @@ export interface EvidencePack {
 
   evidence: EvidenceItem[];
 
+  conflicts?: Array<{
+    metric: string;
+    docA: string;
+    valueA: number;
+    docB: string;
+    valueB: number;
+  }>;
+
   // Debug is *engine-side only*. Never print to user.
   debug?: {
     phases: Array<{ phaseId: string; candidates: number; note?: string }>;
@@ -3937,10 +3945,10 @@ export class RetrievalEngineService {
         scoreGap,
       },
       evidence,
+      conflicts: this.detectEvidenceConflicts(evidence),
       debug: {
         phases: [],
         reasonCodes: [],
-        conflicts: this.detectEvidenceConflicts(evidence),
       },
     };
 

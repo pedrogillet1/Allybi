@@ -715,6 +715,7 @@ function toEngineEvidencePack(pack: EvidencePack | null) {
       },
       evidenceType: item.evidenceType,
     })),
+    conflicts: pack.conflicts,
   };
 }
 
