@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "id": "wrong_section_lock",
+    "version": "1.0.0",
+    "description": "Wrong-section and wrong-table prevention rules. Parallel to wrong_doc_lock but operates at sub-document granularity.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/core/retrieval/retrievalEngine.service.ts"],
+    "tests": ["tests/document-intelligence/wrong-section-lock.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true
+  },
+  "rules": [
+    {
+      "id": "WSL_001_section_mismatch_explicit_ref",
+      "trigger": "User asked about a specific section (e.g., 'the termination clause') but the answer's evidence comes from a different section.",
+      "action": "FILTER_WRONG_SECTION_EVIDENCE",
+      "severity": "warning",
+      "example": "User asks 'What does the termination clause say?' but answer cites the indemnification section."
+    },
+    {
+      "id": "WSL_002_table_mismatch_explicit_ref",
+      "trigger": "User asked about a specific table but the answer's evidence comes from a different table in the same document.",
+      "action": "FILTER_WRONG_TABLE_EVIDENCE",
+      "severity": "warning",
+      "example": "User asks 'Show the balance sheet' but answer cites the income statement table."
+    },
+    {
+      "id": "WSL_003_clause_number_mismatch",
+      "trigger": "User referenced a specific clause number but evidence comes from a different clause number.",
+      "action": "FILTER_WRONG_CLAUSE",
+      "severity": "error",
+      "example": "User asks 'What does Section 4.2 say?' but evidence is from Section 6.1."
+    },
+    {
+      "id": "WSL_004_section_lock_persists_followup",
+      "trigger": "Follow-up query doesn't mention a section but previous turn was section-locked.",
+      "action": "MAINTAIN_SECTION_LOCK",
+      "severity": "info"
+    },
+    {
+      "id": "WSL_005_section_lock_release_on_new_ref",
+      "trigger": "User explicitly references a different section in the same document.",
+      "action": "SWITCH_SECTION_LOCK",
+      "severity": "info"
+    },
+    {
+      "id": "WSL_006_section_lock_release_on_broad_query",
+      "trigger": "User asks a cross-section question (e.g., 'Summarize the whole agreement').",
+      "action": "RELEASE_SECTION_LOCK",
+      "severity": "info"
+    },
+    {
+      "id": "WSL_007_section_not_found",
+      "trigger": "User references a section that doesn't exist in the document's section ontology.",
+      "action": "EMIT_SECTION_NOT_FOUND",
+      "severity": "warning",
+      "example": "User asks 'What does the arbitration clause say?' but the document has no arbitration clause."
+    },
+    {
+      "id": "WSL_008_multi_section_answer_disclosure",
+      "trigger": "Answer synthesizes from multiple sections without the user requesting cross-section analysis.",
+      "action": "REQUIRE_SECTION_DISCLOSURE",
+      "severity": "info"
+    }
+  ]
+}
