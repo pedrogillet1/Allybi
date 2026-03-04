@@ -64,3 +64,13 @@ describe("cross_domain_tiebreak_policy", () => {
     expect(match).toBeTruthy();
   });
 });
+
+describe("cross_domain_tiebreak wiring proof", () => {
+  it("bankSelectionPlanner.service.ts references cross_domain_tiebreak_policy", () => {
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "../../services/core/banks/bankSelectionPlanner.service.ts"),
+      "utf-8",
+    );
+    expect(src).toContain("cross_domain_tiebreak_policy");
+  });
+});
