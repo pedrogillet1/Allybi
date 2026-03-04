@@ -223,6 +223,9 @@ export interface CandidateChunk {
     structureScore?: number;
     numericIntegrityScore?: number;
     warnings?: string[];
+    unitAnnotation?: { unitRaw: string; unitNormalized: string } | null;
+    scaleFactor?: string | null;
+    footnotes?: string[] | null;
   } | null;
 
   // Scoring components (0..1)
