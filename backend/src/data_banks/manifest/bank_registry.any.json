@@ -1933,6 +1933,32 @@
       "lastUpdated": "2026-03-03"
     },
     {
+      "id": "cross_domain_tiebreak_policy",
+      "category": "quality",
+      "path": "quality/document_intelligence/cross_domain_tiebreak_policy.any.json",
+      "filename": "cross_domain_tiebreak_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "doc_taxonomy"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "c4d51609adfff282f0773e772abc7e97df997c25ff3fd76a946999d8625bfaca",
+      "lastUpdated": "2026-03-04"
+    },
+    {
       "id": "crossdoc_alignment_rules",
       "category": "semantics",
       "path": "document_intelligence/retrieval/crossdoc_alignment_rules.any.json",
@@ -33198,6 +33224,32 @@
       "lastUpdated": "2026-03-03"
     },
     {
+      "id": "effective_date_resolution",
+      "category": "patterns",
+      "path": "patterns/doc_refs/effective_date_resolution.any.json",
+      "filename": "effective_date_resolution.any.json",
+      "version": "1.0.0",
+      "contentType": "rules",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "patterns_doc_refs_versioning_patterns"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "8abfbafbcfaa74bb73918aa8ee4cba0e2f4c261c2aab75335aa52e8439006703",
+      "lastUpdated": "2026-03-04"
+    },
+    {
       "id": "patterns_doc_refs_folder_scope_patterns",
       "category": "semantics",
       "filename": "folder_scope_patterns.any.json",
@@ -36417,6 +36469,126 @@
       "dependsOn": []
     },
     {
+      "id": "table_header_ontology_education",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.education.any.json",
+      "filename": "table_header_ontology.education.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lastUpdated": "2026-03-04"
+    },
+    {
+      "id": "table_header_ontology_housing",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.housing.any.json",
+      "filename": "table_header_ontology.housing.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lastUpdated": "2026-03-04"
+    },
+    {
+      "id": "table_header_ontology_hr_payroll",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.hr_payroll.any.json",
+      "filename": "table_header_ontology.hr_payroll.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lastUpdated": "2026-03-04"
+    },
+    {
+      "id": "table_header_ontology_identity",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.identity.any.json",
+      "filename": "table_header_ontology.identity.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lastUpdated": "2026-03-04"
+    },
+    {
+      "id": "table_header_ontology_travel",
+      "category": "semantics",
+      "path": "semantics/structure/table_header_ontology.travel.any.json",
+      "filename": "table_header_ontology.travel.any.json",
+      "version": "1.1.0",
+      "contentType": "json",
+      "schemaId": "bank_schema",
+      "dependsOn": [],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "lastUpdated": "2026-03-04"
+    },
+    {
       "id": "table_render_policy",
       "category": "semantics",
       "path": "document_intelligence/compose/table_render_policy.any.json",
@@ -37088,6 +37260,52 @@
       },
       "dependsOn": [],
       "checksumSha256": "36cb6fe5d9ae2b8418ff4efaa63da03f2812ad7463e9c369694224607539c4eb"
+    },
+    {
+      "id": "section_disambiguation_policy",
+      "category": "ambiguity",
+      "path": "ambiguity/section_disambiguation_policy.any.json",
+      "filename": "section_disambiguation_policy.any.json",
+      "version": "1.0.0",
+      "contentType": "policy",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-04",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "dependsOn": ["disambiguation_policies", "di_section_ontology"]
+    },
+    {
+      "id": "amendment_chain_schema",
+      "category": "semantics",
+      "filename": "amendment_chain_schema.any.json",
+      "path": "patterns/doc_refs/amendment_chain_schema.any.json",
+      "version": "1.0.0",
+      "contentType": "schema",
+      "schemaId": "bank_schema",
+      "lastUpdated": "2026-03-04",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "dependsOn": ["patterns_doc_refs_versioning_patterns"]
     }
   ],
   "tests": [

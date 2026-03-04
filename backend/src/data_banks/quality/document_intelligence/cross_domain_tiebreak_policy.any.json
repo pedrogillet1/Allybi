@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "id": "cross_domain_tiebreak_policy",
+    "version": "1.0.0",
+    "description": "Deterministic tiebreak rules when a document matches detection rules in two or more domains simultaneously. The winner domain takes priority for doc-type assignment.",
+    "languages": ["any"],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": ["services/core/banks/bankSelectionPlanner.service.ts"],
+    "tests": ["tests/document-intelligence/cross-domain-tiebreak.test.ts"]
+  },
+  "config": {
+    "enabled": true,
+    "deterministic": true,
+    "fallbackBehavior": "prefer_specialized_domain"
+  },
+  "rules": [
+    {
+      "id": "TBK_001",
+      "domainA": "billing",
+      "domainB": "everyday",
+      "winner": "billing",
+      "confidenceBoost": 0.1,
+      "reason": "Billing is the specialized domain for utility bills; everyday is a catch-all. Prefer specificity."
+    },
+    {
+      "id": "TBK_002",
+      "domainA": "medical",
+      "domainB": "billing",
+      "winner": "medical",
+      "confidenceBoost": 0.15,
+      "reason": "Medical documents require domain-specific safety rules and disclaimers. Medical takes precedence over generic billing."
+    },
+    {
+      "id": "TBK_003",
+      "domainA": "medical",
+      "domainB": "insurance",
+      "winner": "medical",
+      "confidenceBoost": 0.1,
+      "reason": "Medical content (lab reports, clinical notes) takes precedence. Insurance EOBs stay in insurance domain."
+    },
+    {
+      "id": "TBK_004",
+      "domainA": "legal",
+      "domainB": "hr_payroll",
+      "winner": "legal",
+      "confidenceBoost": 0.1,
+      "reason": "Employment agreements are legal instruments first. HR/payroll handles pay stubs and operational docs."
+    },
+    {
+      "id": "TBK_005",
+      "domainA": "finance",
+      "domainB": "accounting",
+      "winner": "finance",
+      "confidenceBoost": 0.05,
+      "reason": "When a financial statement matches both, prefer finance for investor-facing docs. Accounting handles internal ledgers and GL."
+    },
+    {
+      "id": "TBK_006",
+      "domainA": "housing",
+      "domainB": "billing",
+      "winner": "housing",
+      "confidenceBoost": 0.1,
+      "reason": "Mortgage statements and property tax bills are housing-specific. Generic billing is for utilities."
+    },
+    {
+      "id": "TBK_007",
+      "domainA": "tax",
+      "domainB": "accounting",
+      "winner": "tax",
+      "confidenceBoost": 0.1,
+      "reason": "Tax returns and notices are tax-specific. Accounting handles internal tax reconciliation worksheets."
+    },
+    {
+      "id": "TBK_008",
+      "domainA": "identity",
+      "domainB": "everyday",
+      "winner": "identity",
+      "confidenceBoost": 0.15,
+      "reason": "Identity documents (passport, driver license) require specialized extraction. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_009",
+      "domainA": "insurance",
+      "domainB": "billing",
+      "winner": "insurance",
+      "confidenceBoost": 0.1,
+      "reason": "Insurance premium invoices are insurance-specific. Generic billing handles utility invoices."
+    },
+    {
+      "id": "TBK_010",
+      "domainA": "banking",
+      "domainB": "finance",
+      "winner": "banking",
+      "confidenceBoost": 0.1,
+      "reason": "Consumer bank statements belong to banking. Finance handles investment-grade financial reports."
+    },
+    {
+      "id": "TBK_011",
+      "domainA": "banking",
+      "domainB": "everyday",
+      "winner": "banking",
+      "confidenceBoost": 0.12,
+      "reason": "Bank statements are banking-specific. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_012",
+      "domainA": "education",
+      "domainB": "everyday",
+      "winner": "education",
+      "confidenceBoost": 0.1,
+      "reason": "Transcripts and diplomas are education-specific. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_013",
+      "domainA": "travel",
+      "domainB": "everyday",
+      "winner": "travel",
+      "confidenceBoost": 0.1,
+      "reason": "Boarding passes and itineraries are travel-specific. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_014",
+      "domainA": "hr_payroll",
+      "domainB": "everyday",
+      "winner": "hr_payroll",
+      "confidenceBoost": 0.1,
+      "reason": "Pay stubs and offer letters are HR-specific. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_015",
+      "domainA": "tax",
+      "domainB": "everyday",
+      "winner": "tax",
+      "confidenceBoost": 0.12,
+      "reason": "Tax returns are tax-specific. Everyday is a catch-all."
+    },
+    {
+      "id": "TBK_016",
+      "domainA": "medical",
+      "domainB": "everyday",
+      "winner": "medical",
+      "confidenceBoost": 0.2,
+      "reason": "Medical documents require safety boundaries. Must never be treated as everyday."
+    },
+    {
+      "id": "TBK_017",
+      "domainA": "legal",
+      "domainB": "everyday",
+      "winner": "legal",
+      "confidenceBoost": 0.2,
+      "reason": "Legal contracts require clause-level extraction. Must never be treated as everyday."
+    },
+    {
+      "id": "TBK_018",
+      "domainA": "finance",
+      "domainB": "everyday",
+      "winner": "finance",
+      "confidenceBoost": 0.2,
+      "reason": "Financial statements require numeric integrity rules. Must never be treated as everyday."
+    }
+  ]
+}
