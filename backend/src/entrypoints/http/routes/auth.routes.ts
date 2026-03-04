@@ -47,7 +47,6 @@ const router = Router();
 
 const REFRESH_TOKEN_PEPPER =
   process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || "";
-const AUTH_URL_TOKEN_COMPAT = process.env.AUTH_URL_TOKEN_COMPAT === "true";
 
 function hmacSha256(input: string): string {
   return crypto
@@ -135,17 +134,6 @@ async function handleOAuthUser(
 
     // Set HTTP-only cookies (Safari-resilient)
     setAuthCookies(res, accessToken, refreshToken);
-    if (AUTH_URL_TOKEN_COMPAT) {
-      // Temporary compatibility mode for older frontend builds.
-      const params = new URLSearchParams({
-        accessToken,
-        refreshToken,
-        auth: "ok",
-      });
-      return res.redirect(
-        `${config.FRONTEND_URL}/a/x7k2m9/c3b?${params.toString()}`,
-      );
-    }
     return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?auth=ok`);
   } catch (e: any) {
     console.error("[OAuth] Error handling user:", e?.message || e);
