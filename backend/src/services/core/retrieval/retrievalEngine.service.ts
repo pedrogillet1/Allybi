@@ -2433,13 +2433,13 @@ export class RetrievalEngineService {
       .map((line) => line.trim())
       .filter(Boolean);
     if (lines.length < 2) return null;
+    // Only use pipe or tab delimiters — comma is too noisy (conflicts with
+    // numeric formatting like "$1,250") and produces false-positive tables.
     const delimiter = lines.some((line) => line.includes("|"))
       ? "|"
       : lines.some((line) => line.includes("\t"))
         ? "\t"
-        : lines.some((line) => line.includes(","))
-          ? ","
-          : "";
+        : "";
     if (!delimiter) return null;
 
     const parsed = lines
@@ -2454,7 +2454,11 @@ export class RetrievalEngineService {
     const header = parsed[0];
     const rows = parsed.slice(1, maxRows + 1).map((row) =>
       row.map((cell) => {
-        const numeric = Number(cell.replace(/[,$%]/g, ""));
+        // Preserve cells that contain unit indicators (currency, percent, etc.)
+        const hasUnitIndicator = /[$%€£¥R\$]/.test(cell);
+        if (hasUnitIndicator) return cell;
+        const stripped = cell.replace(/,/g, "");
+        const numeric = Number(stripped);
         if (Number.isFinite(numeric) && cell.match(/[0-9]/)) return numeric;
         return cell;
       }),
