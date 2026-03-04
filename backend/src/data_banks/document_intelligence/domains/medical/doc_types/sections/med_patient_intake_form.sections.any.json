@@ -1,0 +1,117 @@
+{
+  "_meta": {
+    "id": "medical_med_patient_intake_form_sections",
+    "version": "2.0.0",
+    "description": "Section anchors for Patient Intake Form.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-03-04",
+    "owner": "data-bank-governance",
+    "usedBy": [
+      "services/core/banks/dataBankLoader.service.ts"
+    ],
+    "tests": [
+      "tests/patternWiringProof.test.ts"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "domain": "medical",
+    "docType": "med_patient_intake_form"
+  },
+  "sections": [
+    {
+      "id": "document_header",
+      "name": {
+        "en": "Document Header",
+        "pt": "Cabecalho do Documento"
+      },
+      "required": true,
+      "order": 1,
+      "headingAnchors": [
+        "Document Header",
+        "Cabecalho do Documento",
+        "patient intake",
+        "new patient form",
+        "Patient Intake Form Document Header"
+      ]
+    },
+    {
+      "id": "patient_demographics",
+      "name": {
+        "en": "Patient Demographics",
+        "pt": "Dados Demograficos do Paciente"
+      },
+      "required": true,
+      "order": 2,
+      "headingAnchors": [
+        "Patient Demographics",
+        "Dados Demograficos",
+        "personal information",
+        "patient information"
+      ]
+    },
+    {
+      "id": "insurance_information",
+      "name": {
+        "en": "Insurance Information",
+        "pt": "Informacoes do Seguro"
+      },
+      "required": true,
+      "order": 3,
+      "headingAnchors": [
+        "Insurance Information",
+        "Informacoes do Seguro",
+        "insurance",
+        "coverage",
+        "payer"
+      ]
+    },
+    {
+      "id": "medical_history",
+      "name": {
+        "en": "Medical History",
+        "pt": "Historico Medico"
+      },
+      "required": true,
+      "order": 4,
+      "headingAnchors": [
+        "Medical History",
+        "Historico Medico",
+        "past medical history",
+        "surgical history"
+      ]
+    },
+    {
+      "id": "current_medications",
+      "name": {
+        "en": "Current Medications",
+        "pt": "Medicamentos Atuais"
+      },
+      "required": false,
+      "order": 5,
+      "headingAnchors": [
+        "Current Medications",
+        "Medicamentos Atuais",
+        "medications",
+        "prescriptions"
+      ]
+    },
+    {
+      "id": "emergency_contact",
+      "name": {
+        "en": "Emergency Contact",
+        "pt": "Contato de Emergencia"
+      },
+      "required": false,
+      "order": 6,
+      "headingAnchors": [
+        "Emergency Contact",
+        "Contato de Emergencia",
+        "emergency",
+        "next of kin"
+      ]
+    }
+  ]
+}

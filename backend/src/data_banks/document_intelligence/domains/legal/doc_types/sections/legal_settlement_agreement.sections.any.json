@@ -25,18 +25,18 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "required": true,
       "order": 1,
       "headingAnchors": [
         "Document Header",
-        "Cabecalho do Documento",
+        "Cabeçalho do Documento",
         "title",
         "agreement date",
         "version",
         "Settlement Agreement Document Header",
-        "Acordo de Transacao Cabecalho do Documento"
+        "Acordo de Transação Cabeçalho do Documento"
       ]
     },
     {
@@ -54,7 +54,7 @@
         "party",
         "counterparty",
         "Settlement Agreement Parties",
-        "Acordo de Transacao Partes"
+        "Acordo de Transação Partes"
       ]
     },
     {
@@ -72,7 +72,7 @@
         "background",
         "purpose",
         "Settlement Agreement Recitals and Background",
-        "Acordo de Transacao Considerandos e Contexto"
+        "Acordo de Transação Considerandos e Contexto"
       ]
     },
     {
@@ -90,7 +90,7 @@
         "defined terms",
         "definition",
         "Settlement Agreement Definitions",
-        "Acordo de Transacao Definicoes"
+        "Acordo de Transação Definicoes"
       ]
     },
     {
@@ -108,7 +108,7 @@
         "services",
         "statement of work",
         "Settlement Agreement Scope of Services / Subject Matter",
-        "Acordo de Transacao Escopo de Servicos / Objeto"
+        "Acordo de Transação Escopo de Servicos / Objeto"
       ]
     },
     {
@@ -126,7 +126,7 @@
         "payment",
         "invoice",
         "Settlement Agreement Fees and Payment Terms",
-        "Acordo de Transacao Remuneracao e Pagamento"
+        "Acordo de Transação Remuneracao e Pagamento"
       ]
     },
     {
@@ -144,25 +144,25 @@
         "renewal",
         "commencement",
         "Settlement Agreement Term and Renewal",
-        "Acordo de Transacao Prazo e Renovacao"
+        "Acordo de Transação Prazo e Renovacao"
       ]
     },
     {
       "id": "termination",
       "name": {
         "en": "Termination",
-        "pt": "Rescisao"
+        "pt": "Rescisão"
       },
       "required": true,
       "order": 8,
       "headingAnchors": [
         "Termination",
-        "Rescisao",
+        "Rescisão",
         "terminate",
         "termination for cause",
         "survival",
         "Settlement Agreement Termination",
-        "Acordo de Transacao Rescisao"
+        "Acordo de Transação Rescisão"
       ]
     },
     {
@@ -180,7 +180,7 @@
         "privacy",
         "personal data",
         "Settlement Agreement Confidentiality and Privacy",
-        "Acordo de Transacao Confidencialidade e Privacidade"
+        "Acordo de Transação Confidencialidade e Privacidade"
       ]
     },
     {
@@ -198,7 +198,7 @@
         "compliance",
         "controls",
         "Settlement Agreement Security and Compliance",
-        "Acordo de Transacao Seguranca e Conformidade"
+        "Acordo de Transação Seguranca e Conformidade"
       ]
     },
     {
@@ -216,7 +216,7 @@
         "license grant",
         "ownership",
         "Settlement Agreement IP and License",
-        "Acordo de Transacao Propriedade Intelectual e Licenca"
+        "Acordo de Transação Propriedade Intelectual e Licenca"
       ]
     },
     {
@@ -234,7 +234,7 @@
         "indemnify",
         "damages",
         "Settlement Agreement Liability and Indemnity",
-        "Acordo de Transacao Responsabilidade e Indenizacao"
+        "Acordo de Transação Responsabilidade e Indenizacao"
       ]
     },
     {
@@ -252,7 +252,7 @@
         "jurisdiction",
         "arbitration",
         "Settlement Agreement Dispute Resolution",
-        "Acordo de Transacao Resolucao de Disputas"
+        "Acordo de Transação Resolucao de Disputas"
       ]
     },
     {
@@ -270,7 +270,7 @@
         "assignment",
         "entire agreement",
         "Settlement Agreement Notices and Miscellaneous",
-        "Acordo de Transacao Notificacoes e Disposicoes Gerais"
+        "Acordo de Transação Notificacoes e Disposicoes Gerais"
       ]
     },
     {
@@ -288,7 +288,7 @@
         "executed",
         "authorized signatory",
         "Settlement Agreement Signatures",
-        "Acordo de Transacao Assinaturas"
+        "Acordo de Transação Assinaturas"
       ]
     },
     {
@@ -306,7 +306,7 @@
         "annex",
         "appendix",
         "Settlement Agreement Annexes and Schedules",
-        "Acordo de Transacao Anexos e Apensos"
+        "Acordo de Transação Anexos e Apensos"
       ]
     }
   ]

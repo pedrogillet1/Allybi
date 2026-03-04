@@ -25,18 +25,18 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "required": true,
       "order": 1,
       "headingAnchors": [
         "Document Header",
-        "Cabecalho do Documento",
+        "Cabeçalho do Documento",
         "title",
         "agreement date",
         "version",
         "Security Policy Document Header",
-        "Politica de Seguranca Cabecalho do Documento"
+        "Politica de Seguranca Cabeçalho do Documento"
       ]
     },
     {
@@ -151,18 +151,18 @@
       "id": "termination",
       "name": {
         "en": "Termination",
-        "pt": "Rescisao"
+        "pt": "Rescisão"
       },
       "required": true,
       "order": 8,
       "headingAnchors": [
         "Termination",
-        "Rescisao",
+        "Rescisão",
         "terminate",
         "termination for cause",
         "survival",
         "Security Policy Termination",
-        "Politica de Seguranca Rescisao"
+        "Politica de Seguranca Rescisão"
       ]
     },
     {

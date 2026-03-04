@@ -25,18 +25,18 @@
       "id": "document_header",
       "name": {
         "en": "Document Header",
-        "pt": "Cabecalho do Documento"
+        "pt": "Cabeçalho do Documento"
       },
       "required": true,
       "order": 1,
       "headingAnchors": [
         "Document Header",
-        "Cabecalho do Documento",
+        "Cabeçalho do Documento",
         "document id",
         "encounter",
         "record number",
         "Progress Note Document Header",
-        "Nota de Evolucao Cabecalho do Documento"
+        "Nota de Evolucao Cabeçalho do Documento"
       ]
     },
     {
