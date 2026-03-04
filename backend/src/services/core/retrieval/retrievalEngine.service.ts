@@ -3542,6 +3542,19 @@ export class RetrievalEngineService {
       }
     }
 
+    // SCP: Extend truncation to preserve negation context
+    const negPattern =
+      /\b(not|never|no|excluding|without|except|none|nem|não|nunca|exceto|sem)\b\s+\S{3,}/gi;
+    let negMatch: RegExpExecArray | null;
+    while ((negMatch = negPattern.exec(snippet)) !== null) {
+      const nStart = negMatch.index;
+      const nEnd = nStart + negMatch[0].length;
+      if (nStart < truncPoint && nEnd > truncPoint) {
+        truncPoint = nEnd;
+        break;
+      }
+    }
+
     const sentenceBoundary = snippet.lastIndexOf(". ", truncPoint);
     const newlineBoundary = snippet.lastIndexOf("\n", truncPoint);
     const boundary = Math.max(sentenceBoundary, newlineBoundary);
@@ -3771,7 +3784,7 @@ export class RetrievalEngineService {
         filename: c.filename ?? null,
         location: c.location,
         locationKey: c.locationKey,
-        snippet: c.type === "text"
+        snippet: c.snippet
           ? this.compressSnippet(c.snippet, {
               maxChars: maxSnippetChars,
               preserveNumericUnits,
